@@ -1,7 +1,7 @@
 {
   "indices.reload_search_analyzers":{
     "documentation":{
-      "url":"https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-reload-analyzers.html",
+      "url":" https://opensearch.org/docs/",
       "description":"Reloads an index's search analyzers and their resources."
     },
     "stability" : "stable",

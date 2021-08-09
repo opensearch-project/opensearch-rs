@@ -24,10 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Migration APIs
-//!
-//! [Simplify upgrading X-Pack indices from one version to another](https://www.elastic.co/guide/en/elasticsearch/reference/master/migration-api.html).
-
 #![allow(unused_imports)]
 use crate::{
     client::Elasticsearch,
@@ -69,7 +65,7 @@ impl<'b> MigrationDeprecationsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Migration Deprecations API](https://www.elastic.co/guide/en/elasticsearch/reference/7.11/migration-api-deprecation.html)\n\nRetrieves information about different cluster, node, and index level settings that use deprecated features that will be removed or changed in the next major version."]
+#[doc = "Builder for the [Migration Deprecations API](https://opensearch.org/docs/)\n\nRetrieves information about different cluster, node, and index level settings that use deprecated features that will be removed or changed in the next major version."]
 #[derive(Clone, Debug)]
 pub struct MigrationDeprecations<'a, 'b> {
     transport: &'a Transport,
@@ -179,7 +175,7 @@ impl<'a> Migration<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Migration Deprecations API](https://www.elastic.co/guide/en/elasticsearch/reference/7.11/migration-api-deprecation.html)\n\nRetrieves information about different cluster, node, and index level settings that use deprecated features that will be removed or changed in the next major version."]
+    #[doc = "[Migration Deprecations API](https://opensearch.org/docs/)\n\nRetrieves information about different cluster, node, and index level settings that use deprecated features that will be removed or changed in the next major version."]
     pub fn deprecations<'b>(
         &'a self,
         parts: MigrationDeprecationsParts<'b>,

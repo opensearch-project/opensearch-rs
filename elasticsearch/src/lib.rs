@@ -380,16 +380,13 @@ pub mod params;
 pub mod cat;
 pub mod cluster;
 pub mod dangling_indices;
-pub mod graph;
 pub mod indices;
 pub mod ingest;
 pub mod migration;
-pub mod monitoring;
 pub mod nodes;
 pub mod snapshot;
 pub mod tasks;
 pub mod text_structure;
-pub mod transform;
 // GENERATED-END
 
 mod client;

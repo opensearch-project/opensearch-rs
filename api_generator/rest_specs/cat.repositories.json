@@ -1,7 +1,7 @@
 {
   "cat.repositories":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"Returns information about snapshot repositories registered in the cluster."
     },
     "stability":"stable",

@@ -1,7 +1,7 @@
 {
   "update_by_query":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"Performs an update on every document in the index without changing the source,\nfor example to pick up a mapping change."
     },
     "stability":"stable",

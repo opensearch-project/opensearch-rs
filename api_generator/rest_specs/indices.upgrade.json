@@ -1,7 +1,7 @@
 {
   "indices.upgrade":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"DEPRECATED Upgrades to the current version of Lucene."
     },
     "stability":"stable",

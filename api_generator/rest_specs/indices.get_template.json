@@ -1,7 +1,7 @@
 {
   "indices.get_template":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"Returns an index template."
     },
     "stability":"stable",

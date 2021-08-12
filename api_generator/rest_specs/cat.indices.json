@@ -1,7 +1,7 @@
 {
   "cat.indices":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"Returns information about indices: number of primaries and replicas, document counts, disk size, ..."
     },
     "stability":"stable",

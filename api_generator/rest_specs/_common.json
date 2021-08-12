@@ -1,7 +1,7 @@
 {
   "documentation" : {
     "description": "Parameters that are accepted by all API endpoints.",
-    "url": " https://opensearch.org/docs/"
+    "url": "https://opensearch.org/docs/"
   },
   "params": {
     "pretty": {

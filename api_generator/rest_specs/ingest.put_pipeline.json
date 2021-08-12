@@ -1,7 +1,7 @@
 {
   "ingest.put_pipeline":{
     "documentation":{
-      "url":" https://opensearch.org/docs/",
+      "url":"https://opensearch.org/docs/",
       "description":"Creates or updates a pipeline."
     },
     "stability":"stable",

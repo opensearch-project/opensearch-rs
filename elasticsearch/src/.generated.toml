@@ -4,7 +4,6 @@ written = [
     'dangling_indices.rs',
     'indices.rs',
     'ingest.rs',
-    'migration.rs',
     'nodes.rs',
     'root/mod.rs',
     'snapshot.rs',

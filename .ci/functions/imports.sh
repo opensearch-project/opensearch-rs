@@ -25,7 +25,14 @@ if [[ -z $es_node_name ]]; then
 
   export es_node_name=instance
   export elastic_password=changeme
-  export elasticsearch_image=elasticsearch-oss
+  echo $STACK_VERSION
+  if [[ $STACK_VERSION == '1.13.2' ]]; then
+    export elasticsearch_image=opendistro-for-elasticsearch
+  elif [[ $STACK_VERSION == '7.10.2' ]]; then
+    export elasticsearch_image=elasticsearch-oss
+  else
+    export elasticsearch_image=opensearch
+  fi
   export elasticsearch_url=https://elastic:${elastic_password}@${es_node_name}:9200
   if [[ $TEST_SUITE != "platinum" ]]; then
     export elasticsearch_url=http://${es_node_name}:9200

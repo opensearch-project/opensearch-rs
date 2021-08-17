@@ -73,6 +73,16 @@ END
 END
 ))
 
+if [[ $STACK_VERSION == "1.13.2" ]]; then
+echo -e "\033[34;1mINFO: building odfe-no-security-plugin container\033[0m"
+  docker build \
+    --file=.ci/DockerFile.opendistro \
+    --build-arg SECURE_INTEGRATION=false \
+    --tag=odfe-no-security-plugin \
+    .
+fi
+
+if [[ $STACK_VERSION == '7.10.2' ]]; then
   # make sure we detach for all but the last node if DETACH=false (default) so all nodes are started
   local_detach="true"
   if [[ "$i" == "$((NUMBER_OF_NODES-1))" ]]; then local_detach=$DETACH; fi
@@ -94,6 +104,29 @@ END
     --health-timeout=2s \
     --rm \
     docker.elastic.co/elasticsearch/"$elasticsearch_container";
+else
+    # make sure we detach for all but the last node if DETACH=false (default) so all nodes are started
+  local_detach="true"
+  if [[ "$i" == "$((NUMBER_OF_NODES-1))" ]]; then local_detach=$DETACH; fi
+  echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
+  set -x
+  docker run \
+    --name "$node_name" \
+    --network "$network_name" \
+    --env "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+    "${environment[@]}" \
+    "${volumes[@]}" \
+    --publish "$http_port":9200 \
+    --ulimit nofile=65536:65536 \
+    --ulimit memlock=-1:-1 \
+    --detach="$local_detach" \
+    --health-cmd="curl $cert_validation_flags --fail $elasticsearch_url/_cluster/health || exit 1" \
+    --health-interval=2s \
+    --health-retries=20 \
+    --health-timeout=2s \
+    --rm \
+    odfe-no-security-plugin;
+fi
 
   set +x
   if wait_for_container "$es_node_name" "$network_name"; then

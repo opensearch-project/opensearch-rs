@@ -19,7 +19,7 @@ This document explains who the maintainers are (see below), what they do in this
 
 | Maintainer               | GitHub ID                               | Affiliation |
 | ------------------------ | --------------------------------------- | ----------- |
-| Aditya Jindal             | [aditjind](https://github.com/aditjind) | Amazon |
+| Aditya Jindal             | [aditjind](https://github.com/aditjind)| Amazon      |
 
 ## Maintainer Responsibilities
 

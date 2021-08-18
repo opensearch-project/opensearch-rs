@@ -66,7 +66,7 @@
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! elasticsearch = "7.13.0-alpha.1"
+//! elasticsearch = "7.10.2"
 //! ```
 //! The following _optional_ dependencies may also be useful to create requests and read responses
 //!
@@ -382,7 +382,6 @@ pub mod cluster;
 pub mod dangling_indices;
 pub mod indices;
 pub mod ingest;
-pub mod migration;
 pub mod nodes;
 pub mod snapshot;
 pub mod tasks;

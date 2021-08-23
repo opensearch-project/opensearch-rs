@@ -1,4 +1,4 @@
-name: Integration tests against Elasticsearch OSS
+name: Integration tests against Opensearch and Opendistro Cluster
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stack_version: ['7.10.2']
+        cluster-type: ['opendistro', 'opensearch']
 
     steps:
       - name: Checkout
@@ -30,7 +30,5 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - run: |
-          export STACK_VERSION=7.10.2
-          "./.ci/run-tests"
-        name: Integ ${{ matrix.stack_version }}
+      - run: "./.ci/run-tests ${{ matrix.cluster-type }} "
+        name: Integ ${{ matrix.cluster-type }}

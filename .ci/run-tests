@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 #
 # Version 1.1
-# - Moved to .ci folder and seperated out `run-repository.sh`
 # - Add `$RUNSCRIPTS` env var for running Elasticsearch dependent products
+
+export TEST_SUITE="${TEST_SUITE:=oss}"
+export OPENSEARCH_URL_EXTENSION="${OPENSEARCH_URL_EXTENSION:=http}"
+export CLUSTER="${1:=opensearch}"
+
 script_path=$(dirname $(realpath -s $0))
 source $script_path/functions/imports.sh
 set -euo pipefail
 
-echo -e "\033[1m>>>>> Start [$STACK_VERSION container] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m"
-DETACH=true bash .ci/run-elasticsearch.sh
+DETACH=true bash .ci/run-opensearch.sh
 
 if [[ -n "$RUNSCRIPTS" ]]; then
   for RUNSCRIPT in ${RUNSCRIPTS//,/ } ; do

@@ -374,7 +374,7 @@ async fn create_index_if_not_exists(client: &Elasticsearch, delete: bool) -> Res
 
 fn create_client() -> Result<Elasticsearch, Error> {
     fn cluster_addr() -> String {
-        match std::env::var("ELASTICSEARCH_URL") {
+        match std::env::var("OPENSEARCH_URL") {
             Ok(server) => server,
             Err(_) => DEFAULT_ADDRESS.into(),
         }

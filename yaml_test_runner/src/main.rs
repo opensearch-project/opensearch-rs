@@ -63,7 +63,7 @@ fn main() -> Result<(), failure::Error> {
         .arg(Arg::with_name("url")
             .short("u")
             .long("url")
-            .value_name("ELASTICSEARCH_URL")
+            .value_name("OPENSEARCH_URL")
             .help("The url of a running Elasticsearch cluster. Used to determine the version, test suite and branch to use to compile tests")
             .required(true)
             .takes_value(true))

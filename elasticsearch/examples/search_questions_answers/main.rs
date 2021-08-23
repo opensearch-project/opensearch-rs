@@ -111,7 +111,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn create_client() -> Result<Elasticsearch, Error> {
     fn cluster_addr() -> String {
-        match std::env::var("ELASTICSEARCH_URL") {
+        match std::env::var("OPENSEARCH_URL") {
             Ok(server) => server,
             Err(_) => DEFAULT_ADDRESS.into(),
         }

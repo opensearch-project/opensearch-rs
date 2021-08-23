@@ -36,12 +36,12 @@
 //! and accept headers, returning plain text responses
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{Elasticsearch, Error, SearchParts};
+//! # use elasticsearch::{OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use elasticsearch::auth::Credentials;
 //! # use serde_json::{json, Value};
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .nodes()
@@ -58,12 +58,12 @@
 //! JSON responses can be returned from Cat APIs either by using `.format("json")`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{Elasticsearch, Error, SearchParts};
+//! # use elasticsearch::{OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use elasticsearch::auth::Credentials;
 //! # use serde_json::{json, Value};
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .nodes()
@@ -79,11 +79,11 @@
 //! Or by setting an accept header using `.headers()`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{Elasticsearch, Error, SearchParts, http::headers::{HeaderValue, DEFAULT_ACCEPT, ACCEPT}};
+//! # use elasticsearch::{OpenSearch, Error, SearchParts, http::headers::{HeaderValue, DEFAULT_ACCEPT, ACCEPT}};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .nodes()
@@ -101,11 +101,11 @@
 //! The column headers to return can be controlled with `.h()`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{Elasticsearch, Error, SearchParts};
+//! # use elasticsearch::{OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .nodes()
@@ -121,7 +121,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -4058,7 +4058,7 @@ impl<'a> Cat<'a> {
         CatThreadPool::new(self.transport(), parts)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Cat APIs"]
     pub fn cat(&self) -> Cat {
         Cat::new(self.transport())

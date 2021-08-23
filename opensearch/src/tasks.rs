@@ -32,7 +32,7 @@
 #![doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -598,7 +598,7 @@ impl<'a> Tasks<'a> {
     }
 }
 #[cfg(feature = "experimental-apis")]
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Tasks APIs"]
     pub fn tasks(&self) -> Tasks {
         Tasks::new(self.transport())

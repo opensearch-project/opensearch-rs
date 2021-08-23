@@ -28,7 +28,7 @@
  * GitHub history for details.
  */
 
-use elasticsearch::{
+use opensearch::{
     auth::Credentials,
     cat::CatTemplatesParts,
     cert::CertificateValidation,
@@ -59,7 +59,7 @@ use elasticsearch::{
         TransformDeleteTransformParts, TransformGetTransformParts, TransformStopTransformParts,
     },
     watcher::WatcherDeleteWatchParts,
-    Elasticsearch, Error, DEFAULT_ADDRESS,
+    Opensearch, Error, DEFAULT_ADDRESS,
 };
 use once_cell::sync::Lazy;
 use serde_json::{json, Value};
@@ -80,7 +80,7 @@ fn running_proxy() -> bool {
     !system.get_process_by_name("Fiddler").is_empty()
 }
 
-static GLOBAL_CLIENT: Lazy<Elasticsearch> = Lazy::new(|| {
+static GLOBAL_CLIENT: Lazy<Opensearch> = Lazy::new(|| {
     let mut url = Url::parse(cluster_addr().as_ref()).unwrap();
 
     // if the url is https and specifies a username and password, remove from the url and set credentials
@@ -121,15 +121,15 @@ static GLOBAL_CLIENT: Lazy<Elasticsearch> = Lazy::new(|| {
     }
 
     let transport = builder.build().unwrap();
-    Elasticsearch::new(transport)
+    Opensearch::new(transport)
 });
 
 /// Gets the client to use in tests
-pub fn get() -> &'static Elasticsearch {
+pub fn get() -> &'static Opensearch {
     GLOBAL_CLIENT.deref()
 }
 
-/// Reads the response from Elasticsearch, returning the method, status code, text response,
+/// Reads the response from Opensearch, returning the method, status code, text response,
 /// and the response parsed from json or yaml
 pub async fn read_response(
     response: Response,
@@ -161,7 +161,7 @@ pub async fn general_oss_setup() -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn delete_snapshots(client: &Elasticsearch) -> Result<(), Error> {
+pub async fn delete_snapshots(client: &Opensearch) -> Result<(), Error> {
     let cat_repo_response = client
         .cat()
         .repositories()
@@ -199,71 +199,7 @@ pub async fn delete_snapshots(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-/// general setup step for an xpack yaml test
-pub async fn general_xpack_setup() -> Result<(), Error> {
-    let client = get();
-
-    let _delete_watch_response = client
-        .watcher()
-        .delete_watch(WatcherDeleteWatchParts::Id("my_watch"))
-        .send()
-        .await?;
-
-    delete_roles(client).await?;
-    delete_users(client).await?;
-    delete_privileges(client).await?;
-    stop_and_delete_datafeeds(client).await?;
-
-    let response = client
-        .ilm()
-        .remove_policy(IlmRemovePolicyParts::Index("_all"))
-        .send()
-        .await?;
-
-    assert_response_success!(response);
-
-    close_and_delete_jobs(client).await?;
-
-    // TODO: stop and delete rollup jobs once implemented in the client
-
-    cancel_tasks(client).await?;
-    stop_and_delete_transforms(client).await?;
-    wait_for_yellow_status(client).await?;
-    delete_data_streams(client).await?;
-    delete_indices(client).await?;
-    delete_templates(client).await?;
-
-    let response = client
-        .security()
-        .put_user(SecurityPutUserParts::Username("x_pack_rest_user"))
-        .body(json!({
-            "password": "x-pack-test-password",
-            "roles": ["superuser"]
-        }))
-        .send()
-        .await?;
-
-    assert_response_success!(response);
-
-    let response = client
-        .indices()
-        .refresh(IndicesRefreshParts::Index(&["_all"]))
-        .expand_wildcards(&[
-            ExpandWildcards::Open,
-            ExpandWildcards::Closed,
-            ExpandWildcards::Hidden,
-        ])
-        .send()
-        .await?;
-
-    assert_response_success!(response);
-
-    wait_for_yellow_status(client).await?;
-
-    Ok(())
-}
-
-async fn wait_for_yellow_status(client: &Elasticsearch) -> Result<(), Error> {
+async fn wait_for_yellow_status(client: &Opensearch) -> Result<(), Error> {
     let cluster_health = client
         .cluster()
         .health(ClusterHealthParts::None)
@@ -275,7 +211,7 @@ async fn wait_for_yellow_status(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_data_streams(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_data_streams(client: &Opensearch) -> Result<(), Error> {
     // Hand-crafted request as the indices.delete_data_stream spec doesn't yet have the
     // "expand_wildcards" parameter that is needed to delete ILM data streams
     //
@@ -296,7 +232,7 @@ async fn delete_data_streams(client: &Elasticsearch) -> Result<(), Error> {
         .send(
             Method::Delete,
             "/_data_stream/*",
-            elasticsearch::http::headers::HeaderMap::new(),
+            opensearch::http::headers::HeaderMap::new(),
             Some(&[("expand_wildcards", "hidden")]),
             None::<()>, // body
             None,       // timeout
@@ -308,7 +244,7 @@ async fn delete_data_streams(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_indices(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_indices(client: &Opensearch) -> Result<(), Error> {
     let delete_response = client
         .indices()
         .delete(IndicesDeleteParts::Index(&["*"]))
@@ -324,7 +260,7 @@ async fn delete_indices(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn stop_and_delete_transforms(client: &Elasticsearch) -> Result<(), Error> {
+async fn stop_and_delete_transforms(client: &Opensearch) -> Result<(), Error> {
     let transforms_response = client
         .transform()
         .get_transform(TransformGetTransformParts::TransformId("_all"))
@@ -355,7 +291,7 @@ async fn stop_and_delete_transforms(client: &Elasticsearch) -> Result<(), Error>
     Ok(())
 }
 
-async fn cancel_tasks(client: &Elasticsearch) -> Result<(), Error> {
+async fn cancel_tasks(client: &Opensearch) -> Result<(), Error> {
     let rollup_response = client.tasks().list().send().await?.json::<Value>().await?;
 
     for (_node_id, nodes) in rollup_response["nodes"].as_object().unwrap() {
@@ -377,7 +313,7 @@ async fn cancel_tasks(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_templates(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_templates(client: &Opensearch) -> Result<(), Error> {
     // There are "legacy templates and "new templates"
 
     let cat_template_response = client
@@ -421,7 +357,7 @@ async fn delete_templates(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_users(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_users(client: &Opensearch) -> Result<(), Error> {
     let users_response = client
         .security()
         .get_user(SecurityGetUserParts::None)
@@ -447,7 +383,7 @@ async fn delete_users(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_roles(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_roles(client: &Opensearch) -> Result<(), Error> {
     let roles_response = client
         .security()
         .get_role(SecurityGetRoleParts::None)
@@ -473,7 +409,7 @@ async fn delete_roles(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_privileges(client: &Elasticsearch) -> Result<(), Error> {
+async fn delete_privileges(client: &Opensearch) -> Result<(), Error> {
     let privileges_response = client
         .security()
         .get_privileges(SecurityGetPrivilegesParts::None)
@@ -499,7 +435,7 @@ async fn delete_privileges(client: &Elasticsearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn stop_and_delete_datafeeds(client: &Elasticsearch) -> Result<(), Error> {
+async fn stop_and_delete_datafeeds(client: &Opensearch) -> Result<(), Error> {
     let stop_data_feed_response = client
         .ml()
         .stop_datafeed(MlStopDatafeedParts::DatafeedId("_all"))
@@ -528,7 +464,7 @@ async fn stop_and_delete_datafeeds(client: &Elasticsearch) -> Result<(), Error> 
     Ok(())
 }
 
-async fn close_and_delete_jobs(client: &Elasticsearch) -> Result<(), Error> {
+async fn close_and_delete_jobs(client: &Opensearch) -> Result<(), Error> {
     let response = client
         .ml()
         .close_job(MlCloseJobParts::JobId("_all"))

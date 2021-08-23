@@ -33,7 +33,7 @@ pub fn use_declarations() -> Tokens {
         #![allow(unused_imports)]
 
         use crate::{
-            client::Elasticsearch,
+            client::OpenSearch,
             params::*,
             error::Error,
             http::{

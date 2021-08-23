@@ -12,56 +12,6 @@ features:
 # tests to skip generating and compiling a test for
 tests:
 
-  xpack/api_key/10_basic.yml:
-    # Regex contains variable substitutions that the test harness doesn't support yet
-    - "Test invalidate api keys"
-
-  xpack/data_stream/40_supported_apis.yml:
-    # uses number as a key into object. serde_json::Value expects a string key
-    - "Verify shard stores api"
-
-  xpack/data_stream/80_resolve_index_data_streams.yml:
-    # Regex not properly interpreted by the test harness
-    - "Resolve index with hidden and closed indices"
-    # expected value json["indices"][0]["name"] to match String("test_index1") but was String(".security-7")
-    - "Resolve index with indices, aliases, and data streams"
-
-  xpack/ml/filter_crud.yml:
-    # Warning "this request accesses system indices..." to match is wrong on all tests
-    - "*"
-
-  xpack/ml/delete_expired_data.yml:
-    # Warning "this request accesses system indices..." to match is wrong.
-    - "Test delete expired data with job id"
-
-  xpack/runtime_fields/20_long.yml:
-    # expected value ... to match Number(40.0) but was Number(40)
-    - "terms agg"
-    -
-  xpack/ssl/10_basic.yml:
-    # this test returns the CA cert before the cert, so always fails
-    - "Test get SSL certificates"
-
-  xpack/transform/transforms_stats_continuous.yml:
-    # this test always returns "exponential_avg_checkpoint_duration_ms": 0.0 . seems like it might be missing data in
-    # the setup, fires quicker than any documents are processed, or the delay of 1m is too high?
-    - "Test get continuous transform stats"
-
-  # Test generator currently doesn't handle unsigned long values.
-  # We skip all tests as even the setup code will fail to compile.
-  xpack/unsigned_long/10_basic.yml:
-    - "*"
-  xpack/unsigned_long/20_null_value.yml:
-    - "*"
-  xpack/unsigned_long/30_multi_fields.yml:
-    - "*"
-  xpack/unsigned_long/40_different_numeric.yml:
-    - "*"
-  xpack/unsigned_long/50_script_values.yml:
-    - "*"
-  xpack/unsigned_long/60_collapse.yml:
-    - "*"
-
   free/cat.aliases/10_basic.yml:
     # this test fails as the regex needs a \n before the ending $
     - "Multiple alias names"

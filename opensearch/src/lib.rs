@@ -111,8 +111,8 @@
 //! To create a client to make API calls to Elasticsearch running on `http://localhost:9200`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::Elasticsearch;
-//! let client = Elasticsearch::default();
+//! # use opensearch::OpenSearch;
+//! let client = OpenSearch::default();
 //! ```
 //!
 //! Alternatively, you can create a client to make API calls against Elasticsearch running on a
@@ -120,12 +120,12 @@
 //!
 //! ```rust,no_run
 //! # use elasticsearch::{
-//! #     Error, Elasticsearch,
+//! #     Error, OpenSearch,
 //! #     http::transport::{Transport, SingleNodeConnectionPool}
 //! # };
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let transport = Transport::single_node("https://example.com")?;
-//! let client = Elasticsearch::new(transport);
+//! let client = OpenSearch::new(transport);
 //! # Ok(())
 //! # }
 //! ```
@@ -137,7 +137,7 @@
 //! ```rust,no_run
 //! # use elasticsearch::{
 //! #     auth::Credentials,
-//! #     Error, Elasticsearch,
+//! #     Error, OpenSearch,
 //! #     http::transport::Transport,
 //! # };
 //! # use url::Url;
@@ -145,7 +145,7 @@
 //! let cloud_id = "cluster_name:Y2xvdWQtZW5kcG9pbnQuZXhhbXBsZSQzZGFkZjgyM2YwNTM4ODQ5N2VhNjg0MjM2ZDkxOGExYQ==";
 //! let credentials = Credentials::Basic("<username>".into(), "<password>".into());
 //! let transport = Transport::cloud(cloud_id, credentials)?;
-//! let client = Elasticsearch::new(transport);
+//! let client = OpenSearch::new(transport);
 //! # Ok(())
 //! # }
 //! ```
@@ -157,7 +157,7 @@
 //! ```rust,no_run
 //! # use elasticsearch::{
 //! #     auth::Credentials,
-//! #     Error, Elasticsearch,
+//! #     Error, OpenSearch,
 //! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 //! # };
 //! # use url::Url;
@@ -165,7 +165,7 @@
 //! let url = Url::parse("https://example.com")?;
 //! let conn_pool = SingleNodeConnectionPool::new(url);
 //! let transport = TransportBuilder::new(conn_pool).disable_proxy().build()?;
-//! let client = Elasticsearch::new(transport);
+//! let client = OpenSearch::new(transport);
 //! # Ok(())
 //! # }
 //! ```
@@ -179,12 +179,12 @@
 //! The following makes an API call to the cat indices API
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, Elasticsearch, Error, cat::CatIndicesParts};
+//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, cat::CatIndicesParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .indices(CatIndicesParts::Index(&["*"]))
@@ -208,12 +208,12 @@
 //! Indexing a single document can be achieved with the index API
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, Elasticsearch, Error, SearchParts, IndexParts};
+//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, SearchParts, IndexParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .index(IndexParts::IndexId("tweets", "1"))
 //!     .body(json!({
@@ -234,12 +234,12 @@
 //! to be sent in one API call
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, Elasticsearch, Error, IndexParts, BulkParts, http::request::JsonBody};
+//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, IndexParts, BulkParts, http::request::JsonBody};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let mut body: Vec<JsonBody<_>> = Vec::with_capacity(4);
 //!
 //! // add the first operation and document
@@ -277,12 +277,12 @@
 //! `{"query":{"match":{"message":"Elasticsearch"}}}`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, Elasticsearch, Error, SearchParts};
+//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let response = client
 //!     .search(SearchParts::Index(&["tweets"]))
 //!     .from(0)
@@ -324,12 +324,12 @@
 //! [Elasticsearch::send] can be used
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, http::{Method,headers::HeaderMap}, Elasticsearch, Error, SearchParts};
+//! # use elasticsearch::{auth::Credentials, http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! # let client = Elasticsearch::default();
+//! # let client = OpenSearch::default();
 //! let body = b"{\"query\":{\"match_all\":{}}}";
 //!
 //! let response = client

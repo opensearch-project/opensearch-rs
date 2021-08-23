@@ -144,20 +144,20 @@ impl<'a> YamlTests<'a> {
             .iter()
             .map(|n| {
                 let ident = syn::Ident::from(n.as_str());
-                quote!(use elasticsearch::#ident::*;)
+                quote!(use opensearch::#ident::*;)
             })
             .collect();
 
         quote! {
             #![allow(unused_imports, unused_variables, dead_code)]
             use crate::common::{client, macros, transform};
-            use elasticsearch::*;
-            use elasticsearch::http::{
+            use opensearch::*;
+            use opensearch::http::{
                 headers::{HeaderName, HeaderValue},
                 request::JsonBody,
                 Method,
             };
-            use elasticsearch::params::*;
+            use opensearch::params::*;
             #(#directives)*
             use ::regex;
             use serde_json::{json, Value};
@@ -317,7 +317,7 @@ impl<'a> YamlTests<'a> {
 
             (
                 Some(quote! {
-                    async fn #ident(client: &Elasticsearch) -> Result<(), failure::Error> {
+                    async fn #ident(client: &Opensearch) -> Result<(), failure::Error> {
                         #(#tokens)*
                         Ok(())
                     }

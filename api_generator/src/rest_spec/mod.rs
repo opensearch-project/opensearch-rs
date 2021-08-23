@@ -33,7 +33,7 @@ pub fn download_specs(branch: &str, download_dir: &PathBuf) -> Result<(), failur
     let mut headers = HeaderMap::new();
     headers.append(
         USER_AGENT,
-        HeaderValue::from_str(&format!("elasticsearch-rs/{}", env!("CARGO_PKG_NAME")))?,
+        HeaderValue::from_str(&format!("opensearch-rs/{}", env!("CARGO_PKG_NAME")))?,
     );
     let client = reqwest::ClientBuilder::new()
         .default_headers(headers)
@@ -46,13 +46,11 @@ pub fn download_specs(branch: &str, download_dir: &PathBuf) -> Result<(), failur
 
     let oss_spec = Glob::new("**/rest-api-spec/src/main/resources/rest-api-spec/api/*.json")?
         .compile_matcher();
-    let xpack_spec = Glob::new("**/x-pack/plugin/src/test/resources/rest-api-spec/api/*.json")?
-        .compile_matcher();
 
     for entry in archive.entries()? {
         let file = entry?;
         let path = file.path()?;
-        if oss_spec.is_match(&path) || xpack_spec.is_match(&path) {
+        if oss_spec.is_match(&path) {
             write_spec_file(download_dir, file)?;
         }
     }

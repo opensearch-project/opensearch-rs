@@ -44,7 +44,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -797,7 +797,7 @@ impl<'a> Ingest<'a> {
         IngestSimulate::new(self.transport(), parts)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Ingest APIs"]
     pub fn ingest(&self) -> Ingest {
         Ingest::new(self.transport())

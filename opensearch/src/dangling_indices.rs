@@ -35,7 +35,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -516,7 +516,7 @@ impl<'a> DanglingIndices<'a> {
         DanglingIndicesListDanglingIndices::new(self.transport())
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for DanglingIndices APIs"]
     pub fn dangling_indices(&self) -> DanglingIndices {
         DanglingIndices::new(self.transport())

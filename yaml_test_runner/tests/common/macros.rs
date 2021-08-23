@@ -128,7 +128,7 @@ macro_rules! assert_match {
 
 /// Asserts that the passed [serde_json::Value] matches the expected numeric value.
 /// This handles the case where a YAML test asserts a match against an integer value
-/// but a floating point value is returned from Elasticsearch
+/// but a floating point value is returned from Opensearch
 #[macro_export]
 macro_rules! assert_numeric_match {
     ($expected:expr, $actual:expr) => {{

@@ -136,7 +136,7 @@ let _response = client.ping().send().await?;
 /// # use elasticsearch::{
 /// #     auth::Credentials,
 /// #     cert::{Certificate,CertificateValidation},
-/// #     Error, Elasticsearch,
+/// #     Error, OpenSearch,
 /// #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 /// # };
 /// # use std::fs::File;
@@ -148,7 +148,7 @@ let _response = client.ping().send().await?;
 /// let transport = TransportBuilder::new(conn_pool)
 ///     .cert_validation(CertificateValidation::None)
 ///     .build()?;
-/// let client = Elasticsearch::new(transport);
+/// let client = OpenSearch::new(transport);
 /// let _response = client.ping().send().await?;
 /// # Ok(())
 /// # }

@@ -1,4 +1,4 @@
-name: Integration tests against Opensearch and Opendistro Cluster
+name: Integration tests against OpenSearch and Opendistro Cluster
 
 on:
   pull_request:

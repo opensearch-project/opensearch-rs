@@ -38,7 +38,7 @@ use elasticsearch::{
     },
     indices::IndicesExistsParts,
     params::Refresh,
-    BulkOperation, BulkParts, Elasticsearch, Error, DEFAULT_ADDRESS,
+    BulkOperation, BulkParts, Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use reqwest::StatusCode;
 use serde_json::json;
@@ -82,23 +82,23 @@ pub fn create_builder(addr: &str) -> TransportBuilder {
     builder
 }
 
-pub fn create_default() -> Elasticsearch {
+pub fn create_default() -> OpenSearch {
     create_for_url(cluster_addr().as_str())
 }
 
-pub fn create_for_url(url: &str) -> Elasticsearch {
+pub fn create_for_url(url: &str) -> OpenSearch {
     let builder = create_builder(url);
     create(builder)
 }
 
-pub fn create(mut builder: TransportBuilder) -> Elasticsearch {
+pub fn create(mut builder: TransportBuilder) -> OpenSearch {
     if running_proxy() {
         let proxy_url = Url::parse("http://localhost:8888").unwrap();
         builder = builder.proxy(proxy_url, None, None);
     }
 
     let transport = builder.build().unwrap();
-    Elasticsearch::new(transport)
+    OpenSearch::new(transport)
 }
 
 /// index some documents into a posts index. If the posts index already exists, do nothing.
@@ -107,7 +107,7 @@ pub fn create(mut builder: TransportBuilder) -> Elasticsearch {
 /// several times. In this instance, this is fine.
 ///
 /// TODO: This is a temporary measure until https://github.com/elastic/elasticsearch-rs/issues/19 is implemented.
-pub async fn index_documents(client: &Elasticsearch) -> Result<Response, Error> {
+pub async fn index_documents(client: &OpenSearch) -> Result<Response, Error> {
     let index = "posts";
     let exists_response = client
         .indices()

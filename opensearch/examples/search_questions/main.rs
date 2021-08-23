@@ -28,17 +28,14 @@
  * GitHub history for details.
  */
 
-#[macro_use]
-extern crate serde_json;
-
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 use elasticsearch::cert::CertificateValidation;
 use elasticsearch::{
     auth::Credentials,
     http::transport::{SingleNodeConnectionPool, TransportBuilder},
-    Elasticsearch, Error, SearchParts, DEFAULT_ADDRESS,
+    Error, OpenSearch, SearchParts, DEFAULT_ADDRESS,
 };
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::env;
 use sysinfo::SystemExt;
 use url::Url;
@@ -54,16 +51,38 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let query = if args.len() < 2 {
         json!({
             "query": {
-                "match_all": {}
+                "term": {
+                    "type": "Question"
+                }
             }
         })
     } else {
         json!({
             "query": {
-                "match": {
-                    "body": {
-                        "query": args[1],
-                        "operator": "and"
+                "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                        {
+                            "match": {
+                                "title": {
+                                    "query": args[1],
+                                    "operator": "and"
+                                }
+                            }
+                        },
+                        {
+                            "match": {
+                                "body": {
+                                    "query": args[1],
+                                    "operator": "and"
+                                }
+                            }
+                        }
+                    ],
+                    "filter": {
+                        "term": {
+                            "type": "Question"
+                        }
                     }
                 }
             }
@@ -82,34 +101,28 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     response = response.error_for_status_code()?;
 
     let json: Value = response.json().await?;
-    let posts: Vec<Post> = json["hits"]["hits"]
+
+    let questions: Vec<Question> = json["hits"]["hits"]
         .as_array()
         .unwrap()
         .iter()
         .map(|h| serde_json::from_value(h["_source"].clone()).unwrap())
         .collect();
 
-    for post in posts {
-        match post {
-            Post::Question(q) => {
-                println!("{} - https://stackoverflow.com/q/{}", q.title, q.id);
-                println!();
-                println!("{}", fill(&q.body, 80));
-                println!("{}", "-".repeat(50));
-            }
-            Post::Answer(a) => {
-                println!("https://stackoverflow.com/a/{}", a.id);
-                println!();
-                println!("{}", fill(&a.body, 80));
-                println!("{}", "-".repeat(30));
-            }
-        }
+    for question in questions {
+        println!(
+            "{} - https://stackoverflow.com/q/{}",
+            question.title, question.id
+        );
+        println!();
+        println!("{}", fill(&question.body, 80));
+        println!("{}", "-".repeat(50));
     }
 
     Ok(())
 }
 
-fn create_client() -> Result<Elasticsearch, Error> {
+fn create_client() -> Result<OpenSearch, Error> {
     fn cluster_addr() -> String {
         match std::env::var("OPENSEARCH_URL") {
             Ok(server) => server,
@@ -172,5 +185,5 @@ fn create_client() -> Result<Elasticsearch, Error> {
     }
 
     let transport = builder.build()?;
-    Ok(Elasticsearch::new(transport))
+    Ok(OpenSearch::new(transport))
 }

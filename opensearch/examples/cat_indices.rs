@@ -34,7 +34,7 @@ use elasticsearch::{
     auth::Credentials,
     cat::CatIndicesParts,
     http::transport::{SingleNodeConnectionPool, TransportBuilder},
-    Elasticsearch, Error, DEFAULT_ADDRESS,
+    Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use sysinfo::SystemExt;
 use url::Url;
@@ -55,7 +55,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn create_client() -> Result<Elasticsearch, Error> {
+fn create_client() -> Result<OpenSearch, Error> {
     fn cluster_addr() -> String {
         match std::env::var("OPENSEARCH_URL") {
             Ok(server) => server,
@@ -118,5 +118,5 @@ fn create_client() -> Result<Elasticsearch, Error> {
     }
 
     let transport = builder.build()?;
-    Ok(Elasticsearch::new(transport))
+    Ok(OpenSearch::new(transport))
 }

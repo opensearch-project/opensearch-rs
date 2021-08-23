@@ -31,7 +31,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -9541,7 +9541,7 @@ impl<'a> Indices<'a> {
         IndicesValidateQuery::new(self.transport(), parts)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Indices APIs"]
     pub fn indices(&self) -> Indices {
         Indices::new(self.transport())

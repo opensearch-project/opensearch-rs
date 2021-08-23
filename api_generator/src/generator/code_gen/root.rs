@@ -38,7 +38,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<String, failure::Error>
             let builder_name = name.to_pascal_case();
             RequestBuilder::new(
                 docs_dir,
-                "Elasticsearch",
+                "OpenSearch",
                 name,
                 &builder_name,
                 &api.common_params,
@@ -52,7 +52,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<String, failure::Error>
     tokens.append(quote!(
         #(#builders)*
 
-        impl Elasticsearch {
+        impl OpenSearch {
             #(#methods)*
         }
     ));

@@ -33,14 +33,14 @@ extern crate serde_json;
 
 use clap::{App, Arg};
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-use elasticsearch::cert::CertificateValidation;
-use elasticsearch::{
+use opensearch::cert::CertificateValidation;
+use opensearch::{
     auth::Credentials,
     http::transport::{SingleNodeConnectionPool, TransportBuilder},
     indices::{
         IndicesCreateParts, IndicesDeleteParts, IndicesExistsParts, IndicesPutSettingsParts,
     },
-    BulkOperation, BulkParts, Elasticsearch, Error, DEFAULT_ADDRESS,
+    BulkOperation, BulkParts, Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use serde_json::Value;
 use sysinfo::SystemExt;
@@ -157,7 +157,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn set_refresh_interval(client: &Elasticsearch, interval: Value) -> Result<(), Error> {
+async fn set_refresh_interval(client: &OpenSearch, interval: Value) -> Result<(), Error> {
     let response = client
         .indices()
         .put_settings(IndicesPutSettingsParts::Index(&[POSTS_INDEX]))
@@ -176,7 +176,7 @@ async fn set_refresh_interval(client: &Elasticsearch, interval: Value) -> Result
     Ok(())
 }
 
-async fn index_posts(client: &Elasticsearch, posts: &[Post]) -> Result<(), Error> {
+async fn index_posts(client: &OpenSearch, posts: &[Post]) -> Result<(), Error> {
     let body: Vec<BulkOperation<_>> = posts
         .iter()
         .map(|p| {
@@ -208,7 +208,7 @@ async fn index_posts(client: &Elasticsearch, posts: &[Post]) -> Result<(), Error
     Ok(())
 }
 
-async fn create_index_if_not_exists(client: &Elasticsearch, delete: bool) -> Result<(), Error> {
+async fn create_index_if_not_exists(client: &OpenSearch, delete: bool) -> Result<(), Error> {
     let exists = client
         .indices()
         .exists(IndicesExistsParts::Index(&[POSTS_INDEX]))
@@ -372,7 +372,7 @@ async fn create_index_if_not_exists(client: &Elasticsearch, delete: bool) -> Res
     Ok(())
 }
 
-fn create_client() -> Result<Elasticsearch, Error> {
+fn create_client() -> Result<OpenSearch, Error> {
     fn cluster_addr() -> String {
         match std::env::var("OPENSEARCH_URL") {
             Ok(server) => server,
@@ -435,5 +435,5 @@ fn create_client() -> Result<Elasticsearch, Error> {
     }
 
     let transport = builder.build()?;
-    Ok(Elasticsearch::new(transport))
+    Ok(OpenSearch::new(transport))
 }

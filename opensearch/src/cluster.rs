@@ -31,7 +31,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -2497,7 +2497,7 @@ impl<'a> Cluster<'a> {
         ClusterStats::new(self.transport(), parts)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Cluster APIs"]
     pub fn cluster(&self) -> Cluster {
         Cluster::new(self.transport())

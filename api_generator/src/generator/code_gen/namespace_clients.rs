@@ -110,7 +110,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, 
             }
 
             #cfg_attr
-            impl Elasticsearch {
+            impl OpenSearch {
                 #namespace_fn_doc
                 pub fn #namespace_name(&self) -> #namespace_client_name {
                     #namespace_client_name::new(self.transport())

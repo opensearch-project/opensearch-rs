@@ -67,14 +67,14 @@ where
 
 /// Root client for top level APIs
 #[derive(Clone, Debug, Default)]
-pub struct Elasticsearch {
+pub struct OpenSearch {
     transport: Transport,
 }
 
-impl Elasticsearch {
+impl OpenSearch {
     /// Creates a new instance of the root client
     pub fn new(transport: Transport) -> Self {
-        Elasticsearch { transport }
+        OpenSearch { transport }
     }
 
     /// Gets the transport of the client

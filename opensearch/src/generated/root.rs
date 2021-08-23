@@ -23,7 +23,7 @@
 // cargo run -p api_generator
 // -----------------------------------------------
 # ! [ allow ( unused_imports ) ]use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},

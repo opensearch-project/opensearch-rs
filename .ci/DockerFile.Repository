@@ -23,9 +23,9 @@ COPY Cargo.toml ./Cargo.toml
 COPY Makefile.toml ./Makefile.toml
 COPY README.md ./README.md
 COPY api_generator ./api_generator
-COPY elasticsearch/Cargo.toml ./elasticsearch/Cargo.toml
-COPY elasticsearch/src ./elasticsearch/src
-COPY elasticsearch/build.rs ./elasticsearch/build.rs
+COPY opensearch/Cargo.toml ./opensearch/Cargo.toml
+COPY opensearch/src ./opensearch/src
+COPY opensearch/build.rs ./opensearch/build.rs
 COPY yaml_test_runner ./yaml_test_runner
 
 RUN cargo build --tests

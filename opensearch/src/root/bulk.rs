@@ -119,12 +119,12 @@ impl Serialize for BulkHeader {
 /// # use elasticsearch::{
 /// #     BulkOperation,
 /// #     BulkParts,
-/// #     Error, Elasticsearch,
+/// #     Error, OpenSearch,
 /// # };
 /// # use url::Url;
 /// # use serde_json::{json, Value};
 /// # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-/// # let client = Elasticsearch::default();
+/// # let client = OpenSearch::default();
 /// let mut ops: Vec<BulkOperation<Value>> = Vec::with_capacity(4);
 /// ops.push(BulkOperation::index(json!({
 ///         "user": "kimchy",
@@ -586,12 +586,12 @@ impl<B> From<BulkUpdateOperation<B>> for BulkOperation<B> {
 /// #     BulkOperation,
 /// #     BulkOperations,
 /// #     BulkParts,
-/// #     Error, Elasticsearch,
+/// #     Error, OpenSearch,
 /// # };
 /// # use serde::Serialize;
 /// # use serde_json::{json, Value};
 /// # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-/// # let client = Elasticsearch::default();
+/// # let client = OpenSearch::default();
 /// #[derive(Serialize)]
 /// struct IndexDoc<'a> {
 ///     foo: &'a str,

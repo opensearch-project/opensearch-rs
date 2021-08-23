@@ -33,7 +33,7 @@
 
 #![allow(unused_imports)]
 use crate::{
-    client::Elasticsearch,
+    client::OpenSearch,
     error::Error,
     http::{
         headers::{HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE},
@@ -1973,7 +1973,7 @@ impl<'a> Snapshot<'a> {
         SnapshotVerifyRepository::new(self.transport(), parts)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "Creates a namespace client for Snapshot APIs"]
     pub fn snapshot(&self) -> Snapshot {
         Snapshot::new(self.transport())

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Launch one or more Elasticsearch nodes via the Docker image,
+# Launch one or more OpenSearch nodes via the Docker image,
 # to form a cluster suitable for running the REST API tests.
 #
 # Version 1.1.0

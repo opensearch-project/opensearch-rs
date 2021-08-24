@@ -4,45 +4,26 @@
 #
 # Version 1.0.1
 # - Initial version after refactor
-# - Validate STACK_VERSION asap
 
-function require_stack_version() {
-  if [[ -z $STACK_VERSION ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Required environment variable [STACK_VERSION] not set\033[0m"
-    exit 1
-  fi
-}
-
-require_stack_version
-
-if [[ -z $es_node_name ]]; then
+if [[ -z $opensearch_node_name ]]; then
   # only set these once
   set -euo pipefail
-  export TEST_SUITE=${TEST_SUITE-free}
+  export TEST_SUITE=${TEST_SUITE-oss}
   export RUNSCRIPTS=${RUNSCRIPTS-}
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}
+  export OPENSEARCH_URL_EXTENSION=${OPENSEARCH_URL_EXTENSION-http}
 
-  export es_node_name=instance
-  export elastic_password=changeme
-  echo $STACK_VERSION
-  if [[ $STACK_VERSION == '1.13.2' ]]; then
-    export elasticsearch_image=opendistro-for-elasticsearch
-  elif [[ $STACK_VERSION == '7.10.2' ]]; then
-    export elasticsearch_image=elasticsearch-oss
-  else
-    export elasticsearch_image=opensearch
+  export opensearch_node_name=instance
+  export opensearch_image=opensearchproject/opensearch
+  if [[ "$CLUSTER" == "opendistro" ]]; then
+    export opensearch_image=amazon/opendistro-for-elasticsearch
   fi
-  export elasticsearch_url=https://elastic:${elastic_password}@${es_node_name}:9200
-  if [[ $TEST_SUITE != "platinum" ]]; then
-    export elasticsearch_url=http://${es_node_name}:9200
-  fi
-  export external_elasticsearch_url=${elasticsearch_url/$es_node_name/localhost}
-  export elasticsearch_container="${elasticsearch_image}:${STACK_VERSION}"
 
-  export suffix=rest-test
-  export moniker=$(echo "$elasticsearch_container" | tr -C "[:alnum:]" '-')
-  export network_name=${moniker}${suffix}
+  export opensearch_url=$OPENSEARCH_URL_EXTENSION://${opensearch_node_name}:9200
+  export external_opensearch_url=${opensearch_url/$opensearch_node_name/localhost}
+
+  export network_name=search-rest-test
 
   export ssl_cert="${script_path}/certs/testnode.crt"
   export ssl_key="${script_path}/certs/testnode.key"
@@ -63,4 +44,3 @@ fi
 
 echo -e "\033[34;1mINFO:\033[0m Creating network $network_name if it does not exist already \033[0m"
 docker network inspect "$network_name" > /dev/null 2>&1 || docker network create "$network_name"
-

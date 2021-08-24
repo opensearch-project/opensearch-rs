@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cluster-type: ['opendistro', 'opensearch']
+        cluster-type: ['opendistro']
 
     steps:
       - name: Checkout

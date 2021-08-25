@@ -109,7 +109,7 @@ pub enum HttpMethod {
 }
 
 /// Converts a `HttpMethod` in the REST spec, into the AST for
-/// a `Method` in the elasticsearch client
+/// a `Method` in the opensearch client
 impl quote::ToTokens for HttpMethod {
     fn to_tokens(&self, tokens: &mut quote::Tokens) {
         tokens.append("Method");

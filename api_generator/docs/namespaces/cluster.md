@@ -1,4 +1,4 @@
 Cluster APIs
 
-[Manage settings](https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster.html),
-perform operations, and retrieve information about an Elasticsearch cluster.
+[Manage settings](https://opensearch.org/docs/opensearch/rest-api/cluster-settings/),
+perform operations, and retrieve information about an OpenSearch cluster.

@@ -26,10 +26,10 @@
 
 //! Ingest APIs
 //!
-//! [Manage ingest pipelines](https://www.elastic.co/guide/en/elasticsearch/reference/master/ingest-apis.html).
+//! [Manage ingest pipelines](https://opensearch.org/docs/opensearch/rest-api/index/).
 //! Ingest pipelines can be used on a node with the `ingest` role to
 //! pre-process documents before indexing, to apply transformations and enrich data. Transformations are performed
-//! by [processors](https://www.elastic.co/guide/en/elasticsearch/reference/master/ingest-processors.html)
+//! by [processors](https://opensearch.org/docs/opensearch/rest-api/index/)
 //! in the pipeline, and can include such operations as
 //!
 //! - add, remove and append fields within the document

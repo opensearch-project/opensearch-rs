@@ -27,7 +27,7 @@
 //! Node APIs
 //!
 //! Manage settings, perform operations, and retrieve information about the
-//! [nodes in an Elasticsearch cluster](https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster.html).
+//! [nodes in an OpenSearch cluster](https://opensearch.org/docs/opensearch/rest-api/index/).
 
 #![allow(unused_imports)]
 use crate::{

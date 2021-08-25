@@ -1,4 +1,4 @@
 Index APIs
 
-[Manage individual indices](https://www.elastic.co/guide/en/elasticsearch/reference/master/indices.html),
+[Manage individual indices](https://opensearch.org/docs/opensearch/rest-api/index/),
 index settings, aliases, mappings, and index templates.

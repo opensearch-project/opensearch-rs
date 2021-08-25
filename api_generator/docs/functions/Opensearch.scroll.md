@@ -5,10 +5,10 @@ then fetch the next set of hits using the `_scroll_id` returned in
 the response. Once no more hits are returned, clear the scroll.
 
 ```rust,no_run
-# use elasticsearch::{Elasticsearch, Error, SearchParts, ScrollParts, ClearScrollParts};
+# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-let client = Elasticsearch::default();
+let client = OpenSearch::default();
 
 fn print_hits(hits: &[Value]) {
     for hit in hits {
@@ -29,7 +29,7 @@ let mut response = client
         "query": {
             "match": {
                 "body": {
-                    "query": "Elasticsearch rust",
+                    "query": "OpenSearch rust",
                     "operator": "AND"
                 }
             }

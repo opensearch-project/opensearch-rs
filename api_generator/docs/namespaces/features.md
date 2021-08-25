@@ -1,3 +1,3 @@
 Features APIs
 
-Allows [introspecting and managing features](https://www.elastic.co/guide/en/elasticsearch/reference/current/features-apis.html) provided by Elasticsearch and Elasticsearch plugins.
+Allows [introspecting and managing features](https://opensearch.org/docs/opensearch/rest-api/index/) provided by OpenSearch and OpenSearch plugins.

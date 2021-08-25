@@ -1,7 +1,7 @@
 Cat APIs
 
-The [Cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/master/cat.html) aim to
-meet the needs of humans when looking at data returned from Elasticsearch,
+The [Cat APIs](https://opensearch.org/docs/opensearch/rest-api/cat/index/) aim to
+meet the needs of humans when looking at data returned from OpenSearch,
 formatting it as compact, column aligned text, making it easier on human eyes.
 
 # Plain text responses
@@ -10,12 +10,12 @@ By default, all Cat APIs are configured to send requests with `text/plain` conte
 and accept headers, returning plain text responses
 
 ```rust,no_run
-# use elasticsearch::{Elasticsearch, Error, SearchParts};
+# use opensearch::{OpenSearch, Error, SearchParts};
 # use url::Url;
-# use elasticsearch::auth::Credentials;
+# use opensearch::auth::Credentials;
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-# let client = Elasticsearch::default();
+# let client = OpenSearch::default();
 let response = client
     .cat()
     .nodes()
@@ -32,12 +32,12 @@ let response_body = response.text().await?;
 JSON responses can be returned from Cat APIs either by using `.format("json")`
 
 ```rust,no_run
-# use elasticsearch::{Elasticsearch, Error, SearchParts};
+# use opensearch::{OpenSearch, Error, SearchParts};
 # use url::Url;
-# use elasticsearch::auth::Credentials;
+# use opensearch::auth::Credentials;
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-# let client = Elasticsearch::default();
+# let client = OpenSearch::default();
 let response = client
     .cat()
     .nodes()
@@ -53,11 +53,11 @@ let response_body = response.json::<Value>().await?;
 Or by setting an accept header using `.headers()`
 
 ```rust,no_run
-# use elasticsearch::{Elasticsearch, Error, SearchParts, http::headers::{HeaderValue, DEFAULT_ACCEPT, ACCEPT}};
+# use opensearch::{OpenSearch, Error, SearchParts, http::headers::{HeaderValue, DEFAULT_ACCEPT, ACCEPT}};
 # use url::Url;
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-# let client = Elasticsearch::default();
+# let client = OpenSearch::default();
 let response = client
     .cat()
     .nodes()
@@ -75,11 +75,11 @@ let response_body = response.json::<Value>().await?;
 The column headers to return can be controlled with `.h()`
 
 ```rust,no_run
-# use elasticsearch::{Elasticsearch, Error, SearchParts};
+# use opensearch::{OpenSearch, Error, SearchParts};
 # use url::Url;
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
-# let client = Elasticsearch::default();
+# let client = OpenSearch::default();
 let response = client
     .cat()
     .nodes()

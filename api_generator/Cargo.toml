@@ -1,10 +1,10 @@
 [package]
 name = "api_generator"
-version = "7.10.0-alpha.1"
+version = "1.0.0"
 publish = false
-description = "Generates source code for elasticsearch package, from the Elasticsearch REST API specs"
-repository = "https://github.com/elastic/elasticsearch-rs"
-authors = ["Elastic and Contributors"]
+description = "Generates source code for opensearch package, from the Opensearch REST API specs"
+repository = "https://github.com/opensearch-project/opensearch-rs"
+authors = ["Amazon and Contributors"]
 edition = "2018"
 license = "Apache-2.0"
 

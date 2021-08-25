@@ -26,7 +26,7 @@
 
 //! Task Management APIs
 //!
-//! [Manage tasks currently executing on one or more nodes in the cluster](https://www.elastic.co/guide/en/elasticsearch/reference/master/tasks.html).
+//! [Manage tasks currently executing on one or more nodes in the cluster](https://opensearch.org/docs/opensearch/rest-api/index/).
 
 #![cfg(feature = "experimental-apis")]
 #![doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]

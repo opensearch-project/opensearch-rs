@@ -1,10 +1,8 @@
 Ingest APIs
 
-[Manage ingest pipelines](https://opensearch.org/docs/opensearch/rest-api/index/).
-Ingest pipelines can be used on a node with the `ingest` role to
+Manage ingest pipelines : Ingest pipelines can be used on a node with the `ingest` role to
 pre-process documents before indexing, to apply transformations and enrich data. Transformations are performed
-by [processors](https://opensearch.org/docs/opensearch/rest-api/index/)
-in the pipeline, and can include such operations as
+by processors in the pipeline, and can include such operations as
 
 - add, remove and append fields within the document
 - point documents to the right time-based index based on a timestamp within the document

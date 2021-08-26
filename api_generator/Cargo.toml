@@ -4,7 +4,7 @@ version = "1.0.0"
 publish = false
 description = "Generates source code for opensearch package, from the Opensearch REST API specs"
 repository = "https://github.com/opensearch-project/opensearch-rs"
-authors = ["Amazon and Contributors"]
+authors = ["Elastic and Contributors", "OpenSearch Contributors"]
 edition = "2018"
 license = "Apache-2.0"
 

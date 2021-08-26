@@ -111,7 +111,7 @@
 //! To create a client to make API calls to OpenSearch running on `http://localhost:9200`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::OpenSearch;
+//! # use opensearch::OpenSearch;
 //! let client = OpenSearch::default();
 //! ```
 //!
@@ -119,7 +119,7 @@
 //! specific [url::Url]
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{
+//! # use opensearch::{
 //! #     Error, OpenSearch,
 //! #     http::transport::{Transport, SingleNodeConnectionPool}
 //! # };
@@ -135,7 +135,7 @@
 //! and credentials retrieved from the Cloud web console
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{
+//! # use opensearch::{
 //! #     auth::Credentials,
 //! #     Error, OpenSearch,
 //! #     http::transport::Transport,
@@ -155,7 +155,7 @@
 //! passing it to [OpenSearch::new] create a new instance of [OpenSearch]
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{
+//! # use opensearch::{
 //! #     auth::Credentials,
 //! #     Error, OpenSearch,
 //! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
@@ -179,7 +179,7 @@
 //! The following makes an API call to the cat indices API
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, cat::CatIndicesParts};
+//! # use opensearch::{auth::Credentials, OpenSearch, Error, cat::CatIndicesParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -208,7 +208,7 @@
 //! Indexing a single document can be achieved with the index API
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, SearchParts, IndexParts};
+//! # use opensearch::{auth::Credentials, OpenSearch, Error, SearchParts, IndexParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -234,7 +234,7 @@
 //! to be sent in one API call
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, IndexParts, BulkParts, http::request::JsonBody};
+//! # use opensearch::{auth::Credentials, OpenSearch, Error, IndexParts, BulkParts, http::request::JsonBody};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -277,7 +277,7 @@
 //! `{"query":{"match":{"message":"OpenSearch"}}}`
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, OpenSearch, Error, SearchParts};
+//! # use opensearch::{auth::Credentials, OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -324,7 +324,7 @@
 //! [OpenSearch::send] can be used
 //!
 //! ```rust,no_run
-//! # use elasticsearch::{auth::Credentials, http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};
+//! # use opensearch::{auth::Credentials, http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]

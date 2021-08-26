@@ -141,7 +141,7 @@ fn build_meta() -> String {
     meta
 }
 
-/// Builds a HTTP transport to make API calls to Elasticsearch
+/// Builds a HTTP transport to make API calls to OpenSearch
 pub struct TransportBuilder {
     client_builder: reqwest::ClientBuilder,
     conn_pool: Box<dyn ConnectionPool>,

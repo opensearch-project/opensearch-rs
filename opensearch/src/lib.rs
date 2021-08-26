@@ -16,35 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//! Official Rust client for [Elasticsearch](https://www.elastic.co/products/elasticsearch)
+//! Official Rust client for [OpenSearch](https://opensearch.org/)
 //!
-//! `Elasticsearch` is an official Rust client for Elasticsearch, providing an efficient asynchronous
-//! client for all stable Elasticsearch APIs that's easy to use.
+//! `OpenSearch` is an official Rust client for OpenSearch, providing an efficient asynchronous
+//! client for all stable OpenSearch APIs that's easy to use.
 //!
 //! # Versions and Compatibility
 //!
-//! | Rust client | Elasticsearch |
+//! | Rust client | OpenSearch |
 //! |-------------|---------------|
-//! | 7.x         | 7.x           |
+//! | 1.x         | 1.x           |
 //!
-//! A major version of the client is compatible with the same major version of Elasticsearch.
-//! Since Elasticsearch is developed following [Semantic Versioning](https://semver.org/) principles,
-//! Any minor/patch version of the client can be used against any minor/patch version of Elasticsearch
+//! A major version of the client is compatible with the same major version of OpenSearch.
+//! Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,
+//! Any minor/patch version of the client can be used against any minor/patch version of OpenSearch
 //! **within the same major version lineage**. For example,
 //!
-//! - A `7.5.0` client can be used against `7.0.0` Elasticsearch
-//! - A `7.4.0` client can be used against `7.5.1` Elasticsearch
+//! - A `1.5.0` client can be used against `1.0.0` OpenSearch
+//! - A `1.4.0` client can be used against `1.5.1` OpenSearch
 //!
-//! In the former case, a 7.5.0 client may contain additional API functions that are not available
-//! in 7.0.0 Elasticsearch. In this case, these APIs cannot be used, but for any APIs available in
-//! Elasticsearch, the respective API functions on the client will be compatible.
+//! In the former case, a 1.5.0 client may contain additional API functions that are not available
+//! in 1.0.0 OpenSearch. In this case, these APIs cannot be used, but for any APIs available in
+//! OpenSearch, the respective API functions on the client will be compatible.
 //!
-//! In the latter case, a 7.4.0 client won't contain API functions for APIs that are introduced in
-//! Elasticsearch 7.5.0+, but for all other APIs available in Elasticsearch, the respective API
+//! In the latter case, a 1.4.0 client won't contain API functions for APIs that are introduced in
+//! OpenSearch 1.5.0+, but for all other APIs available in OpenSearch, the respective API
 //! functions on the client will be compatible.
 //!
 //! **No compatibility assurances are given between different major versions of the client and
-//! Elasticsearch**. Major differences likely exist between major versions of Elasticsearch, particularly
+//! OpenSearch**. Major differences likely exist between major versions of OpenSearch, particularly
 //! around request and response object formats, but also around API urls and behaviour.
 //!
 //! # Features
@@ -61,12 +61,12 @@
 //!
 //! # Getting started
 //!
-//! Add the `elasticsearch` crate and version to Cargo.toml. Choose the version that is compatible with
-//! the version of Elasticsearch you're using
+//! Add the `opensearch` crate and version to Cargo.toml. Choose the version that is compatible with
+//! the version of OpenSearch you're using
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! elasticsearch = "7.10.2"
+//! opensearch = "1.0.0"
 //! ```
 //! The following _optional_ dependencies may also be useful to create requests and read responses
 //!
@@ -108,14 +108,14 @@
 //!
 //! ## Create a client
 //!
-//! To create a client to make API calls to Elasticsearch running on `http://localhost:9200`
+//! To create a client to make API calls to OpenSearch running on `http://localhost:9200`
 //!
 //! ```rust,no_run
-//! # use opensearch::OpenSearch;
+//! # use elasticsearch::OpenSearch;
 //! let client = OpenSearch::default();
 //! ```
 //!
-//! Alternatively, you can create a client to make API calls against Elasticsearch running on a
+//! Alternatively, you can create a client to make API calls against OpenSearch running on a
 //! specific [url::Url]
 //!
 //! ```rust,no_run
@@ -130,7 +130,7 @@
 //! # }
 //! ```
 //!
-//! If you're running against an Elasticsearch deployment in [Elastic Cloud](https://www.elastic.co/cloud/),
+//! If you're running against an OpenSearch deployment in [Elastic Cloud](https://www.elastic.co/cloud/),
 //! a client can be created using a [Cloud ID](https://www.elastic.co/guide/en/cloud/current/ec-cloud-id.html)
 //! and credentials retrieved from the Cloud web console
 //!
@@ -152,7 +152,7 @@
 //!
 //! More control over how a [Transport](http::transport::Transport) is built can be
 //! achieved using [TransportBuilder](http::transport::TransportBuilder) to build a transport, and
-//! passing it to [Elasticsearch::new] create a new instance of [Elasticsearch]
+//! passing it to [OpenSearch::new] create a new instance of [OpenSearch]
 //!
 //! ```rust,no_run
 //! # use elasticsearch::{
@@ -172,7 +172,7 @@
 //!
 //! ## Making API calls
 //!
-//! The client exposes all stable Elasticsearch APIs, either on the root [Elasticsearch] client,
+//! The client exposes all stable OpenSearch APIs, either on the root [OpenSearch] client,
 //! or on a _namespace_ client that groups related APIs, such as [Cat](cat::Cat), which groups the
 //! Cat related APIs. All API functions are `async` and can be `await`ed.
 //!
@@ -220,7 +220,7 @@
 //!         "id": 1,
 //!         "user": "kimchy",
 //!         "post_date": "2009-11-15T00:00:00Z",
-//!         "message": "Trying out Elasticsearch, so far so good?"
+//!         "message": "Trying out OpenSearch, so far so good?"
 //!     }))
 //!     .send()
 //!     .await?;
@@ -248,7 +248,7 @@
 //!     "id": 1,
 //!     "user": "kimchy",
 //!     "post_date": "2009-11-15T00:00:00Z",
-//!     "message": "Trying out Elasticsearch, so far so good?"
+//!     "message": "Trying out OpenSearch, so far so good?"
 //! }).into());
 //!
 //! // add the second operation and document
@@ -274,7 +274,7 @@
 //! ### Searching
 //!
 //! The following makes an API call to `tweets/_search` with the json body
-//! `{"query":{"match":{"message":"Elasticsearch"}}}`
+//! `{"query":{"match":{"message":"OpenSearch"}}}`
 //!
 //! ```rust,no_run
 //! # use elasticsearch::{auth::Credentials, OpenSearch, Error, SearchParts};
@@ -290,7 +290,7 @@
 //!     .body(json!({
 //!         "query": {
 //!             "match": {
-//!                 "message": "Elasticsearch rust"
+//!                 "message": "OpenSearch rust"
 //!             }
 //!         }
 //!     }))
@@ -321,7 +321,7 @@
 //! The [Body](http::request::Body) trait represents the body of an API call, allowing for different body implementations.
 //! As well as those to represent JSON and NDJSON, a few other types also have implementations for
 //! [Body](http::request::Body), such as byte slice. Whilst these can't be passed to the API functions directly,
-//! [Elasticsearch::send] can be used
+//! [OpenSearch::send] can be used
 //!
 //! ```rust,no_run
 //! # use elasticsearch::{auth::Credentials, http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};

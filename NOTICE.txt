@@ -1,2 +1,5 @@
-elasticsearch-rs (elasticsearch crate): Rust client for Elasticsearch
-Copyright 2012-2020 Elasticsearch B.V.
+OpenSearch (https://opensearch.org/)
+Copyright OpenSearch Contributors
+
+This product includes software developed by
+Elasticsearch (http://www.elastic.co).

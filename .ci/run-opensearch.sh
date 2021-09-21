@@ -37,13 +37,17 @@ NUMBER_OF_NODES=${NUMBER_OF_NODES-1}
 http_port=9200
 for (( i=0; i<$NUMBER_OF_NODES; i++, http_port++ )); do
   node_name=${opensearch_node_name}$i
-  node_url=${external_opensearch_url/9200/${http_port}}$i
+  node_url=${external_opensearch_url/9200/${http_port}}
+  echo "External opensearch URL is ${external_opensearch_url/9200/${http_port}}"
+  echo "node url $node_url"
   if [[ "$i" == "0" ]]; then node_name=$opensearch_node_name; fi
   environment+=($(cat <<-END
     --env node.name=$node_name
 END
 ))
+  echo "external opensearch url $external_opensearch_url "
   echo "$i: $http_port $node_url "
+  echo "$i is $http_port is $node_url"
   volume_name=${node_name}-rest-test-data
   volumes+=($(cat <<-END
     --volume $volume_name:/usr/share/opensearch/data${i}
@@ -58,12 +62,17 @@ END
   echo 'cluster is' $CLUSTER
   docker build \
     --file=.ci/$CLUSTER/Dockerfile \
-    --build-arg SECURE_INTEGRATION=false \
-    --tag=$CLUSTER \
+    --build-arg SECURE_INTEGRATION=$SECURE_INTEGRATION \
+    --tag=$CLUSTER-secure-$SECURE_INTEGRATION \
     .
 
   echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
   set -x
+  healthcmd="curl -vvv -s --fail http://localhost:9200/_cluster/health || exit 1"
+  if [[ "$SECURE_INTEGRATION" == "true" ]]; then
+    healthcmd="curl -vvv -s --insecure -u admin:admin --fail https://localhost:9200/_cluster/health || exit 1"
+  fi
+
   docker run \
     --name "$node_name" \
     --network "$network_name" \
@@ -74,13 +83,13 @@ END
     --ulimit nofile=65536:65536 \
     --ulimit memlock=-1:-1 \
     --detach="$local_detach" \
-    --health-cmd="curl -vvv -s --fail $opensearch_url/_cluster/health || exit 1" \
+    --health-cmd="$(echo $healthcmd)" \
     --health-interval=2s \
     --health-retries=20 \
     --health-timeout=2s \
     --rm \
     -d \
-    $CLUSTER;
+    $CLUSTER-secure-$SECURE_INTEGRATION;
 
   set +x
   if wait_for_container "$opensearch_node_name" "$network_name"; then

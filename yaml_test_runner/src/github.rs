@@ -59,7 +59,7 @@ pub fn download_test_suites(branch: &str, download_dir: &PathBuf) -> Result<(), 
     let mut headers = HeaderMap::new();
     headers.append(
         USER_AGENT,
-        HeaderValue::from_str(&format!("elasticsearch-rs/{}", env!("CARGO_PKG_NAME")))?,
+        HeaderValue::from_str(&format!("opensearch-rs/{}", env!("CARGO_PKG_NAME")))?,
     );
     let client = reqwest::ClientBuilder::new()
         .default_headers(headers)
@@ -72,16 +72,12 @@ pub fn download_test_suites(branch: &str, download_dir: &PathBuf) -> Result<(), 
 
     let oss_test = Glob::new("**/rest-api-spec/src/main/resources/rest-api-spec/test/**/*.yml")?
         .compile_matcher();
-    let xpack_test = Glob::new("**/x-pack/plugin/src/test/resources/rest-api-spec/test/**/*.yml")?
-        .compile_matcher();
 
     for entry in archive.entries()? {
         let file = entry?;
         let path = file.path()?;
         if oss_test.is_match(&path) {
             write_test_file(download_dir, "free", file)?;
-        } else if xpack_test.is_match(&path) {
-            write_test_file(download_dir, "xpack", file)?;
         }
     }
 

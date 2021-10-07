@@ -116,7 +116,7 @@ impl Serialize for BulkHeader {
 /// the source document of each bulk operation
 ///
 /// ```rust,no_run
-/// # use elasticsearch::{
+/// # use opensearch::{
 /// #     BulkOperation,
 /// #     BulkParts,
 /// #     Error, OpenSearch,
@@ -582,7 +582,7 @@ impl<B> From<BulkUpdateOperation<B>> for BulkOperation<B> {
 /// structs to model source documents
 ///
 /// ```rust,no_run
-/// # use elasticsearch::{
+/// # use opensearch::{
 /// #     BulkOperation,
 /// #     BulkOperations,
 /// #     BulkParts,

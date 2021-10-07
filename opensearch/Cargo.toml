@@ -1,13 +1,13 @@
 [package]
-name = "elasticsearch"
+name = "opensearch"
 version = "7.10.2"
 edition = "2018"
-authors = ["Elastic and Contributors"]
-description = "Official Elasticsearch Rust client"
-repository = "https://github.com/elastic/elasticsearch-rs"
-keywords = ["elasticsearch", "elastic", "search", "lucene"]
+authors = ["Elastic and Contributors", "OpenSearch Contributors"]
+description = "Official Opensearch Rust client"
+repository = "https://github.com/opensearch-project/opensearch-rs"
+keywords = ["opensearch", "elasticsearch", "search", "lucene"]
 categories = ["api-bindings", "database"]
-documentation = "https://docs.rs/elasticsearch/"
+documentation = "https://opensearch.org/docs/latest"
 license = "Apache-2.0"
 readme = "../README.md"
 

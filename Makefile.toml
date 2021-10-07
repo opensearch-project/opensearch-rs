@@ -12,21 +12,21 @@ CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"]}}
 
 [tasks.set-free-env]
-category = "Elasticsearch"
+category = "Opensearch"
 description = "Sets OPENSEARCH_URL environment variable if not already set for later tasks when free test suite used"
 private = true
 condition = { env = { "TEST_SUITE" = "free" }, env_not_set = ["OPENSEARCH_URL"] }
 env = { "OPENSEARCH_URL" = "http://localhost:9200" }
 
 [tasks.set-platinum-env]
-category = "Elasticsearch"
+category = "Opensearch"
 description = "Sets OPENSEARCH_URL environment variable if not already set for later tasks when platinum test suite used"
 private = true
 condition = { env = { "TEST_SUITE" = "platinum" }, env_not_set = ["OPENSEARCH_URL"] }
 env = { "OPENSEARCH_URL" = "https://elastic:changeme@localhost:9200" }
 
 [tasks.run-yaml-test-runner]
-category = "Elasticsearch"
+category = "OpenSearch"
 description = '''
 Runs yaml_test_runner package to generate tests from yaml files for a given Elasticsearch commit.
 The commit to use is retrieved from the running Elasticsearch instance
@@ -34,10 +34,10 @@ The commit to use is retrieved from the running Elasticsearch instance
 private = true
 command = "cargo"
 args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}"]
-dependencies = ["start-elasticsearch"]
+dependencies = ["start-opensearch"]
 
 [tasks.test-yaml-test-runner]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ], env_false = ["CARGO_MAKE_CI"] }
 command = "cargo"
@@ -45,73 +45,73 @@ args = ["test", "-p", "yaml_test_runner", "--", "--test-threads", "1"]
 dependencies = ["generate-yaml-tests"]
 
 [tasks.test-yaml-test-runner-ci]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ], env_true = ["CARGO_MAKE_CI"] }
 script = ["cargo test -p yaml_test_runner -- --test-threads 1 -Z unstable-options --format json | tee test_results/results.json"]
 dependencies = ["generate-yaml-tests"]
 
-[tasks.test-elasticsearch]
-category = "Elasticsearch"
+[tasks.test-opensearch]
+category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ], env = { "TEST_SUITE" = "platinum" } }
 command = "cargo"
-args = ["test", "-p", "elasticsearch"]
-dependencies = ["start-elasticsearch"]
+args = ["test", "-p", "opensearch"]
+dependencies = ["start-opensearch"]
 
 [tasks.run-api-generator]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 command = "cargo"
 args = ["run", "-p", "api_generator"]
 
 [tasks.create-test-results-dir]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 condition = { env_true = [ "CARGO_MAKE_CI" ] }
 script = ["[ -d test_results ] || mkdir -p test_results"]
 
 [tasks.install-cargo2junit]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 script = ["cargo install cargo2junit"]
 
 [tasks.convert-test-results-junit]
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 condition = { env_true = [ "CARGO_MAKE_CI" ] }
 script = ["cat test_results/results.json | cargo2junit > test_results/cargo-junit.xml"]
 dependencies = ["install-cargo2junit"]
 
-[tasks.run-elasticsearch]
-category = "Elasticsearch"
+[tasks.run-opensearch]
+category = "Opensearch"
 private = true
 condition = { env_set = [ "STACK_VERSION", "TEST_SUITE" ], env_false = ["CARGO_MAKE_CI"] }
 dependencies = ["set-free-env", "set-platinum-env"]
 
-[tasks.run-elasticsearch.linux]
-command = "./.ci/run-elasticsearch.sh"
+[tasks.run-opensearch.linux]
+command = "./.ci/run-opensearch.sh"
 
-[tasks.run-elasticsearch.mac]
-command = "./.ci/run-elasticsearch.sh"
+[tasks.run-opensearch.mac]
+command = "./.ci/run-opensearch.sh"
 
-[tasks.run-elasticsearch.windows]
+[tasks.run-opensearch.windows]
 script_runner = "cmd"
 script = [
 '''
-bash -c "STACK_VERSION=%STACK_VERSION% TEST_SUITE=%TEST_SUITE% DETACH=%DETACH% CLEANUP=%CLEANUP% bash .ci/run-elasticsearch.sh"
+bash -c "STACK_VERSION=%STACK_VERSION% TEST_SUITE=%TEST_SUITE% DETACH=%DETACH% CLEANUP=%CLEANUP% bash .ci/run-opensearch.sh"
 '''
 ]
 
-[tasks.publish-elasticsearch]
+[tasks.publish-opensearch]
 description = "Runs the cargo publish command."
-category = "Elasticsearch"
+category = "OpenSearch"
 private = true
 script_runner = "@duckscript"
 script = [
 """
-cd elasticsearch
-echo "publishing elasticsearch crate: cargo publish %{CARGO_MAKE_CARGO_PUBLISH_FLAGS}"
+cd opensearch
+echo "publishing opensearch crate: cargo publish %{CARGO_MAKE_CARGO_PUBLISH_FLAGS}"
 if is_empty %{CARGO_MAKE_CARGO_PUBLISH_FLAGS}
     exec cargo publish
 else
@@ -124,64 +124,64 @@ end
 # Public tasks
 # ============
 
-[tasks.start-elasticsearch]
-extend = "run-elasticsearch"
+[tasks.start-opensearch]
+extend = "run-opensearch"
 private = false
-description = "Starts Elasticsearch docker container with the given version and distribution"
+description = "Starts OpenSearch docker container with the given version and distribution"
 env = { "CLEANUP" = false, "DETACH" = true }
 
-[tasks.stop-elasticsearch]
-extend = "run-elasticsearch"
+[tasks.stop-opensearch]
+extend = "run-opensearch"
 private = false
-description = "Stops Elasticsearch docker container, if running"
+description = "Stops OpenSearch docker container, if running"
 env = { "CLEANUP" = true, "DETACH" = false }
 
 [tasks.test-yaml]
-category = "Elasticsearch"
-description = "Generates and runs yaml_test_runner package platinum/free tests against a given Elasticsearch version"
+category = "OpenSearch"
+description = "Generates and runs yaml_test_runner package platinum/free tests against a given OpenSearch version"
 condition = { env_set = [ "STACK_VERSION", "TEST_SUITE" ] }
 dependencies = ["generate-yaml-tests", "create-test-results-dir", "test-yaml-test-runner", "test-yaml-test-runner-ci", "convert-test-results-junit"]
-run_task = "stop-elasticsearch"
+run_task = "stop-opensearch"
 
 [tasks.test-generator]
-category = "Elasticsearch"
+category = "OpenSearch"
 clear = true
 description = "Runs api_generator tests"
 command = "cargo"
 args = ["test", "-p", "api_generator"]
 
 [tasks.test]
-category = "Elasticsearch"
+category = "OpenSearch"
 clear = true
-description = "Runs elasticsearch package tests against a given Elasticsearch version"
+description = "Runs opensearch package tests against a given Opensearch version"
 env = { "TEST_SUITE" = { value = "platinum", condition = { env_set = ["TEST_SUITE"] } } }
-dependencies = ["test-elasticsearch"]
-run_task = "stop-elasticsearch"
+dependencies = ["test-opensearch"]
+run_task = "stop-opensearch"
 
 [tasks.generate-yaml-tests]
-category = "Elasticsearch"
-description = "Generates Elasticsearch client tests from YAML tests"
+category = "OpenSearch"
+description = "Generates OpenSearch client tests from YAML tests"
 dependencies = ["run-yaml-test-runner"]
 run_task = "format"
 
 [tasks.generate-api]
-category = "Elasticsearch"
-description = "Generates Elasticsearch client from REST API specs"
+category = "OpenSearch"
+description = "Generates OpenSearch client from REST API specs"
 dependencies = ["run-api-generator"]
 run_task = "format"
 
 [tasks.docs]
-description = "Generate Elasticsearch client documentation and opens in browser"
+description = "Generate OpenSearch client documentation and opens in browser"
 clear = true
-category = "Elasticsearch"
+category = "OpenSearch"
 command = "cargo"
-args = ["doc", "-p", "elasticsearch", "--no-deps", "--open", "--all-features"]
+args = ["doc", "-p", "opensearch", "--no-deps", "--open", "--all-features"]
 
 [tasks.generate-release-notes]
-category = "Elasticsearch"
+category = "Opensearch"
 description = """
-Generates release notes for Elasticsearch client using a common release notes generator docker image.
-Assumes the clients-team repo is checked out as a sibling directory of elasticsearch-rs
+Generates release notes for Opensearch client using a common release notes generator docker image.
+Assumes the clients-team repo is checked out as a sibling directory of opensearch-rs
 """
 condition = { env_set = ["OLD_VERSION", "NEW_VERSION"], files_exist = [ "${CARGO_MAKE_WORKING_DIRECTORY}/../clients-team/scripts/release-notes-generator/Dockerfile" ] }
 script_runner = "@shell"
@@ -195,7 +195,7 @@ docker run -v "${CARGO_MAKE_WORKING_DIRECTORY}/.ci/release/config.yml:/usr/src/r
 
 [tasks.publish]
 clear = true
-dependencies = [ "publish-elasticsearch" ]
+dependencies = [ "publish-opensearch" ]
 run_task = "generate-release-notes"
 
 [tasks.package]

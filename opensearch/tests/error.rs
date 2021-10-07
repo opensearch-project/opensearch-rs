@@ -31,7 +31,7 @@
 pub mod common;
 use common::*;
 
-use elasticsearch::ExplainParts;
+use opensearch::ExplainParts;
 use reqwest::StatusCode;
 use serde_json::{json, Value};
 

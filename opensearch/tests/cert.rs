@@ -19,8 +19,6 @@
 //! These tests require a cluster configured with Security. One can be spun up using the
 //! .ci/run-elasticsearch.sh script as follows:
 //!
-//! export TEST_SUITE=xpack
-//! export STACK_VERSION=<a version that aligns with the client e.g. 7.8.0, 8.0.0-SNAPSHOT, etc>
 //!
 //! DETACH=true .ci/run-elasticsearch.sh
 #![cfg(any(feature = "native-tls", feature = "rustls-tls"))]

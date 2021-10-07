@@ -49,7 +49,6 @@ use yaml_rust::{Yaml, YamlLoader};
 #[derive(Debug, PartialEq)]
 pub enum TestSuite {
     Free,
-    XPack,
 }
 
 /// The components of a test file, constructed from a yaml file
@@ -132,10 +131,7 @@ impl<'a> YamlTests<'a> {
     pub fn build(self) -> Tokens {
         let (setup_fn, setup_call) = Self::generate_fixture(&self.setup);
         let (teardown_fn, teardown_call) = Self::generate_fixture(&self.teardown);
-        let general_setup_call = match self.suite {
-            TestSuite::Free => quote!(client::general_oss_setup().await?;),
-            TestSuite::XPack => quote!(client::general_xpack_setup().await?;),
-        };
+        let general_setup_call = quote!(client::general_oss_setup().await?;);
 
         let tests = self.fn_impls(general_setup_call, setup_call, teardown_call);
 
@@ -419,7 +415,6 @@ pub fn generate_tests_from_yaml(
 
                         match top_dir.as_str() {
                             "free" => TestSuite::Free,
-                            "xpack" => TestSuite::XPack,
                             _ => panic!("Unknown test suite {:?}", path),
                         }
                     };

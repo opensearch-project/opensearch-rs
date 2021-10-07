@@ -30,7 +30,7 @@ extern crate os_type;
 pub mod common;
 use common::*;
 
-use elasticsearch::cert::{Certificate, CertificateValidation};
+use opensearch::cert::{Certificate, CertificateValidation};
 use os_type::OSType;
 
 static CA_CERT: &[u8] = include_bytes!("../../.ci/certs/ca.crt");

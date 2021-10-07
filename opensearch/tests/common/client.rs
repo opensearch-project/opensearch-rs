@@ -29,8 +29,8 @@
  */
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-use elasticsearch::cert::CertificateValidation;
-use elasticsearch::{
+use opensearch::cert::CertificateValidation;
+use opensearch::{
     auth::Credentials,
     http::{
         response::Response,

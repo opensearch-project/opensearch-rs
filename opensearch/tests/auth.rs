@@ -31,7 +31,7 @@
 pub mod common;
 use common::*;
 
-use elasticsearch::auth::Credentials;
+use opensearch::auth::Credentials;
 
 use base64::{self, write::EncoderWriter as Base64Encoder};
 // use std::fs::File;

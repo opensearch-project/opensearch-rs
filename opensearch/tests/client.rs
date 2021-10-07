@@ -31,7 +31,7 @@
 pub mod common;
 use common::*;
 
-use elasticsearch::{
+use opensearch::{
     http::{
         headers::{
             HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE, DEFAULT_ACCEPT,
@@ -295,7 +295,7 @@ async fn search_with_body() -> Result<(), failure::Error> {
 
     assert_eq!(response.url(), &expected_url);
     assert_eq!(response.status_code(), StatusCode::OK);
-    assert_eq!(response.method(), elasticsearch::http::Method::Post);
+    assert_eq!(response.method(), opensearch::http::Method::Post);
     let debug = format!("{:?}", &response);
     assert!(debug.contains("method"));
     assert!(debug.contains("status_code"));
@@ -318,7 +318,7 @@ async fn search_with_no_body() -> Result<(), failure::Error> {
         .await?;
 
     assert_eq!(response.status_code(), StatusCode::OK);
-    assert_eq!(response.method(), elasticsearch::http::Method::Get);
+    assert_eq!(response.method(), opensearch::http::Method::Get);
     let response_body = response.json::<Value>().await?;
     assert!(response_body["took"].as_i64().is_some());
 
@@ -341,7 +341,7 @@ async fn read_response_as_bytes() -> Result<(), failure::Error> {
         .await?;
 
     assert_eq!(response.status_code(), StatusCode::OK);
-    assert_eq!(response.method(), elasticsearch::http::Method::Get);
+    assert_eq!(response.method(), opensearch::http::Method::Get);
 
     let response: Bytes = response.bytes().await?;
     let json: Value = serde_json::from_slice(&response).unwrap();
@@ -454,7 +454,7 @@ async fn byte_slice_body() -> Result<(), failure::Error> {
 
     let response = client
         .send(
-            elasticsearch::http::Method::Post,
+            opensearch::http::Method::Post,
             SearchParts::None.url().as_ref(),
             HeaderMap::new(),
             Option::<&Value>::None,

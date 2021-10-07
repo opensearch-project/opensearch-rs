@@ -78,7 +78,7 @@ fn create_client() -> Result<OpenSearch, Error> {
             url.set_username("").unwrap();
             u
         } else {
-            std::env::var("ES_USERNAME").unwrap_or_else(|_| "elastic".into())
+            std::env::var("OS_USERNAME").unwrap_or_else(|_| "elastic".into())
         };
 
         let password = match url.password() {
@@ -87,7 +87,7 @@ fn create_client() -> Result<OpenSearch, Error> {
                 url.set_password(None).unwrap();
                 pass
             }
-            None => std::env::var("ES_PASSWORD").unwrap_or_else(|_| "changeme".into()),
+            None => std::env::var("OS_PASSWORD").unwrap_or_else(|_| "changeme".into()),
         };
 
         Some(Credentials::Basic(username, password))

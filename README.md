@@ -1,6 +1,10 @@
+[![Chat](https://img.shields.io/badge/chat-on%20forums-blue)](https://discuss.opendistrocommunity.dev/c/clients/)
+![PRs welcome!](https://img.shields.io/badge/PRs-welcome!-success)
+
 ![OpenSearch logo](OpenSearch.svg)
 
-OpenSearch Rust Client 
+OpenSearch Rust Client
+
 - [Welcome!](#welcome)
 - [Project Resources](#project-resources)
 - [Code of Conduct](#code-of-conduct)
@@ -14,6 +18,8 @@ OpenSearch Rust Client
 ## Project Resources
 
 * [Project Website](https://opensearch.org/)
+* [Developer Guide](DEVELOPER_GUIDE.md)
+* [User Guide](USER_GUIDE.md)
 * [Documentation](https://opensearch.org/docs/)
 * Need help? Try [Forums](https://discuss.opendistrocommunity.dev/c/clients/)
 * [Project Principles](https://opensearch.org/#principles)

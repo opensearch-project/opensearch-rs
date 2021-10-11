@@ -1,204 +1,91 @@
-# Contributing
+- [Contributing to OpenSearch](#contributing-to-opensearch)
+- [First Things First](#first-things-first)
+- [Ways to Contribute](#ways-to-contribute)
+  - [Bug Reports](#bug-reports)
+  - [Feature Requests](#feature-requests)
+  - [Contributing Code](#contributing-code)
+- [Developer Certificate of Origin](#developer-certificate-of-origin)
+- [Review Process](#review-process)
 
-Contributing to the client is very much appreciated, no pull request (PR) is too big or too small!
-We ask that _before_ opening a PR however, you check to see if there is an issue that discusses the change that you
-wish to make. If there isn't, it's best to open a new issue first to discuss it, to save you time in future
-and help us further ascertain the crux of the issue. If an issue already exists, please add to the discussion there.
+## Contributing to OpenSearch
 
-Once an issue has been discussed and agreement reached that it should be acted upon, if you wish to work on a PR
-to address it, please assign the issue to yourself, so that others know that you're working on it.
+OpenSearch is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
 
-## Sign the Contributor License Agreement
+## First Things First
 
-We do ask that you sign the [Contiributor License Agreement](https://www.elastic.co/contributor-agreement)
-before we can accept pull requests from you.
+1. **When in doubt, open an issue** - For almost any type of contribution, the first step is opening an issue. Even if you think you already know what the solution is, writing down a description of the problem you're trying to solve will help everyone get context when they review your pull request. If it's truly a trivial change (e.g. spelling error), you can skip this step -- but as the subject says, when it doubt, [open an issue](https://github.com/opensearch-project/opensearch-rs/issues/new/choose).
 
-## Development
+2. **Only submit your own work**  (or work you have sufficient rights to submit) - Please make sure that any code or documentation you submit is your work or you have the rights to submit. We respect the intellectual property rights of others, and as part of contributing, we'll ask you to sign your contribution with a "Developer Certificate of Origin" (DCO) that states you have the rights to submit this work and you understand we'll use your contribution. There's more information about this topic in the [DCO section](#developer-certificate-of-origin).
 
-The following information will help in getting up and running:
+## Ways to Contribute
 
-### Prerequisites
+### Bug Reports
 
-The project makes use of the following, which should be installed
+Ugh! Bugs!
 
-- [**Docker**](https://www.docker.com/)
+A bug is when software behaves in a way that you didn't expect and the developer didn't intend. To help us understand what's going on, we first want to make sure you're working from the latest version.
 
-  Docker is used to start instances of Elasticsearch by using
-  [Elastic's Elasticsearch docker images](https://container-library.elastic.co/).
-  For Windows, use [Docker with WSL 2 backend](https://docs.docker.com/docker-for-windows/wsl/).
+Once you've confirmed that the bug still exists in the latest version, you'll want to check to make sure it's not something we already know about on the [open issues GitHub page](https://github.com/opensearch-project/opensearch-rs/issues/new/choose).
 
-- [**Cargo make**](https://sagiegurari.github.io/cargo-make/)
+If you've upgraded to the latest version and you can't find it in our open issues list, then you'll need to tell us how to reproduce it Provide as much information as you can. You may think that the problem lies with your query, when actually it depends on how your data is indexed. The easier it is for us to recreate your problem, the faster it is likely to be fixed.
 
-  Cargo make is used to define and configure a set of tasks, and run them as a flow. This helps with performing actions
-  such as starting an Elasticsearch instance for integration tests
+### Feature Requests
 
-  Cargo make can be installed with
-
-  ```sh
-  cargo install --force cargo-make
-  ```
+If you've thought of a way that OpenSearch could be better, we want to hear about it. We track feature requests using GitHub, so please feel free to open an issue which describes the feature you would like to see, why you need it, and how it should work.
 
 
-If you are running the tests in Docker, [set `vm.max_map_count` for your platform](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144) to allow Elasticsearch to start.
+### Contributing Code
 
-### Cargo make
+As with other types of contributions, the first step is to [open an issue on GitHub](https://github.com/opensearch-project/opensearch-rs/issues/new/choose). Opening an issue before you make changes makes sure that someone else isn't already working on that particular problem. It also lets us all work together to find the right approach before you spend a bunch of time on a PR. So again, when in doubt, open an issue.
 
-Cargo make is used to define and configure a set of tasks, and run them as a flow. To see all of the Elasticsearch
-category tasks defined
+## Developer Certificate of Origin
 
-```sh
-cargo make
+OpenSearch is an open source product released under the Apache 2.0 license (see either [the Apache site](https://www.apache.org/licenses/LICENSE-2.0) or the [LICENSE.txt file](LICENSE.txt)). The Apache 2.0 license allows you to freely use, modify, distribute, and sell your own products that include Apache 2.0 licensed software.
+
+We respect intellectual property rights of others and we want to make sure all incoming contributions are correctly attributed and licensed. A Developer Certificate of Origin (DCO) is a lightweight mechanism to do that.
+
+The DCO is a declaration attached to every contribution made by every developer. In the commit message of the contribution, the developer simply adds a `Signed-off-by` statement and thereby agrees to the DCO, which you can find below or at [DeveloperCertificate.org](http://developercertificate.org/).
+
+```
+Developer's Certificate of Origin 1.1
+By making a contribution to this project, I certify that:
+(a) The contribution was created in whole or in part by me and I
+    have the right to submit it under the open source license
+    indicated in the file; or
+(b) The contribution is based upon previous work that, to the
+    best of my knowledge, is covered under an appropriate open
+    source license and I have the right under that license to
+    submit that work with modifications, whether created in whole
+    or in part by me, under the same open source license (unless
+    I am permitted to submit under a different license), as
+    Indicated in the file; or
+(c) The contribution was provided directly to me by some other
+    person who certified (a), (b) or (c) and I have not modified
+    it.
+(d) I understand and agree that this project and the contribution
+    are public and that a record of the contribution (including
+    all personal information I submit with it, including my
+    sign-off) is maintained indefinitely and may be redistributed
+    consistent with this project or the open source license(s)
+    involved.
+ ```
+
+We require that every contribution to OpenSearch is signed with a Developer Certificate of Origin. Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
+
+Each commit must include a DCO which looks like this
+
+```
+Signed-off-by: Jane Smith <jane.smith@email.com>
 ```
 
-The `Elasticsearch` category of steps are specifically defined for this project and are defined in
-[Makefile.toml](Makefile.toml).
+You may type this line on your own when writing your commit messages. However, if your user.name and user.email are set in your git configs, you can use `-s` or `– – signoff` to add the `Signed-off-by` line to the end of the commit message.
 
-- Build all packages
+## Review Process
 
-  ```sh
-  cargo make build
-  ```
+We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. As a reminder, [opening an issue](https://github.com/opensearch-project/opensearch-rs/issues/new/choose) discussing your change before you make it is the best way to smooth the PR process. This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
 
-- Generate client from REST specs
+During the PR process, expect that there will be some back-and-forth. Please try to respond to comments in a timely fashion, and if you don't wish to continue with the PR, let us know. If a PR takes too many iterations for its complexity or size, we may reject it. Additionally, if you stop responding we may close the PR as abandoned. In either case, if you feel this was done in error, please add a comment on the PR.
 
-  ```sh
-  cargo make generate-api
-  ```
+If we accept the PR, a [maintainer](MAINTAINERS.md) will merge your change and usually take care of backporting it to appropriate branches ourselves.
 
-- Run Elasticsearch package tests
-
-  Optionally pass
-
-  - `STACK_VERSION`: Elasticsearch version like `7.9.0` or can be
-  a snapshot release like `7.x-SNAPSHOT`
-
-  ```sh
-  cargo make test --env STACK_VERSION=7.9.0
-  ```
-
-- Run YAML tests
-
-  Optionally pass
-
-  - `STACK_VERSION`: Elasticsearch version like `7.9.0` or can be
-  a snapshot release like `7.x-SNAPSHOT`
-  - `TEST_SUITE`: Elasticsearch distribution of `free` or `platinum`
-
-  ```sh
-  cargo make test-yaml --env STACK_VERSION=7.9.0 --env TEST_SUITE=free
-  ```
-
-### Packages
-
-The workspace contains the following packages:
-
-- #### `elasticsearch`
-
-  The client package crate. The client exposes all Elasticsearch APIs as associated functions, either on
-the root client, `Elasticsearch`, or on one of the _namespaced clients_, such as `Cat`, `Indices`, etc. The _namespaced clients_
-are based on the grouping of APIs within the [Elasticsearch](https://github.com/elastic/elasticsearch/tree/master/rest-api-spec) and [X-Pack](https://github.com/elastic/elasticsearch/tree/master/x-pack/plugin/src/test/resources/rest-api-spec/api) REST API specs from which much of the client is generated.
-All API functions are `async` only, and can be `await`ed.
-
-- #### `api_generator`
-
-  A small executable that downloads REST API specs from GitHub and generates much of the client package from the specs.
-The minimum REST API spec version compatible with the generator is `v7.4.0`.
-
-  The `api_generator` package makes heavy use of the [`syn`](https://docs.rs/syn/1.0.5/syn/) and [`quote`](https://docs.rs/quote/1.0.2/quote/) crates to generate Rust code from the REST API specs.
-The `quote!` macro is particularly useful as it accepts Rust code that can include placeholder tokens (prefixed with `#`)
-that will be interpolated during expansion. Unlike procedural macros, the token stream returned by the `quote!` macro
-can be `to_string()`'ed and written to disk, and this is used to create much of the client scaffolding.
-
-- #### `yaml_test_runner`
-
-  A small executable that downloads YAML tests from GitHub and generates client tests from the YAML tests. The
-  version of YAML tests to download are determined from the commit hash of a running Elasticsearch instance.
-
-  The `yaml_test_runner` package can be run with `cargo make test-yaml` to run the generated client tests,
-  passing environment variables `TEST_SUITE` and `STACK_VERSION` to control the distribution and version,
-  respectively.
-
-### Design principles
-
-1. Generate as much of the client as feasible from the REST API specs
-
-    The REST API specs contain information about
-    - the URL parts e.g. `{index}/{type}/_search` and variants
-    - accepted HTTP methods e.g. `GET`, `POST`
-    - the URL query string parameters
-    - whether the API accepts a body
-
-2. Prefer generation methods that produce ASTs and token streams over strings.
-The `quote` and `syn` crates help
-
-3. Get it working, then refine/refactor
-
-    - Start simple and iterate
-    - Design of the API is conducive to ease of use
-    - Asynchronous only
-    - Control API invariants through arguments on API function. For example
-
-      ```no_run
-      client.delete_script(DeleteScriptParts::Id("script_id"))
-          .send()
-          .await?;
-      ```
-
-      An id must always be provided for a delete script API call, so the `delete_script()` function
-      must accept it as a value.
-
-### Coding style guide
-
-The repository adheres to the styling enforced by `rustfmt`.
-
-#### Formatting
-
-Rust code can be formatted using [`rustfmt`](https://github.com/rust-lang/rustfmt) through cargo make.
-
-To format all packages in a workspace, from the workspace root
-
-```sh
-cargo make format
-```
-
-It is strongly recommended to run this before opening a PR.
-
-#### Clippy
-
-[Clippy](https://github.com/rust-lang/rust-clippy) is a bunch of lints to catch common mistakes and improve your Rust code!
-
-Run clippy before opening a PR
-
-```sh
-cargo make clippy
-```
-
-### Running MSVC debugger in VS Code
-
-From [Bryce Van Dyk's blog post](https://www.brycevandyk.com/debug-rust-on-windows-with-visual-studio-code-and-the-msvc-debugger/),
-if wishing to use the MSVC debugger with Rust in VS code, which may be preferred on Windows
-
-1. Install [C/C++ VS Code extensions](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-
-2. Place the following in `.vscode/launch.json` in the project root
-
-    ```json
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "name": "Debug api_generator",
-                "type": "cppvsdbg",
-                "request": "launch",
-                "program": "${workspaceFolder}/target/debug/api_generator.exe",
-                "args": [],
-                "stopAtEntry": false,
-                "cwd": "${workspaceFolder}",
-                "environment": [],
-                "externalConsole": false
-            }
-        ]
-    }
-    ```
-
-3. Add `"debug.allowBreakpointsEverywhere": true` to VS code settings.json
+If we reject the PR, we will close the pull request with a comment explaining why. This decision isn't always final: if you feel we have misunderstood your intended change or otherwise think that we should reconsider then please continue the conversation with a comment on the PR and we'll do our best to address any further points you raise.

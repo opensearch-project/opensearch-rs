@@ -163,7 +163,7 @@ fn branch_suite_and_version_from_elasticsearch(
     let suite = match std::env::var("TEST_SUITE") {
         Err(_) => panic!("Env var TEST_SUITE is not defined"),
         Ok(ref s) if s == "free" => TestSuite::Free,
-        _ => TestSuite::XPack,
+        _ => TestSuite::Free,
     };
     let mut response = client.get(url).send()?;
     let json: Value = response.json()?;

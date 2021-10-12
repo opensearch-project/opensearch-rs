@@ -33,4 +33,4 @@ pub mod server;
 
 #[allow(unused)]
 pub static DEFAULT_USER_AGENT: &'static str =
-    concat!("elasticsearch-rs/", env!("CARGO_PKG_VERSION"));
+    concat!("opensearch-rs/", env!("CARGO_PKG_VERSION"));

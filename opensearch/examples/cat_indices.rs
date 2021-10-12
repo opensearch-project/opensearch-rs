@@ -29,8 +29,8 @@
  */
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-use elasticsearch::cert::CertificateValidation;
-use elasticsearch::{
+use opensearch::cert::CertificateValidation;
+use opensearch::{
     auth::Credentials,
     cat::CatIndicesParts,
     http::transport::{SingleNodeConnectionPool, TransportBuilder},
@@ -78,7 +78,7 @@ fn create_client() -> Result<OpenSearch, Error> {
             url.set_username("").unwrap();
             u
         } else {
-            std::env::var("OS_USERNAME").unwrap_or_else(|_| "elastic".into())
+            std::env::var("OPENSEARCH_USERNAME").unwrap_or_else(|_| "admin".into())
         };
 
         let password = match url.password() {
@@ -87,7 +87,7 @@ fn create_client() -> Result<OpenSearch, Error> {
                 url.set_password(None).unwrap();
                 pass
             }
-            None => std::env::var("OS_PASSWORD").unwrap_or_else(|_| "changeme".into()),
+            None => std::env::var("OPENSEARCH_PASSWORD").unwrap_or_else(|_| "admin".into()),
         };
 
         Some(Credentials::Basic(username, password))

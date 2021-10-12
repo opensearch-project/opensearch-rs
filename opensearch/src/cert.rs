@@ -60,10 +60,10 @@ use std::{
     any(feature = "native-tls", feature = "rustls-tls"),
     doc = r##"
 ```rust,no_run
-# use elasticsearch::{
+# use opensearch::{
 #     auth::Credentials,
 #     cert::{Certificate,CertificateValidation},
-#     Error, Elasticsearch,
+#     Error, OpenSearch,
 #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 # };
 # use std::fs::File;
@@ -99,10 +99,10 @@ let _response = client.ping().send().await?;
     feature = "native-tls",
     doc = r##"
 ```rust,no_run
-# use elasticsearch::{
+# use opensearch::{
 #     auth::Credentials,
 #     cert::{Certificate,CertificateValidation},
-#     Error, Elasticsearch,
+#     Error, OpenSearch,
 #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 # };
 # use std::fs::File;
@@ -133,7 +133,7 @@ let _response = client.ping().send().await?;
 /// **Use on production clusters is strongly discouraged**
 ///
 /// ```rust,no_run
-/// # use elasticsearch::{
+/// # use opensearch::{
 /// #     auth::Credentials,
 /// #     cert::{Certificate,CertificateValidation},
 /// #     Error, OpenSearch,

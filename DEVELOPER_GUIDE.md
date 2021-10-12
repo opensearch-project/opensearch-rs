@@ -1,6 +1,6 @@
 # Developer Guide
 
-So you want to contribute code to the OpenSearch Go Client?  Excellent!  We're glad you're here.  Here's what you need to do:
+So you want to contribute code to the OpenSearch Rust Client?  Excellent!  We're glad you're here.  Here's what you need to do:
 
 ## Getting Started
 
@@ -22,12 +22,12 @@ The project makes use of the following, which should be installed
 - [**Docker**](https://www.docker.com/)
 
   Docker is used to start instances of OpenSearch by using
-  [Amazon's OpenSearch docker images](https://hub.docker.com/r/opensearchproject/opensearch).
+  [OpenSearch docker image](https://hub.docker.com/r/opensearchproject/opensearch).
 
 - [**Cargo make**](https://sagiegurari.github.io/cargo-make/)
 
   Cargo make is used to define and configure a set of tasks, and run them as a flow. This helps with performing actions
-  such as starting an Elasticsearch instance for integration tests
+  such as starting an OpenSearch instance for integration tests
 
   Cargo make can be installed with
 
@@ -36,11 +36,11 @@ The project makes use of the following, which should be installed
   ```
 
 
-If you are running the tests in Docker, [set `vm.max_map_count` for your platform](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144) to allow OpenSearch to start.
+If you are running the tests in Docker, [set `vm.max_map_count` for your platform](https://opensearch.org/docs/latest/opensearch/install/important-settings) to allow OpenSearch to start.
 
 ### Cargo make
 
-Cargo make is used to define and configure a set of tasks, and run them as a flow. To see all of the Elasticsearch
+Cargo make is used to define and configure a set of tasks, and run them as a flow. To see all of the OpenSearch
 category tasks defined
 
 ```sh

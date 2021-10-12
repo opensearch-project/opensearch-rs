@@ -1,6 +1,6 @@
 ## Overview
 
-This document explains who the admins are (see below), what they do in this repo, and how they should be doing it. If you're interested in becoming a maintainer, see [MAINTAINERS](MAINTAINERS.md). If you're interested in contributing, see [CONTRIBUTING](CONTRIBUTING.md).
+This document explains who the admins are (see below), what they do in this repo, and how they should be doing it. If you're interested in becoming a maintainer, see [MAINTAINERS](MAINTAINERS.md). If you're interested in contributing, see [CONTRIBUTING](DEVELOPER_GUIDE.md).
 
 ## Current Admins
 

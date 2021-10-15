@@ -131,7 +131,7 @@ impl<'a> YamlTests<'a> {
     pub fn build(self) -> Tokens {
         let (setup_fn, setup_call) = Self::generate_fixture(&self.setup);
         let (teardown_fn, teardown_call) = Self::generate_fixture(&self.teardown);
-        let general_setup_call = quote!(client::general_oss_setup().await?;);
+        let general_setup_call = quote!(client::general_cluster_setup().await?;);
 
         let tests = self.fn_impls(general_setup_call, setup_call, teardown_call);
 
@@ -403,26 +403,7 @@ pub fn generate_tests_from_yaml(
                     }
 
                     let relative_path = path.strip_prefix(&base_download_dir)?;
-                    let test_suite = {
-                        let components = relative_path.components();
-                        let mut top_dir = "".to_string();
-                        for c in components {
-                            if c != Component::RootDir {
-                                top_dir = c.as_os_str().to_string_lossy().into_owned();
-                                break;
-                            }
-                        }
-
-                        match top_dir.as_str() {
-                            "free" => TestSuite::Free,
-                            _ => panic!("Unknown test suite {:?}", path),
-                        }
-                    };
-
-                    if &test_suite != suite {
-                        // Belongs to another test suite
-                        continue;
-                    }
+                    let test_suite = TestSuite::Free;
 
                     let yaml = fs::read_to_string(&entry.path()).unwrap();
 

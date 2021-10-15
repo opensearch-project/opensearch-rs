@@ -151,7 +151,7 @@ pub async fn read_response(
 }
 
 /// general setup step for an OSS yaml test
-pub async fn general_oss_setup() -> Result<(), Error> {
+pub async fn general_cluster_setup() -> Result<(), Error> {
     let client = get();
     delete_data_streams(client).await?;
     delete_indices(client).await?;
@@ -430,66 +430,6 @@ async fn delete_privileges(client: &OpenSearch) -> Result<(), Error> {
                 assert_response_success!(response);
             }
         }
-    }
-
-    Ok(())
-}
-
-async fn stop_and_delete_datafeeds(client: &OpenSearch) -> Result<(), Error> {
-    let stop_data_feed_response = client
-        .ml()
-        .stop_datafeed(MlStopDatafeedParts::DatafeedId("_all"))
-        .send()
-        .await?;
-
-    assert_response_success!(stop_data_feed_response);
-
-    let get_data_feeds_response = client
-        .ml()
-        .get_datafeeds(MlGetDatafeedsParts::None)
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for feed in get_data_feeds_response["datafeeds"].as_array().unwrap() {
-        let id = feed["datafeed_id"].as_str().unwrap();
-        let _ = client
-            .ml()
-            .delete_datafeed(MlDeleteDatafeedParts::DatafeedId(id))
-            .send()
-            .await?;
-    }
-
-    Ok(())
-}
-
-async fn close_and_delete_jobs(client: &OpenSearch) -> Result<(), Error> {
-    let response = client
-        .ml()
-        .close_job(MlCloseJobParts::JobId("_all"))
-        .send()
-        .await?;
-
-    assert_response_success!(response);
-
-    let get_jobs_response = client
-        .ml()
-        .get_jobs(MlGetJobsParts::JobId("_all"))
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for job in get_jobs_response["jobs"].as_array().unwrap() {
-        let id = job["job_id"].as_str().unwrap();
-        let response = client
-            .ml()
-            .delete_job(MlDeleteJobParts::JobId(id))
-            .send()
-            .await?;
-
-        assert_response_success!(response);
     }
 
     Ok(())

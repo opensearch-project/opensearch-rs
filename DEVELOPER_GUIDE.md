@@ -77,12 +77,11 @@ The `OpenSearch` category of steps are specifically defined for this project and
 
   Optionally pass
 
-  - `STACK_VERSION`: Elasticsearch version like `1.0.0` or can be
+  - `STACK_VERSION`: OpenSearch version like `1.0.0` or can be
   a snapshot release like `1.x-SNAPSHOT`
-  - `TEST_SUITE`: OpenSearch distribution of `free` or `platinum`
 
   ```sh
-  cargo make test-yaml --env STACK_VERSION=7.9.0 --env TEST_SUITE=free
+  cargo make test-yaml --env STACK_VERSION=1.0.0
   ```
 
 ### Packages
@@ -111,9 +110,7 @@ can be `to_string()`'ed and written to disk, and this is used to create much of 
   A small executable that downloads YAML tests from GitHub and generates client tests from the YAML tests. The
   version of YAML tests to download are determined from the commit hash of a running Elasticsearch instance.
 
-  The `yaml_test_runner` package can be run with `cargo make test-yaml` to run the generated client tests,
-  passing environment variables `TEST_SUITE` and `STACK_VERSION` to control the distribution and version,
-  respectively.
+  The `yaml_test_runner` package can be run with `cargo make test-yaml` to run the generated client tests and we can pass environment variable `STACK_VERSION` to control the distribution and version.
 
 ### Design principles
 

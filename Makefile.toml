@@ -19,8 +19,8 @@ env = { "OPENSEARCH_URL" = "http://localhost:9200" }
 [tasks.run-yaml-test-runner]
 category = "OpenSearch"
 description = '''
-Runs yaml_test_runner package to generate tests from yaml files for a given Elasticsearch commit.
-The commit to use is retrieved from the running Elasticsearch instance
+Runs yaml_test_runner package to generate tests from yaml files for a given OpenSearch commit.
+The commit to use is retrieved from the running OpenSearch instance
 '''
 private = true
 command = "cargo"
@@ -45,7 +45,7 @@ dependencies = ["generate-yaml-tests"]
 [tasks.test-opensearch]
 category = "OpenSearch"
 private = true
-condition = { env_set = [ "OPENSEARCH_URL" ], env = { "TEST_SUITE" = "platinum" } }
+condition = { env_set = [ "OPENSEARCH_URL" ]}
 command = "cargo"
 args = ["test", "-p", "opensearch"]
 dependencies = ["start-opensearch"]
@@ -77,7 +77,7 @@ dependencies = ["install-cargo2junit"]
 [tasks.run-opensearch]
 category = "OpenSearch"
 private = true
-condition = { env_set = [ "STACK_VERSION", "TEST_SUITE" ], env_false = ["CARGO_MAKE_CI"] }
+condition = { env_set = [ "STACK_VERSION"], env_false = ["CARGO_MAKE_CI"] }
 dependencies = ["set-env"]
 
 [tasks.run-opensearch.linux]
@@ -90,7 +90,7 @@ command = "./.ci/run-opensearch.sh"
 script_runner = "cmd"
 script = [
 '''
-bash -c "STACK_VERSION=%STACK_VERSION% TEST_SUITE=%TEST_SUITE% DETACH=%DETACH% CLEANUP=%CLEANUP% bash .ci/run-opensearch.sh"
+bash -c "STACK_VERSION=%STACK_VERSION% DETACH=%DETACH% CLEANUP=%CLEANUP% bash .ci/run-opensearch.sh"
 '''
 ]
 
@@ -130,7 +130,7 @@ env = { "CLEANUP" = true, "DETACH" = false }
 [tasks.test-yaml]
 category = "OpenSearch"
 description = "Generates and runs yaml_test_runner package platinum/free tests against a given OpenSearch version"
-condition = { env_set = [ "STACK_VERSION", "TEST_SUITE" ] }
+condition = { env_set = [ "STACK_VERSION"] }
 dependencies = ["generate-yaml-tests", "create-test-results-dir", "test-yaml-test-runner", "test-yaml-test-runner-ci", "convert-test-results-junit"]
 run_task = "stop-opensearch"
 
@@ -145,7 +145,6 @@ args = ["test", "-p", "api_generator"]
 category = "OpenSearch"
 clear = true
 description = "Runs opensearch package tests against a given OpenSearch version"
-env = { "TEST_SUITE" = { value = "platinum", condition = { env_set = ["TEST_SUITE"] } } }
 dependencies = ["test-opensearch"]
 run_task = "stop-opensearch"
 
@@ -324,9 +323,8 @@ script = ['''
     echo       By default, peforms a dry run by passing --dry-run, but publish flags can be overridden with CARGO_MAKE_CARGO_PUBLISH_FLAGS environment variable
     echo
     echo Most tasks use these environment variables:
-    echo - STACK_VERSION (default '${STACK_VERSION}'): the version of Elasticsearch
-    echo - TEST_SUITE ('free' or 'platinum', default '${TEST_SUITE}'): the distribution of Elasticsearch
-    echo - CI (default not set): set when running on CI to determine whether to start Elasticsearch and format test output as JSON
+    echo - STACK_VERSION (default '${STACK_VERSION}'): the version of OpenSearch
+    echo - CI (default not set): set when running on CI to determine whether to start OpenSearch and format test output as JSON
     echo
     echo Run 'cargo make --list-all-steps' for a complete list of available tasks.
     echo

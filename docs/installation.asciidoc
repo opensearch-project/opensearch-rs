@@ -1,13 +1,13 @@
 [[installation]]
 == Installation
 
-Add `elasticsearch` crate and version to Cargo.toml. Choose the version that is 
-compatible with the version of {es} you are using:
+Add `opensearch` crate and version to Cargo.toml. Choose the version that is
+compatible with the version of {os} you are using:
 
 [source,toml]
 ----
 [dependencies]
-elasticsearch = "7.10.2"
+opensearch = "1.0.0"
 ----
 
 The following _optional_ dependencies may also be useful to create requests and 

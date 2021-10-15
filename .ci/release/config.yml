@@ -1,8 +1,8 @@
 # Used in release notes generation to map GitHub labels to release notes sections
 
 github:
-  owner: elastic
-  repository: elasticsearch-rs
+  owner: Amazon
+  repository: opensearch-rs
 
 # Label headers and their descriptions. The labels will form the sections of the release notes  
 labels:

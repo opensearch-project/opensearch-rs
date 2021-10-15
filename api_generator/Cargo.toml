@@ -2,7 +2,7 @@
 name = "api_generator"
 version = "1.0.0"
 publish = false
-description = "Generates source code for opensearch package, from the Opensearch REST API specs"
+description = "Generates source code for opensearch package, from the OpenSearch REST API specs"
 repository = "https://github.com/opensearch-project/opensearch-rs"
 authors = ["Elastic and Contributors", "OpenSearch Contributors"]
 edition = "2018"

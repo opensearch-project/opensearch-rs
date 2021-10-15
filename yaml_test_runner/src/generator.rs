@@ -313,7 +313,7 @@ impl<'a> YamlTests<'a> {
 
             (
                 Some(quote! {
-                    async fn #ident(client: &Opensearch) -> Result<(), failure::Error> {
+                    async fn #ident(client: &OpenSearch) -> Result<(), failure::Error> {
                         #(#tokens)*
                         Ok(())
                     }

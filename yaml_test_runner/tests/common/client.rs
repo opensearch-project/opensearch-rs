@@ -59,7 +59,7 @@ use opensearch::{
         TransformDeleteTransformParts, TransformGetTransformParts, TransformStopTransformParts,
     },
     watcher::WatcherDeleteWatchParts,
-    Opensearch, Error, DEFAULT_ADDRESS,
+    OpenSearch, Error, DEFAULT_ADDRESS,
 };
 use once_cell::sync::Lazy;
 use serde_json::{json, Value};
@@ -80,7 +80,7 @@ fn running_proxy() -> bool {
     !system.get_process_by_name("Fiddler").is_empty()
 }
 
-static GLOBAL_CLIENT: Lazy<Opensearch> = Lazy::new(|| {
+static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
     let mut url = Url::parse(cluster_addr().as_ref()).unwrap();
 
     // if the url is https and specifies a username and password, remove from the url and set credentials
@@ -121,15 +121,15 @@ static GLOBAL_CLIENT: Lazy<Opensearch> = Lazy::new(|| {
     }
 
     let transport = builder.build().unwrap();
-    Opensearch::new(transport)
+    OpenSearch::new(transport)
 });
 
 /// Gets the client to use in tests
-pub fn get() -> &'static Opensearch {
+pub fn get() -> &'static OpenSearch {
     GLOBAL_CLIENT.deref()
 }
 
-/// Reads the response from Opensearch, returning the method, status code, text response,
+/// Reads the response from OpenSearch, returning the method, status code, text response,
 /// and the response parsed from json or yaml
 pub async fn read_response(
     response: Response,
@@ -161,7 +161,7 @@ pub async fn general_oss_setup() -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn delete_snapshots(client: &Opensearch) -> Result<(), Error> {
+pub async fn delete_snapshots(client: &OpenSearch) -> Result<(), Error> {
     let cat_repo_response = client
         .cat()
         .repositories()
@@ -199,7 +199,7 @@ pub async fn delete_snapshots(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn wait_for_yellow_status(client: &Opensearch) -> Result<(), Error> {
+async fn wait_for_yellow_status(client: &OpenSearch) -> Result<(), Error> {
     let cluster_health = client
         .cluster()
         .health(ClusterHealthParts::None)
@@ -211,7 +211,7 @@ async fn wait_for_yellow_status(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_data_streams(client: &Opensearch) -> Result<(), Error> {
+async fn delete_data_streams(client: &OpenSearch) -> Result<(), Error> {
     // Hand-crafted request as the indices.delete_data_stream spec doesn't yet have the
     // "expand_wildcards" parameter that is needed to delete ILM data streams
     //
@@ -244,7 +244,7 @@ async fn delete_data_streams(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_indices(client: &Opensearch) -> Result<(), Error> {
+async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
     let delete_response = client
         .indices()
         .delete(IndicesDeleteParts::Index(&["*"]))
@@ -260,7 +260,7 @@ async fn delete_indices(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn stop_and_delete_transforms(client: &Opensearch) -> Result<(), Error> {
+async fn stop_and_delete_transforms(client: &OpenSearch) -> Result<(), Error> {
     let transforms_response = client
         .transform()
         .get_transform(TransformGetTransformParts::TransformId("_all"))
@@ -291,7 +291,7 @@ async fn stop_and_delete_transforms(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn cancel_tasks(client: &Opensearch) -> Result<(), Error> {
+async fn cancel_tasks(client: &OpenSearch) -> Result<(), Error> {
     let rollup_response = client.tasks().list().send().await?.json::<Value>().await?;
 
     for (_node_id, nodes) in rollup_response["nodes"].as_object().unwrap() {
@@ -313,7 +313,7 @@ async fn cancel_tasks(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_templates(client: &Opensearch) -> Result<(), Error> {
+async fn delete_templates(client: &OpenSearch) -> Result<(), Error> {
     // There are "legacy templates and "new templates"
 
     let cat_template_response = client
@@ -357,7 +357,7 @@ async fn delete_templates(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_users(client: &Opensearch) -> Result<(), Error> {
+async fn delete_users(client: &OpenSearch) -> Result<(), Error> {
     let users_response = client
         .security()
         .get_user(SecurityGetUserParts::None)
@@ -383,7 +383,7 @@ async fn delete_users(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_roles(client: &Opensearch) -> Result<(), Error> {
+async fn delete_roles(client: &OpenSearch) -> Result<(), Error> {
     let roles_response = client
         .security()
         .get_role(SecurityGetRoleParts::None)
@@ -409,7 +409,7 @@ async fn delete_roles(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_privileges(client: &Opensearch) -> Result<(), Error> {
+async fn delete_privileges(client: &OpenSearch) -> Result<(), Error> {
     let privileges_response = client
         .security()
         .get_privileges(SecurityGetPrivilegesParts::None)
@@ -435,7 +435,7 @@ async fn delete_privileges(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn stop_and_delete_datafeeds(client: &Opensearch) -> Result<(), Error> {
+async fn stop_and_delete_datafeeds(client: &OpenSearch) -> Result<(), Error> {
     let stop_data_feed_response = client
         .ml()
         .stop_datafeed(MlStopDatafeedParts::DatafeedId("_all"))
@@ -464,7 +464,7 @@ async fn stop_and_delete_datafeeds(client: &Opensearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn close_and_delete_jobs(client: &Opensearch) -> Result<(), Error> {
+async fn close_and_delete_jobs(client: &OpenSearch) -> Result<(), Error> {
     let response = client
         .ml()
         .close_job(MlCloseJobParts::JobId("_all"))

@@ -1,4 +1,4 @@
-= Elasticsearch Rust Client
+= OpenSearch Rust Client
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 

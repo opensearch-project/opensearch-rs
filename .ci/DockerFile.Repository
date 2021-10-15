@@ -16,7 +16,7 @@ RUN set -eux; \
     cargo install cargo2junit;
 
 # create app directory
-WORKDIR /usr/src/elasticsearch-rs
+WORKDIR /usr/src/opensearch-rs
 
 COPY .ci/certs ./.ci/certs
 COPY Cargo.toml ./Cargo.toml

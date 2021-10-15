@@ -90,7 +90,7 @@ static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
             url.set_username("").unwrap();
             u
         } else {
-            "elastic".into()
+            "admin".into()
         };
 
         let password = match url.password() {
@@ -99,7 +99,7 @@ static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
                 url.set_password(None).unwrap();
                 pass
             }
-            None => "changeme".into(),
+            None => "admin".into(),
         };
 
         Some(Credentials::Basic(username, password))

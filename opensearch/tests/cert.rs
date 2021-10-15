@@ -17,10 +17,10 @@
  * under the License.
  */
 //! These tests require a cluster configured with Security. One can be spun up using the
-//! .ci/run-elasticsearch.sh script as follows:
+//! .ci/run-opensearch.sh script as follows:
 //!
 //!
-//! DETACH=true .ci/run-elasticsearch.sh
+//! DETACH=true .ci/run-opensearch.sh
 #![cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 
 extern crate os_type;

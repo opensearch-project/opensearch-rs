@@ -1,7 +1,7 @@
 # Used in release notes generation to map GitHub labels to release notes sections
 
 github:
-  owner: Amazon
+  owner: OpenSearch
   repository: opensearch-rs
 
 # Label headers and their descriptions. The labels will form the sections of the release notes  

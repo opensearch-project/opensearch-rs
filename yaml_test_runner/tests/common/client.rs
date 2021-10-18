@@ -43,10 +43,6 @@ use opensearch::{
         IndicesDeleteIndexTemplateParts, IndicesDeleteParts, IndicesDeleteTemplateParts,
         IndicesRefreshParts,
     },
-    ml::{
-        MlCloseJobParts, MlDeleteDatafeedParts, MlDeleteJobParts, MlGetDatafeedsParts,
-        MlGetJobsParts, MlStopDatafeedParts,
-    },
     params::{ExpandWildcards, WaitForStatus},
     security::{
         SecurityDeletePrivilegesParts, SecurityDeleteRoleParts, SecurityDeleteUserParts,
@@ -153,9 +149,7 @@ pub async fn read_response(
 /// general setup step for an OSS yaml test
 pub async fn general_cluster_setup() -> Result<(), Error> {
     let client = get();
-    delete_data_streams(client).await?;
     delete_indices(client).await?;
-    delete_templates(client).await?;
     delete_snapshots(client).await?;
 
     Ok(())
@@ -211,39 +205,6 @@ async fn wait_for_yellow_status(client: &OpenSearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_data_streams(client: &OpenSearch) -> Result<(), Error> {
-    // Hand-crafted request as the indices.delete_data_stream spec doesn't yet have the
-    // "expand_wildcards" parameter that is needed to delete ILM data streams
-    //
-    // Not deleting data streams yields errors like this when trying to delete hidden indices:
-    // {
-    //   "type":"illegal_argument_exception"
-    //   "reason":"index [.ds-ilm-history-5-2021.02.14-000001] is the write index for data
-    //             stream [ilm-history-5] and cannot be deleted"
-    // }
-    //
-    // Quoting the docs:
-    // You cannot delete the current write index of a data stream. To delete the index,
-    // you must roll over the data stream so a new write index is created. You can then use
-    // the delete index API to delete the previous write index.
-    //
-    let delete_response = client
-        .transport()
-        .send(
-            Method::Delete,
-            "/_data_stream/*",
-            opensearch::http::headers::HeaderMap::new(),
-            Some(&[("expand_wildcards", "hidden")]),
-            None::<()>, // body
-            None,       // timeout
-        )
-        .await?;
-
-    assert_response_success!(delete_response);
-
-    Ok(())
-}
-
 async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
     let delete_response = client
         .indices()
@@ -257,37 +218,6 @@ async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
         .await?;
 
     assert_response_success!(delete_response);
-    Ok(())
-}
-
-async fn stop_and_delete_transforms(client: &OpenSearch) -> Result<(), Error> {
-    let transforms_response = client
-        .transform()
-        .get_transform(TransformGetTransformParts::TransformId("_all"))
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for transform in transforms_response["transforms"].as_array().unwrap() {
-        let id = transform["id"].as_str().unwrap();
-        let response = client
-            .transform()
-            .stop_transform(TransformStopTransformParts::TransformId(id))
-            .send()
-            .await?;
-
-        assert_response_success!(response);
-
-        let response = client
-            .transform()
-            .delete_transform(TransformDeleteTransformParts::TransformId(id))
-            .send()
-            .await?;
-
-        assert_response_success!(response);
-    }
-
     Ok(())
 }
 
@@ -308,50 +238,6 @@ async fn cancel_tasks(client: &OpenSearch) -> Result<(), Error> {
                 }
             }
         }
-    }
-
-    Ok(())
-}
-
-async fn delete_templates(client: &OpenSearch) -> Result<(), Error> {
-    // There are "legacy templates and "new templates"
-
-    let cat_template_response = client
-        .cat()
-        .templates(CatTemplatesParts::Name("*"))
-        .h(&["name"])
-        .send()
-        .await?
-        .text()
-        .await?;
-
-    let all_templates: Vec<&str> = cat_template_response
-        .split_terminator('\n')
-        .filter(|s| !s.starts_with('.') && s != &"security-audit-log")
-        .collect();
-
-    for template in all_templates {
-        if template == "ilm-history" {
-            // We may need to extend this to mimic ESRestTestCase.isXPackTemplate() from the ES
-            // test harness
-            continue;
-        }
-
-        let mut delete_template_response = client
-            .indices()
-            .delete_index_template(IndicesDeleteIndexTemplateParts::Name(&template))
-            .send()
-            .await?;
-
-        if delete_template_response.status_code().as_u16() == 404 {
-            // Certainly an old-style template
-            delete_template_response = client
-                .indices()
-                .delete_template(IndicesDeleteTemplateParts::Name(&template))
-                .send()
-                .await?;
-        }
-        assert_response_success!(delete_template_response);
     }
 
     Ok(())

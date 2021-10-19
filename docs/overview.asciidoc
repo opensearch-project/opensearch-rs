@@ -1,8 +1,8 @@
 [[overview]]
 == Overview
 
-This is the official Rust client for {es}. Full documentation is hosted on 
-https://docs.rs/elasticsearch[docs.rs] -- this page provides _only_ an overview.
+This is the official Rust client for {os}. Full documentation is hosted on
+https://opensearch.org/docs/latest[docs.rs] -- this page provides _only_ an overview.
 
 Further resources:
 
@@ -60,19 +60,6 @@ specific `url::Url`
 let transport = Transport::single_node("https://example.com")?;
 let client = OpenSearch::new(transport);
 ----
-
-If you're running against an OpenSearch deployment in https://www.elastic.co/cloud/[Elastic Cloud],
-a client can be created using a https://www.elastic.co/guide/en/cloud/current/ec-cloud-id.html[Cloud ID]
-and credentials retrieved from the Cloud web console
-
-[source,rust]
-----
-let cloud_id = "<cloud id from cloud web console>";
-let credentials = Credentials::Basic("<username>".into(), "<password>".into());
-let transport = Transport::cloud(cloud_id, credentials)?;
-let client = OpenSearch::new(transport);
-----
-
 
 [discrete]
 === Making API calls

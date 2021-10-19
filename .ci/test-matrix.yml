@@ -1,11 +1,7 @@
 ---
 
 STACK_VERSION:
-  - 7.x-SNAPSHOT
-
-TEST_SUITE:
-  - free
-  - platinum
+  - 1.x-SNAPSHOT
 
 RUST_TOOLCHAIN:
   - latest

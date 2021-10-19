@@ -3,7 +3,6 @@
 # Version 1.1
 # - Add `$RUNSCRIPTS` env var for running Elasticsearch dependent products
 
-export TEST_SUITE="${TEST_SUITE:=oss}"
 export OPENSEARCH_URL_EXTENSION="${OPENSEARCH_URL_EXTENSION:=http}"
 export CLUSTER="${1:=opensearch}"
 

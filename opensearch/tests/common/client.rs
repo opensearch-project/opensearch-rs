@@ -71,7 +71,7 @@ pub fn create_builder(addr: &str) -> TransportBuilder {
     // assume if we're running with HTTPS then authentication is also enabled and disable
     // certificate validation - we'll change this for tests that need to.
     if url.scheme() == "https" {
-        builder = builder.auth(Credentials::Basic("elastic".into(), "changeme".into()));
+        builder = builder.auth(Credentials::Basic("admin".into(), "admin".into()));
 
         #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
         {
@@ -118,7 +118,7 @@ pub async fn index_documents(client: &OpenSearch) -> Result<Response, Error> {
     if exists_response.status_code() == StatusCode::NOT_FOUND {
         let mut body: Vec<BulkOperation<_>> = vec![];
         for i in 1..=10 {
-            let op = BulkOperation::index(json!({"title":"Elasticsearch"}))
+            let op = BulkOperation::index(json!({"title":"OpenSearch"}))
                 .id(i.to_string())
                 .into();
             body.push(op);

@@ -130,26 +130,6 @@
 //! # }
 //! ```
 //!
-//! If you're running against an OpenSearch deployment in [Elastic Cloud](https://www.elastic.co/cloud/),
-//! a client can be created using a [Cloud ID](https://www.elastic.co/guide/en/cloud/current/ec-cloud-id.html)
-//! and credentials retrieved from the Cloud web console
-//!
-//! ```rust,no_run
-//! # use opensearch::{
-//! #     auth::Credentials,
-//! #     Error, OpenSearch,
-//! #     http::transport::Transport,
-//! # };
-//! # use url::Url;
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let cloud_id = "cluster_name:Y2xvdWQtZW5kcG9pbnQuZXhhbXBsZSQzZGFkZjgyM2YwNTM4ODQ5N2VhNjg0MjM2ZDkxOGExYQ==";
-//! let credentials = Credentials::Basic("<username>".into(), "<password>".into());
-//! let transport = Transport::cloud(cloud_id, credentials)?;
-//! let client = OpenSearch::new(transport);
-//! # Ok(())
-//! # }
-//! ```
-//!
 //! More control over how a [Transport](http::transport::Transport) is built can be
 //! achieved using [TransportBuilder](http::transport::TransportBuilder) to build a transport, and
 //! passing it to [OpenSearch::new] create a new instance of [OpenSearch]

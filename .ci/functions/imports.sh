@@ -8,7 +8,6 @@
 if [[ -z $opensearch_node_name ]]; then
   # only set these once
   set -euo pipefail
-  export TEST_SUITE=${TEST_SUITE-oss}
   export RUNSCRIPTS=${RUNSCRIPTS-}
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}

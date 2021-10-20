@@ -244,7 +244,7 @@ async fn serialize_querystring() -> Result<(), failure::Error> {
         assert_eq!(req.uri().path(), "/_search");
         assert_eq!(
                 req.uri().query(),
-                Some("filter_path=took%2C_shards&pretty=true&q=title%3AElasticsearch&track_total_hits=100000")
+                Some("filter_path=took%2C_shards&pretty=true&q=title%3AOpenSearch&track_total_hits=100000")
             );
         http::Response::default()
     });
@@ -255,7 +255,7 @@ async fn serialize_querystring() -> Result<(), failure::Error> {
         .pretty(true)
         .filter_path(&["took", "_shards"])
         .track_total_hits(TrackTotalHits::Count(100_000))
-        .q("title:Elasticsearch")
+        .q("title:OpenSearch")
         .send()
         .await?;
 
@@ -313,7 +313,7 @@ async fn search_with_no_body() -> Result<(), failure::Error> {
     let response = client
         .search(SearchParts::None)
         .pretty(true)
-        .q("title:Elasticsearch")
+        .q("title:OpenSearch")
         .send()
         .await?;
 
@@ -336,7 +336,7 @@ async fn read_response_as_bytes() -> Result<(), failure::Error> {
     let response = client
         .search(SearchParts::None)
         .pretty(true)
-        .q("title:Elasticsearch")
+        .q("title:OpenSearch")
         .send()
         .await?;
 
@@ -427,7 +427,7 @@ async fn clone_search_with_body() -> Result<(), failure::Error> {
     let _ = index_documents(&client).await?;
     let base_request = client.search(SearchParts::None);
 
-    let request_clone = base_request.clone().q("title:Elasticsearch").size(1);
+    let request_clone = base_request.clone().q("title:OpenSearch").size(1);
 
     let _request = base_request
         .body(json!({

@@ -64,17 +64,17 @@ fn main() -> Result<(), failure::Error> {
             .short("u")
             .long("url")
             .value_name("OPENSEARCH_URL")
-            .help("The url of a running Elasticsearch cluster. Used to determine the version, test suite and branch to use to compile tests")
+            .help("The url of a running OpenSearch cluster. Used to determine the version, test suite and branch to use to compile tests")
             .required(true)
             .takes_value(true))
         .get_matches();
 
     let url = matches.value_of("url").expect("missing 'url' argument");
-    let (branch, suite, version) = match branch_suite_and_version_from_elasticsearch(url) {
+    let (branch, suite, version) = match branch_suite_and_version_from_opensearch(url) {
         Ok(v) => v,
         Err(e) => {
             error!(
-                "Problem getting values from Elasticsearch at {}. {:?}",
+                "Problem getting values from OpenSearch at {}. {:?}",
                 url, e
             );
             exit(1);
@@ -153,7 +153,7 @@ fn main() -> Result<(), failure::Error> {
     Ok(())
 }
 
-fn branch_suite_and_version_from_elasticsearch(
+fn branch_suite_and_version_from_opensearch(
     url: &str,
 ) -> Result<(String, TestSuite, semver::Version), failure::Error> {
     let client = reqwest::ClientBuilder::new()

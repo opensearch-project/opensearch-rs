@@ -8272,7 +8272,7 @@ where
         Ok(response)
     }
 }
-impl Elasticsearch {
+impl OpenSearch {
     #[doc = "[Bulk API](https://opensearch.org/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
     pub fn bulk<'a, 'b>(&'a self, parts: BulkParts<'b>) -> Bulk<'a, 'b, ()> {
         Bulk::new(self.transport(), parts)

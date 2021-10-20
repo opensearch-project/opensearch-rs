@@ -152,13 +152,12 @@ pub struct TransportBuilder {
     proxy_credentials: Option<Credentials>,
     disable_proxy: bool,
     headers: HeaderMap,
-    meta_header: bool,
     timeout: Option<Duration>,
 }
 
 impl TransportBuilder {
     /// Creates a new instance of [TransportBuilder]. Accepts a [ConnectionPool]
-    /// from which [Connection]s to Elasticsearch will be retrieved.
+    /// from which [Connection]s to OpenSearch will be retrieved.
     pub fn new<P>(conn_pool: P) -> Self
     where
         P: ConnectionPool + Debug + Clone + Send + 'static,
@@ -173,7 +172,6 @@ impl TransportBuilder {
             proxy_credentials: None,
             disable_proxy: false,
             headers: HeaderMap::new(),
-            meta_header: true,
             timeout: None,
         }
     }
@@ -230,16 +228,6 @@ impl TransportBuilder {
         for (key, value) in headers.iter() {
             self.headers.insert(key, value.clone());
         }
-        self
-    }
-
-    /// Whether to send a `x-elastic-client-meta` header that describes the runtime environment.
-    ///
-    /// This header contains information that is similar to what could be found in `User-Agent`. Using a separate
-    /// header allows applications to use `User-Agent` for their own needs, e.g. to identify application version
-    /// or other environment information. Defaults to `true`.
-    pub fn enable_meta_header(mut self, enable: bool) -> Self {
-        self.meta_header = enable;
         self
     }
 
@@ -326,7 +314,6 @@ impl TransportBuilder {
             client,
             conn_pool: self.conn_pool,
             credentials: self.credentials,
-            send_meta: self.meta_header,
         })
     }
 }
@@ -366,7 +353,6 @@ pub struct Transport {
     client: reqwest::Client,
     credentials: Option<Credentials>,
     conn_pool: Box<dyn ConnectionPool>,
-    send_meta: bool,
 }
 
 impl Transport {
@@ -448,13 +434,6 @@ impl Transport {
         request_headers.insert(USER_AGENT, HeaderValue::from_static(DEFAULT_USER_AGENT));
         for (name, value) in headers {
             request_headers.insert(name.unwrap(), value);
-        }
-        // if meta header enabled, send it last so that it's not overridden.
-        if self.send_meta {
-            request_headers.insert(
-                "x-elastic-client-meta",
-                HeaderValue::from_static(CLIENT_META.as_str()),
-            );
         }
 
         request_builder = request_builder.headers(request_headers);
@@ -595,11 +574,4 @@ pub mod tests {
         assert_eq!(conn.url.as_str(), "http://10.1.2.3/");
     }
 
-    #[test]
-    pub fn test_meta_header() {
-        let re = Regex::new(r"^es=[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,3}p?,rs=[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,3}p?,t=[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,3}p?(,tls=[rn])?$").unwrap();
-        let x: &str = CLIENT_META.as_str();
-        println!("{}", x);
-        assert!(re.is_match(x));
-    }
 }

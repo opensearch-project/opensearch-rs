@@ -53,9 +53,9 @@ use std::{
 ///
 /// ## Full validation
 ///
-/// With Elasticsearch running at `https://example.com`, configured to use a certificate generated
+/// With OpenSearch running at `https://example.com`, configured to use a certificate generated
 /// with your own Certificate Authority (CA), and where the certificate contains a CommonName (CN)
-/// or Subject Alternative Name (SAN) that matches the hostname of Elasticsearch
+/// or Subject Alternative Name (SAN) that matches the hostname of OpenSearch
 #[cfg_attr(
     any(feature = "native-tls", feature = "rustls-tls"),
     doc = r##"
@@ -82,7 +82,7 @@ let cert = Certificate::from_pem(&buf)?;
 let transport = TransportBuilder::new(conn_pool)
     .cert_validation(CertificateValidation::Full(cert))
     .build()?;
-let client = Elasticsearch::new(transport);
+let client = OpenSearch::new(transport);
 let _response = client.ping().send().await?;
 # Ok(())
 # }
@@ -93,7 +93,7 @@ let _response = client.ping().send().await?;
 ///
 /// This requires the `native-tls` feature to be enabled.
 ///
-/// With Elasticsearch running at `https://example.com`, configured to use a certificate generated
+/// With OpenSearch running at `https://example.com`, configured to use a certificate generated
 /// with your own Certificate Authority (CA)
 #[cfg_attr(
     feature = "native-tls",
@@ -120,7 +120,7 @@ let cert = Certificate::from_pem(&buf)?;
 let transport = TransportBuilder::new(conn_pool)
     .cert_validation(CertificateValidation::Certificate(cert))
     .build()?;
-let client = Elasticsearch::new(transport);
+let client = OpenSearch::new(transport);
 let _response = client.ping().send().await?;
 # Ok(())
 # }

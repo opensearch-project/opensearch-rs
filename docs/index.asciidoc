@@ -1,6 +1,0 @@
-= OpenSearch Rust Client
-
-include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
-
-include::overview.asciidoc[]
-include::installation.asciidoc[]

@@ -1,36 +1,35 @@
 name: Integration tests
 
-on:
-  pull_request:
-    paths-ignore:
-      - 'README.md'
-    branches:
-      - "*"
-  push:
-    paths-ignore:
-      - 'README.md'
-    branches:
-      - "*"
+on: [push, pull_request]
+
+env:
+  GITHUB_ACTIONS: true
 
 jobs:
-  assemble:
-    name: Assemble
+  tests:
+    name: Test
     runs-on: ubuntu-latest
     env:
       SECURE_INTEGRATION: false
     strategy:
-      fail-fast: false
       matrix:
         cluster-type: ['opendistro', 'opensearch']
+        secured: ["true", "false"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Increase system limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - run: "./.ci/run-tests ${{ matrix.cluster-type }} "
-        name: Integ ${{ matrix.cluster-type }}
+      - run: "./.ci/run-tests ${{ matrix.cluster-type }} ${{ matrix.secured }}"
+        name: Integ ${{ matrix.cluster-type }} secured=${{ matrix.secured }}

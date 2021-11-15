@@ -162,7 +162,7 @@ fn branch_suite_and_version_from_opensearch(
 
     let suite = TestSuite::Free;
 
-    let mut response = client.get(url).send()?;
+    let mut response = client.get(url).basic_auth("admin", Some("admin")).send()?;
     let json: Value = response.json()?;
     let branch = json["version"]["build_hash"].as_str().unwrap().to_string();
 

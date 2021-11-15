@@ -1,4 +1,5 @@
 FROM opensearchproject/opensearch:latest
 ARG SECURE_INTEGRATION
-RUN if [ "$SECURE_INTEGRATION" != "true" ] ; then /usr/share/opensearch/bin/opensearch-plugin remove opensearch-security; fi
-COPY --chown=opensearch:opensearch .ci/opensearch/opensearch.yml /usr/share/opensearch/config/
+ARG opensearch_path=/usr/share/opensearch
+ARG opensearch_yml=$opensearch_path/config/opensearch.yml
+RUN if [ "$SECURE_INTEGRATION" != "true" ] ; then $opensearch_path/bin/opensearch-plugin remove opensearch-security; fi

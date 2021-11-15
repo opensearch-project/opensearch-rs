@@ -1,4 +1,4 @@
-name: Integration tests against OpenSearch and Opendistro Cluster
+name: Integration tests
 
 on:
   pull_request:
@@ -16,6 +16,8 @@ jobs:
   assemble:
     name: Assemble
     runs-on: ubuntu-latest
+    env:
+      SECURE_INTEGRATION: true
     strategy:
       fail-fast: false
       matrix:

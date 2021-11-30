@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  opensearch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SECURE_INTEGRATION=${SECURE_INTEGRATION:-false}
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+    ports:
+      - "9200:9200"
+    user: opensearch

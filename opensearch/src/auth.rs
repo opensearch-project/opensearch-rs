@@ -45,6 +45,9 @@ pub enum Credentials {
     Certificate(ClientCertificate),
     /// An id and api_key to use for API key authentication
     ApiKey(String, String),
+    /// AWS credentials used for AWS SigV4 request signing
+    #[cfg(feature = "aws-auth")]
+    Aws(aws_types::credentials::SharedCredentialsProvider, aws_types::region::Region)
 }
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]

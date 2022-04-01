@@ -424,6 +424,8 @@ impl Transport {
                         HeaderValue::from_bytes(&header_value).unwrap(),
                     )
                 }
+                #[cfg(feature = "aws-auth")]
+                Credentials::Aws(_, _) => request_builder,
             }
         }
 
@@ -448,13 +450,23 @@ impl Transport {
             };
 
             request_builder = request_builder.body(bytes);
-        };
+        }
 
         if let Some(q) = query_string {
             request_builder = request_builder.query(q);
         }
 
-        let response = request_builder.send().await;
+        #[cfg_attr(not(feature = "aws-auth"), allow(unused_mut))]
+        let mut request = request_builder.build()?;
+
+        #[cfg(feature = "aws-auth")]
+        if let Some(Credentials::Aws(credentials_provider, region)) = &self.credentials {
+            super::aws_auth::sign_request(&mut request, credentials_provider, region)
+                .await
+                .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
+        }
+
+        let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
             Err(e) => Err(e.into()),
@@ -573,5 +585,4 @@ pub mod tests {
         let conn = Connection::new(url);
         assert_eq!(conn.url.as_str(), "http://10.1.2.3/");
     }
-
 }

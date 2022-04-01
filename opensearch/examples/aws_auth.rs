@@ -28,30 +28,43 @@
  * GitHub history for details.
  */
 
-//! HTTP components
-
+#[tokio::main]
 #[cfg(feature = "aws-auth")]
-pub(crate) mod aws_auth;
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    use opensearch::{
+        auth::Credentials,
+        cat::CatIndicesParts,
+        http::transport::{SingleNodeConnectionPool, TransportBuilder},
+        OpenSearch,
+    };
+    use url::Url;
 
-pub mod headers;
-pub mod request;
-pub mod response;
-pub mod transport;
+    let aws_config = aws_config::load_from_env().await;
 
-pub use reqwest::StatusCode;
-pub use url::Url;
+    let host = ""; // e.g. https://search-mydomain.us-west-1.es.amazonaws.com
+    let transport = TransportBuilder::new(SingleNodeConnectionPool::new(
+        Url::parse(host).unwrap(),
+    ))
+    .auth(Credentials::Aws(
+        aws_config.credentials_provider().unwrap().clone(),
+        aws_config.region().unwrap().clone(),
+    ))
+    .build()?;
+    let client = OpenSearch::new(transport);
 
-/// Http methods supported by Elasticsearch
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Method {
-    /// get
-    Get,
-    /// put
-    Put,
-    /// post
-    Post,
-    /// delete
-    Delete,
-    /// head
-    Head,
+    let response = client
+        .cat()
+        .indices(CatIndicesParts::None)
+        .v(true)
+        .send()
+        .await?;
+
+    let text = response.text().await?;
+    println!("{}", text);
+    Ok(())
+}
+
+#[cfg(not(feature = "aws-auth"))]
+pub fn main() {
+    panic!("Requires the `aws-auth` feature to be enabled")
 }

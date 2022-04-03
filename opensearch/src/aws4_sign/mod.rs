@@ -13,7 +13,7 @@ use crate::auth::AwsCredentials;
 type HmacSha256 = Hmac<Sha256>;
 
 // Opensearch still uses its old name, "Elasticsearch"
-const AWS_OPENSEARCH_SERVICE: &'static str = "es";
+const AWS_OPENSEARCH_SERVICE: &str = "es";
 
 pub fn add_aws_auth_header(request: &mut Request, aws_creds: &AwsCredentials, domain: &str) {
     let now = chrono::Utc::now();
@@ -146,7 +146,7 @@ fn auth_header(
 }
 
 fn is_canonical_header(name: &HeaderName) -> bool {
-    const CANONICAL_HEADERS: [&'static str; 8] = [
+    const CANONICAL_HEADERS: [&str; 8] = [
         "content-length",
         "content-type",
         "host",
@@ -156,10 +156,7 @@ fn is_canonical_header(name: &HeaderName) -> bool {
         "x-amz-target",
         "x-amz-user-agent",
     ];
-    CANONICAL_HEADERS
-        .iter()
-        .find(|n| **n == name.as_str())
-        .is_some()
+    CANONICAL_HEADERS.iter().any(|n| *n == name.as_str())
 }
 
 fn hash(input: &[u8]) -> GenericArray<u8, U32> {
@@ -191,8 +188,7 @@ fn get_signature_key(
     let kdate = sign(&aws_key, datestamp);
     let kregion = sign(&kdate, region_name);
     let kservice = sign(&kregion, service_name);
-    let ksigning = sign(&kservice, b"aws4_request");
-    ksigning
+    sign(&kservice, b"aws4_request")
 }
 
 // Applies the signing algorithm (HMAC using SHA265)
@@ -200,8 +196,7 @@ fn sign(key: &[u8], input: &[u8]) -> GenericArray<u8, U32> {
     let mut mac = HmacSha256::new_from_slice(key).unwrap();
     mac.update(input);
     let result = mac.finalize();
-    let code_bytes = result.into_bytes();
-    code_bytes
+    result.into_bytes()
 }
 
 // Returns 't' as both a date-time string, and a date-only string. The

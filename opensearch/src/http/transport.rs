@@ -460,18 +460,13 @@ impl Transport {
 
         let mut request = request_builder.build().unwrap();
 
-        if let Some(c) = &self.credentials {
-            match c {
-                Credentials::Aws(aws_creds) => {
-                    if let Some(domain) = domain {
-                        crate::aws4_sign::add_aws_auth_header(&mut request, aws_creds, &domain)
-                    } else {
-                        return Err(crate::lib(format!(
-                            "Domain must be specified when using AWS credentials"
-                        )));
-                    }
-                }
-                _ => {} // No action
+        if let Some(Credentials::Aws(aws_creds)) = &self.credentials {
+            if let Some(domain) = domain {
+                crate::aws4_sign::add_aws_auth_header(&mut request, aws_creds, &domain)
+            } else {
+                return Err(crate::lib(
+                    "Domain must be specified when using AWS credentials".to_string(),
+                ));
             }
         }
 

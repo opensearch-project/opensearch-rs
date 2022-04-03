@@ -396,6 +396,8 @@ impl Transport {
     {
         let connection = self.conn_pool.next();
         let url = connection.url.join(path.trim_start_matches('/'))?;
+        let domain: Option<String> = url.domain().map(|s| s.to_string());
+
         let reqwest_method = self.method(method);
         let mut request_builder = self.client.request(reqwest_method, url);
 
@@ -424,6 +426,8 @@ impl Transport {
                         HeaderValue::from_bytes(&header_value).unwrap(),
                     )
                 }
+                // AWS credentials are applied below, after the request has been built.
+                Credentials::Aws(_) => request_builder,
             }
         }
 
@@ -454,7 +458,24 @@ impl Transport {
             request_builder = request_builder.query(q);
         }
 
-        let response = request_builder.send().await;
+        let mut request = request_builder.build().unwrap();
+
+        if let Some(c) = &self.credentials {
+            match c {
+                Credentials::Aws(aws_creds) => {
+                    if let Some(domain) = domain {
+                        crate::aws4_sign::add_aws_auth_header(&mut request, aws_creds, &domain)
+                    } else {
+                        return Err(crate::lib(format!(
+                            "Domain must be specified when using AWS credentials"
+                        )));
+                    }
+                }
+                _ => {} // No action
+            }
+        }
+
+        let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
             Err(e) => Err(e.into()),
@@ -573,5 +594,4 @@ pub mod tests {
         let conn = Connection::new(url);
         assert_eq!(conn.url.as_str(), "http://10.1.2.3/");
     }
-
 }

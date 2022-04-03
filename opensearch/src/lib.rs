@@ -350,6 +350,7 @@ mod readme {
 extern crate dyn_clone;
 
 pub mod auth;
+mod aws4_sign;
 pub mod cert;
 pub mod http;
 pub mod params;

@@ -45,6 +45,17 @@ pub enum Credentials {
     Certificate(ClientCertificate),
     /// An id and api_key to use for API key authentication
     ApiKey(String, String),
+    /// AWS4 signature using AWS credentials used for authentication
+    Aws(AwsCredentials),
+}
+
+/// An AWS access key, secret access key, and optional session token
+#[derive(Debug, Clone)]
+pub struct AwsCredentials {
+    pub region: String,
+    pub access_key_id: String,
+    pub secret_access_key: String,
+    pub session_token: Option<String>,
 }
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]

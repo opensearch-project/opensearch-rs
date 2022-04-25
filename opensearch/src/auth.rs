@@ -46,12 +46,15 @@ pub enum Credentials {
     /// An id and api_key to use for API key authentication
     ApiKey(String, String),
     /// AWS credentials used for AWS SigV4 request signing.
-    /// 
+    ///
     /// # Optional
-    /// 
+    ///
     /// This requires the `aws-auth` feature to be enabled.
     #[cfg(feature = "aws-auth")]
-    Aws(aws_types::credentials::SharedCredentialsProvider, aws_types::region::Region)
+    Aws(
+        aws_types::credentials::SharedCredentialsProvider,
+        aws_types::region::Region,
+    ),
 }
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -84,5 +87,22 @@ pub enum ClientCertificate {
 impl From<ClientCertificate> for Credentials {
     fn from(cert: ClientCertificate) -> Self {
         Credentials::Certificate(cert)
+    }
+}
+
+#[cfg(any(feature = "aws-auth"))]
+impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
+    type Error = super::Error;
+
+    fn try_from(value: aws_types::SdkConfig) -> Result<Self, Self::Error> {
+        let credentials = value
+            .credentials_provider()
+            .ok_or_else(|| super::error::lib("SdkConfig does not have a credentials_provider"))?
+            .clone();
+        let region = value
+            .region()
+            .ok_or_else(|| super::error::lib("SdkConfig does not have a region"))?
+            .clone();
+        Ok(Credentials::Aws(credentials, region))
     }
 }

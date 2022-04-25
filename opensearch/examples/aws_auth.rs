@@ -12,8 +12,9 @@
 #[tokio::main]
 #[cfg(feature = "aws-auth")]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    use std::convert::TryInto;
+
     use opensearch::{
-        auth::Credentials,
         cat::CatIndicesParts,
         http::transport::{SingleNodeConnectionPool, TransportBuilder},
         OpenSearch,
@@ -23,14 +24,9 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let aws_config = aws_config::load_from_env().await;
 
     let host = ""; // e.g. https://search-mydomain.us-west-1.es.amazonaws.com
-    let transport = TransportBuilder::new(SingleNodeConnectionPool::new(
-        Url::parse(host).unwrap(),
-    ))
-    .auth(Credentials::Aws(
-        aws_config.credentials_provider().unwrap().clone(),
-        aws_config.region().unwrap().clone(),
-    ))
-    .build()?;
+    let transport = TransportBuilder::new(SingleNodeConnectionPool::new(Url::parse(host).unwrap()))
+        .auth(aws_config.try_into()?)
+        .build()?;
     let client = OpenSearch::new(transport);
 
     let response = client

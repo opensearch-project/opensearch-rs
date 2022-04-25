@@ -198,7 +198,7 @@ impl TransportBuilder {
         self
     }
 
-    /// Credentials for the client to use for authentication to Elasticsearch
+    /// Credentials for the client to use for authentication to OpenSearch.
     pub fn auth(mut self, credentials: Credentials) -> Self {
         self.credentials = Some(credentials);
         self

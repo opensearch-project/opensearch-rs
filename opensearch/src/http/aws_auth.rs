@@ -31,19 +31,13 @@ fn get_signing_params<'a>(
     credentials: &'a Credentials,
     region: &'a Region,
 ) -> Result<SigningParams<'a>, BuildError> {
-    let mut settings = SigningSettings::default();
-    settings.percent_encoding_mode = PercentEncodingMode::Double;
-    settings.payload_checksum_kind = PayloadChecksumKind::NoHeader;
-    settings.signature_location = SignatureLocation::Headers;
-    settings.expires_in = None;
-
     let mut builder = SigningParams::builder()
         .access_key(credentials.access_key_id())
         .secret_key(credentials.secret_access_key())
         .service_name(SERVICE_NAME)
         .region(region.as_ref())
         .time(SystemTime::now())
-        .settings(settings);
+        .settings(SigningSettings::default());
 
     builder.set_security_token(credentials.session_token());
 

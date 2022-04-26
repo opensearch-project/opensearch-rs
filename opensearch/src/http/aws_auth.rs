@@ -45,9 +45,7 @@ fn get_signing_params<'a>(
         .time(SystemTime::now())
         .settings(settings);
 
-    if let Some(session_token) = credentials.session_token() {
-        builder = builder.security_token(session_token);
-    }
+    builder.set_security_token(credentials.session_token());
 
     builder.build()
 }

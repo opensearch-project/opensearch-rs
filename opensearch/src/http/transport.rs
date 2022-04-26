@@ -425,7 +425,7 @@ impl Transport {
                     )
                 }
                 #[cfg(feature = "aws-auth")]
-                Credentials::Aws(_, _) => request_builder,
+                Credentials::AwsSigV4(_, _) => request_builder,
             }
         }
 
@@ -460,7 +460,7 @@ impl Transport {
         let mut request = request_builder.build()?;
 
         #[cfg(feature = "aws-auth")]
-        if let Some(Credentials::Aws(credentials_provider, region)) = &self.credentials {
+        if let Some(Credentials::AwsSigV4(credentials_provider, region)) = &self.credentials {
             super::aws_auth::sign_request(&mut request, credentials_provider, region)
                 .await
                 .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;

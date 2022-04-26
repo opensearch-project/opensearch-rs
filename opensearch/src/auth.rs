@@ -51,7 +51,7 @@ pub enum Credentials {
     ///
     /// This requires the `aws-auth` feature to be enabled.
     #[cfg(feature = "aws-auth")]
-    Aws(
+    AwsSigV4(
         aws_types::credentials::SharedCredentialsProvider,
         aws_types::region::Region,
     ),
@@ -103,6 +103,6 @@ impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
             .region()
             .ok_or_else(|| super::error::lib("SdkConfig does not have a region"))?
             .clone();
-        Ok(Credentials::Aws(credentials, region))
+        Ok(Credentials::AwsSigV4(credentials, region))
     }
 }

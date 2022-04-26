@@ -32,5 +32,4 @@ pub mod client;
 pub mod server;
 
 #[allow(unused)]
-pub static DEFAULT_USER_AGENT: &'static str =
-    concat!("opensearch-rs/", env!("CARGO_PKG_VERSION"));
+pub static DEFAULT_USER_AGENT: &'static str = concat!("opensearch-rs/", env!("CARGO_PKG_VERSION"));

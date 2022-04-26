@@ -73,10 +73,7 @@ fn main() -> Result<(), failure::Error> {
     let (branch, suite, version) = match branch_suite_and_version_from_opensearch(url) {
         Ok(v) => v,
         Err(e) => {
-            error!(
-                "Problem getting values from OpenSearch at {}. {:?}",
-                url, e
-            );
+            error!("Problem getting values from OpenSearch at {}. {:?}", url, e);
             exit(1);
         }
     };

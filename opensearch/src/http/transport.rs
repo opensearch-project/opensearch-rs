@@ -198,7 +198,7 @@ impl TransportBuilder {
         self
     }
 
-    /// Credentials for the client to use for authentication to Elasticsearch
+    /// Credentials for the client to use for authentication to OpenSearch.
     pub fn auth(mut self, credentials: Credentials) -> Self {
         self.credentials = Some(credentials);
         self
@@ -254,26 +254,24 @@ impl TransportBuilder {
 
         #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
         {
-            if let Some(creds) = &self.credentials {
-                if let Credentials::Certificate(cert) = creds {
-                    client_builder = match cert {
-                        #[cfg(feature = "native-tls")]
-                        ClientCertificate::Pkcs12(b, p) => {
-                            let password = match p {
-                                Some(pass) => pass.as_str(),
-                                None => "",
-                            };
-                            let pkcs12 = reqwest::Identity::from_pkcs12_der(b, password)?;
-                            client_builder.identity(pkcs12)
-                        }
-                        #[cfg(feature = "rustls-tls")]
-                        ClientCertificate::Pem(b) => {
-                            let pem = reqwest::Identity::from_pem(b)?;
-                            client_builder.identity(pem)
-                        }
+            if let Some(Credentials::Certificate(cert)) = &self.credentials {
+                client_builder = match cert {
+                    #[cfg(feature = "native-tls")]
+                    ClientCertificate::Pkcs12(b, p) => {
+                        let password = match p {
+                            Some(pass) => pass.as_str(),
+                            None => "",
+                        };
+                        let pkcs12 = reqwest::Identity::from_pkcs12_der(b, password)?;
+                        client_builder.identity(pkcs12)
+                    }
+                    #[cfg(feature = "rustls-tls")]
+                    ClientCertificate::Pem(b) => {
+                        let pem = reqwest::Identity::from_pem(b)?;
+                        client_builder.identity(pem)
                     }
                 }
-            };
+            }
         }
 
         #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -424,6 +422,8 @@ impl Transport {
                         HeaderValue::from_bytes(&header_value).unwrap(),
                     )
                 }
+                #[cfg(feature = "aws-auth")]
+                Credentials::AwsSigV4(_, _) => request_builder,
             }
         }
 
@@ -448,13 +448,23 @@ impl Transport {
             };
 
             request_builder = request_builder.body(bytes);
-        };
+        }
 
         if let Some(q) = query_string {
             request_builder = request_builder.query(q);
         }
 
-        let response = request_builder.send().await;
+        #[cfg_attr(not(feature = "aws-auth"), allow(unused_mut))]
+        let mut request = request_builder.build()?;
+
+        #[cfg(feature = "aws-auth")]
+        if let Some(Credentials::AwsSigV4(credentials_provider, region)) = &self.credentials {
+            super::aws_auth::sign_request(&mut request, credentials_provider, region)
+                .await
+                .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
+        }
+
+        let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
             Err(e) => Err(e.into()),
@@ -573,5 +583,4 @@ pub mod tests {
         let conn = Connection::new(url);
         assert_eq!(conn.url.as_str(), "http://10.1.2.3/");
     }
-
 }

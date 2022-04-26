@@ -58,6 +58,7 @@
 //! - **experimental-apis**: Enables experimental APIs. Experimental APIs are just that - an experiment. An experimental
 //!   API might have breaking changes in any future version, or it might even be removed entirely. This feature also
 //!   enables `beta-apis`.
+//! - **aws-auth**: Enables AWS authentication. Performs AWS SigV4 signing using credential types from `aws-types`.
 //!
 //! # Getting started
 //!
@@ -322,6 +323,36 @@
 //!     )
 //!     .await?;
 //!
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## AWS Authentication
+//!
+//! For authenticating against an OpenSearch endpoint using AWS SigV4 request signing,
+//! you must enable the `aws-auth` feature, then pass the AWS credentials to the [TransportBuilder](http::transport::TransportBuilder).
+//! The easiest way to retrieve AWS credentials in the required format is to use [aws-config](https://docs.rs/aws-config/latest/aws_config/).
+//!
+//! ```toml,no_run
+//! [dependencies]
+//! opensearch = { version = "1", features = ["aws-auth"] }
+//! aws-config = "0.10"
+//! ```
+//!
+//! ```rust,no_run
+//! # use opensearch::{
+//! #     auth::Credentials,
+//! #     Error, OpenSearch,
+//! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
+//! # };
+//! # use url::Url;
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let creds = aws_config::load_from_env().await;
+//! let url = Url::parse("https://example.com")?;
+//! let conn_pool = SingleNodeConnectionPool::new(url);
+//! let transport = TransportBuilder::new(conn_pool)
+//!     .auth(creds.try_into()?).build()?;
+//! let client = OpenSearch::new(transport);
 //! # Ok(())
 //! # }
 //! ```

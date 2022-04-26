@@ -28,6 +28,7 @@
  * GitHub history for details.
  */
 
+use once_cell::sync::Lazy;
 use opensearch::{
     auth::Credentials,
     cat::CatTemplatesParts,
@@ -55,9 +56,8 @@ use opensearch::{
         TransformDeleteTransformParts, TransformGetTransformParts, TransformStopTransformParts,
     },
     watcher::WatcherDeleteWatchParts,
-    OpenSearch, Error, DEFAULT_ADDRESS,
+    Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use once_cell::sync::Lazy;
 use serde_json::{json, Value};
 use std::ops::Deref;
 use sysinfo::SystemExt;

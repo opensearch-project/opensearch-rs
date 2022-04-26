@@ -74,7 +74,7 @@ pub async fn sign_request(
 
     if let Some(new_headers) = instructions.take_headers() {
         for (name, value) in new_headers.into_iter() {
-            request.headers_mut().insert(name.unwrap(), value);
+            request.headers_mut().insert(name.expect("AWS signing header name must never be None"), value);
         }
     }
 

@@ -12,9 +12,7 @@
 use std::time::SystemTime;
 
 use aws_sigv4::{
-    http_request::{
-        sign, SignableBody, SignableRequest, SigningParams, SigningSettings,
-    },
+    http_request::{sign, SignableBody, SignableRequest, SigningParams, SigningSettings},
     signing_params::BuildError,
 };
 use aws_types::{

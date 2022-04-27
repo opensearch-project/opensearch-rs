@@ -38,7 +38,7 @@ if [[ -z $opensearch_node_name ]]; then
   export ssl_key="${script_path}/certs/testnode.key"
   export ssl_ca="${script_path}/certs/ca.crt"
 
-  echo -e "\033[34;1mINFO:\033[0m Running OpenSearch $STACK_VERSION\033[0m"
+  echo -e "\033[34;1mINFO:\033[0m Running $CLUSTER $STACK_VERSION\033[0m"
 fi
 
 export script_path=$(dirname $(realpath -s $0))

@@ -1,4 +1,5 @@
-FROM amazon/opendistro-for-elasticsearch:1.13.2
+ARG STACK_VERSION
+FROM "amazon/opendistro-for-elasticsearch:$STACK_VERSION"
 ARG SECURE_INTEGRATION
 ARG es_path=/usr/share/elasticsearch
 

@@ -3,7 +3,7 @@ default_to_workspace = false
 
 [env]
 # Determines the version of OpenSearch docker container used
-STACK_VERSION = { value = "1.3.1", condition = { env_not_set = ["STACK_VERSION"] }}
+STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"] }}
 # Set publish flags to dry-run by default, to force user to explicitly define for publishing
 CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 # RUST_BACKTRACE is set to "full" in cargo make's builtin makefiles/stable.toml

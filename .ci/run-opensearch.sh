@@ -59,14 +59,16 @@ END
   docker build \
     --file=.ci/$CLUSTER/Dockerfile \
     --build-arg SECURE_INTEGRATION=$SECURE_INTEGRATION \
+    --build-arg STACK_VERSION=$STACK_VERSION \
     --tag=$CLUSTER-secure-$SECURE_INTEGRATION \
     .
 
   echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
   set -x
-  healthcmd="curl -vvv -s --fail http://localhost:9200/_cluster/health || exit 1"
   if [[ "$SECURE_INTEGRATION" == "true" ]]; then
     healthcmd="curl -vvv -s --insecure -u admin:admin --fail https://localhost:9200/_cluster/health || exit 1"
+  else
+    healthcmd="curl -vvv -s --fail http://localhost:9200/_cluster/health || exit 1"
   fi
 
   docker run \

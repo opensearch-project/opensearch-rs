@@ -70,7 +70,7 @@ The `OpenSearch` category of steps are specifically defined for this project and
   a snapshot release like `1.x-SNAPSHOT`
 
   ```sh
-  cargo make test --env STACK_VERSION=1.0.0
+  STACK_VERSION=1.2.4 cargo make test
   ```
 
 - Run YAML tests
@@ -81,7 +81,7 @@ The `OpenSearch` category of steps are specifically defined for this project and
   a snapshot release like `1.x-SNAPSHOT`
 
   ```sh
-  cargo make test-yaml --env STACK_VERSION=1.0.0
+  STACK_VERSION=1.2.4 cargo make test-yaml
   ```
 
 ### Packages

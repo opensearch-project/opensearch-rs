@@ -13,8 +13,13 @@ jobs:
       SECURE_INTEGRATION: false
     strategy:
       matrix:
-        cluster-type: ['opendistro', 'opensearch']
-        secured: ["true", "false"]
+        entry:
+          - { cluster: 'opendistro', secured: 'true', version: '1.13.3' }
+          - { cluster: 'opendistro', secured: 'false', version: '1.13.3' }
+          - { cluster: 'opensearch', secured: 'true', version: '1.2.4' }
+          - { cluster: 'opensearch', secured: 'false', version: '1.2.4' }
+          - { cluster: 'opensearch', secured: 'true', version: '1.3.1' }
+          - { cluster: 'opensearch', secured: 'false', version: '1.3.1' }
 
     steps:
       - name: Checkout
@@ -31,5 +36,6 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - run: "./.ci/run-tests ${{ matrix.cluster-type }} ${{ matrix.secured }}"
-        name: Integ ${{ matrix.cluster-type }} secured=${{ matrix.secured }}
+      - name: Integ ${{ matrix.entry.cluster }} ${{ matrix.entry.version }} secured=${{ matrix.entry.secured }}
+        run: "./.ci/run-tests ${{ matrix.entry.cluster }} ${{ matrix.entry.version }} ${{ matrix.entry.secured }}"
+        

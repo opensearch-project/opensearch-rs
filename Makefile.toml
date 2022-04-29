@@ -3,18 +3,12 @@ default_to_workspace = false
 
 [env]
 # Determines the version of OpenSearch docker container used
-STACK_VERSION = { value = "1.x-SNAPSHOT", condition = { env_not_set = ["STACK_VERSION"] }}
+STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"] }}
 # Set publish flags to dry-run by default, to force user to explicitly define for publishing
 CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 # RUST_BACKTRACE is set to "full" in cargo make's builtin makefiles/stable.toml
 RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"]}}
-
-[tasks.set-env]
-category = "OpenSearch"
-description = "Sets OPENSEARCH_URL environment variable if not already set"
-private = true
-condition = { env_not_set = ["OPENSEARCH_URL"] }
-env = { "OPENSEARCH_URL" = "http://localhost:9200" }
+OPENSEARCH_URL = { value = "http://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
 
 [tasks.run-yaml-test-runner]
 category = "OpenSearch"
@@ -78,7 +72,6 @@ dependencies = ["install-cargo2junit"]
 category = "OpenSearch"
 private = true
 condition = { env_set = [ "STACK_VERSION"], env_false = ["CARGO_MAKE_CI"] }
-dependencies = ["set-env"]
 
 [tasks.run-opensearch.linux]
 command = "./.ci/run-opensearch.sh"

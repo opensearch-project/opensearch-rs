@@ -1,3 +1,7 @@
+- [User Guide](#user-guide)
+  - [Example](#example)
+      - [Create a client](#create-a-client)
+      - [Making API calls](#making-api-calls)
 # User Guide
 
 ## Example

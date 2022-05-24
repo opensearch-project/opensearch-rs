@@ -1,3 +1,16 @@
+- [Developer Guide](#developer-guide)
+  - [Getting Started](#getting-started)
+    - [Git Clone OpenSearch Rust Client Repository](#git-clone-opensearch-rust-client-repository)
+    - [Install Prerequisites](#install-prerequisites)
+  - [Development](#development)
+    - [Prerequisites](#prerequisites)
+    - [Cargo make](#cargo-make)
+    - [Packages](#packages)
+    - [Design principles](#design-principles)
+    - [Coding style guide](#coding-style-guide)
+      - [Formatting](#formatting)
+      - [Clippy](#clippy)
+    - [Running MSVC debugger in VS Code](#running-msvc-debugger-in-vs-code)
 # Developer Guide
 
 So you want to contribute code to the OpenSearch Rust Client?  Excellent!  We're glad you're here.  Here's what you need to do:

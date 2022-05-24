@@ -4,12 +4,8 @@
 # - Add `$RUNSCRIPTS` env var for running Elasticsearch dependent products
 
 export CLUSTER="${1:=opensearch}"
-export SECURE_INTEGRATION="${2:-false}"
-if [[ "$SECURE_INTEGRATION" == "true" ]]; then
-    export OPENSEARCH_URL_EXTENSION="https"
-else
-    export OPENSEARCH_URL_EXTENSION="http"
-fi
+export STACK_VERSION="${2:-latest}"
+export SECURE_INTEGRATION="${3:-false}"
 
 script_path=$(dirname $(realpath -s $0))
 source $script_path/functions/imports.sh

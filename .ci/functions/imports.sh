@@ -11,12 +11,22 @@ if [[ -z $opensearch_node_name ]]; then
   export RUNSCRIPTS=${RUNSCRIPTS-}
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}
-  export OPENSEARCH_URL_EXTENSION=${OPENSEARCH_URL_EXTENSION-http}
+  export CLUSTER=${CLUSTER-opensearch}
+  export SECURE_INTEGRATION=${SECURE_INTEGRATION-true}
+  export STACK_VERSION=${STACK_VERSION-latest}
 
   export opensearch_node_name=instance
-  export opensearch_image=opensearchproject/opensearch
+
+  if [[ "$SECURE_INTEGRATION" == "true" ]]; then
+    export OPENSEARCH_URL_EXTENSION="https"
+  else
+    export OPENSEARCH_URL_EXTENSION="http"
+  fi
+
   if [[ "$CLUSTER" == "opendistro" ]]; then
     export opensearch_image=amazon/opendistro-for-elasticsearch
+  else
+    export opensearch_image=opensearchproject/opensearch
   fi
 
   export opensearch_url=$OPENSEARCH_URL_EXTENSION://${opensearch_node_name}:9200
@@ -28,13 +38,13 @@ if [[ -z $opensearch_node_name ]]; then
   export ssl_key="${script_path}/certs/testnode.key"
   export ssl_ca="${script_path}/certs/ca.crt"
 
+  echo -e "\033[34;1mINFO:\033[0m Running $CLUSTER $STACK_VERSION\033[0m"
 fi
 
-  export script_path=$(dirname $(realpath -s $0))
-  source $script_path/functions/cleanup.sh
-  source $script_path/functions/wait-for-container.sh
-  trap "cleanup_trap ${network_name}" EXIT
-
+export script_path=$(dirname $(realpath -s $0))
+source $script_path/functions/cleanup.sh
+source $script_path/functions/wait-for-container.sh
+trap "cleanup_trap ${network_name}" EXIT
 
 if [[ "$CLEANUP" == "true" ]]; then
   cleanup_all_in_network $network_name

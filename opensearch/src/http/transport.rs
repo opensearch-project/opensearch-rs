@@ -515,7 +515,6 @@ pub mod tests {
     use super::*;
     #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
     use crate::auth::ClientCertificate;
-    use regex::Regex;
     use url::Url;
 
     #[test]

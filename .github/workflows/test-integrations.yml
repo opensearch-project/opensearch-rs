@@ -9,12 +9,19 @@ jobs:
   tests:
     name: Test
     runs-on: ubuntu-latest
-    env:
-      SECURE_INTEGRATION: false
     strategy:
       matrix:
-        cluster-type: ['opendistro', 'opensearch']
-        secured: ["true", "false"]
+        entry:
+          - { cluster: 'opendistro', version: '1.13.3', secured: 'true' }
+          - { cluster: 'opendistro', version: '1.13.3', secured: 'false' }
+          - { cluster: 'opensearch', version: '1.2.4', secured: 'true' }
+          - { cluster: 'opensearch', version: '1.2.4', secured: 'false' }
+          - { cluster: 'opensearch', version: '1.3.1', secured: 'true' }
+          - { cluster: 'opensearch', version: '1.3.1', secured: 'false' }
+          - { cluster: 'opensearch', version: '1.2.4', secured: 'true' }
+          - { cluster: 'opensearch', version: '1.2.4', secured: 'false' }
+          - { cluster: 'opensearch', version: '1.1.0', secured: 'true' }
+          - { cluster: 'opensearch', version: '1.1.0', secured: 'false' }
 
     steps:
       - name: Checkout
@@ -31,5 +38,6 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - run: "./.ci/run-tests ${{ matrix.cluster-type }} ${{ matrix.secured }}"
-        name: Integ ${{ matrix.cluster-type }} secured=${{ matrix.secured }}
+      - name: Integ ${{ matrix.entry.cluster }} ${{ matrix.entry.version }} secured=${{ matrix.entry.secured }}
+        run: "./.ci/run-tests ${{ matrix.entry.cluster }} ${{ matrix.entry.version }} ${{ matrix.entry.secured }}"
+        

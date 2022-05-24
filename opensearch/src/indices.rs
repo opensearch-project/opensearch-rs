@@ -1045,7 +1045,6 @@ pub struct IndicesCreate<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_type_name: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -1068,7 +1067,6 @@ where
             error_trace: None,
             filter_path: None,
             human: None,
-            include_type_name: None,
             master_timeout: None,
             pretty: None,
             request_timeout: None,
@@ -1090,7 +1088,6 @@ where
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            include_type_name: self.include_type_name,
             master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
@@ -1117,11 +1114,6 @@ where
     #[doc = "Return human readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
-        self
-    }
-    #[doc = "Whether a type should be expected in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Specify timeout for connection to master"]
@@ -1168,7 +1160,6 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                include_type_name: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
@@ -1179,7 +1170,6 @@ where
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                include_type_name: self.include_type_name,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
@@ -2994,7 +2984,6 @@ pub struct IndicesGet<'a, 'b> {
     human: Option<bool>,
     ignore_unavailable: Option<bool>,
     include_defaults: Option<bool>,
-    include_type_name: Option<bool>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -3017,7 +3006,6 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
             human: None,
             ignore_unavailable: None,
             include_defaults: None,
-            include_type_name: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -3070,11 +3058,6 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Whether to add the type name to the response (default: false)"]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
-        self
-    }
     #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
@@ -3120,7 +3103,6 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
                 human: Option<bool>,
                 ignore_unavailable: Option<bool>,
                 include_defaults: Option<bool>,
-                include_type_name: Option<bool>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -3135,7 +3117,6 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
                 human: self.human,
                 ignore_unavailable: self.ignore_unavailable,
                 include_defaults: self.include_defaults,
-                include_type_name: self.include_type_name,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -3392,7 +3373,6 @@ pub struct IndicesGetFieldMapping<'a, 'b> {
     human: Option<bool>,
     ignore_unavailable: Option<bool>,
     include_defaults: Option<bool>,
-    include_type_name: Option<bool>,
     local: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -3413,7 +3393,6 @@ impl<'a, 'b> IndicesGetFieldMapping<'a, 'b> {
             human: None,
             ignore_unavailable: None,
             include_defaults: None,
-            include_type_name: None,
             local: None,
             pretty: None,
             request_timeout: None,
@@ -3460,11 +3439,6 @@ impl<'a, 'b> IndicesGetFieldMapping<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Whether a type should be returned in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
-        self
-    }
     #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
@@ -3504,7 +3478,6 @@ impl<'a, 'b> IndicesGetFieldMapping<'a, 'b> {
                 human: Option<bool>,
                 ignore_unavailable: Option<bool>,
                 include_defaults: Option<bool>,
-                include_type_name: Option<bool>,
                 local: Option<bool>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
@@ -3517,7 +3490,6 @@ impl<'a, 'b> IndicesGetFieldMapping<'a, 'b> {
                 human: self.human,
                 ignore_unavailable: self.ignore_unavailable,
                 include_defaults: self.include_defaults,
-                include_type_name: self.include_type_name,
                 local: self.local,
                 pretty: self.pretty,
                 source: self.source,
@@ -3689,8 +3661,6 @@ pub enum IndicesGetMappingParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Type"]
-    Type(&'b [&'b str]),
 }
 impl<'b> IndicesGetMappingParts<'b> {
     #[doc = "Builds a relative URL path to the Indices Get Mapping API"]
@@ -3722,7 +3692,6 @@ pub struct IndicesGetMapping<'a, 'b> {
     headers: HeaderMap,
     human: Option<bool>,
     ignore_unavailable: Option<bool>,
-    include_type_name: Option<bool>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -3743,7 +3712,6 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
             filter_path: None,
             human: None,
             ignore_unavailable: None,
-            include_type_name: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -3784,11 +3752,6 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
     #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
-        self
-    }
-    #[doc = "Whether to add the type name to the response (default: false)"]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
@@ -3834,7 +3797,6 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 ignore_unavailable: Option<bool>,
-                include_type_name: Option<bool>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -3847,7 +3809,6 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 ignore_unavailable: self.ignore_unavailable,
-                include_type_name: self.include_type_name,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -4114,7 +4075,6 @@ pub struct IndicesGetTemplate<'a, 'b> {
     flat_settings: Option<bool>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_type_name: Option<bool>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -4133,7 +4093,6 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
             filter_path: None,
             flat_settings: None,
             human: None,
-            include_type_name: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -4164,11 +4123,6 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
     #[doc = "Return human readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
-        self
-    }
-    #[doc = "Whether a type should be returned in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
@@ -4211,7 +4165,6 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 flat_settings: Option<bool>,
                 human: Option<bool>,
-                include_type_name: Option<bool>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -4222,7 +4175,6 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
                 filter_path: self.filter_path,
                 flat_settings: self.flat_settings,
                 human: self.human,
-                include_type_name: self.include_type_name,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -5251,7 +5203,6 @@ pub struct IndicesPutMapping<'a, 'b, B> {
     headers: HeaderMap,
     human: Option<bool>,
     ignore_unavailable: Option<bool>,
-    include_type_name: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -5277,7 +5228,6 @@ where
             filter_path: None,
             human: None,
             ignore_unavailable: None,
-            include_type_name: None,
             master_timeout: None,
             pretty: None,
             request_timeout: None,
@@ -5307,7 +5257,6 @@ where
             headers: self.headers,
             human: self.human,
             ignore_unavailable: self.ignore_unavailable,
-            include_type_name: self.include_type_name,
             master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
@@ -5344,11 +5293,6 @@ where
     #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
-        self
-    }
-    #[doc = "Whether a type should be expected in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Specify timeout for connection to master"]
@@ -5399,7 +5343,6 @@ where
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 ignore_unavailable: Option<bool>,
-                include_type_name: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
@@ -5413,7 +5356,6 @@ where
                 filter_path: self.filter_path,
                 human: self.human,
                 ignore_unavailable: self.ignore_unavailable,
-                include_type_name: self.include_type_name,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
@@ -5679,7 +5621,6 @@ pub struct IndicesPutTemplate<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_type_name: Option<bool>,
     master_timeout: Option<&'b str>,
     order: Option<i64>,
     pretty: Option<bool>,
@@ -5702,7 +5643,6 @@ where
             error_trace: None,
             filter_path: None,
             human: None,
-            include_type_name: None,
             master_timeout: None,
             order: None,
             pretty: None,
@@ -5724,7 +5664,6 @@ where
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            include_type_name: self.include_type_name,
             master_timeout: self.master_timeout,
             order: self.order,
             pretty: self.pretty,
@@ -5755,11 +5694,6 @@ where
     #[doc = "Return human readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
-        self
-    }
-    #[doc = "Whether a type should be returned in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Specify timeout for connection to master"]
@@ -5802,7 +5736,6 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                include_type_name: Option<bool>,
                 master_timeout: Option<&'b str>,
                 order: Option<i64>,
                 pretty: Option<bool>,
@@ -5813,7 +5746,6 @@ where
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                include_type_name: self.include_type_name,
                 master_timeout: self.master_timeout,
                 order: self.order,
                 pretty: self.pretty,
@@ -6513,7 +6445,6 @@ pub struct IndicesRollover<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_type_name: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -6537,7 +6468,6 @@ where
             error_trace: None,
             filter_path: None,
             human: None,
-            include_type_name: None,
             master_timeout: None,
             pretty: None,
             request_timeout: None,
@@ -6560,7 +6490,6 @@ where
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            include_type_name: self.include_type_name,
             master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
@@ -6592,11 +6521,6 @@ where
     #[doc = "Return human readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
-        self
-    }
-    #[doc = "Whether a type should be included in the body of the mappings."]
-    pub fn include_type_name(mut self, include_type_name: bool) -> Self {
-        self.include_type_name = Some(include_type_name);
         self
     }
     #[doc = "Specify timeout for connection to master"]
@@ -6644,7 +6568,6 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                include_type_name: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
@@ -6656,7 +6579,6 @@ where
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                include_type_name: self.include_type_name,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
@@ -8887,23 +8809,9 @@ impl<'a> Indices<'a> {
     ) -> IndicesExistsTemplate<'a, 'b> {
         IndicesExistsTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Indices Exists Type API](https://opensearch.org/docs/)\n\nReturns information about whether a particular document type exists. (DEPRECATED)"]
-    pub fn exists_type<'b>(
-        &'a self,
-        parts: IndicesExistsTypeParts<'b>,
-    ) -> IndicesExistsType<'a, 'b> {
-        IndicesExistsType::new(self.transport(), parts)
-    }
     #[doc = "[Indices Flush API](https://opensearch.org/docs/)\n\nPerforms the flush operation on one or more indices."]
     pub fn flush<'b>(&'a self, parts: IndicesFlushParts<'b>) -> IndicesFlush<'a, 'b, ()> {
         IndicesFlush::new(self.transport(), parts)
-    }
-    #[doc = "[Indices Flush Synced API](https://opensearch.org/docs/)\n\nPerforms a synced flush operation on one or more indices. Synced flush is deprecated and will be removed in 8.0. Use flush instead"]
-    pub fn flush_synced<'b>(
-        &'a self,
-        parts: IndicesFlushSyncedParts<'b>,
-    ) -> IndicesFlushSynced<'a, 'b, ()> {
-        IndicesFlushSynced::new(self.transport(), parts)
     }
     #[doc = "[Indices Forcemerge API](https://opensearch.org/docs/)\n\nPerforms the force merge operation on one or more indices."]
     pub fn forcemerge<'b>(

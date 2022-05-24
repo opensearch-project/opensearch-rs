@@ -397,7 +397,7 @@ mod tests {
                 #[doc = "No parts"]
                 None,
                 #[doc = "Index"]
-                Index(&'b [&'b str])
+                Index(&'b [&'b str]),
             }
         );
 

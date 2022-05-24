@@ -63,8 +63,6 @@ enum BulkAction {
 #[derive(Serialize, Default)]
 struct BulkMetadata {
     _index: Option<String>,
-    // TODO: intentionally omit type for now, as it's going away.
-    //_type: Option<String>,
     _id: Option<String>,
     pipeline: Option<String>,
     if_seq_no: Option<i64>,

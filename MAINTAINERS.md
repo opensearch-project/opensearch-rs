@@ -1,15 +1,15 @@
 - [Overview](#overview)
 - [Current Maintainers](#current-maintainers)
 - [Maintainer Responsibilities](#maintainer-responsibilities)
-    - [Uphold Code of Conduct](#uphold-code-of-conduct)
-    - [Prioritize Security](#prioritize-security)
-    - [Review Pull Requests](#review-pull-requests)
-    - [Triage Open Issues](#triage-open-issues)
-    - [Be Responsive](#be-responsive)
-    - [Maintain Overall Health of the Repo](#maintain-overall-health-of-the-repo)
-    - [Use Semver](#use-semver)
-    - [Release Frequently](#release-frequently)
-    - [Promote Other Maintainers](#promote-other-maintainers)
+  - [Uphold Code of Conduct](#uphold-code-of-conduct)
+  - [Prioritize Security](#prioritize-security)
+  - [Review Pull Requests](#review-pull-requests)
+  - [Triage Open Issues](#triage-open-issues)
+  - [Be Responsive](#be-responsive)
+  - [Maintain Overall Health of the Repo](#maintain-overall-health-of-the-repo)
+  - [Use Semver](#use-semver)
+  - [Release Frequently](#release-frequently)
+  - [Promote Other Maintainers](#promote-other-maintainers)
 
 ## Overview
 
@@ -19,7 +19,9 @@ This document explains who the maintainers are (see below), what they do in this
 
 | Maintainer               | GitHub ID                               | Affiliation |
 | ------------------------ | --------------------------------------- | ----------- |
-| Aditya Jindal             | [aditjind](https://github.com/aditjind)| Amazon      |
+| Aditya Jindal            | [aditjind](https://github.com/aditjind) | Amazon      |
+| Daniel Doubrovkine       | [dblock](https://github.com/dblock)     | Amazon      |
+| Thomas Farr              | [xtansia](https://github.com/xtansia)   | Xtansia     |
 
 ## Maintainer Responsibilities
 

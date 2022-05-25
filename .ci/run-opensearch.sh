@@ -54,14 +54,20 @@ END
   local_detach="true"
   if [[ "$i" == "$((NUMBER_OF_NODES-1))" ]]; then local_detach=$DETACH; fi
 
-  echo -e "\033[34;1mINFO: building $CLUSTER container\033[0m"
-  echo 'cluster is' $CLUSTER
-  docker build \
-    --file=.ci/$CLUSTER/Dockerfile \
-    --build-arg SECURE_INTEGRATION=$SECURE_INTEGRATION \
-    --build-arg STACK_VERSION=$STACK_VERSION \
-    --tag=$CLUSTER-secure-$SECURE_INTEGRATION \
-    .
+  CLUSTER_TAG=$CLUSTER
+  if [[ "$STACK_VERSION" != *"SNAPSHOT" ]]; then
+    CLUSTER_TAG=$CLUSTER-secure-$SECURE_INTEGRATION
+    echo -e "\033[34;1mINFO: building $CLUSTER container\033[0m"
+    echo 'cluster is' $CLUSTER
+    docker build \
+      --file=.ci/$CLUSTER/Dockerfile \
+      --build-arg SECURE_INTEGRATION=$SECURE_INTEGRATION \
+      --build-arg STACK_VERSION=$STACK_VERSION \
+      --tag=$CLUSTER_TAG \
+      .
+  else
+    CLUSTER_TAG=$CLUSTER_TAG:test
+  fi
 
   echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
   set -x
@@ -87,7 +93,7 @@ END
     --health-timeout=2s \
     --rm \
     -d \
-    $CLUSTER-secure-$SECURE_INTEGRATION;
+    $CLUSTER_TAG;
 
   set +x
   if wait_for_container "$opensearch_node_name" "$network_name"; then

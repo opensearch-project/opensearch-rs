@@ -1,0 +1,49 @@
+name: Integration with Unreleased OpenSearch
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        entry:
+          - { opensearch_ref: '1.x' }
+          - { opensearch_ref: '2.0' }
+          - { opensearch_ref: '2.x' }
+          - { opensearch_ref: 'main' }
+    steps:
+      - name: Checkout OpenSearch
+        uses: actions/checkout@v2
+        with:
+          repository: opensearch-project/opensearch
+          ref: ${{ matrix.entry.opensearch_ref }}
+          path: opensearch
+
+        # This step builds the docker image tagged as opensearch:test. It will be further used in /ci/run-tests to test against unreleased OpenSearch.
+        # Reference: https://github.com/opensearch-project/OpenSearch/blob/2.0/distribution/docker/build.gradle#L190
+      - name: Assemble OpenSearch
+        run: |
+          cd opensearch
+          ./gradlew assemble
+
+      - name: Checkout Rust Client
+        uses: actions/checkout@v2
+
+      - name: Increase system limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+
+      - name: Integ OpenSearch ${{ matrix.entry.opensearch_ref }} secured=false
+        run: "./.ci/run-tests opensearch SNAPSHOT false"

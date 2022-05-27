@@ -103,13 +103,10 @@ impl Do {
     pub fn to_tokens(&self, mut read_response: bool, tokens: &mut Tokens) -> bool {
         self.api_call.to_tokens(tokens);
 
-        // Filter out [types removal] warnings in all cases, same as the java runner. This should
-        // really be in the yaml tests themselves
         if !self.warnings.is_empty() {
             tokens.append(quote! {
                 let warnings: Vec<&str> = response
                     .warning_headers()
-                    .filter(|w| !w.starts_with("[types removal]"))
                     .collect();
             });
             for warning in &self.warnings {
@@ -122,7 +119,7 @@ impl Do {
             tokens.append(quote! {
                 let allowed_warnings = vec![#(#allowed),*];
                 let warnings: Vec<&str> = response.warning_headers()
-                    .filter(|w| !w.starts_with("[types removal]") && !allowed_warnings.iter().any(|a| w.contains(a)))
+                    .filter(!allowed_warnings.iter().any(|a| w.contains(a)))
                     .collect();
                 assert_warnings_is_empty!(warnings);
             });

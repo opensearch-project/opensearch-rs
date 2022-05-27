@@ -352,7 +352,7 @@ mod tests {
                             deprecated: None,
                         },
                         Path {
-                            path: PathString("/{index}/{type}/_search".to_string()),
+                            path: PathString("/{index}/_search".to_string()),
                             methods: vec![HttpMethod::Get, HttpMethod::Post],
                             parts: {
                                 let mut map = BTreeMap::new();
@@ -398,8 +398,6 @@ mod tests {
                 None,
                 #[doc = "Index"]
                 Index(&'b [&'b str]),
-                #[doc = "Index and Type"]
-                IndexType(&'b [&'b str], &'b [&'b str]),
             }
         );
 
@@ -417,19 +415,6 @@ mod tests {
                             let mut p = String::with_capacity(9usize + encoded_index.len());
                             p.push_str("/");
                             p.push_str(encoded_index.as_ref());
-                            p.push_str("/_search");
-                            p.into()
-                        }
-                        SearchParts::IndexType(ref index, ref ty) => {
-                            let index_str = index.join(",");
-                            let ty_str = ty.join(",");
-                            let encoded_index: Cow<str> = percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                            let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                            let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_ty.len());
-                            p.push_str("/");
-                            p.push_str(encoded_index.as_ref());
-                            p.push_str("/");
-                            p.push_str(encoded_ty.as_ref());
                             p.push_str("/_search");
                             p.into()
                         }

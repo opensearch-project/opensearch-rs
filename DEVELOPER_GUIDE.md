@@ -130,7 +130,7 @@ can be `to_string()`'ed and written to disk, and this is used to create much of 
 1. Generate as much of the client as feasible from the REST API specs
 
     The REST API specs contain information about
-    - the URL parts e.g. `{index}/{type}/_search` and variants
+    - the URL parts e.g. `{index}/_search` and variants
     - accepted HTTP methods e.g. `GET`, `POST`
     - the URL query string parameters
     - whether the API accepts a body

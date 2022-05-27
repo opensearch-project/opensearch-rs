@@ -47,8 +47,6 @@ pub enum BulkParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b str),
-    #[doc = "Index and Type"]
-    IndexType(&'b str, &'b str),
 }
 impl<'b> BulkParts<'b> {
     #[doc = "Builds a relative URL path to the Bulk API"]
@@ -61,18 +59,6 @@ impl<'b> BulkParts<'b> {
                 let mut p = String::with_capacity(7usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_bulk");
-                p.into()
-            }
-            BulkParts::IndexType(ref index, ref ty) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(8usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_bulk");
                 p.into()
             }
@@ -592,8 +578,6 @@ pub enum CountParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> CountParts<'b> {
     #[doc = "Builds a relative URL path to the Count API"]
@@ -607,20 +591,6 @@ impl<'b> CountParts<'b> {
                 let mut p = String::with_capacity(8usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_count");
-                p.into()
-            }
-            CountParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(9usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_count");
                 p.into()
             }
@@ -898,8 +868,6 @@ where
 pub enum CreateParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> CreateParts<'b> {
     #[doc = "Builds a relative URL path to the Create API"]
@@ -914,23 +882,6 @@ impl<'b> CreateParts<'b> {
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_create/");
                 p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            CreateParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    11usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_create");
                 p.into()
             }
         }
@@ -1132,8 +1083,6 @@ where
 pub enum DeleteParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> DeleteParts<'b> {
     #[doc = "Builds a relative URL path to the Delete API"]
@@ -1147,22 +1096,6 @@ impl<'b> DeleteParts<'b> {
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            DeleteParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    3usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -1344,8 +1277,6 @@ impl<'a, 'b> Delete<'a, 'b> {
 pub enum DeleteByQueryParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> DeleteByQueryParts<'b> {
     #[doc = "Builds a relative URL path to the Delete By Query API"]
@@ -1358,20 +1289,6 @@ impl<'b> DeleteByQueryParts<'b> {
                 let mut p = String::with_capacity(18usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_delete_by_query");
-                p.into()
-            }
-            DeleteByQueryParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(19usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_delete_by_query");
                 p.into()
             }
@@ -2130,8 +2047,6 @@ impl<'a, 'b> DeleteScript<'a, 'b> {
 pub enum ExistsParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> ExistsParts<'b> {
     #[doc = "Builds a relative URL path to the Exists API"]
@@ -2145,22 +2060,6 @@ impl<'b> ExistsParts<'b> {
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            ExistsParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    3usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -2364,8 +2263,6 @@ impl<'a, 'b> Exists<'a, 'b> {
 pub enum ExistsSourceParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> ExistsSourceParts<'b> {
     #[doc = "Builds a relative URL path to the Exists Source API"]
@@ -2380,23 +2277,6 @@ impl<'b> ExistsSourceParts<'b> {
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_source/");
                 p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            ExistsSourceParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    11usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_source");
                 p.into()
             }
         }
@@ -2589,8 +2469,6 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
 pub enum ExplainParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> ExplainParts<'b> {
     #[doc = "Builds a relative URL path to the Explain API"]
@@ -2605,23 +2483,6 @@ impl<'b> ExplainParts<'b> {
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_explain/");
                 p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            ExplainParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    12usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_explain");
                 p.into()
             }
         }
@@ -3082,8 +2943,6 @@ where
 pub enum GetParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> GetParts<'b> {
     #[doc = "Builds a relative URL path to the Get API"]
@@ -3097,22 +2956,6 @@ impl<'b> GetParts<'b> {
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            GetParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    3usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -3677,8 +3520,6 @@ impl<'a, 'b> GetScriptLanguages<'a, 'b> {
 pub enum GetSourceParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> GetSourceParts<'b> {
     #[doc = "Builds a relative URL path to the Get Source API"]
@@ -3693,23 +3534,6 @@ impl<'b> GetSourceParts<'b> {
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_source/");
                 p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            GetSourceParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    11usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_source");
                 p.into()
             }
         }
@@ -3904,10 +3728,6 @@ pub enum IndexParts<'b> {
     IndexId(&'b str, &'b str),
     #[doc = "Index"]
     Index(&'b str),
-    #[doc = "Index and Type"]
-    IndexType(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> IndexParts<'b> {
     #[doc = "Builds a relative URL path to the Index API"]
@@ -3931,33 +3751,6 @@ impl<'b> IndexParts<'b> {
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc");
-                p.into()
-            }
-            IndexParts::IndexType(ref index, ref ty) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(2usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.into()
-            }
-            IndexParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    3usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
                 p.into()
             }
         }
@@ -4313,8 +4106,6 @@ pub enum MgetParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b str),
-    #[doc = "Index and Type"]
-    IndexType(&'b str, &'b str),
 }
 impl<'b> MgetParts<'b> {
     #[doc = "Builds a relative URL path to the Mget API"]
@@ -4327,18 +4118,6 @@ impl<'b> MgetParts<'b> {
                 let mut p = String::with_capacity(7usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_mget");
-                p.into()
-            }
-            MgetParts::IndexType(ref index, ref ty) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(8usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_mget");
                 p.into()
             }
@@ -4560,8 +4339,6 @@ pub enum MsearchParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> MsearchParts<'b> {
     #[doc = "Builds a relative URL path to the Msearch API"]
@@ -4575,20 +4352,6 @@ impl<'b> MsearchParts<'b> {
                 let mut p = String::with_capacity(10usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_msearch");
-                p.into()
-            }
-            MsearchParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(11usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_msearch");
                 p.into()
             }
@@ -4796,8 +4559,6 @@ pub enum MsearchTemplateParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> MsearchTemplateParts<'b> {
     #[doc = "Builds a relative URL path to the Msearch Template API"]
@@ -4811,20 +4572,6 @@ impl<'b> MsearchTemplateParts<'b> {
                 let mut p = String::with_capacity(19usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_msearch/template");
-                p.into()
-            }
-            MsearchTemplateParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(20usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_msearch/template");
                 p.into()
             }
@@ -5012,8 +4759,6 @@ pub enum MtermvectorsParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b str),
-    #[doc = "Index and Type"]
-    IndexType(&'b str, &'b str),
 }
 impl<'b> MtermvectorsParts<'b> {
     #[doc = "Builds a relative URL path to the Mtermvectors API"]
@@ -5026,18 +4771,6 @@ impl<'b> MtermvectorsParts<'b> {
                 let mut p = String::with_capacity(15usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_mtermvectors");
-                p.into()
-            }
-            MtermvectorsParts::IndexType(ref index, ref ty) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(16usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_mtermvectors");
                 p.into()
             }
@@ -6824,8 +6557,6 @@ pub enum SearchParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> SearchParts<'b> {
     #[doc = "Builds a relative URL path to the Search API"]
@@ -6839,20 +6570,6 @@ impl<'b> SearchParts<'b> {
                 let mut p = String::with_capacity(9usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_search");
-                p.into()
-            }
-            SearchParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_search");
                 p.into()
             }
@@ -7640,8 +7357,6 @@ pub enum SearchTemplateParts<'b> {
     None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> SearchTemplateParts<'b> {
     #[doc = "Builds a relative URL path to the Search Template API"]
@@ -7655,20 +7370,6 @@ impl<'b> SearchTemplateParts<'b> {
                 let mut p = String::with_capacity(18usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_search/template");
-                p.into()
-            }
-            SearchTemplateParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(19usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_search/template");
                 p.into()
             }
@@ -7938,10 +7639,6 @@ pub enum TermvectorsParts<'b> {
     IndexId(&'b str, &'b str),
     #[doc = "Index"]
     Index(&'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
-    #[doc = "Index and Type"]
-    IndexType(&'b str, &'b str),
 }
 impl<'b> TermvectorsParts<'b> {
     #[doc = "Builds a relative URL path to the Termvectors API"]
@@ -7964,35 +7661,6 @@ impl<'b> TermvectorsParts<'b> {
                 let mut p = String::with_capacity(14usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_termvectors");
-                p.into()
-            }
-            TermvectorsParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    16usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_termvectors");
-                p.into()
-            }
-            TermvectorsParts::IndexType(ref index, ref ty) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(15usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_termvectors");
                 p.into()
             }
@@ -8239,8 +7907,6 @@ where
 pub enum UpdateParts<'b> {
     #[doc = "Index and Id"]
     IndexId(&'b str, &'b str),
-    #[doc = "Index, Type and Id"]
-    IndexTypeId(&'b str, &'b str, &'b str),
 }
 impl<'b> UpdateParts<'b> {
     #[doc = "Builds a relative URL path to the Update API"]
@@ -8255,23 +7921,6 @@ impl<'b> UpdateParts<'b> {
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_update/");
                 p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-            UpdateParts::IndexTypeId(ref index, ref ty, ref id) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty.as_bytes(), PARTS_ENCODED).into();
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(
-                    11usize + encoded_index.len() + encoded_ty.len() + encoded_id.len(),
-                );
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_update");
                 p.into()
             }
         }
@@ -8526,8 +8175,6 @@ where
 pub enum UpdateByQueryParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
-    #[doc = "Index and Type"]
-    IndexType(&'b [&'b str], &'b [&'b str]),
 }
 impl<'b> UpdateByQueryParts<'b> {
     #[doc = "Builds a relative URL path to the Update By Query API"]
@@ -8540,20 +8187,6 @@ impl<'b> UpdateByQueryParts<'b> {
                 let mut p = String::with_capacity(18usize + encoded_index.len());
                 p.push_str("/");
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_update_by_query");
-                p.into()
-            }
-            UpdateByQueryParts::IndexType(ref index, ref ty) => {
-                let index_str = index.join(",");
-                let ty_str = ty.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_ty: Cow<str> = percent_encode(ty_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(19usize + encoded_index.len() + encoded_ty.len());
-                p.push_str("/");
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/");
-                p.push_str(encoded_ty.as_ref());
                 p.push_str("/_update_by_query");
                 p.into()
             }

@@ -159,16 +159,22 @@ fn branch_suite_and_version_from_opensearch(
 
     let mut response = client.get(url).basic_auth("admin", Some("admin")).send()?;
     let json: Value = response.json()?;
-    let branch = json["version"]["build_hash"].as_str().unwrap().to_string();
+    let mut branch = json["version"]["build_hash"].as_str().unwrap().to_string();
 
     // any prerelease part needs to be trimmed because the semver crate only allows
     // a version with a prerelease to match against predicates, if at least one predicate
     // has a prerelease. See
     // https://github.com/steveklabnik/semver/blob/afa5fc853cb4d6d2b1329579e5528f86f3b550f9/src/version_req.rs#L319-L331
-    let version = json["version"]["number"]
+    let mut version = json["version"]["number"]
         .as_str()
         .unwrap()
         .trim_end_matches(|c: char| c.is_alphabetic() || c == '-');
 
+    if version.to_string().starts_with("1.") {
+        info!("Found a 1.x version");
+        // If a 1.x version is found for OpenSearch, use the yaml files from 2.0 branch since type is removed from 2.0.
+        version = "2.0.0";
+        branch = "5d6eeed3830ebd66ba5bfacc3ba94d901dede89a".to_string();
+    }
     Ok((branch, suite, semver::Version::parse(version)?))
 }

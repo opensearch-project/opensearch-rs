@@ -170,9 +170,9 @@ fn branch_suite_and_version_from_opensearch(
         .unwrap()
         .trim_end_matches(|c: char| c.is_alphabetic() || c == '-');
 
-    if version.to_string().starts_with("1.") {
-        info!("Found a 1.x version");
-        // If a 1.x version is found for OpenSearch, use the yaml files from 2.0 branch since type is removed from 2.0.
+    if version.to_string().starts_with("1.") || version.to_string().starts_with("7.") {
+        info!("Found a 1.x/7.x version, using yaml docs from 2.0 version since type mapping related tests has been removed");
+        // If a 1.x/7.x version is found for OpenSearch, use the yaml files from 2.0 branch since type is removed from 2.0.
         version = "2.0.0";
         branch = "5d6eeed3830ebd66ba5bfacc3ba94d901dede89a".to_string();
     }

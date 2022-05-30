@@ -265,7 +265,7 @@ mod tests {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let bytes: &'static [u8] = b"{\"foo\":\"bar\",\"baz\":1}";
         let _ = bytes.write(&mut bytes_mut)?;
-        assert_eq!(&bytes[..], &bytes_mut[..]);
+        assert_eq!(bytes, &bytes_mut[..]);
 
         Ok(())
     }

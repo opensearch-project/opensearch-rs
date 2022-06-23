@@ -41,7 +41,7 @@ use std::{
     fs,
     fs::{File, OpenOptions},
     io::Write,
-    path::{Component, Path, PathBuf},
+    path::{Path, PathBuf},
 };
 use yaml_rust::{Yaml, YamlLoader};
 
@@ -146,7 +146,7 @@ impl<'a> YamlTests<'a> {
 
         quote! {
             #![allow(unused_imports, unused_variables, dead_code)]
-            use crate::common::{client, macros, transform};
+            use crate::common::{client, macros};
             use opensearch::*;
             use opensearch::http::{
                 headers::{HeaderName, HeaderValue},

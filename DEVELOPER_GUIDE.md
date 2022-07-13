@@ -105,7 +105,7 @@ The workspace contains the following packages:
 
   The client package crate. The client exposes all OpenSearch APIs as associated functions, either on
 the root client, `OpenSearch`, or on one of the _namespaced clients_, such as `Cat`, `Indices`, etc. The _namespaced clients_
-are based on the grouping of APIs within the [OpenSearch](https://github.com/opensearch-project/opensearch-specification/tree/main/specification) REST API specs from which much of the client is generated.
+are based on the grouping of APIs within the [OpenSearch](https://github.com/opensearch-project/OpenSearch/tree/main/rest-api-spec) REST API specs from which much of the client is generated.
 All API functions are `async` only, and can be `await`ed.
 
 - #### `api_generator`

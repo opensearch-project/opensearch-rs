@@ -51,3 +51,44 @@ tests:
     # The use of an invalid window interval results in a 400 response which looks like
     # it suppresses the sending of deprecation headers
     - "Bad window deprecated interval"
+
+  free/indices.put_mapping/10_basic.yml:
+    # The type parameter is removed in 2.0
+    - "Put mappings with explicit _doc type"
+    - "Put mappings with explicit _doc type bwc"
+
+  free/cat.health/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Help"
+
+  free/cat.nodes/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Test cat nodes output"
+
+  free/cluster.health/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Get cluster health has same value for discovered_master and discovered_cluster_manager"
+    - "cluster health with closed index (pre 7.2.0)"
+
+  free/cluster.reroute/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Cluster reroute returns cluster_manager_node"
+  
+  free/cluster.reroute/20_response_filtering.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Filter the cluster reroute by cluster_manager_node only should work"
+
+  free/cluster.state/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Get cluster state returns cluster_manager_node"
+  
+  free/cluster.state/20_filtering.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "Filter the cluster state by cluster_manager_node only should work"
+
+  free/cluster.stats/10_basic.yml:
+    # Should be fixed after inclusive naming changes - master -> cluster_manager
+    - "get cluster stats nodes count with both master and cluster_manager"
+
+  free/search/230_interval_query.yml:
+    - "*"

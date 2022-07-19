@@ -10,6 +10,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         entry:
           - { cluster: 'opendistro', version: '1.13.3', secured: 'true' }

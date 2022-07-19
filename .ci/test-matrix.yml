@@ -1,7 +1,7 @@
 ---
 
 STACK_VERSION:
-  - 1.x-SNAPSHOT
+  - 2.x-SNAPSHOT
 
 RUST_TOOLCHAIN:
   - latest

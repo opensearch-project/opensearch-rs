@@ -29,10 +29,14 @@
  */
 
 use once_cell::sync::Lazy;
+use std::fs::File;
+use std::io::Read;
 use opensearch::{
-    auth::Credentials,
+    auth::{
+        Credentials,
+        ClientCertificate
+    },
     cert::CertificateValidation,
-    cluster::ClusterHealthParts,
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
@@ -41,9 +45,8 @@ use opensearch::{
     indices::{
         IndicesDeleteParts,
     },
-    params::{ExpandWildcards, WaitForStatus},
+    params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
-    tasks::TasksCancelParts,
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use serde_json::{Value};
@@ -65,28 +68,15 @@ fn running_proxy() -> bool {
 }
 
 static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
-    let mut url = Url::parse(cluster_addr().as_ref()).unwrap();
+    let url = Url::parse(cluster_addr().as_ref()).unwrap();
 
-    // if the url is https and specifies a username and password, remove from the url and set credentials
+    // if the url is https, set credentials
     let credentials = if url.scheme() == "https" {
-        let username = if !url.username().is_empty() {
-            let u = url.username().to_string();
-            url.set_username("").unwrap();
-            u
-        } else {
-            "admin".into()
-        };
-
-        let password = match url.password() {
-            Some(p) => {
-                let pass = p.to_string();
-                url.set_password(None).unwrap();
-                pass
-            }
-            None => "admin".into(),
-        };
-
-        Some(Credentials::Basic(username, password))
+        let mut buf = Vec::new();
+        let mut f = File::open("tests/common/kirk.p12").expect("Unable to open file");
+        f.read_to_end(&mut buf).expect("Unable to read vec");
+        let cert = ClientCertificate::Pkcs12(buf, Some("".to_string()));
+        Some(Credentials::Certificate(cert))
     } else {
         None
     };

@@ -23,11 +23,7 @@ if [[ -z $opensearch_node_name ]]; then
     export OPENSEARCH_URL_EXTENSION="http"
   fi
 
-  if [[ "$CLUSTER" == "opendistro" ]]; then
-    export opensearch_image=amazon/opendistro-for-elasticsearch
-  else
-    export opensearch_image=opensearchproject/opensearch
-  fi
+  export opensearch_image=opensearchproject/opensearch
 
   export opensearch_url=$OPENSEARCH_URL_EXTENSION://${opensearch_node_name}:9200
   export external_opensearch_url=${opensearch_url/$opensearch_node_name/localhost}

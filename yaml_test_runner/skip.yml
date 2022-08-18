@@ -90,5 +90,8 @@ tests:
     # Should be fixed after inclusive naming changes - master -> cluster_manager
     - "get cluster stats nodes count with both master and cluster_manager"
 
+  free/cluster.put_settings/10_basic.yml:
+    - "Test put and reset persistent settings"
+
   free/search/230_interval_query.yml:
     - "*"

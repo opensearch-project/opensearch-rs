@@ -13,14 +13,11 @@ jobs:
       fail-fast: false
       matrix:
         entry:
-          - { version: '1.3.4', secured: 'true' }
-          - { version: '1.3.4', secured: 'false' }
-          - { version: '1.2.4', secured: 'true' }
-          - { version: '1.2.4', secured: 'false' }
-          - { version: '1.1.0', secured: 'true' }
-          - { version: '1.1.0', secured: 'false' }
-          - { version: '2.2.0', secured: 'true' }
-          - { version: '2.2.0', secured: 'false' }
+          - { version: '1.1.0' }
+          - { version: '1.2.4' }
+          - { version: '1.3.4' }
+          - { version: '2.2.0' }
+        secured: ["true", "false"]
 
     steps:
       - name: Checkout
@@ -37,6 +34,6 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - name: Integ OpenSearch ${{ matrix.entry.version }} secured=${{ matrix.entry.secured }}
-        run: "./.ci/run-tests opensearch ${{ matrix.entry.version }} ${{ matrix.entry.secured }}"
+      - name: Integ OpenSearch ${{ matrix.entry.version }} secured=${{ matrix.secured }}
+        run: "./.ci/run-tests opensearch ${{ matrix.entry.version }} ${{ matrix.secured }}"
         

@@ -36,8 +36,7 @@ tests:
 
   free/indices.shard_stores/10_basic.yml:
     # uses number as a key into object. serde_json::Value expects a string key
-    - "basic index test"
-    - "multiple indices test"
+    - "*"
 
   free/indices.stats/12_level.yml:
     # uses number as a key into object. serde_json::Value expects a string key
@@ -93,11 +92,15 @@ tests:
     # Should be fixed after inclusive naming changes - master -> cluster_manager
     - "get cluster stats nodes count with both master and cluster_manager"
 
+  free/cluster.put_settings/10_basic.yml:
+    - "Test put and reset persistent settings"
+
   free/search/230_interval_query.yml:
     - "*"
 
   free/cat.allocation/10_basic.yml:
     - "Node ID"
+    - "Bytes"
   
   free/cat.count/10_basic.yml:
     - "Test cat count output"
@@ -118,6 +121,9 @@ tests:
   free/cluster.allocation_explain/10_basic.yml:
     - "cluster shard allocation explanation test with empty request"
   
+  free/cluster.health/20_request_timeout.yml:
+    - "cluster health request timeout waiting for active shards"
+
   free/indices.refresh/10_basic.yml:
     - "Indices refresh test _all"
     - "Indices refresh test empty array"
@@ -131,6 +137,9 @@ tests:
   free/msearch/10_basic.yml:
     - "Basic multi-search"
     - "Least impact smoke test"
+  
+  free/range/10_basic.yml:
+    - "Integer range"
   
   free/search/10_source_filtering.yml:
     - "*"
@@ -151,42 +160,71 @@ tests:
     - "pre_filter_shard_size with shards that have no hit"
 
   free/search.aggregation/100_avg_metric.yml:
-    - "Aggregating wrong datatype test"
+    - "*"
   
   free/search.aggregation/10_histogram.yml:
     - "Basic test"
     - "Format test"
 
   free/search.aggregation/110_max_metric.yml:
-    - "Aggregating wrong datatype test"
+    - "*"
 
   free/search.aggregation/120_min_metric.yml:
-    - "Aggregating wrong datatype test"
+    - "*"
   
   free/search.aggregation/130_sum_metric.yml:
-    - "Aggregating wrong datatype test"
+    - "*"
+  
+  free/search.aggregation/140_value_count_metric.yml:
+    - "*"
+  
+  free/search.aggregation/150_stats_metric.yml:
+    - "*"
+  
+  free/search.aggregation/160_extended_stats_metric.yml:
+    - "*"
+  
+  free/search.aggregation/170_cardinality_metric.yml:
+    - "*"
   
   free/search.aggregation/180_percentiles_tdigest_metric.yml:
-    - "Invalid params test"
+    - "*"
   
   free/search.aggregation/190_percentiles_hdr_metric.yml:
-    - "Basic test"
-    - "Invalid params test"
+    - "*"
   
   free/search.aggregation/20_terms.yml:
+    - "*"
+  
+  free/search.aggregation/220_filters_bucket.yml:
     - "*"
 
   free/search.aggregation/260_weighted_avg.yml:
     - "Basic test"
+  
+  free/search.aggregation/270_median_absolute_deviation_metric.yml:
+    - "*"
 
   free/search.aggregation/280_rare_terms.yml:
     - "*"
+  
+  free/search.aggregation/280_geohash_grid.yml:
+    - "Basic test"
+    
+  free/search.aggregation/290_geotile_grid.yml:
+    - "Basic test"
+  
+  free/search.aggregation/320_missing.yml:
+    - "*"
+
+  free/search.aggregation/340_geo_distance.yml:
+    - "basic"
   
   free/search.aggregation/40_range.yml:
     - "*"
   
   free/search.aggregation/50_filter.yml:
-    - "As a child of terms"
+    - "*"
   
   free/snapshot.create/10_basic.yml:
     - "Create a snapshot"

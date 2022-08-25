@@ -29,36 +29,27 @@
  */
 
 use once_cell::sync::Lazy;
+use std::fs::File;
+use std::io::Read;
 use opensearch::{
-    auth::Credentials,
-    cat::CatTemplatesParts,
+    auth::{
+        Credentials,
+        ClientCertificate
+    },
     cert::CertificateValidation,
-    cluster::ClusterHealthParts,
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
         Method, StatusCode,
     },
-    ilm::IlmRemovePolicyParts,
     indices::{
-        IndicesDeleteIndexTemplateParts, IndicesDeleteParts, IndicesDeleteTemplateParts,
-        IndicesRefreshParts,
+        IndicesDeleteParts,
     },
-    params::{ExpandWildcards, WaitForStatus},
-    security::{
-        SecurityDeletePrivilegesParts, SecurityDeleteRoleParts, SecurityDeleteUserParts,
-        SecurityGetPrivilegesParts, SecurityGetRoleParts, SecurityGetUserParts,
-        SecurityPutUserParts,
-    },
+    params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
-    tasks::TasksCancelParts,
-    transform::{
-        TransformDeleteTransformParts, TransformGetTransformParts, TransformStopTransformParts,
-    },
-    watcher::WatcherDeleteWatchParts,
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use serde_json::{json, Value};
+use serde_json::{Value};
 use std::ops::Deref;
 use sysinfo::SystemExt;
 use url::Url;
@@ -77,28 +68,15 @@ fn running_proxy() -> bool {
 }
 
 static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
-    let mut url = Url::parse(cluster_addr().as_ref()).unwrap();
+    let url = Url::parse(cluster_addr().as_ref()).unwrap();
 
-    // if the url is https and specifies a username and password, remove from the url and set credentials
+    // if the url is https, set credentials
     let credentials = if url.scheme() == "https" {
-        let username = if !url.username().is_empty() {
-            let u = url.username().to_string();
-            url.set_username("").unwrap();
-            u
-        } else {
-            "admin".into()
-        };
-
-        let password = match url.password() {
-            Some(p) => {
-                let pass = p.to_string();
-                url.set_password(None).unwrap();
-                pass
-            }
-            None => "admin".into(),
-        };
-
-        Some(Credentials::Basic(username, password))
+        let mut buf = Vec::new();
+        let mut f = File::open("tests/common/kirk.p12").expect("Unable to open file");
+        f.read_to_end(&mut buf).expect("Unable to read vec");
+        let cert = ClientCertificate::Pkcs12(buf, Some("".to_string()));
+        Some(Credentials::Certificate(cert))
     } else {
         None
     };
@@ -193,18 +171,6 @@ pub async fn delete_snapshots(client: &OpenSearch) -> Result<(), Error> {
     Ok(())
 }
 
-async fn wait_for_yellow_status(client: &OpenSearch) -> Result<(), Error> {
-    let cluster_health = client
-        .cluster()
-        .health(ClusterHealthParts::None)
-        .wait_for_status(WaitForStatus::Yellow)
-        .send()
-        .await?;
-
-    assert_response_success!(cluster_health);
-    Ok(())
-}
-
 async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
     let delete_response = client
         .indices()
@@ -218,105 +184,5 @@ async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
         .await?;
 
     assert_response_success!(delete_response);
-    Ok(())
-}
-
-async fn cancel_tasks(client: &OpenSearch) -> Result<(), Error> {
-    let rollup_response = client.tasks().list().send().await?.json::<Value>().await?;
-
-    for (_node_id, nodes) in rollup_response["nodes"].as_object().unwrap() {
-        for (task_id, task) in nodes["tasks"].as_object().unwrap() {
-            if let Some(b) = task["cancellable"].as_bool() {
-                if b {
-                    let response = client
-                        .tasks()
-                        .cancel(TasksCancelParts::TaskId(task_id))
-                        .send()
-                        .await?;
-
-                    assert_response_success!(response);
-                }
-            }
-        }
-    }
-
-    Ok(())
-}
-
-async fn delete_users(client: &OpenSearch) -> Result<(), Error> {
-    let users_response = client
-        .security()
-        .get_user(SecurityGetUserParts::None)
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for (k, v) in users_response.as_object().unwrap() {
-        if let Some(b) = v["metadata"]["_reserved"].as_bool() {
-            if !b {
-                let response = client
-                    .security()
-                    .delete_user(SecurityDeleteUserParts::Username(k))
-                    .send()
-                    .await?;
-
-                assert_response_success!(response);
-            }
-        }
-    }
-
-    Ok(())
-}
-
-async fn delete_roles(client: &OpenSearch) -> Result<(), Error> {
-    let roles_response = client
-        .security()
-        .get_role(SecurityGetRoleParts::None)
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for (k, v) in roles_response.as_object().unwrap() {
-        if let Some(b) = v["metadata"]["_reserved"].as_bool() {
-            if !b {
-                let response = client
-                    .security()
-                    .delete_role(SecurityDeleteRoleParts::Name(k))
-                    .send()
-                    .await?;
-
-                assert_response_success!(response);
-            }
-        }
-    }
-
-    Ok(())
-}
-
-async fn delete_privileges(client: &OpenSearch) -> Result<(), Error> {
-    let privileges_response = client
-        .security()
-        .get_privileges(SecurityGetPrivilegesParts::None)
-        .send()
-        .await?
-        .json::<Value>()
-        .await?;
-
-    for (k, v) in privileges_response.as_object().unwrap() {
-        if let Some(b) = v["metadata"]["_reserved"].as_bool() {
-            if !b {
-                let response = client
-                    .security()
-                    .delete_privileges(SecurityDeletePrivilegesParts::ApplicationName(k, "_all"))
-                    .send()
-                    .await?;
-
-                assert_response_success!(response);
-            }
-        }
-    }
-
     Ok(())
 }

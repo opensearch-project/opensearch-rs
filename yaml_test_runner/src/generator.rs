@@ -41,9 +41,13 @@ use std::{
     fs,
     fs::{File, OpenOptions},
     io::Write,
-    path::{Component, Path, PathBuf},
+    path::{Path, PathBuf},
+};
+use opensearch::{
+    DEFAULT_ADDRESS,
 };
 use yaml_rust::{Yaml, YamlLoader};
+use url::Url;
 
 /// The test suite to compile
 #[derive(Debug, PartialEq)]
@@ -146,7 +150,7 @@ impl<'a> YamlTests<'a> {
 
         quote! {
             #![allow(unused_imports, unused_variables, dead_code)]
-            use crate::common::{client, macros, transform};
+            use crate::common::{client, macros};
             use opensearch::*;
             use opensearch::http::{
                 headers::{HeaderName, HeaderValue},
@@ -365,6 +369,13 @@ impl TestFn {
     }
 }
 
+fn cluster_addr() -> String {
+    match std::env::var("OPENSEARCH_URL") {
+        Ok(server) => server,
+        Err(_) => DEFAULT_ADDRESS.into(),
+    }
+}
+
 /// Items to globally skip
 #[derive(Deserialize)]
 struct GlobalSkip {
@@ -380,7 +391,12 @@ pub fn generate_tests_from_yaml(
     download_dir: &PathBuf,
     generated_dir: &PathBuf,
 ) -> Result<(), failure::Error> {
-    let skips = serde_yaml::from_str::<GlobalSkip>(include_str!("./../skip.yml"))?;
+    let url = Url::parse(cluster_addr().as_ref()).unwrap();
+    let skips = if url.scheme() == "https" {
+        serde_yaml::from_str::<GlobalSkip>(include_str!("./../skip_with_security.yml"))?
+    } else {
+        serde_yaml::from_str::<GlobalSkip>(include_str!("./../skip.yml"))?
+    };
     let paths = fs::read_dir(download_dir)?;
     for entry in paths {
         if let Ok(entry) = entry {

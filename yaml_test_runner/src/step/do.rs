@@ -119,7 +119,7 @@ impl Do {
             tokens.append(quote! {
                 let allowed_warnings = vec![#(#allowed),*];
                 let warnings: Vec<&str> = response.warning_headers()
-                    .filter(!allowed_warnings.iter().any(|a| w.contains(a)))
+                    .filter(|w| !allowed_warnings.iter().any(|a| w.contains(a)))
                     .collect();
                 assert_warnings_is_empty!(warnings);
             });

@@ -29,27 +29,22 @@
  */
 
 use once_cell::sync::Lazy;
-use std::fs::File;
-use std::io::Read;
 use opensearch::{
-    auth::{
-        Credentials,
-        ClientCertificate
-    },
+    auth::{ClientCertificate, Credentials},
     cert::CertificateValidation,
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
         Method, StatusCode,
     },
-    indices::{
-        IndicesDeleteParts,
-    },
+    indices::IndicesDeleteParts,
     params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use serde_json::{Value};
+use serde_json::Value;
+use std::fs::File;
+use std::io::Read;
 use std::ops::Deref;
 use sysinfo::SystemExt;
 use url::Url;

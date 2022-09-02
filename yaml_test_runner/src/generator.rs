@@ -421,6 +421,7 @@ pub fn generate_tests_from_yaml(
                     let relative_path = path.strip_prefix(&base_download_dir)?;
                     let test_suite = TestSuite::Free;
 
+                    info!("Generating: {}", relative_path.display());
                     let yaml = fs::read_to_string(&entry.path()).unwrap();
 
                     // a yaml test can contain multiple yaml docs, so use yaml_rust to parse

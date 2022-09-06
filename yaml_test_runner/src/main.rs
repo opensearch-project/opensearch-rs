@@ -48,6 +48,7 @@ use std::{fs, path::PathBuf, process::exit};
 mod generator;
 mod github;
 mod regex;
+mod skip;
 mod step;
 
 use generator::TestSuite;

@@ -28,16 +28,18 @@
  * GitHub history for details.
  */
 
-use crate::step::*;
+use crate::{
+    skip::{GlobalSkips, SkippedFeaturesAndTests},
+    step::*,
+};
 use api_generator::generator::Api;
 use inflector::Inflector;
 use path_slash::PathExt;
 use quote::{ToTokens, Tokens};
 use regex::Regex;
 use semver::Version;
-use serde::Deserialize;
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::HashSet,
     fs,
     fs::{File, OpenOptions},
     io::Write,
@@ -59,7 +61,8 @@ pub enum TestSuite {
 struct YamlTests<'a> {
     path: String,
     version: &'a Version,
-    skip: &'a GlobalSkip,
+    skip: &'a SkippedFeaturesAndTests,
+    #[allow(dead_code)]
     suite: TestSuite,
     directives: HashSet<String>,
     setup: Option<TestFn>,
@@ -71,11 +74,11 @@ impl<'a> YamlTests<'a> {
     pub fn new(
         path: &'a Path,
         version: &'a semver::Version,
-        skip: &'a GlobalSkip,
+        skip: &'a SkippedFeaturesAndTests,
         suite: TestSuite,
         len: usize,
     ) -> Self {
-        let path = path.to_slash_lossy();
+        let path = path.to_slash_lossy().into_owned();
         Self {
             path,
             version,
@@ -180,12 +183,8 @@ impl<'a> YamlTests<'a> {
     }
 
     /// Whether the test should be skipped
-    fn skip_test(&self, name: &str) -> bool {
-        if let Some(tests) = self.skip.tests.get(&self.path) {
-            tests.iter().any(|n| n == name || n == "*")
-        } else {
-            false
-        }
+    fn should_skip_test(&self, name: &str) -> bool {
+        self.skip.should_skip_test(&self.path, name)
     }
 
     fn fn_impls(
@@ -201,7 +200,7 @@ impl<'a> YamlTests<'a> {
             .map(|test_fn| {
                 let name = test_fn.name();
                 let unique_name = test_fn.unique_name(&mut seen_names);
-                if self.skip_test(name) {
+                if self.should_skip_test(name) {
                     info!(
                         r#"skipping "{}" in {} because it's included in skip.yml"#,
                         name,
@@ -227,7 +226,7 @@ impl<'a> YamlTests<'a> {
                                     s.reason()
                                 );
                                 Some(m)
-                            } else if s.skip_features(&self.skip.features) {
+                            } else if s.skip_features(self.skip) {
                                 let m = format!(
                                     r#"skipping "{}" in {} because it needs features "{:?}" which are currently not implemented"#,
                                     name,
@@ -376,13 +375,6 @@ fn cluster_addr() -> String {
     }
 }
 
-/// Items to globally skip
-#[derive(Deserialize)]
-struct GlobalSkip {
-    features: Vec<String>,
-    tests: BTreeMap<String, Vec<String>>,
-}
-
 pub fn generate_tests_from_yaml(
     api: &Api,
     suite: &TestSuite,
@@ -392,11 +384,9 @@ pub fn generate_tests_from_yaml(
     generated_dir: &PathBuf,
 ) -> Result<(), failure::Error> {
     let url = Url::parse(cluster_addr().as_ref()).unwrap();
-    let skips = if url.scheme() == "https" {
-        serde_yaml::from_str::<GlobalSkip>(include_str!("./../skip_with_security.yml"))?
-    } else {
-        serde_yaml::from_str::<GlobalSkip>(include_str!("./../skip.yml"))?
-    };
+    let global_skips = serde_yaml::from_str::<GlobalSkips>(include_str!("../skip.yml"))?;
+    let skips = global_skips.get_skips_for(version, url.scheme() == "https");
+
     let paths = fs::read_dir(download_dir)?;
     for entry in paths {
         if let Ok(entry) = entry {
@@ -561,7 +551,7 @@ fn write_test_file(
     relative_path: &Path,
     generated_dir: &PathBuf,
 ) -> Result<(), failure::Error> {
-    if test.skip_test("*") {
+    if test.should_skip_test("*") {
         info!(
             r#"skipping all tests in {} because it's included in skip.yml"#,
             test.path,

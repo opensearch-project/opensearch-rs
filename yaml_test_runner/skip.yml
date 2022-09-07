@@ -142,3 +142,10 @@
         - Create a snapshot
       free/snapshot.restore/10_basic.yml:
         - Create a snapshot and then restore it
+
+">=1.1.0, <1.3.0":
+  tests:
+    free/search/40_indices_boost.yml:
+      - Indices boost using object
+    free/search.aggregation/20_terms.yml:
+      - Deprecated _term order

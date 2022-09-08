@@ -22,7 +22,7 @@ This document explains who the maintainers are (see below), what they do in this
 | ------------------------ | --------------------------------------- | ----------- |
 | Aditya Jindal            | [aditjind](https://github.com/aditjind) | Amazon      |
 | Daniel Doubrovkine       | [dblock](https://github.com/dblock)     | Amazon      |
-| Thomas Farr              | [xtansia](https://github.com/xtansia)   | Xtansia     |
+| Thomas Farr              | [xtansia](https://github.com/xtansia)   | Amazon      |
 
 ## Maintainer Responsibilities
 

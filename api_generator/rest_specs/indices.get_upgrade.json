@@ -6,6 +6,10 @@
     },
     "stability":"stable",
     "visibility": "public",
+    "deprecated":{
+      "version":"8.0.0",
+      "description":"The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."
+    },
     "headers":{
       "accept": [ "application/json"]
     },

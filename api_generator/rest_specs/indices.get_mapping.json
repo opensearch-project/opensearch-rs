@@ -54,11 +54,19 @@
       },
       "master_timeout":{
         "type":"time",
-        "description":"Specify timeout for connection to master"
+        "description":"Specify timeout for connection to cluster-manager node",
+        "deprecated":{
+          "version":"2.0.0",
+          "description":"To promote inclusive language, use 'cluster_manager_timeout' instead."
+        }
+      },
+      "cluster_manager_timeout":{
+        "type":"time",
+        "description":"Specify timeout for connection to cluster-manager node"
       },
       "local":{
         "type":"boolean",
-        "description":"Return local information, do not retrieve the state from master node (default: false)",
+        "description":"Return local information, do not retrieve the state from cluster-manager node (default: false)",
         "deprecated":{
           "version":"7.8.0",
           "description":"This parameter is a no-op and field mappings are always retrieved locally."

@@ -1,29 +1,17 @@
 {
-  "cat.master":{
+  "cat.cluster_manager":{
     "documentation":{
       "url":"https://opensearch.org/docs/latest/opensearch/rest-api/cat/cat-cluster_manager/",
       "description":"Returns information about the cluster-manager node."
     },
     "stability":"stable",
-    "visibility":"public",
-    "headers":{
-      "accept": [ "text/plain", "application/json"]
-    },
-    "deprecated":{
-      "version":"2.0.0",
-      "description":"To promote inclusive language, please use '/_cat/cluster_manager' instead."
-    },
     "url":{
       "paths":[
         {
-          "path":"/_cat/master",
+          "path":"/_cat/cluster_manager",
           "methods":[
             "GET"
-          ],
-          "deprecated":{
-            "version":"2.0.0",
-            "description":"To promote inclusive language, please use '/_cat/cluster_manager' instead."
-          }
+          ]
         }
       ]
     },
@@ -41,7 +29,7 @@
         "description":"Explicit operation timeout for connection to cluster-manager node",
         "deprecated":{
           "version":"2.0.0",
-          "description":"This parameter is deprecated in favor of cluster_manager_timeout to support inclusive terminology."
+          "description":"To promote inclusive language, use 'cluster_manager_timeout' instead."
         }
       },
       "cluster_manager_timeout":{

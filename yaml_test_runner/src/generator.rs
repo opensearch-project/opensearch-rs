@@ -34,6 +34,7 @@ use crate::{
 };
 use api_generator::generator::Api;
 use inflector::Inflector;
+use opensearch::DEFAULT_ADDRESS;
 use path_slash::PathExt;
 use quote::{ToTokens, Tokens};
 use regex::Regex;
@@ -45,11 +46,8 @@ use std::{
     io::Write,
     path::{Path, PathBuf},
 };
-use opensearch::{
-    DEFAULT_ADDRESS,
-};
-use yaml_rust::{Yaml, YamlLoader};
 use url::Url;
+use yaml_rust::{Yaml, YamlLoader};
 
 /// The test suite to compile
 #[derive(Debug, PartialEq)]

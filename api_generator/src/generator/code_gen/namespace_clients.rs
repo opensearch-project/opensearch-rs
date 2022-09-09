@@ -16,16 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-use crate::generator::{
-    code_gen::{request::request_builder::RequestBuilder, *},
-    *,
-};
+use crate::generator::{code_gen::request::request_builder::RequestBuilder, Api};
 use inflector::Inflector;
 use quote::Tokens;
-use std::path::PathBuf;
+use std::path::Path;
+
+use super::{doc, ident, stability_doc, use_declarations};
 
 /// Generates the source code for a namespaced client
-pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, failure::Error> {
+pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, failure::Error> {
     let mut output = Vec::new();
 
     for (namespace_name, namespace) in &api.namespaces {

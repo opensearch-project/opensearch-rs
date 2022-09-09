@@ -29,7 +29,6 @@ use std::{
     hash::{Hash, Hasher},
     io::Read,
     marker::PhantomData,
-    path::PathBuf,
     str::FromStr,
 };
 
@@ -515,16 +514,13 @@ impl Eq for ApiEnum {}
 /// Generates all client source code from the REST API spec
 pub fn generate(
     branch: &str,
-    download_dir: &PathBuf,
-    generated_dir: &PathBuf,
+    download_dir: &std::path::Path,
+    generated_dir: &std::path::Path,
 ) -> Result<(), failure::Error> {
     // read the Api from file
     let api = read_api(branch, download_dir)?;
 
-    let docs_dir = {
-        let d = download_dir.clone();
-        d.parent().unwrap().join("docs")
-    };
+    let docs_dir = download_dir.parent().unwrap().join("docs");
 
     // generated file tracking lists
     let mut tracker = GeneratedFiles::default();
@@ -588,7 +584,7 @@ pub use bulk::*;
         &mut tracker,
     )?;
 
-    let mut generated = generated_dir.clone();
+    let mut generated = generated_dir.to_path_buf();
     generated.push(GENERATED_TOML);
 
     fs::write(generated, toml::to_string_pretty(&tracker)?)?;
@@ -597,7 +593,7 @@ pub use bulk::*;
 }
 
 /// Reads Api from a directory of REST Api specs
-pub fn read_api(branch: &str, download_dir: &PathBuf) -> Result<Api, failure::Error> {
+pub fn read_api(branch: &str, download_dir: &std::path::Path) -> Result<Api, failure::Error> {
     let paths = fs::read_dir(download_dir)?;
     let mut namespaces = BTreeMap::<String, ApiNamespace>::new();
     let mut enums: HashSet<ApiEnum> = HashSet::new();

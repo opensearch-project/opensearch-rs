@@ -377,9 +377,9 @@ pub fn generate_tests_from_yaml(
     api: &Api,
     suite: &TestSuite,
     version: &semver::Version,
-    base_download_dir: &PathBuf,
-    download_dir: &PathBuf,
-    generated_dir: &PathBuf,
+    base_download_dir: &Path,
+    download_dir: &Path,
+    generated_dir: &Path,
 ) -> Result<(), failure::Error> {
     let url = Url::parse(cluster_addr().as_ref()).unwrap();
     let global_skips = serde_yaml::from_str::<GlobalSkips>(include_str!("../skip.yml"))?;
@@ -479,7 +479,7 @@ pub fn generate_tests_from_yaml(
 }
 
 /// Writes a mod.rs file in each generated directory
-fn write_mod_files(generated_dir: &PathBuf, toplevel: bool) -> Result<(), failure::Error> {
+fn write_mod_files(generated_dir: &Path, toplevel: bool) -> Result<(), failure::Error> {
     if !generated_dir.exists() {
         fs::create_dir(generated_dir)?;
     }
@@ -516,8 +516,7 @@ fn write_mod_files(generated_dir: &PathBuf, toplevel: bool) -> Result<(), failur
         mods.insert(2, "".into());
     }
 
-    let mut path = generated_dir.clone();
-    path.push("mod.rs");
+    let path = generated_dir.join("mod.rs");
     let mut file = File::create(&path)?;
     let generated_mods: String = mods.join("\n");
     file.write_all(generated_mods.as_bytes())?;
@@ -547,7 +546,7 @@ fn test_file_path(relative_path: &Path) -> Result<PathBuf, failure::Error> {
 fn write_test_file(
     test: YamlTests,
     relative_path: &Path,
-    generated_dir: &PathBuf,
+    generated_dir: &Path,
 ) -> Result<(), failure::Error> {
     if test.should_skip_test("*") {
         info!(

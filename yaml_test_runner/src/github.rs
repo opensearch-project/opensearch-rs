@@ -35,13 +35,12 @@ use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
     Response,
 };
-use std::{fs, fs::File, io, path::PathBuf};
+use std::{fs, fs::File, io, path::Path};
 use tar::{Archive, Entry};
 
 /// Downloads the yaml tests if not already downloaded
-pub fn download_test_suites(branch: &str, download_dir: &PathBuf) -> Result<(), failure::Error> {
-    let mut last_downloaded_version = download_dir.clone();
-    last_downloaded_version.push("last_downloaded_version");
+pub fn download_test_suites(branch: &str, download_dir: &Path) -> Result<(), failure::Error> {
+    let mut last_downloaded_version = download_dir.join("last_downloaded_version");
     if last_downloaded_version.exists() {
         let version = fs::read_to_string(&last_downloaded_version)
             .expect("Unable to read last_downloaded_version of yaml tests");
@@ -91,15 +90,14 @@ pub fn download_test_suites(branch: &str, download_dir: &PathBuf) -> Result<(), 
 }
 
 fn write_test_file(
-    download_dir: &PathBuf,
+    download_dir: &Path,
     suite_dir: &str,
     mut entry: Entry<GzDecoder<Response>>,
 ) -> Result<(), failure::Error> {
     let path = entry.path()?;
 
     let mut dir = {
-        let mut dir = download_dir.clone();
-        dir.push(suite_dir);
+        let mut dir = download_dir.join(suite_dir);
         let parent = path.parent().unwrap().file_name().unwrap();
         dir.push(parent);
         dir

@@ -43,7 +43,11 @@ extern crate simple_logger;
 use clap::{App, Arg};
 use log::LevelFilter;
 use serde_json::Value;
-use std::{fs, path::PathBuf, process::exit};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::exit,
+};
 
 mod generator;
 mod github;
@@ -83,7 +87,7 @@ fn main() -> Result<(), failure::Error> {
     info!("Using branch {}", &branch);
     info!("Using test_suite {:?}", &suite);
 
-    let rest_specs_dir = PathBuf::from("./api_generator/rest_specs");
+    let rest_specs_dir = Path::new("./api_generator/rest_specs");
 
     if !rest_specs_dir.exists()
         || rest_specs_dir
@@ -98,11 +102,7 @@ fn main() -> Result<(), failure::Error> {
         exit(1);
     }
 
-    let last_downloaded_rest_spec_branch = {
-        let mut p = rest_specs_dir.clone();
-        p.push("last_downloaded_version");
-        p
-    };
+    let last_downloaded_rest_spec_branch = rest_specs_dir.join("last_downloaded_version");
 
     if !last_downloaded_rest_spec_branch.exists() {
         error!(

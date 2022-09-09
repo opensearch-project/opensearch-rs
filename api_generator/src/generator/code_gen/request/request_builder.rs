@@ -19,7 +19,7 @@
 use crate::generator::{
     code_gen,
     code_gen::{url::enum_builder::EnumBuilder, *},
-    ApiEndpoint, HttpMethod, Type, TypeKind,
+    ApiEndpoint, Deprecated, HttpMethod, Type, TypeKind,
 };
 use inflector::Inflector;
 use quote::{ToTokens, Tokens};
@@ -431,16 +431,24 @@ impl<'a> RequestBuilder<'a> {
         };
         let impl_ident = ident(&name);
         let field_ident = ident(&name);
-        let doc_attr = match &f.1.description {
-            Some(docs) => vec![doc_escaped(docs)],
-            _ => vec![],
-        };
+        let mut attrs = vec![];
+
+        if let Some(docs) = &f.1.description {
+            attrs.push(doc_escaped(docs));
+        }
+        if let Some(deprecated) = &f.1.deprecated {
+            attrs.push(syn::Attribute {
+                style: syn::AttrStyle::Outer,
+                value: syn::MetaItem::NameValue(ident("deprecated"), lit(&deprecated.description)),
+                is_sugared_doc: false,
+            });
+        }
 
         syn::ImplItem {
             ident: impl_ident,
             vis: syn::Visibility::Public,
             defaultness: syn::Defaultness::Final,
-            attrs: doc_attr,
+            attrs,
             node: syn::ImplItemKind::Method(
                 syn::MethodSig {
                     unsafety: syn::Unsafety::Normal,
@@ -627,17 +635,22 @@ impl<'a> RequestBuilder<'a> {
 
         let cfg_attr = endpoint.stability.outer_cfg_attr();
         let cfg_doc = stability_doc(endpoint.stability);
+        let (deprecated_attr, allow_deprecated_attr) = Deprecated::attr(&endpoint.deprecated);
 
         quote! {
             #cfg_attr
+            #deprecated_attr
             #enum_struct
 
             #cfg_attr
+            #allow_deprecated_attr
             #enum_impl
 
             #[doc = #builder_doc]
             #cfg_doc
             #cfg_attr
+            #deprecated_attr
+            #allow_deprecated_attr
             #[derive(Clone, Debug)]
             pub struct #builder_expr {
                 transport: &'a Transport,
@@ -646,6 +659,7 @@ impl<'a> RequestBuilder<'a> {
             }
 
             #cfg_attr
+            #allow_deprecated_attr
             #builder_impl {
                 #new_fn
                 #(#builder_fns)*
@@ -678,6 +692,7 @@ impl<'a> RequestBuilder<'a> {
     ) -> Tokens {
         let cfg_attr = endpoint.stability.outer_cfg_attr();
         let cfg_doc = stability_doc(endpoint.stability);
+        let (deprecated_attr, allow_deprecated_attr) = Deprecated::attr(&endpoint.deprecated);
 
         let builder_ident = ident(builder_name);
 
@@ -738,6 +753,8 @@ impl<'a> RequestBuilder<'a> {
                 #method_doc
                 #cfg_doc
                 #cfg_attr
+                #deprecated_attr
+                #allow_deprecated_attr
                 pub fn #fn_name(&'a self) -> #builder_ident_ret {
                     #builder_ident::new(#clone_expr)
                 }
@@ -748,6 +765,8 @@ impl<'a> RequestBuilder<'a> {
                 #method_doc
                 #cfg_doc
                 #cfg_attr
+                #deprecated_attr
+                #allow_deprecated_attr
                 pub fn #fn_name(&'a self, parts: #enum_ty) -> #builder_ident_ret {
                     #builder_ident::new(#clone_expr, parts)
                 }

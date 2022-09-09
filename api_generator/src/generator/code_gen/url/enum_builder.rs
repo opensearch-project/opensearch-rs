@@ -347,6 +347,7 @@ mod tests {
                                     description: Some("A comma-separated list of document types to search".to_string()),
                                     options: vec![],
                                     default: None,
+                                    deprecated: None,
                                 });
                                 map
                             },
@@ -362,12 +363,14 @@ mod tests {
                                     description: Some("A comma-separated list of index names to search".to_string()),
                                     options: vec![],
                                     default: None,
+                                    deprecated: None,
                                 });
                                 map.insert("type".to_string(), Type {
                                     ty: TypeKind::List,
                                     description: Some("A comma-separated list of document types to search".to_string()),
                                     options: vec![],
                                     default: None,
+                                    deprecated: None,
                                 });
                                 map
                             },

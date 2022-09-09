@@ -81,6 +81,7 @@ impl<'b> IngestDeletePipelineParts<'b> {
 pub struct IngestDeletePipeline<'a, 'b> {
     transport: &'a Transport,
     parts: IngestDeletePipelineParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -99,6 +100,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -108,6 +110,11 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             source: None,
             timeout: None,
         }
+    }
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -129,7 +136,8 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -164,6 +172,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -174,6 +183,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -220,6 +230,7 @@ impl<'b> IngestGetPipelineParts<'b> {
 pub struct IngestGetPipeline<'a, 'b> {
     transport: &'a Transport,
     parts: IngestGetPipelineParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -237,6 +248,7 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -245,6 +257,11 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
             request_timeout: None,
             source: None,
         }
+    }
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -266,7 +283,8 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -296,6 +314,7 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -305,6 +324,7 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -460,6 +480,7 @@ pub struct IngestPutPipeline<'a, 'b, B> {
     transport: &'a Transport,
     parts: IngestPutPipelineParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -482,6 +503,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -501,6 +523,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -511,6 +534,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -532,7 +560,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -567,6 +596,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -577,6 +607,7 @@ where
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,

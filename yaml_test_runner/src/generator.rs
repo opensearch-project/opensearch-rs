@@ -375,7 +375,7 @@ fn cluster_addr() -> String {
 
 pub fn generate_tests_from_yaml(
     api: &Api,
-    suite: &TestSuite,
+    _suite: &TestSuite,
     version: &semver::Version,
     base_download_dir: &Path,
     download_dir: &Path,
@@ -391,7 +391,7 @@ pub fn generate_tests_from_yaml(
             if file_type.is_dir() {
                 generate_tests_from_yaml(
                     api,
-                    suite,
+                    _suite,
                     version,
                     base_download_dir,
                     &entry.path(),
@@ -405,7 +405,7 @@ pub fn generate_tests_from_yaml(
                     continue;
                 }
 
-                let relative_path = path.strip_prefix(&base_download_dir)?;
+                let relative_path = path.strip_prefix(base_download_dir)?;
                 let test_suite = TestSuite::Free;
 
                 info!("Generating: {}", relative_path.display());
@@ -553,7 +553,7 @@ fn write_test_file(
     path = generated_dir.join(path);
     path.set_extension("rs");
 
-    fs::create_dir_all(&path.parent().unwrap())?;
+    fs::create_dir_all(path.parent().unwrap())?;
     let mut file = File::create(&path)?;
     file.write_all(
         r#"/*

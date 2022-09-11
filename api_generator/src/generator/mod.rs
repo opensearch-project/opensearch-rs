@@ -314,7 +314,7 @@ impl DocumentationUrlString {
 impl core::ops::Deref for DocumentationUrlString {
     type Target = String;
 
-    fn deref(self: &'_ Self) -> &'_ Self::Target {
+    fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
@@ -475,6 +475,12 @@ impl ApiNamespace {
 
     pub fn endpoints(&self) -> &BTreeMap<String, ApiEndpoint> {
         &self.endpoints
+    }
+}
+
+impl Default for ApiNamespace {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

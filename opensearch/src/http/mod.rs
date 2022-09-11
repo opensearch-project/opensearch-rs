@@ -42,7 +42,7 @@ pub use reqwest::StatusCode;
 pub use url::Url;
 
 /// Http methods supported by Elasticsearch
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
     /// get
     Get,

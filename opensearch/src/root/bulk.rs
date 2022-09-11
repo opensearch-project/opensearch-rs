@@ -687,7 +687,7 @@ mod tests {
             .zip(b)
             .map(|(x, y)| x.cmp(y))
             .find(|&ord| ord != Ordering::Equal)
-            .unwrap_or(a.len().cmp(&b.len()))
+            .unwrap_or_else(|| a.len().cmp(&b.len()))
     }
 
     #[test]
@@ -736,7 +736,7 @@ mod tests {
         ops.push(BulkOperation::delete("7").into());
 
         let body = NdBody(ops);
-        let _ = body.write(&mut bytes)?;
+        body.write(&mut bytes)?;
 
         let mut expected = BytesMut::new();
         expected.put_slice(b"{\"index\":{\"_id\":\"1\",\"pipeline\":\"pipeline\",\"if_seq_no\":1,\"if_primary_term\":2,\"routing\":\"routing\",\"version\":3,\"version_type\":\"internal\"}}\n");
@@ -794,7 +794,7 @@ mod tests {
         ops.push(BulkOperation::<()>::delete("4"))?;
 
         let body = NdBody(vec![ops]);
-        let _ = body.write(&mut bytes)?;
+        body.write(&mut bytes)?;
 
         let mut expected = BytesMut::new();
         expected.put_slice(b"{\"index\":{\"_index\":\"index_doc\",\"_id\":\"1\",\"pipeline\":\"pipeline\",\"routing\":\"routing\"}}\n");

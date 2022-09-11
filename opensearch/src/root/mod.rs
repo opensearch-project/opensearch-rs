@@ -40,7 +40,7 @@ use crate::{
 use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Bulk API"]
 pub enum BulkParts<'b> {
     #[doc = "No parts"]
@@ -53,11 +53,11 @@ impl<'b> BulkParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             BulkParts::None => "/_bulk".into(),
-            BulkParts::Index(ref index) => {
+            BulkParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_bulk");
                 p.into()
@@ -290,7 +290,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Clear Scroll API"]
 pub enum ClearScrollParts<'b> {
     #[doc = "No parts"]
@@ -303,7 +303,7 @@ impl<'b> ClearScrollParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             ClearScrollParts::None => "/_search/scroll".into(),
-            ClearScrollParts::ScrollId(ref scroll_id) => {
+            ClearScrollParts::ScrollId(scroll_id) => {
                 let scroll_id_str = scroll_id.join(",");
                 let encoded_scroll_id: Cow<str> =
                     percent_encode(scroll_id_str.as_bytes(), PARTS_ENCODED).into();
@@ -436,7 +436,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Close Point In Time API"]
 pub enum ClosePointInTimeParts {
     #[doc = "No parts"]
@@ -571,7 +571,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Count API"]
 pub enum CountParts<'b> {
     #[doc = "No parts"]
@@ -584,12 +584,12 @@ impl<'b> CountParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             CountParts::None => "/_count".into(),
-            CountParts::Index(ref index) => {
+            CountParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(8usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_count");
                 p.into()
@@ -863,7 +863,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Create API"]
 pub enum CreateParts<'b> {
     #[doc = "Index and Id"]
@@ -873,12 +873,12 @@ impl<'b> CreateParts<'b> {
     #[doc = "Builds a relative URL path to the Create API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            CreateParts::IndexId(ref index, ref id) => {
+            CreateParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_create/");
                 p.push_str(encoded_id.as_ref());
@@ -1078,7 +1078,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Delete API"]
 pub enum DeleteParts<'b> {
     #[doc = "Index and Id"]
@@ -1088,12 +1088,12 @@ impl<'b> DeleteParts<'b> {
     #[doc = "Builds a relative URL path to the Delete API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DeleteParts::IndexId(ref index, ref id) => {
+            DeleteParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
                 p.push_str(encoded_id.as_ref());
@@ -1272,7 +1272,7 @@ impl<'a, 'b> Delete<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Delete By Query API"]
 pub enum DeleteByQueryParts<'b> {
     #[doc = "Index"]
@@ -1282,12 +1282,12 @@ impl<'b> DeleteByQueryParts<'b> {
     #[doc = "Builds a relative URL path to the Delete By Query API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DeleteByQueryParts::Index(ref index) => {
+            DeleteByQueryParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_delete_by_query");
                 p.into()
@@ -1753,7 +1753,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Delete By Query Rethrottle API"]
 pub enum DeleteByQueryRethrottleParts<'b> {
     #[doc = "TaskId"]
@@ -1763,7 +1763,7 @@ impl<'b> DeleteByQueryRethrottleParts<'b> {
     #[doc = "Builds a relative URL path to the Delete By Query Rethrottle API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DeleteByQueryRethrottleParts::TaskId(ref task_id) => {
+            DeleteByQueryRethrottleParts::TaskId(task_id) => {
                 let encoded_task_id: Cow<str> =
                     percent_encode(task_id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(30usize + encoded_task_id.len());
@@ -1906,7 +1906,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Delete Script API"]
 pub enum DeleteScriptParts<'b> {
     #[doc = "Id"]
@@ -1916,7 +1916,7 @@ impl<'b> DeleteScriptParts<'b> {
     #[doc = "Builds a relative URL path to the Delete Script API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DeleteScriptParts::Id(ref id) => {
+            DeleteScriptParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_id.len());
                 p.push_str("/_scripts/");
@@ -2042,7 +2042,7 @@ impl<'a, 'b> DeleteScript<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Exists API"]
 pub enum ExistsParts<'b> {
     #[doc = "Index and Id"]
@@ -2052,12 +2052,12 @@ impl<'b> ExistsParts<'b> {
     #[doc = "Builds a relative URL path to the Exists API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            ExistsParts::IndexId(ref index, ref id) => {
+            ExistsParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
                 p.push_str(encoded_id.as_ref());
@@ -2258,7 +2258,7 @@ impl<'a, 'b> Exists<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Exists Source API"]
 pub enum ExistsSourceParts<'b> {
     #[doc = "Index and Id"]
@@ -2268,12 +2268,12 @@ impl<'b> ExistsSourceParts<'b> {
     #[doc = "Builds a relative URL path to the Exists Source API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            ExistsSourceParts::IndexId(ref index, ref id) => {
+            ExistsSourceParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_source/");
                 p.push_str(encoded_id.as_ref());
@@ -2464,7 +2464,7 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Explain API"]
 pub enum ExplainParts<'b> {
     #[doc = "Index and Id"]
@@ -2474,12 +2474,12 @@ impl<'b> ExplainParts<'b> {
     #[doc = "Builds a relative URL path to the Explain API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            ExplainParts::IndexId(ref index, ref id) => {
+            ExplainParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(11usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_explain/");
                 p.push_str(encoded_id.as_ref());
@@ -2736,7 +2736,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Field Caps API"]
 pub enum FieldCapsParts<'b> {
     #[doc = "No parts"]
@@ -2749,12 +2749,12 @@ impl<'b> FieldCapsParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             FieldCapsParts::None => "/_field_caps".into(),
-            FieldCapsParts::Index(ref index) => {
+            FieldCapsParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(13usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_field_caps");
                 p.into()
@@ -2938,7 +2938,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get API"]
 pub enum GetParts<'b> {
     #[doc = "Index and Id"]
@@ -2948,12 +2948,12 @@ impl<'b> GetParts<'b> {
     #[doc = "Builds a relative URL path to the Get API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            GetParts::IndexId(ref index, ref id) => {
+            GetParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
                 p.push_str(encoded_id.as_ref());
@@ -3154,7 +3154,7 @@ impl<'a, 'b> Get<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Script API"]
 pub enum GetScriptParts<'b> {
     #[doc = "Id"]
@@ -3164,7 +3164,7 @@ impl<'b> GetScriptParts<'b> {
     #[doc = "Builds a relative URL path to the Get Script API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            GetScriptParts::Id(ref id) => {
+            GetScriptParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_id.len());
                 p.push_str("/_scripts/");
@@ -3282,7 +3282,7 @@ impl<'a, 'b> GetScript<'a, 'b> {
     }
 }
 #[cfg(feature = "experimental-apis")]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Script Context API"]
 pub enum GetScriptContextParts {
     #[doc = "No parts"]
@@ -3399,7 +3399,7 @@ impl<'a, 'b> GetScriptContext<'a, 'b> {
     }
 }
 #[cfg(feature = "experimental-apis")]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Script Languages API"]
 pub enum GetScriptLanguagesParts {
     #[doc = "No parts"]
@@ -3515,7 +3515,7 @@ impl<'a, 'b> GetScriptLanguages<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Source API"]
 pub enum GetSourceParts<'b> {
     #[doc = "Index and Id"]
@@ -3525,12 +3525,12 @@ impl<'b> GetSourceParts<'b> {
     #[doc = "Builds a relative URL path to the Get Source API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            GetSourceParts::IndexId(ref index, ref id) => {
+            GetSourceParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_source/");
                 p.push_str(encoded_id.as_ref());
@@ -3721,7 +3721,7 @@ impl<'a, 'b> GetSource<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Index API"]
 pub enum IndexParts<'b> {
     #[doc = "Index and Id"]
@@ -3733,22 +3733,22 @@ impl<'b> IndexParts<'b> {
     #[doc = "Builds a relative URL path to the Index API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IndexParts::IndexId(ref index, ref id) => {
+            IndexParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
-            IndexParts::Index(ref index) => {
+            IndexParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(6usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_doc");
                 p.into()
@@ -3987,7 +3987,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Info API"]
 pub enum InfoParts {
     #[doc = "No parts"]
@@ -4099,7 +4099,7 @@ impl<'a, 'b> Info<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Mget API"]
 pub enum MgetParts<'b> {
     #[doc = "No parts"]
@@ -4112,11 +4112,11 @@ impl<'b> MgetParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             MgetParts::None => "/_mget".into(),
-            MgetParts::Index(ref index) => {
+            MgetParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(7usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_mget");
                 p.into()
@@ -4332,7 +4332,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Msearch API"]
 pub enum MsearchParts<'b> {
     #[doc = "No parts"]
@@ -4345,12 +4345,12 @@ impl<'b> MsearchParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             MsearchParts::None => "/_msearch".into(),
-            MsearchParts::Index(ref index) => {
+            MsearchParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_msearch");
                 p.into()
@@ -4552,7 +4552,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Msearch Template API"]
 pub enum MsearchTemplateParts<'b> {
     #[doc = "No parts"]
@@ -4565,12 +4565,12 @@ impl<'b> MsearchTemplateParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             MsearchTemplateParts::None => "/_msearch/template".into(),
-            MsearchTemplateParts::Index(ref index) => {
+            MsearchTemplateParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(19usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_msearch/template");
                 p.into()
@@ -4752,7 +4752,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Mtermvectors API"]
 pub enum MtermvectorsParts<'b> {
     #[doc = "No parts"]
@@ -4765,11 +4765,11 @@ impl<'b> MtermvectorsParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             MtermvectorsParts::None => "/_mtermvectors".into(),
-            MtermvectorsParts::Index(ref index) => {
+            MtermvectorsParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(15usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_mtermvectors");
                 p.into()
@@ -5023,7 +5023,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Open Point In Time API"]
 pub enum OpenPointInTimeParts<'b> {
     #[doc = "No parts"]
@@ -5036,12 +5036,12 @@ impl<'b> OpenPointInTimeParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             OpenPointInTimeParts::None => "/_pit".into(),
-            OpenPointInTimeParts::Index(ref index) => {
+            OpenPointInTimeParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(6usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_pit");
                 p.into()
@@ -5221,7 +5221,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ping API"]
 pub enum PingParts {
     #[doc = "No parts"]
@@ -5333,7 +5333,7 @@ impl<'a, 'b> Ping<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Put Script API"]
 pub enum PutScriptParts<'b> {
     #[doc = "Id"]
@@ -5345,14 +5345,14 @@ impl<'b> PutScriptParts<'b> {
     #[doc = "Builds a relative URL path to the Put Script API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            PutScriptParts::Id(ref id) => {
+            PutScriptParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_id.len());
                 p.push_str("/_scripts/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
-            PutScriptParts::IdContext(ref id, ref context) => {
+            PutScriptParts::IdContext(id, context) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let encoded_context: Cow<str> =
                     percent_encode(context.as_bytes(), PARTS_ENCODED).into();
@@ -5360,7 +5360,7 @@ impl<'b> PutScriptParts<'b> {
                     String::with_capacity(11usize + encoded_id.len() + encoded_context.len());
                 p.push_str("/_scripts/");
                 p.push_str(encoded_id.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_context.as_ref());
                 p.into()
             }
@@ -5519,7 +5519,7 @@ where
     }
 }
 #[cfg(feature = "experimental-apis")]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Rank Eval API"]
 pub enum RankEvalParts<'b> {
     #[doc = "No parts"]
@@ -5533,12 +5533,12 @@ impl<'b> RankEvalParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             RankEvalParts::None => "/_rank_eval".into(),
-            RankEvalParts::Index(ref index) => {
+            RankEvalParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(12usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_rank_eval");
                 p.into()
@@ -5714,7 +5714,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Reindex API"]
 pub enum ReindexParts {
     #[doc = "No parts"]
@@ -5929,7 +5929,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Reindex Rethrottle API"]
 pub enum ReindexRethrottleParts<'b> {
     #[doc = "TaskId"]
@@ -5939,7 +5939,7 @@ impl<'b> ReindexRethrottleParts<'b> {
     #[doc = "Builds a relative URL path to the Reindex Rethrottle API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            ReindexRethrottleParts::TaskId(ref task_id) => {
+            ReindexRethrottleParts::TaskId(task_id) => {
                 let encoded_task_id: Cow<str> =
                     percent_encode(task_id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(22usize + encoded_task_id.len());
@@ -6082,7 +6082,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Render Search Template API"]
 pub enum RenderSearchTemplateParts<'b> {
     #[doc = "No parts"]
@@ -6095,7 +6095,7 @@ impl<'b> RenderSearchTemplateParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             RenderSearchTemplateParts::None => "/_render/template".into(),
-            RenderSearchTemplateParts::Id(ref id) => {
+            RenderSearchTemplateParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_id.len());
                 p.push_str("/_render/template/");
@@ -6230,7 +6230,7 @@ where
     }
 }
 #[cfg(feature = "experimental-apis")]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Scripts Painless Execute API"]
 pub enum ScriptsPainlessExecuteParts {
     #[doc = "No parts"]
@@ -6372,7 +6372,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Scroll API"]
 pub enum ScrollParts<'b> {
     #[doc = "No parts"]
@@ -6385,7 +6385,7 @@ impl<'b> ScrollParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             ScrollParts::None => "/_search/scroll".into(),
-            ScrollParts::ScrollId(ref scroll_id) => {
+            ScrollParts::ScrollId(scroll_id) => {
                 let encoded_scroll_id: Cow<str> =
                     percent_encode(scroll_id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(16usize + encoded_scroll_id.len());
@@ -6550,7 +6550,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Search API"]
 pub enum SearchParts<'b> {
     #[doc = "No parts"]
@@ -6563,12 +6563,12 @@ impl<'b> SearchParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SearchParts::None => "/_search".into(),
-            SearchParts::Index(ref index) => {
+            SearchParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(9usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_search");
                 p.into()
@@ -7139,7 +7139,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Search Shards API"]
 pub enum SearchShardsParts<'b> {
     #[doc = "No parts"]
@@ -7152,12 +7152,12 @@ impl<'b> SearchShardsParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SearchShardsParts::None => "/_search_shards".into(),
-            SearchShardsParts::Index(ref index) => {
+            SearchShardsParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(16usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_search_shards");
                 p.into()
@@ -7350,7 +7350,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Search Template API"]
 pub enum SearchTemplateParts<'b> {
     #[doc = "No parts"]
@@ -7363,12 +7363,12 @@ impl<'b> SearchTemplateParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SearchTemplateParts::None => "/_search/template".into(),
-            SearchTemplateParts::Index(ref index) => {
+            SearchTemplateParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_search/template");
                 p.into()
@@ -7632,7 +7632,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Termvectors API"]
 pub enum TermvectorsParts<'b> {
     #[doc = "Index and Id"]
@@ -7644,22 +7644,22 @@ impl<'b> TermvectorsParts<'b> {
     #[doc = "Builds a relative URL path to the Termvectors API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            TermvectorsParts::IndexId(ref index, ref id) => {
+            TermvectorsParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(15usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_termvectors/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
-            TermvectorsParts::Index(ref index) => {
+            TermvectorsParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(14usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_termvectors");
                 p.into()
@@ -7902,7 +7902,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Update API"]
 pub enum UpdateParts<'b> {
     #[doc = "Index and Id"]
@@ -7912,12 +7912,12 @@ impl<'b> UpdateParts<'b> {
     #[doc = "Builds a relative URL path to the Update API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            UpdateParts::IndexId(ref index, ref id) => {
+            UpdateParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(10usize + encoded_index.len() + encoded_id.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_update/");
                 p.push_str(encoded_id.as_ref());
@@ -8170,7 +8170,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Update By Query API"]
 pub enum UpdateByQueryParts<'b> {
     #[doc = "Index"]
@@ -8180,12 +8180,12 @@ impl<'b> UpdateByQueryParts<'b> {
     #[doc = "Builds a relative URL path to the Update By Query API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            UpdateByQueryParts::Index(ref index) => {
+            UpdateByQueryParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_index.len());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_index.as_ref());
                 p.push_str("/_update_by_query");
                 p.into()
@@ -8671,7 +8671,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Update By Query Rethrottle API"]
 pub enum UpdateByQueryRethrottleParts<'b> {
     #[doc = "TaskId"]
@@ -8681,7 +8681,7 @@ impl<'b> UpdateByQueryRethrottleParts<'b> {
     #[doc = "Builds a relative URL path to the Update By Query Rethrottle API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            UpdateByQueryRethrottleParts::TaskId(ref task_id) => {
+            UpdateByQueryRethrottleParts::TaskId(task_id) => {
                 let encoded_task_id: Cow<str> =
                     percent_encode(task_id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(30usize + encoded_task_id.len());

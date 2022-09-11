@@ -386,48 +386,47 @@ pub fn generate_tests_from_yaml(
     let skips = global_skips.get_skips_for(version, url.scheme() == "https");
 
     let paths = fs::read_dir(download_dir)?;
-    for entry in paths {
-        if let Ok(entry) = entry {
-            if let Ok(file_type) = entry.file_type() {
-                if file_type.is_dir() {
-                    generate_tests_from_yaml(
-                        api,
-                        suite,
-                        version,
-                        base_download_dir,
-                        &entry.path(),
-                        generated_dir,
-                    )?;
-                } else if file_type.is_file() {
-                    let path = entry.path();
-                    // skip non-yaml files
-                    let extension = path.extension().unwrap_or_else(|| "".as_ref());
-                    if extension != "yml" && extension != "yaml" {
-                        continue;
-                    }
+    for entry in paths.flatten() {
+        if let Ok(file_type) = entry.file_type() {
+            if file_type.is_dir() {
+                generate_tests_from_yaml(
+                    api,
+                    suite,
+                    version,
+                    base_download_dir,
+                    &entry.path(),
+                    generated_dir,
+                )?;
+            } else if file_type.is_file() {
+                let path = entry.path();
+                // skip non-yaml files
+                let extension = path.extension().unwrap_or_else(|| "".as_ref());
+                if extension != "yml" && extension != "yaml" {
+                    continue;
+                }
 
-                    let relative_path = path.strip_prefix(&base_download_dir)?;
-                    let test_suite = TestSuite::Free;
+                let relative_path = path.strip_prefix(&base_download_dir)?;
+                let test_suite = TestSuite::Free;
 
-                    info!("Generating: {}", relative_path.display());
-                    let yaml = fs::read_to_string(&entry.path()).unwrap();
+                info!("Generating: {}", relative_path.display());
+                let yaml = fs::read_to_string(&entry.path()).unwrap();
 
-                    // a yaml test can contain multiple yaml docs, so use yaml_rust to parse
-                    let result = YamlLoader::load_from_str(&yaml);
-                    if result.is_err() {
-                        error!(
-                            "skipping {}. cannot read as Yaml struct: {}",
-                            relative_path.to_slash_lossy(),
-                            result.err().unwrap().to_string()
-                        );
-                        continue;
-                    }
+                // a yaml test can contain multiple yaml docs, so use yaml_rust to parse
+                let result = YamlLoader::load_from_str(&yaml);
+                if result.is_err() {
+                    error!(
+                        "skipping {}. cannot read as Yaml struct: {}",
+                        relative_path.to_slash_lossy(),
+                        result.err().unwrap().to_string()
+                    );
+                    continue;
+                }
 
-                    let docs = result.unwrap();
-                    let mut test =
-                        YamlTests::new(relative_path, version, &skips, test_suite, docs.len());
+                let docs = result.unwrap();
+                let mut test =
+                    YamlTests::new(relative_path, version, &skips, test_suite, docs.len());
 
-                    let results : Vec<Result<(), failure::Error>> = docs
+                let results : Vec<Result<(), failure::Error>> = docs
                         .iter()
                         .map(|doc| {
                             let hash = doc
@@ -461,19 +460,18 @@ pub fn generate_tests_from_yaml(
                         })
                         .collect();
 
-                    //if there has been an Err in any step of the yaml test file, don't create a test for it
-                    match ok_or_accumulate(&results) {
-                        Ok(_) => write_test_file(test, relative_path, generated_dir)?,
-                        Err(e) => {
-                            info!("skipping {} because {}", relative_path.to_slash_lossy(), e)
-                        }
+                //if there has been an Err in any step of the yaml test file, don't create a test for it
+                match ok_or_accumulate(&results) {
+                    Ok(_) => write_test_file(test, relative_path, generated_dir)?,
+                    Err(e) => {
+                        info!("skipping {} because {}", relative_path.to_slash_lossy(), e)
                     }
                 }
             }
         }
     }
 
-    write_mod_files(&generated_dir, true)?;
+    write_mod_files(generated_dir, true)?;
 
     Ok(())
 }
@@ -486,21 +484,19 @@ fn write_mod_files(generated_dir: &Path, toplevel: bool) -> Result<(), failure::
 
     let paths = fs::read_dir(generated_dir)?;
     let mut mods = vec![];
-    for path in paths {
-        if let Ok(entry) = path {
-            let path = entry.path();
-            let name = path.file_stem().unwrap().to_string_lossy();
+    for entry in paths.flatten() {
+        let path = entry.path();
+        let name = path.file_stem().unwrap().to_string_lossy();
 
-            if name != "mod" {
-                mods.push(format!(
-                    "pub mod {};",
-                    path.file_stem().unwrap().to_string_lossy()
-                ));
-            }
+        if name != "mod" {
+            mods.push(format!(
+                "pub mod {};",
+                path.file_stem().unwrap().to_string_lossy()
+            ));
+        }
 
-            if path.is_dir() && !(toplevel && name == "common") {
-                write_mod_files(&entry.path(), false)?;
-            }
+        if path.is_dir() && !(toplevel && name == "common") {
+            write_mod_files(&entry.path(), false)?;
         }
     }
 

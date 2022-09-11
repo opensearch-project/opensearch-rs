@@ -318,7 +318,7 @@ impl ApiCall {
         let api_call = endpoint.full_name.as_ref().unwrap();
         let parts = Self::generate_parts(api_call, endpoint, &parts)?;
         let params = Self::generate_params(api, endpoint, &params)?;
-        let function = syn::Ident::from(api_call.replace(".", "()."));
+        let function = syn::Ident::from(api_call.replace('.', "()."));
         let namespace: Option<String> = if api_call.contains('.') {
             let namespaces: Vec<&str> = api_call.splitn(2, '.').collect();
             Some(namespaces[0].to_string())
@@ -658,7 +658,7 @@ impl ApiCall {
     ) -> Result<Option<Tokens>, failure::Error> {
         // TODO: ideally, this should share the logic from EnumBuilder
         let enum_name = {
-            let name = api_call.to_pascal_case().replace(".", "");
+            let name = api_call.to_pascal_case().replace('.', "");
             syn::Ident::from(format!("{}Parts", name))
         };
 

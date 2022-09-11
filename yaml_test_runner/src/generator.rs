@@ -349,7 +349,7 @@ impl TestFn {
     /// some function descriptions are the same in YAML tests, which would result in
     /// duplicate generated test function names. Deduplicate by appending incrementing number
     pub fn unique_name(&self, seen_names: &mut HashSet<String>) -> String {
-        let mut fn_name = self.name.replace(" ", "_").to_lowercase().to_snake_case();
+        let mut fn_name = self.name.replace(' ', "_").to_lowercase().to_snake_case();
         while !seen_names.insert(fn_name.clone()) {
             lazy_static! {
                 static ref ENDING_DIGITS_REGEX: Regex = Regex::new(r"^(.*?)_(\d*?)$").unwrap();
@@ -529,8 +529,7 @@ fn test_file_path(relative_path: &Path) -> Result<PathBuf, failure::Error> {
     // directories and files will form the module names so ensure they're valid module names
     let clean: String = relative
         .to_string_lossy()
-        .replace(".", "_")
-        .replace("-", "_");
+        .replace(['.', '-'], "_");
 
     relative = PathBuf::from(clean);
 

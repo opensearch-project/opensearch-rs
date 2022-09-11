@@ -113,18 +113,18 @@ impl<'a> EnumBuilder<'a> {
             .join("");
 
         let doc = match params.len() {
-            1 => doc(params[0].replace("_", " ").to_pascal_case()),
+            1 => doc(params[0].replace('_', " ").to_pascal_case()),
             n => {
                 let mut d: String = params
                     .iter()
                     .enumerate()
                     .filter(|&(i, _)| i != n - 1)
-                    .map(|(_, e)| e.replace("_", " ").to_pascal_case())
+                    .map(|(_, e)| e.replace('_', " ").to_pascal_case())
                     .collect::<Vec<_>>()
                     .join(", ");
 
                 d.push_str(
-                    format!(" and {}", params[n - 1].replace("_", " ").to_pascal_case()).as_str(),
+                    format!(" and {}", params[n - 1].replace('_', " ").to_pascal_case()).as_str(),
                 );
                 doc(d)
             }

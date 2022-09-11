@@ -176,7 +176,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
         TypeKind::List => {
             v.push_str("&'b [");
             v.push_str(str_type);
-            v.push_str("]");
+            v.push(']');
         }
         TypeKind::Enum => match name {
             // opened https://github.com/elastic/elasticsearch/issues/53212
@@ -185,7 +185,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
                 // Expand wildcards should
                 v.push_str("&'b [");
                 v.push_str(name.to_pascal_case().as_str());
-                v.push_str("]");
+                v.push(']');
             }
             _ => v.push_str(name.to_pascal_case().as_str()),
         },
@@ -215,7 +215,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
     };
 
     if !required {
-        v.push_str(">");
+        v.push('>');
     }
 
     syn::parse_type(v.as_str()).unwrap()

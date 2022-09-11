@@ -40,7 +40,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
         tokens.append(use_declarations());
 
         let namespace_pascal_case = namespace_name.to_pascal_case();
-        let namespace_replaced_pascal_case = namespace_name.replace("_", " ").to_pascal_case();
+        let namespace_replaced_pascal_case = namespace_name.replace('_', " ").to_pascal_case();
         let namespace_client_name = ident(&namespace_pascal_case);
         let name_for_docs = match namespace_replaced_pascal_case.as_ref() {
             "Ccr" => "Cross Cluster Replication",

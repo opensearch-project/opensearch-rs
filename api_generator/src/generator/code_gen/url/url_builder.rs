@@ -420,10 +420,7 @@ impl<'a> UrlBuilder<'a> {
     }
 
     pub fn build(self) -> syn::Expr {
-        let has_params = self.path.iter().any(|p| match *p {
-            PathPart::Param(_) => true,
-            _ => false,
-        });
+        let has_params = self.path.iter().any(|p| matches!(p, PathPart::Param(_)));
 
         if has_params {
             self.build_owned().into_expr()

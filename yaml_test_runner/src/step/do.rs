@@ -412,9 +412,8 @@ impl ApiCall {
 
                                         match ok_or_accumulate(&idents) {
                                             Ok(_) => {
-                                                let idents = idents
-                                                    .into_iter()
-                                                    .filter_map(Result::ok);
+                                                let idents =
+                                                    idents.into_iter().filter_map(Result::ok);
 
                                                 tokens.append(quote! {
                                                     .#param_ident(&[#(#idents),*])
@@ -442,9 +441,7 @@ impl ApiCall {
                                     Err(e) => {
                                         return Err(failure::err_msg(format!(
                                             r#"cannot parse bool from "{}" for param "{}", {}"#,
-                                            s,
-                                            n,
-                                            e
+                                            s, n, e
                                         )))
                                     }
                                 },
@@ -455,9 +452,7 @@ impl ApiCall {
                                     Err(e) => {
                                         return Err(failure::err_msg(format!(
                                             r#"cannot parse f64 from "{}" for param "{}", {}"#,
-                                            s,
-                                            n,
-                                            e
+                                            s, n, e
                                         )))
                                     }
                                 },
@@ -475,9 +470,7 @@ impl ApiCall {
                                             Err(e) => {
                                                 return Err(failure::err_msg(format!(
                                                     r#"cannot parse i32 from "{}" for param "{}", {}"#,
-                                                    s,
-                                                    n,
-                                                    e
+                                                    s, n, e
                                                 )))
                                             }
                                         }
@@ -666,11 +659,7 @@ impl ApiCall {
         // Also, short circuit for tests where the only parts specified are null
         // e.g. security API test. It seems these should simply omit the value though...
         if parts.is_empty() || parts.iter().all(|(_, v)| v.is_null()) {
-            let mut param_counts = endpoint
-                .url
-                .paths
-                .iter()
-                .map(|p| p.path.params().len());
+            let mut param_counts = endpoint.url.paths.iter().map(|p| p.path.params().len());
 
             // check there's actually a None value
             if !param_counts.any(|c| c == 0) {
@@ -707,9 +696,10 @@ impl ApiCall {
                             return false;
                         }
 
-                        let contains = parts
-                            .iter()
-                            .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None });
+                        let contains =
+                            parts
+                                .iter()
+                                .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None });
                         contains.count() == parts.len()
                     })
                     .collect::<Vec<_>>();
@@ -760,16 +750,14 @@ impl ApiCall {
 
                         match ty.ty {
                             TypeKind::List => {
-                                let values = s
-                                    .split(',')
-                                    .map(|s| {
-                                        if is_set_value {
-                                            let set_value = Self::from_set_value(s);
-                                            quote! { #set_value.as_str().unwrap() }
-                                        } else {
-                                            quote! { #s }
-                                        }
-                                    });
+                                let values = s.split(',').map(|s| {
+                                    if is_set_value {
+                                        let set_value = Self::from_set_value(s);
+                                        quote! { #set_value.as_str().unwrap() }
+                                    } else {
+                                        quote! { #s }
+                                    }
+                                });
                                 Ok(quote! { &[#(#values),*] })
                             }
                             TypeKind::Long => {
@@ -879,13 +867,10 @@ impl ApiCall {
                         json.split(char::is_whitespace).collect::<Vec<_>>()
                     };
 
-                    let values = split
-                        .into_iter()
-                        .filter(|s| !s.is_empty())
-                        .map(|s| {
-                            let ident = syn::Ident::from(s);
-                            quote! { JsonBody::from(json!(#ident)) }
-                        });
+                    let values = split.into_iter().filter(|s| !s.is_empty()).map(|s| {
+                        let ident = syn::Ident::from(s);
+                        quote! { JsonBody::from(json!(#ident)) }
+                    });
                     Ok(Some(quote!(.body(vec![#(#values),*]))))
                 } else {
                     let ident = syn::Ident::from(json);
@@ -901,21 +886,19 @@ impl ApiCall {
 
                 if endpoint.supports_nd_body() {
                     let values: Vec<serde_json::Value> = serde_yaml::from_str(&s)?;
-                    let json = values
-                        .iter()
-                        .map(|value| {
-                            let mut json = serde_json::to_string(&value).unwrap();
-                            if value.is_string() {
-                                json = replace_set(&json);
-                                let ident = syn::Ident::from(json);
-                                quote!(#ident)
-                            } else {
-                                json = replace_set(json);
-                                json = replace_i64(json);
-                                let ident = syn::Ident::from(json);
-                                quote!(JsonBody::from(json!(#ident)))
-                            }
-                        });
+                    let json = values.iter().map(|value| {
+                        let mut json = serde_json::to_string(&value).unwrap();
+                        if value.is_string() {
+                            json = replace_set(&json);
+                            let ident = syn::Ident::from(json);
+                            quote!(#ident)
+                        } else {
+                            json = replace_set(json);
+                            json = replace_i64(json);
+                            let ident = syn::Ident::from(json);
+                            quote!(JsonBody::from(json!(#ident)))
+                        }
+                    });
                     Ok(Some(quote!(.body(vec![ #(#json),* ]))))
                 } else {
                     let value: serde_json::Value = serde_yaml::from_str(&s)?;

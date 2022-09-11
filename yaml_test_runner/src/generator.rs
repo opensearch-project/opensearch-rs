@@ -523,9 +523,7 @@ fn test_file_path(relative_path: &Path) -> Result<PathBuf, failure::Error> {
     let mut relative = relative_path.to_path_buf();
     relative.set_extension("");
     // directories and files will form the module names so ensure they're valid module names
-    let clean: String = relative
-        .to_string_lossy()
-        .replace(['.', '-'], "_");
+    let clean: String = relative.to_string_lossy().replace(['.', '-'], "_");
 
     relative = PathBuf::from(clean);
 

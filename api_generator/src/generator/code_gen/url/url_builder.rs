@@ -170,9 +170,9 @@ impl<'a> UrlBuilder<'a> {
     /// Build the AST for an allocated url from the path literals and params.
     fn build_owned(self) -> syn::Block {
         // collection of let {name}_str = [self.]{name}.[join(",")|to_string()];
-        let let_params_exprs = Self::let_parameters_exprs(&self.path, &self.parts);
+        let let_params_exprs = Self::let_parameters_exprs(&self.path, self.parts);
 
-        let mut let_encoded_params_exprs = Self::let_encoded_exprs(&self.path, &self.parts);
+        let mut let_encoded_params_exprs = Self::let_encoded_exprs(&self.path, self.parts);
 
         let url_ident = ident("p");
         let len_expr = {
@@ -275,7 +275,7 @@ impl<'a> UrlBuilder<'a> {
             .filter_map(|p| match *p {
                 PathPart::Param(p) => {
                     let name = valid_name(p);
-                    let name_ident = ident(&name);
+                    let name_ident = ident(name);
                     let ty = &parts[p].ty;
 
                     // don't generate an assignment expression for strings

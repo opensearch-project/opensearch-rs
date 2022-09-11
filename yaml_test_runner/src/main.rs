@@ -119,7 +119,7 @@ fn main() -> Result<(), failure::Error> {
 
     github::download_test_suites(&branch, &download_dir)?;
 
-    let api = api_generator::generator::read_api(&branch, &rest_specs_dir)?;
+    let api = api_generator::generator::read_api(&branch, rest_specs_dir)?;
 
     // delete everything under the generated_dir except common dir
     if generated_dir.exists() {

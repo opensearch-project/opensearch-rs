@@ -73,7 +73,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
                     name,
                     &builder_name,
                     &api.common_params,
-                    &endpoint,
+                    endpoint,
                     false,
                 )
                 .build()

@@ -91,7 +91,7 @@ impl<'a> EnumBuilder<'a> {
                 0 => Self::parts_none(),
                 _ => {
                     self.has_lifetime = true;
-                    Self::parts(&path)
+                    Self::parts(path)
                 }
             };
 
@@ -299,7 +299,7 @@ impl<'a> From<&'a (String, ApiEndpoint)> for EnumBuilder<'a> {
         let endpoint = &value.1;
         let mut builder = EnumBuilder::new(value.0.to_pascal_case().as_ref());
         for path in &endpoint.url.paths {
-            builder = builder.with_path(&path);
+            builder = builder.with_path(path);
         }
 
         builder

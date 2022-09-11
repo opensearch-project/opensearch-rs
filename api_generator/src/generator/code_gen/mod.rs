@@ -140,7 +140,7 @@ pub trait GetPath {
 impl GetPath for syn::Ty {
     fn get_path(&self) -> &syn::Path {
         match *self {
-            syn::Ty::Path(_, ref p) => &p,
+            syn::Ty::Path(_, ref p) => p,
             ref p => panic!("Expected syn::Ty::Path, but found {:?}", p),
         }
     }
@@ -148,7 +148,7 @@ impl GetPath for syn::Ty {
 
 impl GetPath for syn::Path {
     fn get_path(&self) -> &syn::Path {
-        &self
+        self
     }
 }
 

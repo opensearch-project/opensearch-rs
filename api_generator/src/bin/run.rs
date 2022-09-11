@@ -73,7 +73,7 @@ fn main() -> Result<(), failure::Error> {
         fs::remove_dir_all(&download_dir)?;
         fs::create_dir_all(&download_dir)?;
         rest_spec::download_specs(&branch, &download_dir)?;
-        File::create(&last_downloaded_version)?.write_all(branch.as_bytes())?;
+        File::create(last_downloaded_version)?.write_all(branch.as_bytes())?;
     }
 
     // only offer to generate if there are downloaded specs

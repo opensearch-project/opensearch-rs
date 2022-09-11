@@ -27,7 +27,7 @@ pub fn generate(api: &Api) -> Result<String, failure::Error> {
         use serde::{Serialize, Deserialize};
     );
     for e in &api.enums {
-        generate_param(&mut tokens, &e);
+        generate_param(&mut tokens, e);
     }
 
     let generated = tokens.to_string();

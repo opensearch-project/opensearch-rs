@@ -550,7 +550,7 @@ pub fn generate(
         write_file(
             input,
             Some(&docs_file),
-            &generated_dir,
+            generated_dir,
             format!("{}.rs", name).as_str(),
             &mut tracker,
         )?;

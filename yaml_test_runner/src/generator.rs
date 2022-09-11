@@ -50,7 +50,7 @@ use url::Url;
 use yaml_rust::{Yaml, YamlLoader};
 
 /// The test suite to compile
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum TestSuite {
     Free,
 }

@@ -199,7 +199,7 @@ impl Default for TypeKind {
 }
 
 /// Details about a deprecated API url path
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Deprecated {
     pub version: String,
     pub description: String,
@@ -253,7 +253,7 @@ pub struct Url {
 }
 
 /// Body of an API endpoint
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Body {
     pub description: Option<String>,
     pub required: Option<bool>,
@@ -271,7 +271,7 @@ where
 }
 
 /// A Documentation URL string
-#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct DocumentationUrlString(
     #[serde(deserialize_with = "documentation_url_string")] pub String,
 );
@@ -326,7 +326,7 @@ impl fmt::Display for DocumentationUrlString {
 }
 
 /// Documentation for an API endpoint
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Documentation {
     pub url: Option<DocumentationUrlString>,
     pub description: Option<String>,

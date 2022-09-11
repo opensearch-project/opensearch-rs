@@ -38,7 +38,7 @@ use serde::{Deserialize, Deserializer};
 use std::{collections::BTreeMap, fmt, iter::Iterator, str};
 
 /// A URL path
-#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct PathString(#[serde(deserialize_with = "rooted_path_string")] pub String);
 
 /// Ensure all deserialized paths have a leading `/`
@@ -129,7 +129,7 @@ enum PathParseState {
 }
 
 /// A part of a Path
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum PathPart<'a> {
     Literal(&'a str),
     Param(&'a str),

@@ -284,8 +284,7 @@ impl DocumentationUrlString {
 
     fn replace_version_in_url(s: String) -> String {
         match url::Url::parse(&s) {
-            Ok(u) => {
-                let mut u = u;
+            Ok(mut u) => {
                 if u.path().contains("/master") {
                     u.set_path(
                         u.path()
@@ -305,7 +304,7 @@ impl DocumentationUrlString {
                             .as_str(),
                     );
                 }
-                u.into_string()
+                u.to_string()
             }
             Err(_) => s,
         }

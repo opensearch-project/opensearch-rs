@@ -67,7 +67,7 @@ fn ident<I: AsRef<str>>(name: I) -> syn::Ident {
 fn doc<I: Into<String>>(comment: I) -> syn::Attribute {
     syn::Attribute {
         style: syn::AttrStyle::Outer,
-        value: syn::MetaItem::NameValue(ident("doc".to_string()), lit(comment)),
+        value: syn::MetaItem::NameValue(ident("doc"), lit(comment)),
         is_sugared_doc: true,
     }
 }
@@ -94,7 +94,7 @@ happen in minor versions.
 
 /// AST for an expression parsed from quoted tokens
 pub fn parse_expr(input: quote::Tokens) -> syn::Expr {
-    syn::parse_expr(input.to_string().as_ref()).unwrap()
+    syn::parse_expr(input.as_str()).unwrap()
 }
 
 /// Ensures that the name generated is one that is valid for Rust

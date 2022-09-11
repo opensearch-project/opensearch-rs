@@ -444,7 +444,7 @@ impl ApiCall {
                                             r#"cannot parse bool from "{}" for param "{}", {}"#,
                                             s,
                                             n,
-                                            e.to_string()
+                                            e
                                         )))
                                     }
                                 },
@@ -457,7 +457,7 @@ impl ApiCall {
                                             r#"cannot parse f64 from "{}" for param "{}", {}"#,
                                             s,
                                             n,
-                                            e.to_string()
+                                            e
                                         )))
                                     }
                                 },
@@ -477,7 +477,7 @@ impl ApiCall {
                                                     r#"cannot parse i32 from "{}" for param "{}", {}"#,
                                                     s,
                                                     n,
-                                                    e.to_string()
+                                                    e
                                                 )))
                                             }
                                         }

@@ -60,7 +60,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
             "Creates a new instance of [{}]",
             &namespace_pascal_case
         ));
-        let namespace_name = ident(namespace_name.to_string());
+        let namespace_name = ident(namespace_name);
 
         let (builders, methods): (Vec<Tokens>, Vec<Tokens>) = namespace
             .endpoints()

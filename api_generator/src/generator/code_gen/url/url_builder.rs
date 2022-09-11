@@ -405,8 +405,15 @@ impl<'a> UrlBuilder<'a> {
         url.iter()
             .map(|p| match *p {
                 PathPart::Literal(p) => {
-                    let lit = syn::Lit::Str(p.to_string(), syn::StrStyle::Cooked);
-                    syn::Stmt::Semi(Box::new(parse_expr(quote!(#url_ident.push_str(#lit)))))
+                    let push = if p.len() == 1 {
+                        let lit = syn::Lit::Char(p.chars().next().unwrap());
+                        quote!(#url_ident.push(#lit))
+                    } else {
+                        let lit = syn::Lit::Str(p.to_string(), syn::StrStyle::Cooked);
+                        quote!(#url_ident.push_str(#lit))
+                    };
+
+                    syn::Stmt::Semi(Box::new(parse_expr(push)))
                 }
                 PathPart::Param(p) => {
                     let name = format!("encoded_{}", valid_name(p));

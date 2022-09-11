@@ -69,7 +69,7 @@ fn generate_param(tokens: &mut Tokens, e: &ApiEnum) {
         #doc
         #cfg_doc
         #cfg_attr
-        #[derive(Debug, PartialEq, Deserialize, Serialize, Clone, Copy)]
+        #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
         pub enum #name {
             #(#[serde(rename = #renames)] #variants),*
         }

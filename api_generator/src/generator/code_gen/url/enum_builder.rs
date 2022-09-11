@@ -181,7 +181,7 @@ impl<'a> EnumBuilder<'a> {
             .iter()
             .map(|&p| {
                 syn::Pat::Ident(
-                    syn::BindingMode::ByRef(syn::Mutability::Immutable),
+                    syn::BindingMode::ByValue(syn::Mutability::Immutable),
                     ident(valid_name(p)),
                     None,
                 )
@@ -282,6 +282,7 @@ impl<'a> EnumBuilder<'a> {
                             syn::NestedMetaItem::MetaItem(syn::MetaItem::Word(ident("Debug"))),
                             syn::NestedMetaItem::MetaItem(syn::MetaItem::Word(ident("Clone"))),
                             syn::NestedMetaItem::MetaItem(syn::MetaItem::Word(ident("PartialEq"))),
+                            syn::NestedMetaItem::MetaItem(syn::MetaItem::Word(ident("Eq"))),
                         ],
                     ),
                 },

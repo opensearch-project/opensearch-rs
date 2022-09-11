@@ -245,7 +245,7 @@ impl<'a> RequestBuilder<'a> {
         default_fields: &[&syn::Ident],
         accepts_nd_body: bool,
     ) -> syn::ImplItem {
-        let fields: Vec<FieldValue> = default_fields
+        let fields = default_fields
             .iter()
             .filter(|&&part| part != &ident("body"))
             .map(|&part| syn::FieldValue {
@@ -257,8 +257,7 @@ impl<'a> RequestBuilder<'a> {
                 )
                 .into(),
                 is_shorthand: false,
-            })
-            .collect();
+            });
 
         let (fn_arg, field_arg, ret_ty) = if accepts_nd_body {
             (

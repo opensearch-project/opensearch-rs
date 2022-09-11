@@ -412,10 +412,9 @@ impl ApiCall {
 
                                         match ok_or_accumulate(&idents) {
                                             Ok(_) => {
-                                                let idents: Vec<Tokens> = idents
+                                                let idents = idents
                                                     .into_iter()
-                                                    .filter_map(Result::ok)
-                                                    .collect();
+                                                    .filter_map(Result::ok);
 
                                                 tokens.append(quote! {
                                                     .#param_ident(&[#(#idents),*])
@@ -431,7 +430,7 @@ impl ApiCall {
                                     }
                                 }
                                 TypeKind::List => {
-                                    let values: Vec<&str> = s.split(',').collect();
+                                    let values = s.split(',');
                                     tokens.append(quote! {
                                         .#param_ident(&[#(#values),*])
                                     })
@@ -589,8 +588,7 @@ impl ApiCall {
 
                                 match ok_or_accumulate(&result) {
                                     Ok(_) => {
-                                        let result: Vec<Tokens> =
-                                            result.into_iter().filter_map(Result::ok).collect();
+                                        let result = result.into_iter().filter_map(Result::ok);
 
                                         tokens.append(quote! {
                                             .#param_ident(&[#(#result),*])
@@ -668,15 +666,14 @@ impl ApiCall {
         // Also, short circuit for tests where the only parts specified are null
         // e.g. security API test. It seems these should simply omit the value though...
         if parts.is_empty() || parts.iter().all(|(_, v)| v.is_null()) {
-            let param_counts = endpoint
+            let mut param_counts = endpoint
                 .url
                 .paths
                 .iter()
-                .map(|p| p.path.params().len())
-                .collect::<Vec<usize>>();
+                .map(|p| p.path.params().len());
 
             // check there's actually a None value
-            if !param_counts.contains(&0) {
+            if !param_counts.any(|c| c == 0) {
                 return Err(failure::err_msg(format!(
                     r#"no path for "{}" API with no url parts"#,
                     api_call
@@ -712,9 +709,8 @@ impl ApiCall {
 
                         let contains = parts
                             .iter()
-                            .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None })
-                            .collect::<Vec<_>>();
-                        contains.len() == parts.len()
+                            .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None });
+                        contains.count() == parts.len()
                     })
                     .collect::<Vec<_>>();
 
@@ -764,7 +760,7 @@ impl ApiCall {
 
                         match ty.ty {
                             TypeKind::List => {
-                                let values: Vec<Tokens> = s
+                                let values = s
                                     .split(',')
                                     .map(|s| {
                                         if is_set_value {
@@ -773,8 +769,7 @@ impl ApiCall {
                                         } else {
                                             quote! { #s }
                                         }
-                                    })
-                                    .collect();
+                                    });
                                 Ok(quote! { &[#(#values),*] })
                             }
                             TypeKind::Long => {
@@ -847,8 +842,7 @@ impl ApiCall {
 
         match ok_or_accumulate(&part_tokens) {
             Ok(_) => {
-                let part_tokens: Vec<Tokens> =
-                    part_tokens.into_iter().filter_map(Result::ok).collect();
+                let part_tokens = part_tokens.into_iter().filter_map(Result::ok);
                 Ok(Some(
                     quote! { #enum_name::#variant_name(#(#part_tokens),*) },
                 ))
@@ -885,14 +879,13 @@ impl ApiCall {
                         json.split(char::is_whitespace).collect::<Vec<_>>()
                     };
 
-                    let values: Vec<Tokens> = split
+                    let values = split
                         .into_iter()
                         .filter(|s| !s.is_empty())
                         .map(|s| {
                             let ident = syn::Ident::from(s);
                             quote! { JsonBody::from(json!(#ident)) }
-                        })
-                        .collect();
+                        });
                     Ok(Some(quote!(.body(vec![#(#values),*]))))
                 } else {
                     let ident = syn::Ident::from(json);
@@ -908,7 +901,7 @@ impl ApiCall {
 
                 if endpoint.supports_nd_body() {
                     let values: Vec<serde_json::Value> = serde_yaml::from_str(&s)?;
-                    let json: Vec<Tokens> = values
+                    let json = values
                         .iter()
                         .map(|value| {
                             let mut json = serde_json::to_string(&value).unwrap();
@@ -922,8 +915,7 @@ impl ApiCall {
                                 let ident = syn::Ident::from(json);
                                 quote!(JsonBody::from(json!(#ident)))
                             }
-                        })
-                        .collect();
+                        });
                     Ok(Some(quote!(.body(vec![ #(#json),* ]))))
                 } else {
                     let value: serde_json::Value = serde_yaml::from_str(&s)?;

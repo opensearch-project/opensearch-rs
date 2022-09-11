@@ -41,7 +41,6 @@ use void::Void;
 pub mod code_gen;
 pub mod output;
 
-use itertools::Itertools;
 use output::{merge_file, write_file};
 use std::cmp::Ordering;
 
@@ -710,7 +709,7 @@ where
         .paths
         .iter()
         .map(|p| &p.deprecated)
-        .fold1(|d1, d2| Deprecated::combine(d1, d2))
+        .reduce(Deprecated::combine)
         .unwrap_or(&None);
 
     if let Some(deprecated) = deprecation {

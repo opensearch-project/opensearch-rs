@@ -61,7 +61,7 @@ fn generate_param(tokens: &mut Tokens, e: &ApiEnum) {
         .unzip();
 
     let doc = match &e.description {
-        Some(description) => Some(code_gen::doc(description)),
+        Some(description) => Some(code_gen::doc_escaped(description)),
         None => None,
     };
 

@@ -150,7 +150,7 @@ impl<'a> YamlTests<'a> {
             .collect();
 
         quote! {
-            #![allow(unused_imports, unused_variables, dead_code)]
+            #![allow(unused_imports, unused_variables, dead_code, clippy::redundant_clone, clippy::approx_constant)]
             use crate::common::{client, macros};
             use opensearch::*;
             use opensearch::http::{
@@ -319,7 +319,7 @@ impl<'a> YamlTests<'a> {
                         Ok(())
                     }
                 }),
-                Some(quote! { #ident(&client).await?; }),
+                Some(quote! { #ident(client).await?; }),
             )
         } else {
             (None, None)

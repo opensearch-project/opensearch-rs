@@ -141,7 +141,7 @@ pub async fn delete_snapshots(client: &OpenSearch) -> Result<(), Error> {
         .text()
         .await?;
 
-    if cat_repo_response.len() > 0 {
+    if !cat_repo_response.is_empty() {
         let repositories: Vec<&str> = cat_repo_response.split_terminator('\n').collect();
 
         // Delete snapshots in each repository

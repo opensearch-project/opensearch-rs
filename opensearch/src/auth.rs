@@ -91,10 +91,10 @@ impl From<ClientCertificate> for Credentials {
 }
 
 #[cfg(any(feature = "aws-auth"))]
-impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
+impl std::convert::TryFrom<&aws_types::SdkConfig> for Credentials {
     type Error = super::Error;
 
-    fn try_from(value: aws_types::SdkConfig) -> Result<Self, Self::Error> {
+    fn try_from(value: &aws_types::SdkConfig) -> Result<Self, Self::Error> {
         let credentials = value
             .credentials_provider()
             .ok_or_else(|| super::error::lib("SdkConfig does not have a credentials_provider"))?
@@ -104,5 +104,14 @@ impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
             .ok_or_else(|| super::error::lib("SdkConfig does not have a region"))?
             .clone();
         Ok(Credentials::AwsSigV4(credentials, region))
+    }
+}
+
+#[cfg(any(feature = "aws-auth"))]
+impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
+    type Error = super::Error;
+
+    fn try_from(value: aws_types::SdkConfig) -> Result<Self, Self::Error> {
+        Credentials::try_from(&value)
     }
 }

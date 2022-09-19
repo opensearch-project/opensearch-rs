@@ -29,27 +29,22 @@
  */
 
 use once_cell::sync::Lazy;
-use std::fs::File;
-use std::io::Read;
 use opensearch::{
-    auth::{
-        Credentials,
-        ClientCertificate
-    },
+    auth::{ClientCertificate, Credentials},
     cert::CertificateValidation,
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
         Method, StatusCode,
     },
-    indices::{
-        IndicesDeleteParts,
-    },
+    indices::IndicesDeleteParts,
     params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use serde_json::{Value};
+use serde_json::Value;
+use std::fs::File;
+use std::io::Read;
 use std::ops::Deref;
 use sysinfo::SystemExt;
 use url::Url;
@@ -63,8 +58,10 @@ fn cluster_addr() -> String {
 
 /// Determines if Fiddler.exe proxy process is running
 fn running_proxy() -> bool {
-    let system = sysinfo::System::new();
-    !system.get_process_by_name("Fiddler").is_empty()
+    let mut system = sysinfo::System::new();
+    system.refresh_processes();
+    let running = system.processes_by_name("Fiddler").next().is_some();
+    running
 }
 
 static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {

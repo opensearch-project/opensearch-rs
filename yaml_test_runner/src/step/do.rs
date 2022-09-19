@@ -746,8 +746,8 @@ impl ApiCall {
             // don't rely on URL parts being ordered in the yaml test in the same order as specified
             // in the REST spec.
             .sorted_by(|(p, _), (p2, _)| {
-                let f = path_parts.iter().position(|x| x == p).unwrap();
-                let s = path_parts.iter().position(|x| x == p2).unwrap();
+                let f = path_parts.iter().position(|x| x == p).unwrap_or_default(); // unwrap_or_default() here as we can't bubble up the error from sorted_by(|| ...),
+                let s = path_parts.iter().position(|x| x == p2).unwrap_or_default(); // instead it'll hit the "no url part found for..." error below in the map
                 f.cmp(&s)
             })
             .map(|(p, v)| {

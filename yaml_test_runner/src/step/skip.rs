@@ -28,6 +28,8 @@
  * GitHub history for details.
  */
 
+use crate::skip::SkippedFeaturesAndTests;
+
 use super::Step;
 use regex::Regex;
 use yaml_rust::Yaml;
@@ -68,7 +70,7 @@ impl Skip {
     fn parse_version_requirements(version: &Option<String>) -> Option<semver::VersionReq> {
         if let Some(v) = version {
             if v.to_lowercase() == "all" {
-                Some(semver::VersionReq::any())
+                Some(semver::VersionReq::STAR)
             } else {
                 lazy_static! {
                     static ref VERSION_REGEX: Regex =
@@ -137,9 +139,9 @@ impl Skip {
     }
 
     /// Determines if this instance matches the version
-    pub fn skip_features(&self, features: &[String]) -> bool {
+    pub fn skip_features(&self, skips: &SkippedFeaturesAndTests) -> bool {
         match &self.features {
-            Some(test_features) => test_features.iter().any(|f| features.contains(f)),
+            Some(test_features) => test_features.iter().any(|f| skips.should_skip_feature(f)),
             None => false,
         }
     }

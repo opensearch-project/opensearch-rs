@@ -48,6 +48,7 @@ use std::{fs, path::PathBuf, process::exit};
 mod generator;
 mod github;
 mod regex;
+mod skip;
 mod step;
 
 use generator::TestSuite;
@@ -159,22 +160,16 @@ fn branch_suite_and_version_from_opensearch(
 
     let mut response = client.get(url).basic_auth("admin", Some("admin")).send()?;
     let json: Value = response.json()?;
-    let mut branch = json["version"]["build_hash"].as_str().unwrap().to_string();
+    let branch = json["version"]["build_hash"].as_str().unwrap().to_string();
 
     // any prerelease part needs to be trimmed because the semver crate only allows
     // a version with a prerelease to match against predicates, if at least one predicate
     // has a prerelease. See
     // https://github.com/steveklabnik/semver/blob/afa5fc853cb4d6d2b1329579e5528f86f3b550f9/src/version_req.rs#L319-L331
-    let mut version = json["version"]["number"]
+    let version = json["version"]["number"]
         .as_str()
         .unwrap()
         .trim_end_matches(|c: char| c.is_alphabetic() || c == '-');
 
-    if version.starts_with("1.") || version.starts_with("7.") {
-        info!("Found a 1.x/7.x version, using yaml docs from 2.0 version since type mapping related tests has been removed");
-        // If a 1.x/7.x version is found for OpenSearch, use the yaml files from 2.0 branch since type is removed from 2.0.
-        version = "2.0.0";
-        branch = "5d6eeed3830ebd66ba5bfacc3ba94d901dede89a".to_string();
-    }
     Ok((branch, suite, semver::Version::parse(version)?))
 }

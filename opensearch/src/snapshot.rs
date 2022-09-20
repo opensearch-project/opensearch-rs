@@ -44,7 +44,7 @@ use crate::{
 use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Cleanup Repository API"]
 pub enum SnapshotCleanupRepositoryParts<'b> {
     #[doc = "Repository"]
@@ -54,7 +54,7 @@ impl<'b> SnapshotCleanupRepositoryParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Cleanup Repository API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotCleanupRepositoryParts::Repository(ref repository) => {
+            SnapshotCleanupRepositoryParts::Repository(repository) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(20usize + encoded_repository.len());
@@ -207,7 +207,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Clone API"]
 pub enum SnapshotCloneParts<'b> {
     #[doc = "Repository, Snapshot and TargetSnapshot"]
@@ -218,9 +218,9 @@ impl<'b> SnapshotCloneParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SnapshotCloneParts::RepositorySnapshotTargetSnapshot(
-                ref repository,
-                ref snapshot,
-                ref target_snapshot,
+                repository,
+                snapshot,
+                target_snapshot,
             ) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
@@ -236,7 +236,7 @@ impl<'b> SnapshotCloneParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.push_str("/_clone/");
                 p.push_str(encoded_target_snapshot.as_ref());
@@ -376,7 +376,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Create API"]
 pub enum SnapshotCreateParts<'b> {
     #[doc = "Repository and Snapshot"]
@@ -386,7 +386,7 @@ impl<'b> SnapshotCreateParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Create API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotCreateParts::RepositorySnapshot(ref repository, ref snapshot) => {
+            SnapshotCreateParts::RepositorySnapshot(repository, snapshot) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let encoded_snapshot: Cow<str> =
@@ -396,7 +396,7 @@ impl<'b> SnapshotCreateParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.into()
             }
@@ -544,7 +544,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Create Repository API"]
 pub enum SnapshotCreateRepositoryParts<'b> {
     #[doc = "Repository"]
@@ -554,7 +554,7 @@ impl<'b> SnapshotCreateRepositoryParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Create Repository API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotCreateRepositoryParts::Repository(ref repository) => {
+            SnapshotCreateRepositoryParts::Repository(repository) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(11usize + encoded_repository.len());
@@ -716,7 +716,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Delete API"]
 pub enum SnapshotDeleteParts<'b> {
     #[doc = "Repository and Snapshot"]
@@ -726,7 +726,7 @@ impl<'b> SnapshotDeleteParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Delete API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotDeleteParts::RepositorySnapshot(ref repository, ref snapshot) => {
+            SnapshotDeleteParts::RepositorySnapshot(repository, snapshot) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let encoded_snapshot: Cow<str> =
@@ -736,7 +736,7 @@ impl<'b> SnapshotDeleteParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.into()
             }
@@ -850,7 +850,7 @@ impl<'a, 'b> SnapshotDelete<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Delete Repository API"]
 pub enum SnapshotDeleteRepositoryParts<'b> {
     #[doc = "Repository"]
@@ -860,7 +860,7 @@ impl<'b> SnapshotDeleteRepositoryParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Delete Repository API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotDeleteRepositoryParts::Repository(ref repository) => {
+            SnapshotDeleteRepositoryParts::Repository(repository) => {
                 let repository_str = repository.join(",");
                 let encoded_repository: Cow<str> =
                     percent_encode(repository_str.as_bytes(), PARTS_ENCODED).into();
@@ -988,7 +988,7 @@ impl<'a, 'b> SnapshotDeleteRepository<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Get API"]
 pub enum SnapshotGetParts<'b> {
     #[doc = "Repository and Snapshot"]
@@ -998,7 +998,7 @@ impl<'b> SnapshotGetParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Get API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotGetParts::RepositorySnapshot(ref repository, ref snapshot) => {
+            SnapshotGetParts::RepositorySnapshot(repository, snapshot) => {
                 let snapshot_str = snapshot.join(",");
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
@@ -1009,7 +1009,7 @@ impl<'b> SnapshotGetParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.into()
             }
@@ -1141,7 +1141,7 @@ impl<'a, 'b> SnapshotGet<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Get Features API"]
 pub enum SnapshotGetFeaturesParts {
     #[doc = "No parts"]
@@ -1262,7 +1262,7 @@ impl<'a, 'b> SnapshotGetFeatures<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Get Repository API"]
 pub enum SnapshotGetRepositoryParts<'b> {
     #[doc = "No parts"]
@@ -1275,7 +1275,7 @@ impl<'b> SnapshotGetRepositoryParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SnapshotGetRepositoryParts::None => "/_snapshot".into(),
-            SnapshotGetRepositoryParts::Repository(ref repository) => {
+            SnapshotGetRepositoryParts::Repository(repository) => {
                 let repository_str = repository.join(",");
                 let encoded_repository: Cow<str> =
                     percent_encode(repository_str.as_bytes(), PARTS_ENCODED).into();
@@ -1403,7 +1403,7 @@ impl<'a, 'b> SnapshotGetRepository<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Restore API"]
 pub enum SnapshotRestoreParts<'b> {
     #[doc = "Repository and Snapshot"]
@@ -1413,7 +1413,7 @@ impl<'b> SnapshotRestoreParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Restore API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotRestoreParts::RepositorySnapshot(ref repository, ref snapshot) => {
+            SnapshotRestoreParts::RepositorySnapshot(repository, snapshot) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let encoded_snapshot: Cow<str> =
@@ -1423,7 +1423,7 @@ impl<'b> SnapshotRestoreParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.push_str("/_restore");
                 p.into()
@@ -1572,7 +1572,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Status API"]
 pub enum SnapshotStatusParts<'b> {
     #[doc = "No parts"]
@@ -1587,7 +1587,7 @@ impl<'b> SnapshotStatusParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SnapshotStatusParts::None => "/_snapshot/_status".into(),
-            SnapshotStatusParts::Repository(ref repository) => {
+            SnapshotStatusParts::Repository(repository) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(19usize + encoded_repository.len());
@@ -1596,7 +1596,7 @@ impl<'b> SnapshotStatusParts<'b> {
                 p.push_str("/_status");
                 p.into()
             }
-            SnapshotStatusParts::RepositorySnapshot(ref repository, ref snapshot) => {
+            SnapshotStatusParts::RepositorySnapshot(repository, snapshot) => {
                 let snapshot_str = snapshot.join(",");
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
@@ -1607,7 +1607,7 @@ impl<'b> SnapshotStatusParts<'b> {
                 );
                 p.push_str("/_snapshot/");
                 p.push_str(encoded_repository.as_ref());
-                p.push_str("/");
+                p.push('/');
                 p.push_str(encoded_snapshot.as_ref());
                 p.push_str("/_status");
                 p.into()
@@ -1731,7 +1731,7 @@ impl<'a, 'b> SnapshotStatus<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Snapshot Verify Repository API"]
 pub enum SnapshotVerifyRepositoryParts<'b> {
     #[doc = "Repository"]
@@ -1741,7 +1741,7 @@ impl<'b> SnapshotVerifyRepositoryParts<'b> {
     #[doc = "Builds a relative URL path to the Snapshot Verify Repository API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SnapshotVerifyRepositoryParts::Repository(ref repository) => {
+            SnapshotVerifyRepositoryParts::Repository(repository) => {
                 let encoded_repository: Cow<str> =
                     percent_encode(repository.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(19usize + encoded_repository.len());

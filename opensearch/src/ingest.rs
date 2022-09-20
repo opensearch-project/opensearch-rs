@@ -56,7 +56,7 @@ use crate::{
 use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ingest Delete Pipeline API"]
 pub enum IngestDeletePipelineParts<'b> {
     #[doc = "Id"]
@@ -66,7 +66,7 @@ impl<'b> IngestDeletePipelineParts<'b> {
     #[doc = "Builds a relative URL path to the Ingest Delete Pipeline API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestDeletePipelineParts::Id(ref id) => {
+            IngestDeletePipelineParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_id.len());
                 p.push_str("/_ingest/pipeline/");
@@ -192,7 +192,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ingest Get Pipeline API"]
 pub enum IngestGetPipelineParts<'b> {
     #[doc = "No parts"]
@@ -205,7 +205,7 @@ impl<'b> IngestGetPipelineParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             IngestGetPipelineParts::None => "/_ingest/pipeline".into(),
-            IngestGetPipelineParts::Id(ref id) => {
+            IngestGetPipelineParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_id.len());
                 p.push_str("/_ingest/pipeline/");
@@ -322,7 +322,7 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ingest Processor Grok API"]
 pub enum IngestProcessorGrokParts {
     #[doc = "No parts"]
@@ -434,7 +434,7 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ingest Put Pipeline API"]
 pub enum IngestPutPipelineParts<'b> {
     #[doc = "Id"]
@@ -444,7 +444,7 @@ impl<'b> IngestPutPipelineParts<'b> {
     #[doc = "Builds a relative URL path to the Ingest Put Pipeline API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestPutPipelineParts::Id(ref id) => {
+            IngestPutPipelineParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(18usize + encoded_id.len());
                 p.push_str("/_ingest/pipeline/");
@@ -595,7 +595,7 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ingest Simulate API"]
 pub enum IngestSimulateParts<'b> {
     #[doc = "No parts"]
@@ -608,7 +608,7 @@ impl<'b> IngestSimulateParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             IngestSimulateParts::None => "/_ingest/pipeline/_simulate".into(),
-            IngestSimulateParts::Id(ref id) => {
+            IngestSimulateParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(28usize + encoded_id.len());
                 p.push_str("/_ingest/pipeline/");

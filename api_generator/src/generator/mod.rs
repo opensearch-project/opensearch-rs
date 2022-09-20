@@ -29,7 +29,6 @@ use std::{
     hash::{Hash, Hasher},
     io::Read,
     marker::PhantomData,
-    path::PathBuf,
     str::FromStr,
 };
 
@@ -42,7 +41,6 @@ use void::Void;
 pub mod code_gen;
 pub mod output;
 
-use itertools::Itertools;
 use output::{merge_file, write_file};
 use std::cmp::Ordering;
 
@@ -201,7 +199,7 @@ impl Default for TypeKind {
 }
 
 /// Details about a deprecated API url path
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Deprecated {
     pub version: String,
     pub description: String,
@@ -255,7 +253,7 @@ pub struct Url {
 }
 
 /// Body of an API endpoint
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Body {
     pub description: Option<String>,
     pub required: Option<bool>,
@@ -273,7 +271,7 @@ where
 }
 
 /// A Documentation URL string
-#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct DocumentationUrlString(
     #[serde(deserialize_with = "documentation_url_string")] pub String,
 );
@@ -286,8 +284,7 @@ impl DocumentationUrlString {
 
     fn replace_version_in_url(s: String) -> String {
         match url::Url::parse(&s) {
-            Ok(u) => {
-                let mut u = u;
+            Ok(mut u) => {
                 if u.path().contains("/master") {
                     u.set_path(
                         u.path()
@@ -307,7 +304,7 @@ impl DocumentationUrlString {
                             .as_str(),
                     );
                 }
-                u.into_string()
+                u.to_string()
             }
             Err(_) => s,
         }
@@ -317,7 +314,7 @@ impl DocumentationUrlString {
 impl core::ops::Deref for DocumentationUrlString {
     type Target = String;
 
-    fn deref(self: &'_ Self) -> &'_ Self::Target {
+    fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
@@ -329,7 +326,7 @@ impl fmt::Display for DocumentationUrlString {
 }
 
 /// Documentation for an API endpoint
-#[derive(Debug, PartialEq, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Clone)]
 pub struct Documentation {
     pub url: Option<DocumentationUrlString>,
     pub description: Option<String>,
@@ -481,6 +478,12 @@ impl ApiNamespace {
     }
 }
 
+impl Default for ApiNamespace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Common parameters accepted by all API endpoints
 #[derive(Debug, PartialEq, Deserialize, Clone)]
 pub struct Common {
@@ -515,16 +518,13 @@ impl Eq for ApiEnum {}
 /// Generates all client source code from the REST API spec
 pub fn generate(
     branch: &str,
-    download_dir: &PathBuf,
-    generated_dir: &PathBuf,
+    download_dir: &std::path::Path,
+    generated_dir: &std::path::Path,
 ) -> Result<(), failure::Error> {
     // read the Api from file
     let api = read_api(branch, download_dir)?;
 
-    let docs_dir = {
-        let d = download_dir.clone();
-        d.parent().unwrap().join("docs")
-    };
+    let docs_dir = download_dir.parent().unwrap().join("docs");
 
     // generated file tracking lists
     let mut tracker = GeneratedFiles::default();
@@ -554,7 +554,7 @@ pub fn generate(
         write_file(
             input,
             Some(&docs_file),
-            &generated_dir,
+            generated_dir,
             format!("{}.rs", name).as_str(),
             &mut tracker,
         )?;
@@ -588,7 +588,7 @@ pub use bulk::*;
         &mut tracker,
     )?;
 
-    let mut generated = generated_dir.clone();
+    let mut generated = generated_dir.to_path_buf();
     generated.push(GENERATED_TOML);
 
     fs::write(generated, toml::to_string_pretty(&tracker)?)?;
@@ -597,7 +597,7 @@ pub use bulk::*;
 }
 
 /// Reads Api from a directory of REST Api specs
-pub fn read_api(branch: &str, download_dir: &PathBuf) -> Result<Api, failure::Error> {
+pub fn read_api(branch: &str, download_dir: &std::path::Path) -> Result<Api, failure::Error> {
     let paths = fs::read_dir(download_dir)?;
     let mut namespaces = BTreeMap::<String, ApiNamespace>::new();
     let mut enums: HashSet<ApiEnum> = HashSet::new();
@@ -714,7 +714,7 @@ where
         .paths
         .iter()
         .map(|p| &p.deprecated)
-        .fold1(|d1, d2| Deprecated::combine(d1, d2))
+        .reduce(Deprecated::combine)
         .unwrap_or(&None);
 
     if let Some(deprecated) = deprecation {

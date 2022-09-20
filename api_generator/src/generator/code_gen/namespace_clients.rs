@@ -16,16 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-use crate::generator::{
-    code_gen::{request::request_builder::RequestBuilder, *},
-    *,
-};
+use crate::generator::{code_gen::request::request_builder::RequestBuilder, Api};
 use inflector::Inflector;
 use quote::Tokens;
-use std::path::PathBuf;
+use std::path::Path;
+
+use super::{doc, ident, stability_doc, use_declarations};
 
 /// Generates the source code for a namespaced client
-pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, failure::Error> {
+pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, failure::Error> {
     let mut output = Vec::new();
 
     for (namespace_name, namespace) in &api.namespaces {
@@ -41,7 +40,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, 
         tokens.append(use_declarations());
 
         let namespace_pascal_case = namespace_name.to_pascal_case();
-        let namespace_replaced_pascal_case = namespace_name.replace("_", " ").to_pascal_case();
+        let namespace_replaced_pascal_case = namespace_name.replace('_', " ").to_pascal_case();
         let namespace_client_name = ident(&namespace_pascal_case);
         let name_for_docs = match namespace_replaced_pascal_case.as_ref() {
             "Ccr" => "Cross Cluster Replication",
@@ -61,7 +60,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, 
             "Creates a new instance of [{}]",
             &namespace_pascal_case
         ));
-        let namespace_name = ident(namespace_name.to_string());
+        let namespace_name = ident(namespace_name);
 
         let (builders, methods): (Vec<Tokens>, Vec<Tokens>) = namespace
             .endpoints()
@@ -74,7 +73,7 @@ pub fn generate(api: &Api, docs_dir: &PathBuf) -> Result<Vec<(String, String)>, 
                     name,
                     &builder_name,
                     &api.common_params,
-                    &endpoint,
+                    endpoint,
                     false,
                 )
                 .build()

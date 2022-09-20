@@ -16,15 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-extern crate api_generator;
-extern crate dialoguer;
 
 use api_generator::{generator, rest_spec};
 use dialoguer::Input;
 use std::{
     fs::{self, File},
     io::Write,
-    path::PathBuf,
+    path::Path,
 };
 
 fn main() -> Result<(), failure::Error> {
@@ -34,15 +32,14 @@ fn main() -> Result<(), failure::Error> {
         .unwrap();
 
     // This must be run from the repo root directory, with cargo make generate-api
-    let download_dir = fs::canonicalize(PathBuf::from("./api_generator/rest_specs"))?;
-    let generated_dir = fs::canonicalize(PathBuf::from("./opensearch/src"))?;
-    let last_downloaded_version =
-        PathBuf::from("./api_generator/rest_specs/last_downloaded_version");
+    let download_dir = fs::canonicalize(Path::new("./api_generator/rest_specs"))?;
+    let generated_dir = fs::canonicalize(Path::new("./opensearch/src"))?;
+    let last_downloaded_version = Path::new("./api_generator/rest_specs/last_downloaded_version");
 
     let mut download_specs = false;
     let mut answer = String::new();
     let default_branch = if last_downloaded_version.exists() {
-        fs::read_to_string(&last_downloaded_version)?
+        fs::read_to_string(last_downloaded_version)?
     } else {
         String::from("master")
     };
@@ -76,7 +73,7 @@ fn main() -> Result<(), failure::Error> {
         fs::remove_dir_all(&download_dir)?;
         fs::create_dir_all(&download_dir)?;
         rest_spec::download_specs(&branch, &download_dir)?;
-        File::create(&last_downloaded_version)?.write_all(branch.as_bytes())?;
+        File::create(last_downloaded_version)?.write_all(branch.as_bytes())?;
     }
 
     // only offer to generate if there are downloaded specs

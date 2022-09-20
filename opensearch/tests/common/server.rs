@@ -78,7 +78,9 @@ where
             .enable_all()
             .build()
             .expect("new rt");
-        let srv = rt.block_on(async move {
+
+        let srv = {
+            let _guard = rt.enter();
             hyper::Server::bind(&([127, 0, 0, 1], 0).into()).serve(hyper::service::make_service_fn(
                 move |_| {
                     let func = func.clone();
@@ -90,7 +92,7 @@ where
                     }
                 },
             ))
-        });
+        };
 
         let addr = srv.local_addr();
         let (shutdown_tx, shutdown_rx) = oneshot::channel();

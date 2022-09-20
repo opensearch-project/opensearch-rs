@@ -67,7 +67,7 @@ fn ident<I: AsRef<str>>(name: I) -> syn::Ident {
 fn doc<I: Into<String>>(comment: I) -> syn::Attribute {
     syn::Attribute {
         style: syn::AttrStyle::Outer,
-        value: syn::MetaItem::NameValue(ident("doc".to_string()), lit(comment)),
+        value: syn::MetaItem::NameValue(ident("doc"), lit(comment)),
         is_sugared_doc: true,
     }
 }
@@ -94,7 +94,7 @@ happen in minor versions.
 
 /// AST for an expression parsed from quoted tokens
 pub fn parse_expr(input: quote::Tokens) -> syn::Expr {
-    syn::parse_expr(input.to_string().as_ref()).unwrap()
+    syn::parse_expr(input.as_str()).unwrap()
 }
 
 /// Ensures that the name generated is one that is valid for Rust
@@ -140,7 +140,7 @@ pub trait GetPath {
 impl GetPath for syn::Ty {
     fn get_path(&self) -> &syn::Path {
         match *self {
-            syn::Ty::Path(_, ref p) => &p,
+            syn::Ty::Path(_, ref p) => p,
             ref p => panic!("Expected syn::Ty::Path, but found {:?}", p),
         }
     }
@@ -148,7 +148,7 @@ impl GetPath for syn::Ty {
 
 impl GetPath for syn::Path {
     fn get_path(&self) -> &syn::Path {
-        &self
+        self
     }
 }
 
@@ -176,7 +176,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
         TypeKind::List => {
             v.push_str("&'b [");
             v.push_str(str_type);
-            v.push_str("]");
+            v.push(']');
         }
         TypeKind::Enum => match name {
             // opened https://github.com/elastic/elasticsearch/issues/53212
@@ -185,7 +185,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
                 // Expand wildcards should
                 v.push_str("&'b [");
                 v.push_str(name.to_pascal_case().as_str());
-                v.push_str("]");
+                v.push(']');
             }
             _ => v.push_str(name.to_pascal_case().as_str()),
         },
@@ -215,7 +215,7 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
     };
 
     if !required {
-        v.push_str(">");
+        v.push('>');
     }
 
     syn::parse_type(v.as_str()).unwrap()

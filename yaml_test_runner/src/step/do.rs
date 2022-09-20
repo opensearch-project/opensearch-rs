@@ -318,7 +318,7 @@ impl ApiCall {
         let api_call = endpoint.full_name.as_ref().unwrap();
         let parts = Self::generate_parts(api_call, endpoint, &parts)?;
         let params = Self::generate_params(api, endpoint, &params)?;
-        let function = syn::Ident::from(api_call.replace(".", "()."));
+        let function = syn::Ident::from(api_call.replace('.', "()."));
         let namespace: Option<String> = if api_call.contains('.') {
             let namespaces: Vec<&str> = api_call.splitn(2, '.').collect();
             Some(namespaces[0].to_string())
@@ -412,10 +412,8 @@ impl ApiCall {
 
                                         match ok_or_accumulate(&idents) {
                                             Ok(_) => {
-                                                let idents: Vec<Tokens> = idents
-                                                    .into_iter()
-                                                    .filter_map(Result::ok)
-                                                    .collect();
+                                                let idents =
+                                                    idents.into_iter().filter_map(Result::ok);
 
                                                 tokens.append(quote! {
                                                     .#param_ident(&[#(#idents),*])
@@ -431,7 +429,7 @@ impl ApiCall {
                                     }
                                 }
                                 TypeKind::List => {
-                                    let values: Vec<&str> = s.split(',').collect();
+                                    let values = s.split(',');
                                     tokens.append(quote! {
                                         .#param_ident(&[#(#values),*])
                                     })
@@ -443,9 +441,7 @@ impl ApiCall {
                                     Err(e) => {
                                         return Err(failure::err_msg(format!(
                                             r#"cannot parse bool from "{}" for param "{}", {}"#,
-                                            s,
-                                            n,
-                                            e.to_string()
+                                            s, n, e
                                         )))
                                     }
                                 },
@@ -456,9 +452,7 @@ impl ApiCall {
                                     Err(e) => {
                                         return Err(failure::err_msg(format!(
                                             r#"cannot parse f64 from "{}" for param "{}", {}"#,
-                                            s,
-                                            n,
-                                            e.to_string()
+                                            s, n, e
                                         )))
                                     }
                                 },
@@ -476,9 +470,7 @@ impl ApiCall {
                                             Err(e) => {
                                                 return Err(failure::err_msg(format!(
                                                     r#"cannot parse i32 from "{}" for param "{}", {}"#,
-                                                    s,
-                                                    n,
-                                                    e.to_string()
+                                                    s, n, e
                                                 )))
                                             }
                                         }
@@ -589,8 +581,7 @@ impl ApiCall {
 
                                 match ok_or_accumulate(&result) {
                                     Ok(_) => {
-                                        let result: Vec<Tokens> =
-                                            result.into_iter().filter_map(Result::ok).collect();
+                                        let result = result.into_iter().filter_map(Result::ok);
 
                                         tokens.append(quote! {
                                             .#param_ident(&[#(#result),*])
@@ -658,7 +649,7 @@ impl ApiCall {
     ) -> Result<Option<Tokens>, failure::Error> {
         // TODO: ideally, this should share the logic from EnumBuilder
         let enum_name = {
-            let name = api_call.to_pascal_case().replace(".", "");
+            let name = api_call.to_pascal_case().replace('.', "");
             syn::Ident::from(format!("{}Parts", name))
         };
 
@@ -668,15 +659,10 @@ impl ApiCall {
         // Also, short circuit for tests where the only parts specified are null
         // e.g. security API test. It seems these should simply omit the value though...
         if parts.is_empty() || parts.iter().all(|(_, v)| v.is_null()) {
-            let param_counts = endpoint
-                .url
-                .paths
-                .iter()
-                .map(|p| p.path.params().len())
-                .collect::<Vec<usize>>();
+            let mut param_counts = endpoint.url.paths.iter().map(|p| p.path.params().len());
 
             // check there's actually a None value
-            if !param_counts.contains(&0) {
+            if !param_counts.any(|c| c == 0) {
                 return Err(failure::err_msg(format!(
                     r#"no path for "{}" API with no url parts"#,
                     api_call
@@ -710,11 +696,11 @@ impl ApiCall {
                             return false;
                         }
 
-                        let contains = parts
-                            .iter()
-                            .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None })
-                            .collect::<Vec<_>>();
-                        contains.len() == parts.len()
+                        let contains =
+                            parts
+                                .iter()
+                                .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None });
+                        contains.count() == parts.len()
                     })
                     .collect::<Vec<_>>();
 
@@ -764,17 +750,14 @@ impl ApiCall {
 
                         match ty.ty {
                             TypeKind::List => {
-                                let values: Vec<Tokens> = s
-                                    .split(',')
-                                    .map(|s| {
-                                        if is_set_value {
-                                            let set_value = Self::from_set_value(s);
-                                            quote! { #set_value.as_str().unwrap() }
-                                        } else {
-                                            quote! { #s }
-                                        }
-                                    })
-                                    .collect();
+                                let values = s.split(',').map(|s| {
+                                    if is_set_value {
+                                        let set_value = Self::from_set_value(s);
+                                        quote! { #set_value.as_str().unwrap() }
+                                    } else {
+                                        quote! { #s }
+                                    }
+                                });
                                 Ok(quote! { &[#(#values),*] })
                             }
                             TypeKind::Long => {
@@ -847,8 +830,7 @@ impl ApiCall {
 
         match ok_or_accumulate(&part_tokens) {
             Ok(_) => {
-                let part_tokens: Vec<Tokens> =
-                    part_tokens.into_iter().filter_map(Result::ok).collect();
+                let part_tokens = part_tokens.into_iter().filter_map(Result::ok);
                 Ok(Some(
                     quote! { #enum_name::#variant_name(#(#part_tokens),*) },
                 ))
@@ -885,14 +867,10 @@ impl ApiCall {
                         json.split(char::is_whitespace).collect::<Vec<_>>()
                     };
 
-                    let values: Vec<Tokens> = split
-                        .into_iter()
-                        .filter(|s| !s.is_empty())
-                        .map(|s| {
-                            let ident = syn::Ident::from(s);
-                            quote! { JsonBody::from(json!(#ident)) }
-                        })
-                        .collect();
+                    let values = split.into_iter().filter(|s| !s.is_empty()).map(|s| {
+                        let ident = syn::Ident::from(s);
+                        quote! { JsonBody::from(json!(#ident)) }
+                    });
                     Ok(Some(quote!(.body(vec![#(#values),*]))))
                 } else {
                     let ident = syn::Ident::from(json);
@@ -908,22 +886,19 @@ impl ApiCall {
 
                 if endpoint.supports_nd_body() {
                     let values: Vec<serde_json::Value> = serde_yaml::from_str(&s)?;
-                    let json: Vec<Tokens> = values
-                        .iter()
-                        .map(|value| {
-                            let mut json = serde_json::to_string(&value).unwrap();
-                            if value.is_string() {
-                                json = replace_set(&json);
-                                let ident = syn::Ident::from(json);
-                                quote!(#ident)
-                            } else {
-                                json = replace_set(json);
-                                json = replace_i64(json);
-                                let ident = syn::Ident::from(json);
-                                quote!(JsonBody::from(json!(#ident)))
-                            }
-                        })
-                        .collect();
+                    let json = values.iter().map(|value| {
+                        let mut json = serde_json::to_string(&value).unwrap();
+                        if value.is_string() {
+                            json = replace_set(&json);
+                            let ident = syn::Ident::from(json);
+                            quote!(#ident)
+                        } else {
+                            json = replace_set(json);
+                            json = replace_i64(json);
+                            let ident = syn::Ident::from(json);
+                            quote!(JsonBody::from(json!(#ident)))
+                        }
+                    });
                     Ok(Some(quote!(.body(vec![ #(#json),* ]))))
                 } else {
                     let value: serde_json::Value = serde_yaml::from_str(&s)?;

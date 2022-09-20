@@ -36,6 +36,19 @@ condition = { env_set = [ "OPENSEARCH_URL" ], env_true = ["CARGO_MAKE_CI"] }
 script = ["cargo test -p yaml_test_runner -- --test-threads 1 -Z unstable-options --format json | tee test_results/results.json"]
 dependencies = ["generate-yaml-tests"]
 
+[tasks.set-coverage-vars]
+description = "Set environment variables to enable coverage data"
+private = true
+condition = { env_true = [ "CARGO_MAKE_CI" ] }
+env = { "RUSTFLAGS" = "-C instrument-coverage", "LLVM_PROFILE_FILE" = "${CARGO_MAKE_WORKING_DIRECTORY}/test_results/opensearch-%m.profraw" }
+
+[tasks.convert-coverage-data]
+description = "Convert coverage data to lcov format"
+private = true
+condition = { env_true = [ "CARGO_MAKE_CI" ] }
+command = "grcov"
+args = ["./test_results", "-s", ".", "--binary-path", "./target/debug", "-t", "lcov", "--branch", "--ignore-not-existing", "--llvm", "-o", "./test_results/opensearch.lcov"]
+
 [tasks.test-opensearch]
 category = "OpenSearch"
 private = true
@@ -124,7 +137,7 @@ env = { "CLEANUP" = true, "DETACH" = false }
 category = "OpenSearch"
 description = "Generates and runs yaml_test_runner package platinum/free tests against a given OpenSearch version"
 condition = { env_set = [ "STACK_VERSION"] }
-dependencies = ["generate-yaml-tests", "create-test-results-dir", "test-yaml-test-runner", "test-yaml-test-runner-ci", "convert-test-results-junit"]
+dependencies = ["set-coverage-vars", "generate-yaml-tests", "create-test-results-dir", "test-yaml-test-runner", "test-yaml-test-runner-ci", "convert-coverage-data", "convert-test-results-junit"]
 run_task = "stop-opensearch"
 
 [tasks.test-generator]

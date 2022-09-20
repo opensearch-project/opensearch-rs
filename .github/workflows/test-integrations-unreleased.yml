@@ -47,3 +47,8 @@ jobs:
 
       - name: Integ OpenSearch ${{ matrix.entry.opensearch_ref }} secured=false
         run: "./.ci/run-tests opensearch SNAPSHOT false"
+
+      - uses: codecov/codecov-action@v3
+        with:
+          files: ./test_results/opensearch.lcov
+          flags: integration

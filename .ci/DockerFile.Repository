@@ -13,7 +13,9 @@ RUN set -eux; \
         pkg-config \
         ; \
     cargo install --force cargo-make; \
-    cargo install cargo2junit;
+    cargo install cargo2junit; \
+    rustup component add llvm-tools-preview; \
+    cargo install grcov;
 
 # create app directory
 WORKDIR /usr/src/opensearch-rs

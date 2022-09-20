@@ -36,4 +36,8 @@ jobs:
             components: rustfmt, clippy
       - name: Integ OpenSearch ${{ matrix.entry.version }} secured=${{ matrix.secured }}
         run: "./.ci/run-tests opensearch ${{ matrix.entry.version }} ${{ matrix.secured }}"
+      - uses: codecov/codecov-action@v3
+        with:
+          files: ./test_results/opensearch.lcov
+          flags: integration
         

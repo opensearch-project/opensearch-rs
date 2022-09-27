@@ -3,6 +3,7 @@ name: Clippy check
 jobs:
   clippy_check:
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1

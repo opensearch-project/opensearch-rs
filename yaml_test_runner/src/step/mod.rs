@@ -30,6 +30,7 @@
 
 use crate::regex::*;
 use api_generator::generator::Api;
+use proc_macro2::TokenStream;
 use std::fmt::Write;
 use yaml_rust::{Yaml, YamlEmitter};
 
@@ -144,9 +145,9 @@ impl Expr {
         s == "$body"
     }
 
-    pub fn expression(&self) -> String {
+    pub fn expression(&self) -> TokenStream {
         if self.is_body() {
-            self.expr.clone()
+            syn::parse_str(&self.expr).unwrap()
         } else {
             let mut values = Vec::new();
             let mut value = String::new();
@@ -202,7 +203,7 @@ impl Expr {
                     write!(expr, "[\"{}\"]", s).unwrap();
                 }
             }
-            expr
+            syn::parse_str(&expr).unwrap()
         }
     }
 }

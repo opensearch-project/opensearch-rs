@@ -30,18 +30,9 @@
 
 #![recursion_limit = "256"]
 
-extern crate api_generator;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate quote;
-
-extern crate simple_logger;
-
 use clap::{App, Arg};
-use log::LevelFilter;
+use log::{error, info, LevelFilter};
+use reqwest::blocking::ClientBuilder;
 use serde_json::Value;
 use std::{
     fs,
@@ -152,13 +143,13 @@ fn main() -> Result<(), failure::Error> {
 fn branch_suite_and_version_from_opensearch(
     url: &str,
 ) -> Result<(String, TestSuite, semver::Version), failure::Error> {
-    let client = reqwest::ClientBuilder::new()
+    let client = ClientBuilder::new()
         .danger_accept_invalid_certs(true)
         .build()?;
 
     let suite = TestSuite::Free;
 
-    let mut response = client.get(url).basic_auth("admin", Some("admin")).send()?;
+    let response = client.get(url).basic_auth("admin", Some("admin")).send()?;
     let json: Value = response.json()?;
     let branch = json["version"]["build_hash"].as_str().unwrap().to_string();
 

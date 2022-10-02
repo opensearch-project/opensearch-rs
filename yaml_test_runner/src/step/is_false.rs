@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::Expr;
-use quote::{ToTokens, Tokens};
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct IsFalse {
@@ -54,16 +55,15 @@ impl IsFalse {
 }
 
 impl ToTokens for IsFalse {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         if self.expr.is_body() {
-            tokens.append(quote! {
+            tokens.append_all(quote! {
                 assert!(text.is_empty(), "expected value to be empty but was {}", &text);
             });
         } else {
             let expr = self.expr.expression();
-            let ident = syn::Ident::from(expr.as_str());
-            tokens.append(quote! {
-                assert_is_false!(&json#ident);
+            tokens.append_all(quote! {
+                crate::assert_is_false!(&json#expr);
             });
         }
     }

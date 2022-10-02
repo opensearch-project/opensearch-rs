@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::Expr;
-use quote::{ToTokens, Tokens};
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub const OPERATORS: [&str; 4] = ["lt", "lte", "gt", "gte"];
@@ -65,30 +66,34 @@ impl Comparison {
         })
     }
 
-    fn assert<T: PartialOrd + ToTokens>(&self, t: T, expr: &str, op: &str, tokens: &mut Tokens) {
-        let ident = syn::Ident::from(expr);
-        let op_ident = syn::Ident::from(op);
-        tokens.append(quote! {
-            assert_comparison!(&json#ident, #op_ident #t);
+    fn assert<T: PartialOrd + ToTokens>(
+        &self,
+        t: T,
+        expr: TokenStream,
+        op: syn::BinOp,
+        tokens: &mut TokenStream,
+    ) {
+        tokens.append_all(quote! {
+            crate::assert_comparison!(&json#expr, #op #t);
         });
     }
 }
 
 impl ToTokens for Comparison {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let expr = self.expr.expression();
         let op = match self.op.as_str() {
-            "lte" => "<=",
-            "lt" => "<",
-            "gt" => ">",
-            "gte" => ">=",
+            "lte" => syn::BinOp::Le(syn::token::Le(Span::call_site())),
+            "lt" => syn::BinOp::Lt(syn::token::Lt(Span::call_site())),
+            "gt" => syn::BinOp::Gt(syn::token::Gt(Span::call_site())),
+            "gte" => syn::BinOp::Ge(syn::token::Ge(Span::call_site())),
             n => panic!("unsupported op {}", n),
         };
 
         match self.value.as_i64() {
-            Some(i) => self.assert(i, &expr, op, tokens),
+            Some(i) => self.assert(i, expr, op, tokens),
             None => match self.value.as_f64() {
-                Some(f) => self.assert(f, &expr, op, tokens),
+                Some(f) => self.assert(f, expr, op, tokens),
                 None => {
                     match self.value.as_str() {
                         // handle "set" values
@@ -97,11 +102,9 @@ impl ToTokens for Comparison {
                                 .trim_start_matches('$')
                                 .trim_start_matches('{')
                                 .trim_end_matches('}');
-                            let expr_ident = syn::Ident::from(expr.as_str());
-                            let ident = syn::Ident::from(s);
-                            let op_ident = syn::Ident::from(op);
-                            tokens.append(quote! {
-                                assert_comparison_from_set_value!(&json#expr_ident, #op_ident #ident);
+                            let ident = syn::Ident::new(s, Span::call_site());
+                            tokens.append_all(quote! {
+                                crate::assert_comparison_from_set_value!(&json#expr, #op #ident);
                             });
                         }
                         _ => panic!("Expected i64 or f64 but found {:?}", &self.value),

@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::Expr;
-use quote::{ToTokens, Tokens};
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct IsTrue {
@@ -54,10 +55,10 @@ impl IsTrue {
 }
 
 impl ToTokens for IsTrue {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         if self.expr.is_body() {
             // for a HEAD request, the body is expected to be empty, so check the status code instead.
-            tokens.append(quote! {
+            tokens.append_all(quote! {
                 match method {
                     Method::Head => assert!(status_code.is_success(), "expected successful response for HEAD request but was {}", status_code.as_u16()),
                     _ => assert!(!text.is_empty(), "expected value to be true (not empty) but was {}", &text),
@@ -65,9 +66,8 @@ impl ToTokens for IsTrue {
             });
         } else {
             let expr = self.expr.expression();
-            let ident = syn::Ident::from(expr.as_str());
-            tokens.append(quote! {
-                assert_is_true!(&json#ident);
+            tokens.append_all(quote! {
+                crate::assert_is_true!(&json#expr);
             });
         }
     }

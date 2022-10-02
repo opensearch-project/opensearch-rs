@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::Expr;
-use quote::{ToTokens, Tokens};
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct Length {
@@ -68,18 +69,17 @@ impl Length {
 }
 
 impl ToTokens for Length {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let len = self.len;
 
         if self.expr.is_body() {
-            tokens.append(quote! {
-                assert_length!(&json, #len);
+            tokens.append_all(quote! {
+                crate::assert_length!(&json, #len);
             });
         } else {
             let expr = self.expr.expression();
-            let ident = syn::Ident::from(expr);
-            tokens.append(quote! {
-                assert_length!(&json#ident, #len);
+            tokens.append_all(quote! {
+                crate::assert_length!(&json#expr, #len);
             });
         }
     }

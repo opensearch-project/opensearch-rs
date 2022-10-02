@@ -31,9 +31,10 @@
 use flate2::read::GzDecoder;
 use globset::Glob;
 use io::Write;
+use log::info;
 use reqwest::{
+    blocking::{ClientBuilder, Response},
     header::{HeaderMap, HeaderValue, USER_AGENT},
-    Response,
 };
 use std::{fs, fs::File, io, path::Path};
 use tar::{Archive, Entry};
@@ -60,7 +61,7 @@ pub fn download_test_suites(branch: &str, download_dir: &Path) -> Result<(), fai
         USER_AGENT,
         HeaderValue::from_str(&format!("opensearch-rs/{}", env!("CARGO_PKG_NAME")))?,
     );
-    let client = reqwest::ClientBuilder::new()
+    let client = ClientBuilder::new()
         .default_headers(headers)
         .build()
         .unwrap();

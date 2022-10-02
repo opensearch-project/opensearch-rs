@@ -33,7 +33,8 @@ use crate::{
     regex::clean_regex,
     step::{json_string_from_yaml, Expr},
 };
-use quote::{ToTokens, Tokens};
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct Match {
@@ -63,7 +64,7 @@ impl Match {
 }
 
 impl ToTokens for Match {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let expr = self.expr.expression();
 
         match &self.value {
@@ -71,18 +72,15 @@ impl ToTokens for Match {
                 if s.starts_with('/') {
                     let s = clean_regex(s);
                     if self.expr.is_body() {
-                        tokens.append(quote! {
-                            assert_regex_match!(&text, #s, true);
+                        tokens.append_all(quote! {
+                            crate::assert_regex_match!(&text, #s, true);
                         });
                     } else {
-                        let ident = syn::Ident::from(expr.as_str());
-                        tokens.append(quote! {
-                            assert_regex_match!(json#ident.as_str().unwrap(), #s, true);
+                        tokens.append_all(quote! {
+                            crate::assert_regex_match!(json#expr.as_str().unwrap(), #s, true);
                         });
                     }
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-
                     // handle set values
                     if s.starts_with('$') {
                         let t = {
@@ -90,15 +88,15 @@ impl ToTokens for Match {
                                 .trim_start_matches('$')
                                 .trim_start_matches('{')
                                 .trim_end_matches('}');
-                            syn::Ident::from(s)
+                            syn::parse_str::<TokenStream>(s).unwrap()
                         };
 
-                        tokens.append(quote! {
-                            assert_match!(json#ident, json!(#t));
+                        tokens.append_all(quote! {
+                            crate::assert_match!(json#expr, json!(#t));
                         });
                     } else {
-                        tokens.append(quote! {
-                            assert_match!(json#ident, json!(#s));
+                        tokens.append_all(quote! {
+                            crate::assert_match!(json#expr, json!(#s));
                         })
                     };
                 }
@@ -107,9 +105,8 @@ impl ToTokens for Match {
                 if self.expr.is_body() {
                     panic!("match on $body with i64");
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-                    tokens.append(quote! {
-                        assert_numeric_match!(json#ident, #i);
+                    tokens.append_all(quote! {
+                        crate::assert_numeric_match!(json#expr, #i);
                     });
                 }
             }
@@ -118,21 +115,19 @@ impl ToTokens for Match {
                 if self.expr.is_body() {
                     panic!("match on $body with f64");
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-                    tokens.append(quote! {
-                        assert_match!(json#ident, json!(#f));
+                    tokens.append_all(quote! {
+                        crate::assert_match!(json#expr, json!(#f));
                     });
                 }
             }
             Yaml::Null => {
                 if self.expr.is_body() {
-                    tokens.append(quote! {
+                    tokens.append_all(quote! {
                         assert!(text.is_empty(), "expected response to be null (empty) but was {}", &text);
                     });
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-                    tokens.append(quote! {
-                        assert_null!(json#ident);
+                    tokens.append_all(quote! {
+                        crate::assert_null!(json#expr);
                     });
                 }
             }
@@ -140,26 +135,21 @@ impl ToTokens for Match {
                 if self.expr.is_body() {
                     panic!("match on $body with bool");
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-                    tokens.append(quote! {
-                        assert_match!(json#ident, json!(#b));
+                    tokens.append_all(quote! {
+                        crate::assert_match!(json#expr, json!(#b));
                     });
                 }
             }
             yaml if yaml.is_array() || yaml.as_hash().is_some() => {
-                let json = {
-                    let s = json_string_from_yaml(yaml);
-                    syn::Ident::from(s)
-                };
+                let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
 
                 if self.expr.is_body() {
-                    tokens.append(quote! {
-                        assert_match!(json, json!(#json));
+                    tokens.append_all(quote! {
+                        crate::assert_match!(json, json!(#json));
                     });
                 } else {
-                    let ident = syn::Ident::from(expr.as_str());
-                    tokens.append(quote! {
-                        assert_match!(json#ident, json!(#json));
+                    tokens.append_all(quote! {
+                        crate::assert_match!(json#expr, json!(#json));
                     });
                 }
             }

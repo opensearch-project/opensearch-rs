@@ -34,9 +34,12 @@ use crate::{
 };
 use api_generator::generator::Api;
 use inflector::Inflector;
+use lazy_static::lazy_static;
+use log::{error, info};
 use opensearch::DEFAULT_ADDRESS;
 use path_slash::PathExt;
-use quote::{ToTokens, Tokens};
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens, TokenStreamExt};
 use regex::Regex;
 use semver::Version;
 use std::{
@@ -133,25 +136,25 @@ impl<'a> YamlTests<'a> {
     }
 
     /// Generates the AST for the Yaml test file
-    pub fn build(self) -> Tokens {
+    pub fn build(self) -> TokenStream {
         let (setup_fn, setup_call) = Self::generate_fixture(&self.setup);
         let (teardown_fn, teardown_call) = Self::generate_fixture(&self.teardown);
         let general_setup_call = quote!(client::general_cluster_setup().await?;);
 
         let tests = self.fn_impls(general_setup_call, setup_call, teardown_call);
 
-        let directives: Vec<Tokens> = self
+        let directives: Vec<TokenStream> = self
             .directives
             .iter()
             .map(|n| {
-                let ident = syn::Ident::from(n.as_str());
+                let ident = syn::Ident::new(n.as_str(), Span::call_site());
                 quote!(use opensearch::#ident::*;)
             })
             .collect();
 
         quote! {
             #![allow(unused_imports, unused_variables, dead_code, deprecated, clippy::redundant_clone, clippy::approx_constant)]
-            use crate::common::{client, macros};
+            use crate::common::client;
             use opensearch::*;
             use opensearch::http::{
                 headers::{HeaderName, HeaderValue},
@@ -170,9 +173,9 @@ impl<'a> YamlTests<'a> {
     }
 
     /// Whether to emit code to read the last response, as text and optionally json
-    pub fn read_response(read_response: bool, tokens: &mut Tokens) -> bool {
+    pub fn read_response(read_response: bool, tokens: &mut TokenStream) -> bool {
         if !read_response {
-            tokens.append(quote! {
+            tokens.append_all(quote! {
                 let (method, status_code, text, json) = client::read_response(response).await?;
             });
         }
@@ -187,10 +190,10 @@ impl<'a> YamlTests<'a> {
 
     fn fn_impls(
         &self,
-        general_setup_call: Tokens,
-        setup_call: Option<Tokens>,
-        teardown_call: Option<Tokens>,
-    ) -> Vec<Option<Tokens>> {
+        general_setup_call: TokenStream,
+        setup_call: Option<TokenStream>,
+        teardown_call: Option<TokenStream>,
+    ) -> Vec<Option<TokenStream>> {
         let mut seen_names = HashSet::new();
 
         self.tests
@@ -207,8 +210,8 @@ impl<'a> YamlTests<'a> {
                     return None;
                 }
 
-                let fn_name = syn::Ident::from(unique_name.as_str());
-                let mut body = Tokens::new();
+                let fn_name = syn::Ident::new(unique_name.as_str(), Span::call_site());
+                let mut body = TokenStream::new();
                 let mut skip : Option<String> = None;
                 let mut read_response = false;
 
@@ -296,9 +299,9 @@ impl<'a> YamlTests<'a> {
     }
 
     /// Generates the AST for the fixture fn and its invocation
-    fn generate_fixture(test_fn: &Option<TestFn>) -> (Option<Tokens>, Option<Tokens>) {
+    fn generate_fixture(test_fn: &Option<TestFn>) -> (Option<TokenStream>, Option<TokenStream>) {
         if let Some(t) = test_fn {
-            let ident = syn::Ident::from(t.name.as_str());
+            let ident = syn::Ident::new(t.name.as_str(), Span::call_site());
 
             // TODO: collect up the do calls for now. We do also need to handle skip, etc.
             let tokens = t
@@ -306,7 +309,7 @@ impl<'a> YamlTests<'a> {
                 .iter()
                 .filter_map(Step::r#do)
                 .map(|d| {
-                    let mut tokens = Tokens::new();
+                    let mut tokens = TokenStream::new();
                     ToTokens::to_tokens(d, &mut tokens);
                     tokens
                 })
@@ -502,15 +505,6 @@ fn write_mod_files(generated_dir: &Path, toplevel: bool) -> Result<(), failure::
 
     // Make sure we have a stable output
     mods.sort();
-
-    if toplevel {
-        // The "common" module must appear first so that its macros are parsed before the
-        // compiler visits other modules, otherwise we'll have "macro not found" errors.
-        mods.retain(|name| name != "pub mod common;");
-        mods.insert(0, "#[macro_use]".into());
-        mods.insert(1, "pub mod common;".into());
-        mods.insert(2, "".into());
-    }
 
     let path = generated_dir.join("mod.rs");
     let mut file = File::create(&path)?;

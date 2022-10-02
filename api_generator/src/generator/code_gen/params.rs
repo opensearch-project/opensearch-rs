@@ -19,7 +19,7 @@
 use crate::generator::code_gen::stability_doc;
 use crate::generator::*;
 use inflector::Inflector;
-use quote::Tokens;
+use proc_macro2::Span;
 use regex::Regex;
 
 pub fn generate(api: &Api) -> Result<String, failure::Error> {
@@ -34,16 +34,22 @@ pub fn generate(api: &Api) -> Result<String, failure::Error> {
     Ok(generated)
 }
 
-fn generate_param(tokens: &mut Tokens, e: &ApiEnum) {
-    let name = syn::Ident::from(e.name.to_pascal_case());
+fn generate_param(tokens: &mut TokenStream, e: &ApiEnum) {
+    let name = syn::Ident::new(&e.name.to_pascal_case(), Span::call_site());
     let (renames, variants): (Vec<String>, Vec<syn::Ident>) = e
         .values
         .iter()
         .map(|v| {
             if v.is_empty() {
-                (v.to_owned(), syn::Ident::from("Unspecified"))
+                (
+                    v.to_owned(),
+                    syn::Ident::new("Unspecified", Span::call_site()),
+                )
             } else if !v.contains('(') {
-                (v.to_owned(), syn::Ident::from(v.to_pascal_case()))
+                (
+                    v.to_owned(),
+                    syn::Ident::new(&v.to_pascal_case(), Span::call_site()),
+                )
             } else {
                 lazy_static! {
                     static ref PARENS_REGEX: Regex = Regex::new(r"^(.*?)\s*\(.*?\)\s*$").unwrap();
@@ -51,10 +57,16 @@ fn generate_param(tokens: &mut Tokens, e: &ApiEnum) {
                 if let Some(c) = PARENS_REGEX.captures(v) {
                     (
                         c.get(1).unwrap().as_str().to_owned(),
-                        syn::Ident::from(c.get(1).unwrap().as_str().to_pascal_case()),
+                        syn::Ident::new(
+                            &c.get(1).unwrap().as_str().to_pascal_case(),
+                            Span::call_site(),
+                        ),
                     )
                 } else {
-                    (v.to_owned(), syn::Ident::from(v.to_pascal_case()))
+                    (
+                        v.to_owned(),
+                        syn::Ident::new(&v.to_pascal_case(), Span::call_site()),
+                    )
                 }
             }
         })
@@ -75,5 +87,5 @@ fn generate_param(tokens: &mut Tokens, e: &ApiEnum) {
         }
     );
 
-    tokens.append(generated_enum_tokens);
+    tokens.append_all(generated_enum_tokens);
 }

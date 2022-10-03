@@ -377,9 +377,6 @@ mod readme {
     external_doc_test!(include_str!("../../README.md"));
 }
 
-#[macro_use]
-extern crate dyn_clone;
-
 pub mod auth;
 pub mod cert;
 pub mod http;

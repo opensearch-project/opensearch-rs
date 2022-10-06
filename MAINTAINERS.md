@@ -29,11 +29,11 @@ This document explains who the maintainers are (see below), what they do in this
 
 ## Current Maintainers
 
-| Maintainer               | GitHub ID                               | Affiliation |
-| ------------------------ | --------------------------------------- | ----------- |
-| Aditya Jindal            | [aditjind](https://github.com/aditjind) | Amazon      |
-| Daniel Doubrovkine       | [dblock](https://github.com/dblock)     | Amazon      |
-| Thomas Farr              | [xtansia](https://github.com/xtansia)   | Amazon      |
+| Maintainer               | GitHub ID                                                          | Affiliation |
+| ------------------------ | ------------------------------------------------------------------ | ----------- |
+| Daniel Doubrovkine       | [dblock](https://github.com/dblock)                                |   Amazon    |
+| Thomas Farr              | [Xtansia](https://github.com/Xtansia)                              |   Amazon    |
+| Aditya Jindal            | [aditjind](https://github.com/aditjind)                            |  aditjind   |
 
 ## Maintainer Responsibilities
 

@@ -8,8 +8,6 @@ This document explains who the admins are (see below), what they do in this repo
 | -------------------------| --------------------------------------- | ----------- |
 | Charlotte                | [CEHENKLE](https://github.com/cehenkle) | Amazon |
 | Henri Yandell            | [hyandell](https://github.com/hyandell) | Amazon |
-| Aditya Jindal                | [ADITJIND](https://github.com/ADITJIND) | Amazon |
-
 
 ## Admin Responsibilities
 

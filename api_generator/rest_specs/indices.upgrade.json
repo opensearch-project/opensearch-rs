@@ -5,6 +5,10 @@
       "description":"DEPRECATED Upgrades to the current version of Lucene."
     },
     "stability":"stable",
+    "deprecated":{
+      "version":"8.0.0",
+      "description":"The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."
+    },
     "visibility" : "public",
     "headers":{
       "accept": [ "application/json"]

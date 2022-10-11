@@ -133,6 +133,8 @@ pub struct Type {
     pub options: Vec<Value>,
     #[serde(default)]
     pub default: Option<Value>,
+    #[serde(default)]
+    pub deprecated: Option<Deprecated>,
 }
 
 /// The type of the param or part
@@ -234,6 +236,19 @@ impl Deprecated {
             &None
         }
     }
+
+    pub fn attr(d: &Option<Self>) -> (Option<Tokens>, Option<Tokens>) {
+        match d.as_ref() {
+            Some(d) => {
+                let message = &d.description;
+                (
+                    Some(quote!(#[deprecated = #message])),
+                    Some(quote!(#[allow(deprecated)])),
+                )
+            }
+            None => (None, None),
+        }
+    }
 }
 
 /// An API url path
@@ -304,7 +319,7 @@ impl DocumentationUrlString {
                             .as_str(),
                     );
                 }
-                u.to_string()
+                u.into()
             }
             Err(_) => s,
         }
@@ -717,7 +732,7 @@ where
         .reduce(Deprecated::combine)
         .unwrap_or(&None);
 
-    if let Some(deprecated) = deprecation {
+    if let (Some(deprecated), true) = (deprecation, endpoint.deprecated.is_none()) {
         endpoint.deprecated = Some(Deprecated {
             version: deprecated.version.clone(),
             description: "Deprecated via one of the child items".to_string(),

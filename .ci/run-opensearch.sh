@@ -15,15 +15,15 @@ set -euo pipefail
 echo -e "\033[34;1mINFO:\033[0m Take down node if called twice with the same arguments (DETACH=true) or on seperate terminals \033[0m"
 cleanup_node $opensearch_node_name
 
-master_node_name=${opensearch_node_name}
+manager_node_name=${opensearch_node_name}
 cluster_name=search-rest-test
 
 declare -a volumes
 environment=($(cat <<-END
   --env node.name=$opensearch_node_name
   --env cluster.name=$cluster_name
-  --env cluster.initial_master_nodes=$master_node_name
-  --env discovery.seed_hosts=$master_node_name
+  --env cluster.initial_master_nodes=$manager_node_name
+  --env discovery.seed_hosts=$manager_node_name
   --env cluster.routing.allocation.disk.threshold_enabled=false
   --env bootstrap.memory_lock=true
   --env node.attr.testattr=test

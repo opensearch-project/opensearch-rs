@@ -78,6 +78,7 @@ pub struct IndicesAddBlock<'a, 'b, B> {
     parts: IndicesAddBlockParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -103,6 +104,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -130,6 +132,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -142,6 +145,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -173,7 +181,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -209,6 +218,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -223,6 +233,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -664,6 +675,7 @@ pub struct IndicesClone<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesCloneParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -687,6 +699,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -707,6 +720,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -718,6 +732,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -739,7 +758,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -779,6 +799,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -790,6 +811,7 @@ where
                 wait_for_active_shards: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -839,6 +861,7 @@ pub struct IndicesClose<'a, 'b, B> {
     parts: IndicesCloseParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -865,6 +888,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -893,6 +917,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -906,6 +931,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -937,7 +967,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -962,7 +993,7 @@ where
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Sets the number of active shards to wait for before the operation returns. Set to `index-setting` to wait according to the index setting `index.write.wait_for_active_shards`, or `all` to wait for all shards, or an integer. Defaults to `0`."]
+    #[doc = "Sets the number of active shards to wait for before the operation returns."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -978,6 +1009,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -993,6 +1025,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -1041,6 +1074,7 @@ pub struct IndicesCreate<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesCreateParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -1064,6 +1098,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -1084,6 +1119,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -1095,6 +1131,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -1116,7 +1157,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1156,6 +1198,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -1167,6 +1210,7 @@ where
                 wait_for_active_shards: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -1214,6 +1258,7 @@ pub struct IndicesDelete<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesDeleteParts<'b>,
     allow_no_indices: Option<bool>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -1235,6 +1280,7 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
             parts,
             headers,
             allow_no_indices: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -1250,6 +1296,11 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
     #[doc = "Ignore if a wildcard expression resolves to no concrete indices (default: false)"]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Include the stack trace of returned errors."]
@@ -1282,7 +1333,8 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1318,6 +1370,7 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -1332,6 +1385,7 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -1385,6 +1439,7 @@ impl<'b> IndicesDeleteAliasParts<'b> {
 pub struct IndicesDeleteAlias<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesDeleteAliasParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -1403,6 +1458,7 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -1412,6 +1468,11 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
             source: None,
             timeout: None,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -1433,7 +1494,8 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1468,6 +1530,7 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -1478,6 +1541,7 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -1651,6 +1715,7 @@ impl<'b> IndicesDeleteIndexTemplateParts<'b> {
 pub struct IndicesDeleteIndexTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesDeleteIndexTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -1669,6 +1734,7 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -1678,6 +1744,11 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
             source: None,
             timeout: None,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -1699,7 +1770,8 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1734,6 +1806,7 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -1744,6 +1817,7 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -1787,6 +1861,7 @@ impl<'b> IndicesDeleteTemplateParts<'b> {
 pub struct IndicesDeleteTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesDeleteTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -1805,6 +1880,7 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -1814,6 +1890,11 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
             source: None,
             timeout: None,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -1835,7 +1916,8 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1870,6 +1952,7 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -1880,6 +1963,7 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -2006,7 +2090,7 @@ impl<'a, 'b> IndicesExists<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
@@ -2184,7 +2268,7 @@ impl<'a, 'b> IndicesExistsAlias<'a, 'b> {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
@@ -2272,6 +2356,7 @@ impl<'b> IndicesExistsIndexTemplateParts<'b> {
 pub struct IndicesExistsIndexTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesExistsIndexTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     flat_settings: Option<bool>,
@@ -2291,6 +2376,7 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             flat_settings: None,
@@ -2301,6 +2387,11 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
             request_timeout: None,
             source: None,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -2327,12 +2418,13 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2362,6 +2454,7 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -2373,6 +2466,7 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 flat_settings: self.flat_settings,
@@ -2419,6 +2513,7 @@ impl<'b> IndicesExistsTemplateParts<'b> {
 pub struct IndicesExistsTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesExistsTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     flat_settings: Option<bool>,
@@ -2438,6 +2533,7 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             flat_settings: None,
@@ -2448,6 +2544,11 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
             request_timeout: None,
             source: None,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -2474,12 +2575,13 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2509,6 +2611,7 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -2520,6 +2623,7 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 flat_settings: self.flat_settings,
@@ -2976,6 +3080,7 @@ pub struct IndicesGet<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesGetParts<'b>,
     allow_no_indices: Option<bool>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -2999,6 +3104,7 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
             parts,
             headers,
             allow_no_indices: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -3016,6 +3122,11 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
     #[doc = "Ignore if a wildcard expression resolves to no concrete indices (default: false)"]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Include the stack trace of returned errors."]
@@ -3058,12 +3169,13 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3094,6 +3206,7 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -3110,6 +3223,7 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -3258,7 +3372,7 @@ impl<'a, 'b> IndicesGetAlias<'a, 'b> {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
@@ -3439,7 +3553,7 @@ impl<'a, 'b> IndicesGetFieldMapping<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
@@ -3534,6 +3648,7 @@ impl<'b> IndicesGetIndexTemplateParts<'b> {
 pub struct IndicesGetIndexTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesGetIndexTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     flat_settings: Option<bool>,
@@ -3553,6 +3668,7 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             flat_settings: None,
@@ -3563,6 +3679,11 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
             request_timeout: None,
             source: None,
         }
+    }
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -3589,12 +3710,13 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3624,6 +3746,7 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -3635,6 +3758,7 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 flat_settings: self.flat_settings,
@@ -3686,6 +3810,7 @@ pub struct IndicesGetMapping<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesGetMappingParts<'b>,
     allow_no_indices: Option<bool>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -3707,6 +3832,7 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
             parts,
             headers,
             allow_no_indices: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -3722,6 +3848,11 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
     #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Include the stack trace of returned errors."]
@@ -3754,12 +3885,14 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[deprecated = "This parameter is a no-op and field mappings are always retrieved locally."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3790,6 +3923,7 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -3804,6 +3938,7 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -3884,6 +4019,7 @@ pub struct IndicesGetSettings<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesGetSettingsParts<'b>,
     allow_no_indices: Option<bool>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -3907,6 +4043,7 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
             parts,
             headers,
             allow_no_indices: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -3924,6 +4061,11 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
     #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Include the stack trace of returned errors."]
@@ -3966,12 +4108,13 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4002,6 +4145,7 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -4018,6 +4162,7 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -4070,6 +4215,7 @@ impl<'b> IndicesGetTemplateParts<'b> {
 pub struct IndicesGetTemplate<'a, 'b> {
     transport: &'a Transport,
     parts: IndicesGetTemplateParts<'b>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     flat_settings: Option<bool>,
@@ -4089,6 +4235,7 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
             transport,
             parts,
             headers,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             flat_settings: None,
@@ -4099,6 +4246,11 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
             request_timeout: None,
             source: None,
         }
+    }
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -4125,12 +4277,13 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from master node (default: false)"]
+    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to master node"]
+    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4160,6 +4313,7 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -4171,6 +4325,7 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 flat_settings: self.flat_settings,
@@ -4190,6 +4345,7 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
         Ok(response)
     }
 }
+#[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Indices Get Upgrade API"]
 pub enum IndicesGetUpgradeParts<'b> {
@@ -4198,6 +4354,7 @@ pub enum IndicesGetUpgradeParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
 }
+#[allow(deprecated)]
 impl<'b> IndicesGetUpgradeParts<'b> {
     #[doc = "Builds a relative URL path to the Indices Get Upgrade API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -4217,6 +4374,8 @@ impl<'b> IndicesGetUpgradeParts<'b> {
     }
 }
 #[doc = "Builder for the [Indices Get Upgrade API](https://opensearch.org/docs/)\n\nDEPRECATED Returns a progress status of current upgrade."]
+#[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
+#[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct IndicesGetUpgrade<'a, 'b> {
     transport: &'a Transport,
@@ -4232,6 +4391,7 @@ pub struct IndicesGetUpgrade<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
+#[allow(deprecated)]
 impl<'a, 'b> IndicesGetUpgrade<'a, 'b> {
     #[doc = "Creates a new instance of [IndicesGetUpgrade] with the specified API parts"]
     pub fn new(transport: &'a Transport, parts: IndicesGetUpgradeParts<'b>) -> Self {
@@ -4513,6 +4673,7 @@ pub struct IndicesOpen<'a, 'b, B> {
     parts: IndicesOpenParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -4539,6 +4700,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -4567,6 +4729,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -4580,6 +4743,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -4611,7 +4779,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4652,6 +4821,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -4667,6 +4837,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -4861,6 +5032,7 @@ pub struct IndicesPutAlias<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesPutAliasParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -4883,6 +5055,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -4902,6 +5075,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -4912,6 +5086,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -4933,7 +5112,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4968,6 +5148,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -4978,6 +5159,7 @@ where
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -5023,6 +5205,7 @@ pub struct IndicesPutIndexTemplate<'a, 'b, B> {
     parts: IndicesPutIndexTemplateParts<'b>,
     body: Option<B>,
     cause: Option<&'b str>,
+    cluster_manager_timeout: Option<&'b str>,
     create: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -5046,6 +5229,7 @@ where
             headers,
             body: None,
             cause: None,
+            cluster_manager_timeout: None,
             create: None,
             error_trace: None,
             filter_path: None,
@@ -5066,6 +5250,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             cause: self.cause,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             create: self.create,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -5080,6 +5265,11 @@ where
     #[doc = "User defined reason for creating/updating the index template"]
     pub fn cause(mut self, cause: &'b str) -> Self {
         self.cause = Some(cause);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Whether the index template should only be added if new or can also replace an existing one"]
@@ -5107,7 +5297,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5138,6 +5329,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 cause: Option<&'b str>,
+                cluster_manager_timeout: Option<&'b str>,
                 create: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -5149,6 +5341,7 @@ where
             }
             let query_params = QueryParams {
                 cause: self.cause,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 create: self.create,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -5197,6 +5390,7 @@ pub struct IndicesPutMapping<'a, 'b, B> {
     parts: IndicesPutMappingParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -5223,6 +5417,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -5251,6 +5446,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -5264,6 +5460,11 @@ where
             timeout: self.timeout,
             write_index_only: self.write_index_only,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -5295,7 +5496,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5336,6 +5538,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -5351,6 +5554,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -5405,6 +5609,7 @@ pub struct IndicesPutSettings<'a, 'b, B> {
     parts: IndicesPutSettingsParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -5432,6 +5637,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -5461,6 +5667,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -5475,6 +5682,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -5511,7 +5723,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5552,6 +5765,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -5568,6 +5782,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -5616,6 +5831,7 @@ pub struct IndicesPutTemplate<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesPutTemplateParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     create: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -5639,6 +5855,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             create: None,
             error_trace: None,
             filter_path: None,
@@ -5659,6 +5876,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             create: self.create,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -5670,6 +5888,11 @@ where
             request_timeout: self.request_timeout,
             source: self.source,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Whether the index template should only be added if new or can also replace an existing one"]
     pub fn create(mut self, create: bool) -> Self {
@@ -5696,7 +5919,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5731,6 +5955,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 create: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -5742,6 +5967,7 @@ where
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 create: self.create,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -6440,6 +6666,7 @@ pub struct IndicesRollover<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesRolloverParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     dry_run: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -6464,6 +6691,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             dry_run: None,
             error_trace: None,
             filter_path: None,
@@ -6485,6 +6713,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             dry_run: self.dry_run,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -6497,6 +6726,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "If set to true the rollover action will only be validated but not actually performed even if a condition matches. The default is false"]
     pub fn dry_run(mut self, dry_run: bool) -> Self {
@@ -6523,7 +6757,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -6563,6 +6798,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 dry_run: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -6575,6 +6811,7 @@ where
                 wait_for_active_shards: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 dry_run: self.dry_run,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -6950,6 +7187,7 @@ pub struct IndicesShrink<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesShrinkParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     copy_settings: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -6974,6 +7212,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             copy_settings: None,
             error_trace: None,
             filter_path: None,
@@ -6995,6 +7234,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             copy_settings: self.copy_settings,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -7007,6 +7247,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "whether or not to copy settings from the source index (defaults to false)"]
     pub fn copy_settings(mut self, copy_settings: bool) -> Self {
@@ -7033,7 +7278,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7073,6 +7319,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 copy_settings: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -7085,6 +7332,7 @@ where
                 wait_for_active_shards: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 copy_settings: self.copy_settings,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -7132,6 +7380,7 @@ pub struct IndicesSimulateIndexTemplate<'a, 'b, B> {
     parts: IndicesSimulateIndexTemplateParts<'b>,
     body: Option<B>,
     cause: Option<&'b str>,
+    cluster_manager_timeout: Option<&'b str>,
     create: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -7155,6 +7404,7 @@ where
             headers,
             body: None,
             cause: None,
+            cluster_manager_timeout: None,
             create: None,
             error_trace: None,
             filter_path: None,
@@ -7175,6 +7425,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             cause: self.cause,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             create: self.create,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -7189,6 +7440,11 @@ where
     #[doc = "User defined reason for dry-run creating the new template for simulation purposes"]
     pub fn cause(mut self, cause: &'b str) -> Self {
         self.cause = Some(cause);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Whether the index template we optionally defined in the body should only be dry-run added if new or can also replace an existing one"]
@@ -7216,7 +7472,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7247,6 +7504,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 cause: Option<&'b str>,
+                cluster_manager_timeout: Option<&'b str>,
                 create: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -7258,6 +7516,7 @@ where
             }
             let query_params = QueryParams {
                 cause: self.cause,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 create: self.create,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -7306,6 +7565,7 @@ pub struct IndicesSimulateTemplate<'a, 'b, B> {
     parts: IndicesSimulateTemplateParts<'b>,
     body: Option<B>,
     cause: Option<&'b str>,
+    cluster_manager_timeout: Option<&'b str>,
     create: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -7329,6 +7589,7 @@ where
             headers,
             body: None,
             cause: None,
+            cluster_manager_timeout: None,
             create: None,
             error_trace: None,
             filter_path: None,
@@ -7349,6 +7610,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             cause: self.cause,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             create: self.create,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -7363,6 +7625,11 @@ where
     #[doc = "User defined reason for dry-run creating the new template for simulation purposes"]
     pub fn cause(mut self, cause: &'b str) -> Self {
         self.cause = Some(cause);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Whether the index template we optionally defined in the body should only be dry-run added if new or can also replace an existing one"]
@@ -7390,7 +7657,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node node"]
+    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7421,6 +7689,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 cause: Option<&'b str>,
+                cluster_manager_timeout: Option<&'b str>,
                 create: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -7432,6 +7701,7 @@ where
             }
             let query_params = QueryParams {
                 cause: self.cause,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 create: self.create,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -7482,6 +7752,7 @@ pub struct IndicesSplit<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesSplitParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     copy_settings: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -7506,6 +7777,7 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             copy_settings: None,
             error_trace: None,
             filter_path: None,
@@ -7527,6 +7799,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             copy_settings: self.copy_settings,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -7539,6 +7812,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "whether or not to copy settings from the source index (defaults to false)"]
     pub fn copy_settings(mut self, copy_settings: bool) -> Self {
@@ -7565,7 +7843,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7605,6 +7884,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 copy_settings: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -7617,6 +7897,7 @@ where
                 wait_for_active_shards: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 copy_settings: self.copy_settings,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -7914,6 +8195,7 @@ pub struct IndicesUnfreeze<'a, 'b, B> {
     parts: IndicesUnfreezeParts<'b>,
     allow_no_indices: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
@@ -7940,6 +8222,7 @@ where
             headers,
             allow_no_indices: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
@@ -7968,6 +8251,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             allow_no_indices: self.allow_no_indices,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -7981,6 +8265,11 @@ where
             timeout: self.timeout,
             wait_for_active_shards: self.wait_for_active_shards,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -8012,7 +8301,8 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -8053,6 +8343,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 allow_no_indices: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -8068,6 +8359,7 @@ where
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -8109,6 +8401,7 @@ pub struct IndicesUpdateAliases<'a, 'b, B> {
     transport: &'a Transport,
     parts: IndicesUpdateAliasesParts,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -8131,6 +8424,7 @@ where
             parts: IndicesUpdateAliasesParts::None,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -8150,6 +8444,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -8160,6 +8455,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -8181,7 +8481,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -8216,6 +8517,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -8226,6 +8528,7 @@ where
                 timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -8244,6 +8547,7 @@ where
         Ok(response)
     }
 }
+#[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Indices Upgrade API"]
 pub enum IndicesUpgradeParts<'b> {
@@ -8252,6 +8556,7 @@ pub enum IndicesUpgradeParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
 }
+#[allow(deprecated)]
 impl<'b> IndicesUpgradeParts<'b> {
     #[doc = "Builds a relative URL path to the Indices Upgrade API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -8271,6 +8576,8 @@ impl<'b> IndicesUpgradeParts<'b> {
     }
 }
 #[doc = "Builder for the [Indices Upgrade API](https://opensearch.org/docs/)\n\nDEPRECATED Upgrades to the current version of Lucene."]
+#[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
+#[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct IndicesUpgrade<'a, 'b, B> {
     transport: &'a Transport,
@@ -8289,6 +8596,7 @@ pub struct IndicesUpgrade<'a, 'b, B> {
     source: Option<&'b str>,
     wait_for_completion: Option<bool>,
 }
+#[allow(deprecated)]
 impl<'a, 'b, B> IndicesUpgrade<'a, 'b, B>
 where
     B: Body,
@@ -8864,6 +9172,8 @@ impl<'a> Indices<'a> {
         IndicesGetTemplate::new(self.transport(), parts)
     }
     #[doc = "[Indices Get Upgrade API](https://opensearch.org/docs/)\n\nDEPRECATED Returns a progress status of current upgrade."]
+    #[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
+    #[allow(deprecated)]
     pub fn get_upgrade<'b>(
         &'a self,
         parts: IndicesGetUpgradeParts<'b>,
@@ -8994,6 +9304,8 @@ impl<'a> Indices<'a> {
         IndicesUpdateAliases::new(self.transport())
     }
     #[doc = "[Indices Upgrade API](https://opensearch.org/docs/)\n\nDEPRECATED Upgrades to the current version of Lucene."]
+    #[deprecated = "The _upgrade API is no longer useful and will be removed. Instead, see _reindex API."]
+    #[allow(deprecated)]
     pub fn upgrade<'b>(&'a self, parts: IndicesUpgradeParts<'b>) -> IndicesUpgrade<'a, 'b, ()> {
         IndicesUpgrade::new(self.transport(), parts)
     }

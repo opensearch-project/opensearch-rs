@@ -150,7 +150,7 @@ impl<'a> YamlTests<'a> {
             .collect();
 
         quote! {
-            #![allow(unused_imports, unused_variables, dead_code, clippy::redundant_clone, clippy::approx_constant)]
+            #![allow(unused_imports, unused_variables, dead_code, deprecated, clippy::redundant_clone, clippy::approx_constant)]
             use crate::common::{client, macros};
             use opensearch::*;
             use opensearch::http::{

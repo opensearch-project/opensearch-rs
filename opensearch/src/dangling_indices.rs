@@ -76,6 +76,7 @@ pub struct DanglingIndicesDeleteDanglingIndex<'a, 'b> {
     transport: &'a Transport,
     parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
     accept_data_loss: Option<bool>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -98,6 +99,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
             parts,
             headers,
             accept_data_loss: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -111,6 +113,11 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
     #[doc = "Must be set to true in order to delete the dangling index"]
     pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
         self.accept_data_loss = Some(accept_data_loss);
+        self
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
     #[doc = "Include the stack trace of returned errors."]
@@ -133,7 +140,8 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -169,6 +177,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 accept_data_loss: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -180,6 +189,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
             }
             let query_params = QueryParams {
                 accept_data_loss: self.accept_data_loss,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -226,6 +236,7 @@ pub struct DanglingIndicesImportDanglingIndex<'a, 'b, B> {
     parts: DanglingIndicesImportDanglingIndexParts<'b>,
     accept_data_loss: Option<bool>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -252,6 +263,7 @@ where
             headers,
             accept_data_loss: None,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -277,6 +289,7 @@ where
             parts: self.parts,
             body: Some(body.into()),
             accept_data_loss: self.accept_data_loss,
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
@@ -287,6 +300,11 @@ where
             source: self.source,
             timeout: self.timeout,
         }
+    }
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -308,7 +326,8 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to master"]
+    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -344,6 +363,7 @@ where
             #[derive(Serialize)]
             struct QueryParams<'b> {
                 accept_data_loss: Option<bool>,
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
@@ -355,6 +375,7 @@ where
             }
             let query_params = QueryParams {
                 accept_data_loss: self.accept_data_loss,
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,

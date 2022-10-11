@@ -64,7 +64,7 @@
       },
       "local":{
         "type":"boolean",
-        "description":"Return local information, do not retrieve the state from master node (default: false)"
+        "description":"Return local information, do not retrieve the state from cluster-manager node (default: false)"
       }
     }
   }

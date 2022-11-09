@@ -535,7 +535,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Cluster Manager API"]
 pub enum CatClusterManagerParts {
     #[doc = "No parts"]

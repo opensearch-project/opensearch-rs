@@ -33,8 +33,10 @@ use crate::regex::{clean_regex, *};
 use api_generator::generator::{Api, ApiEndpoint, TypeKind};
 use inflector::Inflector;
 use itertools::Itertools;
-use quote::{ToTokens, Tokens};
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens};
 use std::collections::BTreeMap;
+use syn::__private::TokenStreamExt;
 use yaml_rust::{Yaml, YamlEmitter};
 
 /// A catch expression on a do step
@@ -47,10 +49,10 @@ impl Catch {
 }
 
 impl ToTokens for Catch {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        fn http_status_code(status_code: u16, tokens: &mut Tokens) {
-            tokens.append(quote! {
-                assert_response_status_code!(response, #status_code);
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        fn http_status_code(status_code: u16, tokens: &mut TokenStream) {
+            tokens.append_all(quote! {
+                crate::assert_response_status_code!(response, #status_code);
             });
         }
 
@@ -62,8 +64,8 @@ impl ToTokens for Catch {
             "request_timeout" => http_status_code(408, tokens),
             "conflict" => http_status_code(409, tokens),
             "request" => {
-                tokens.append(quote! {
-                    assert_request_status_code!(response.status_code());
+                tokens.append_all(quote! {
+                    crate::assert_request_status_code!(response.status_code());
                 });
             }
             "unavailable" => http_status_code(503, tokens),
@@ -72,8 +74,8 @@ impl ToTokens for Catch {
             }
             s => {
                 let t = clean_regex(s);
-                tokens.append(quote! {
-                    assert_regex_match!(&text, #t);
+                tokens.append_all(quote! {
+                    crate::assert_regex_match!(&text, #t);
                 });
             }
         }
@@ -88,7 +90,7 @@ pub struct Do {
 }
 
 impl ToTokens for Do {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let _ = self.to_tokens(false, tokens);
     }
 }
@@ -100,35 +102,35 @@ impl From<Do> for Step {
 }
 
 impl Do {
-    pub fn to_tokens(&self, mut read_response: bool, tokens: &mut Tokens) -> bool {
+    pub fn to_tokens(&self, mut read_response: bool, tokens: &mut TokenStream) -> bool {
         self.api_call.to_tokens(tokens);
 
         if !self.warnings.is_empty() {
-            tokens.append(quote! {
+            tokens.append_all(quote! {
                 let warnings: Vec<&str> = response
                     .warning_headers()
                     .collect();
             });
             for warning in &self.warnings {
-                tokens.append(quote! {
-                    assert_warnings_contain!(warnings, #warning);
+                tokens.append_all(quote! {
+                    crate::assert_warnings_contain!(warnings, #warning);
                 });
             }
         } else if !self.allowed_warnings.is_empty() {
             let allowed = &self.allowed_warnings;
-            tokens.append(quote! {
+            tokens.append_all(quote! {
                 let allowed_warnings = vec![#(#allowed),*];
                 let warnings: Vec<&str> = response.warning_headers()
                     .filter(|w| !allowed_warnings.iter().any(|a| w.contains(a)))
                     .collect();
-                assert_warnings_is_empty!(warnings);
+                crate::assert_warnings_is_empty!(warnings);
             });
         }
 
         if let Some(c) = &self.catch {
             if !read_response && c.needs_response_body() {
                 read_response = true;
-                tokens.append(quote! {
+                tokens.append_all(quote! {
                     let (method, status_code, text, json) = client::read_response(response).await?;
                 });
             }
@@ -136,8 +138,8 @@ impl Do {
         }
 
         if let Some(i) = &self.api_call.ignore {
-            tokens.append(quote! {
-                assert_response_success_or!(response, #i);
+            tokens.append_all(quote! {
+                crate::assert_response_success_or!(response, #i);
             });
         }
 
@@ -229,22 +231,22 @@ impl Do {
 /// The components of an API call
 pub struct ApiCall {
     pub namespace: Option<String>,
-    function: syn::Ident,
-    parts: Option<Tokens>,
-    params: Option<Tokens>,
+    function: syn::Expr,
+    parts: Option<TokenStream>,
+    params: Option<TokenStream>,
     headers: BTreeMap<String, String>,
-    body: Option<Tokens>,
+    body: Option<TokenStream>,
     ignore: Option<u16>,
 }
 
 impl ToTokens for ApiCall {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let function = &self.function;
         let parts = &self.parts;
         let params = &self.params;
         let body = &self.body;
 
-        let headers: Vec<Tokens> = self
+        let headers: Vec<TokenStream> = self
             .headers
             .iter()
             .map(|(k, v)| {
@@ -253,7 +255,7 @@ impl ToTokens for ApiCall {
 
                 // handle "set" value in headers
                 if let Some(c) = SET_DELIMITED_REGEX.captures(v) {
-                    let token = syn::Ident::from(c.get(1).unwrap().as_str());
+                    let token = syn::Ident::new(c.get(1).unwrap().as_str(), Span::call_site());
                     let replacement = SET_DELIMITED_REGEX.replace_all(v, "{}");
                     quote! { .header(
                         HeaderName::from_static(#k),
@@ -268,7 +270,7 @@ impl ToTokens for ApiCall {
             })
             .collect();
 
-        tokens.append(quote! {
+        tokens.append_all(quote! {
             let response = client.#function(#parts)
                 #(#headers)*
                 #params
@@ -293,7 +295,7 @@ impl ApiCall {
 
         let mut parts: Vec<(&str, &Yaml)> = vec![];
         let mut params: Vec<(&str, &Yaml)> = vec![];
-        let mut body: Option<Tokens> = None;
+        let mut body: Option<TokenStream> = None;
         let mut ignore: Option<u16> = None;
 
         // work out what's a URL part and what's a param in the supplied
@@ -318,7 +320,7 @@ impl ApiCall {
         let api_call = endpoint.full_name.as_ref().unwrap();
         let parts = Self::generate_parts(api_call, endpoint, &parts)?;
         let params = Self::generate_params(api, endpoint, &params)?;
-        let function = syn::Ident::from(api_call.replace('.', "()."));
+        let function: syn::Expr = syn::parse_str(&api_call.replace('.', "().")).unwrap();
         let namespace: Option<String> = if api_call.contains('.') {
             let namespaces: Vec<&str> = api_call.splitn(2, '.').collect();
             Some(namespaces[0].to_string())
@@ -341,7 +343,7 @@ impl ApiCall {
         enum_name: &str,
         variant: &str,
         options: &[serde_json::Value],
-    ) -> Result<Tokens, failure::Error> {
+    ) -> Result<TokenStream, failure::Error> {
         if !variant.is_empty() && !options.contains(&serde_json::Value::String(variant.to_owned()))
         {
             return Err(failure::err_msg(format!(
@@ -351,13 +353,13 @@ impl ApiCall {
         }
 
         let e: String = enum_name.to_pascal_case();
-        let enum_name = syn::Ident::from(e.as_str());
+        let enum_name = syn::Ident::new(e.as_str(), Span::call_site());
         let variant = if variant.is_empty() {
             // TODO: Should we simply omit empty Refresh tests?
             if e == "Refresh" {
-                syn::Ident::from("True")
+                syn::Ident::new("True", Span::call_site())
             } else if e == "Size" {
-                syn::Ident::from("Unspecified")
+                syn::Ident::new("Unspecified", Span::call_site())
             } else {
                 return Err(failure::err_msg(format!(
                     "unhandled empty value for {}",
@@ -365,7 +367,7 @@ impl ApiCall {
                 )));
             }
         } else {
-            syn::Ident::from(variant.to_pascal_case())
+            syn::Ident::new(&variant.to_pascal_case(), Span::call_site())
         };
 
         Ok(quote!(#enum_name::#variant))
@@ -375,14 +377,16 @@ impl ApiCall {
         api: &Api,
         endpoint: &ApiEndpoint,
         params: &[(&str, &Yaml)],
-    ) -> Result<Option<Tokens>, failure::Error> {
+    ) -> Result<Option<TokenStream>, failure::Error> {
         match params.len() {
             0 => Ok(None),
             _ => {
-                let mut tokens = Tokens::new();
+                let mut tokens = TokenStream::new();
                 for (n, v) in params {
-                    let param_ident =
-                        syn::Ident::from(api_generator::generator::code_gen::valid_name(n));
+                    let param_ident = syn::Ident::new(
+                        api_generator::generator::code_gen::valid_name(n),
+                        Span::call_site(),
+                    );
 
                     let ty = match endpoint.params.get(*n) {
                         Some(t) => Ok(t),
@@ -403,7 +407,7 @@ impl ApiCall {
                                     if n == &"expand_wildcards" {
                                         // expand_wildcards might be defined as a comma-separated
                                         // string. e.g.
-                                        let idents: Vec<Result<Tokens, failure::Error>> = s
+                                        let idents: Vec<Result<TokenStream, failure::Error>> = s
                                             .split(',')
                                             .collect::<Vec<_>>()
                                             .iter()
@@ -415,7 +419,7 @@ impl ApiCall {
                                                 let idents =
                                                     idents.into_iter().filter_map(Result::ok);
 
-                                                tokens.append(quote! {
+                                                tokens.append_all(quote! {
                                                     .#param_ident(&[#(#idents),*])
                                                 });
                                             }
@@ -423,19 +427,19 @@ impl ApiCall {
                                         }
                                     } else {
                                         let e = Self::generate_enum(n, s.as_str(), &ty.options)?;
-                                        tokens.append(quote! {
+                                        tokens.append_all(quote! {
                                             .#param_ident(#e)
                                         });
                                     }
                                 }
                                 TypeKind::List => {
                                     let values = s.split(',');
-                                    tokens.append(quote! {
+                                    tokens.append_all(quote! {
                                         .#param_ident(&[#(#values),*])
                                     })
                                 }
                                 TypeKind::Boolean => match s.parse::<bool>() {
-                                    Ok(b) => tokens.append(quote! {
+                                    Ok(b) => tokens.append_all(quote! {
                                         .#param_ident(#b)
                                     }),
                                     Err(e) => {
@@ -446,7 +450,7 @@ impl ApiCall {
                                     }
                                 },
                                 TypeKind::Double => match s.parse::<f64>() {
-                                    Ok(f) => tokens.append(quote! {
+                                    Ok(f) => tokens.append_all(quote! {
                                         .#param_ident(#f)
                                     }),
                                     Err(e) => {
@@ -459,12 +463,12 @@ impl ApiCall {
                                 TypeKind::Integer => {
                                     if is_set_value {
                                         let set_value = Self::from_set_value(s);
-                                        tokens.append(quote! {
+                                        tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap() as i32)
                                         });
                                     } else {
                                         match s.parse::<i32>() {
-                                            Ok(i) => tokens.append(quote! {
+                                            Ok(i) => tokens.append_all(quote! {
                                                 .#param_ident(#i)
                                             }),
                                             Err(e) => {
@@ -479,12 +483,12 @@ impl ApiCall {
                                 TypeKind::Number | TypeKind::Long => {
                                     if is_set_value {
                                         let set_value = Self::from_set_value(s);
-                                        tokens.append(quote! {
+                                        tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap())
                                         });
                                     } else {
                                         let i = s.parse::<i64>()?;
-                                        tokens.append(quote! {
+                                        tokens.append_all(quote! {
                                             .#param_ident(#i)
                                         });
                                     }
@@ -498,7 +502,7 @@ impl ApiCall {
                                         quote! { #s }
                                     };
 
-                                    tokens.append(quote! {
+                                    tokens.append_all(quote! {
                                         .#param_ident(#t)
                                     })
                                 }
@@ -506,21 +510,25 @@ impl ApiCall {
                         }
                         Yaml::Boolean(ref b) => match kind {
                             TypeKind::Enum => {
-                                let enum_name = syn::Ident::from(n.to_pascal_case());
-                                let variant = syn::Ident::from(b.to_string().to_pascal_case());
-                                tokens.append(quote! {
+                                let enum_name =
+                                    syn::Ident::new(&n.to_pascal_case(), Span::call_site());
+                                let variant = syn::Ident::new(
+                                    &b.to_string().to_pascal_case(),
+                                    Span::call_site(),
+                                );
+                                tokens.append_all(quote! {
                                     .#param_ident(#enum_name::#variant)
                                 })
                             }
                             TypeKind::List => {
                                 // TODO: _source filter can be true|false|list of strings
                                 let s = b.to_string();
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(&[#s])
                                 })
                             }
                             _ => {
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#b)
                                 });
                             }
@@ -528,33 +536,33 @@ impl ApiCall {
                         Yaml::Integer(ref i) => match kind {
                             TypeKind::String => {
                                 let s = i.to_string();
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#s)
                                 })
                             }
                             TypeKind::Integer => {
                                 // yaml-rust parses all as i64
                                 let int = *i as i32;
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#int)
                                 });
                             }
                             TypeKind::Float => {
                                 // yaml-rust parses all as i64
                                 let f = *i as f32;
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#f)
                                 });
                             }
                             TypeKind::Double => {
                                 // yaml-rust parses all as i64
                                 let f = *i as f64;
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#f)
                                 });
                             }
                             _ => {
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#i)
                                 });
                             }
@@ -574,7 +582,7 @@ impl ApiCall {
                                 .collect();
 
                             if n == &"expand_wildcards" {
-                                let result: Vec<Result<Tokens, failure::Error>> = result
+                                let result: Vec<Result<TokenStream, failure::Error>> = result
                                     .iter()
                                     .map(|s| Self::generate_enum(n, s.as_str(), &ty.options))
                                     .collect();
@@ -583,14 +591,14 @@ impl ApiCall {
                                     Ok(_) => {
                                         let result = result.into_iter().filter_map(Result::ok);
 
-                                        tokens.append(quote! {
+                                        tokens.append_all(quote! {
                                             .#param_ident(&[#(#result),*])
                                         });
                                     }
                                     Err(e) => return Err(failure::err_msg(e)),
                                 }
                             } else {
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(&[#(#result),*])
                                 });
                             }
@@ -598,13 +606,13 @@ impl ApiCall {
                         Yaml::Real(r) => match kind {
                             TypeKind::Long | TypeKind::Number => {
                                 let f = r.parse::<f64>()?;
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#f as i64)
                                 });
                             }
                             _ => {
                                 let f = r.parse::<f64>()?;
-                                tokens.append(quote! {
+                                tokens.append_all(quote! {
                                     .#param_ident(#f)
                                 });
                             }
@@ -618,24 +626,26 @@ impl ApiCall {
         }
     }
 
-    fn from_set_value(s: &str) -> Tokens {
+    fn from_set_value(s: &str) -> TokenStream {
         // check if the entire string is a token
         if s.starts_with('$') {
-            let ident = syn::Ident::from(
+            let ident = syn::Ident::new(
                 s.trim_start_matches('$')
                     .trim_start_matches('{')
                     .trim_end_matches('}'),
+                Span::call_site(),
             );
             quote! { #ident }
         } else {
             // only part of the string is a token, so substitute
-            let token = syn::Ident::from(
+            let token = syn::Ident::new(
                 SET_DELIMITED_REGEX
                     .captures(s)
                     .unwrap()
                     .get(1)
                     .unwrap()
                     .as_str(),
+                Span::call_site(),
             );
             let replacement = SET_DELIMITED_REGEX.replace_all(s, "{}");
             quote! { Value::String(format!(#replacement, #token.as_str().unwrap())) }
@@ -646,11 +656,11 @@ impl ApiCall {
         api_call: &str,
         endpoint: &ApiEndpoint,
         parts: &[(&str, &Yaml)],
-    ) -> Result<Option<Tokens>, failure::Error> {
+    ) -> Result<Option<TokenStream>, failure::Error> {
         // TODO: ideally, this should share the logic from EnumBuilder
         let enum_name = {
             let name = api_call.to_pascal_case().replace('.', "");
-            syn::Ident::from(format!("{}Parts", name))
+            syn::Ident::new(&format!("{}Parts", name), Span::call_site())
         };
 
         // Enum variants containing no URL parts where there is only a single API URL,
@@ -724,10 +734,10 @@ impl ApiCall {
                 .map(|k| k.to_pascal_case())
                 .collect::<Vec<_>>()
                 .join("");
-            syn::Ident::from(v)
+            syn::Ident::new(&v, Span::call_site())
         };
 
-        let part_tokens: Vec<Result<Tokens, failure::Error>> = parts
+        let part_tokens: Vec<Result<TokenStream, failure::Error>> = parts
             .iter()
             // don't rely on URL parts being ordered in the yaml test in the same order as specified
             // in the REST spec.
@@ -844,7 +854,10 @@ impl ApiCall {
     /// When reading a body from the YAML test, it'll be converted to a Yaml variant,
     /// usually a Hash. To get the JSON representation back requires converting
     /// back to JSON
-    fn generate_body(endpoint: &ApiEndpoint, v: &Yaml) -> Result<Option<Tokens>, failure::Error> {
+    fn generate_body(
+        endpoint: &ApiEndpoint,
+        v: &Yaml,
+    ) -> Result<Option<TokenStream>, failure::Error> {
         match v {
             Yaml::Null => Ok(None),
             Yaml::String(s) => {
@@ -868,13 +881,13 @@ impl ApiCall {
                     };
 
                     let values = split.into_iter().filter(|s| !s.is_empty()).map(|s| {
-                        let ident = syn::Ident::from(s);
-                        quote! { JsonBody::from(json!(#ident)) }
+                        let json = syn::parse_str::<TokenStream>(s).unwrap();
+                        quote! { JsonBody::from(json!(#json)) }
                     });
                     Ok(Some(quote!(.body(vec![#(#values),*]))))
                 } else {
-                    let ident = syn::Ident::from(json);
-                    Ok(Some(quote!(.body(json!{#ident}))))
+                    let json = syn::parse_str::<TokenStream>(&json).unwrap();
+                    Ok(Some(quote!(.body(json!{#json}))))
                 }
             }
             _ => {
@@ -890,13 +903,12 @@ impl ApiCall {
                         let mut json = serde_json::to_string(&value).unwrap();
                         if value.is_string() {
                             json = replace_set(&json);
-                            let ident = syn::Ident::from(json);
-                            quote!(#ident)
+                            syn::parse_str::<TokenStream>(&json).unwrap()
                         } else {
                             json = replace_set(json);
                             json = replace_i64(json);
-                            let ident = syn::Ident::from(json);
-                            quote!(JsonBody::from(json!(#ident)))
+                            let json = syn::parse_str::<TokenStream>(&json).unwrap();
+                            quote!(JsonBody::from(json!(#json)))
                         }
                     });
                     Ok(Some(quote!(.body(vec![ #(#json),* ]))))
@@ -905,7 +917,7 @@ impl ApiCall {
                     let mut json = serde_json::to_string_pretty(&value)?;
                     json = replace_set(json);
                     json = replace_i64(json);
-                    let ident = syn::Ident::from(json);
+                    let ident: TokenStream = syn::parse_str(&json).unwrap();
 
                     Ok(Some(quote!(.body(json!{#ident}))))
                 }

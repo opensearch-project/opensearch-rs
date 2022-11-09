@@ -24,11 +24,18 @@ pub mod url;
 
 use crate::generator::{Stability, TypeKind};
 use inflector::Inflector;
-use quote::Tokens;
+use proc_macro2::{Span, TokenStream};
+use quote::quote;
 use std::str;
+use syn::{
+    parse_quote,
+    punctuated::Punctuated,
+    token::{Gt, Lt},
+    AngleBracketedGenericArguments, GenericArgument, ImplItem, LitStr, PathArguments, PathSegment,
+};
 
 /// use declarations common across builders
-pub fn use_declarations() -> Tokens {
+pub fn use_declarations() -> TokenStream {
     quote!(
         #![allow(unused_imports)]
 
@@ -54,26 +61,23 @@ pub fn use_declarations() -> Tokens {
 }
 
 /// AST for a string literal
-fn lit<I: Into<String>>(lit: I) -> syn::Lit {
-    syn::Lit::Str(lit.into(), syn::StrStyle::Cooked)
+fn lit<S: AsRef<str> + ?Sized>(lit: &S) -> syn::Lit {
+    syn::Lit::Str(LitStr::new(lit.as_ref(), Span::call_site()))
 }
 
 /// AST for an identifier
-fn ident<I: AsRef<str>>(name: I) -> syn::Ident {
-    syn::Ident::from(name.as_ref())
+fn ident<S: AsRef<str> + ?Sized>(name: &S) -> syn::Ident {
+    syn::Ident::new(name.as_ref(), Span::call_site())
 }
 
 /// AST for document attribute
-fn doc<I: Into<String>>(comment: I) -> syn::Attribute {
-    syn::Attribute {
-        style: syn::AttrStyle::Outer,
-        value: syn::MetaItem::NameValue(ident("doc"), lit(comment)),
-        is_sugared_doc: true,
-    }
+fn doc<S: AsRef<str> + ?Sized>(comment: &S) -> syn::Attribute {
+    let comment = lit(comment);
+    parse_quote!(#[doc = #comment])
 }
 
 fn doc_escaped<S: ?Sized + AsRef<str>>(comment: &S) -> syn::Attribute {
-    doc(html_escape::encode_text(comment))
+    doc(&html_escape::encode_text(comment))
 }
 
 fn stability_doc(stability: Stability) -> Option<syn::Attribute> {
@@ -93,8 +97,8 @@ happen in minor versions.
 }
 
 /// AST for an expression parsed from quoted tokens
-pub fn parse_expr(input: quote::Tokens) -> syn::Expr {
-    syn::parse_expr(input.as_str()).unwrap()
+pub fn parse_expr(input: TokenStream) -> syn::Expr {
+    syn::parse_str(&input.to_string()).unwrap()
 }
 
 /// Ensures that the name generated is one that is valid for Rust
@@ -106,7 +110,7 @@ pub fn valid_name(s: &str) -> &str {
 }
 
 /// AST for a path variable.
-fn path(path: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Ty>) -> syn::Path {
+fn path(path: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Type>) -> syn::Path {
     path_segments(vec![(path, lifetimes, types)])
 }
 
@@ -116,18 +120,30 @@ fn path_none(path_ident: &str) -> syn::Path {
 }
 
 /// AST for a path variable.
-fn path_segments(paths: Vec<(&str, Vec<syn::Lifetime>, Vec<syn::Ty>)>) -> syn::Path {
+fn path_segments(paths: Vec<(&str, Vec<syn::Lifetime>, Vec<syn::Type>)>) -> syn::Path {
     syn::Path {
-        global: false,
+        leading_colon: None,
         segments: paths
             .into_iter()
-            .map(|(path, lifetimes, types)| syn::PathSegment {
-                ident: syn::Ident::new(valid_name(path)),
-                parameters: syn::PathParameters::AngleBracketed(syn::AngleBracketedParameterData {
-                    lifetimes,
-                    types,
-                    bindings: vec![],
-                }),
+            .map::<PathSegment, _>(|(path, lifetimes, types)| {
+                let ident = ident(valid_name(path));
+                PathSegment {
+                    ident,
+                    arguments: if !lifetimes.is_empty() || !types.is_empty() {
+                        PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                            colon2_token: None,
+                            lt_token: Lt(Span::call_site()),
+                            args: lifetimes
+                                .into_iter()
+                                .map(GenericArgument::Lifetime)
+                                .chain(types.into_iter().map(GenericArgument::Type))
+                                .collect(),
+                            gt_token: Gt(Span::call_site()),
+                        })
+                    } else {
+                        PathArguments::None
+                    },
+                }
             })
             .collect(),
     }
@@ -137,11 +153,11 @@ pub trait GetPath {
     fn get_path(&self) -> &syn::Path;
 }
 
-impl GetPath for syn::Ty {
+impl GetPath for syn::Type {
     fn get_path(&self) -> &syn::Path {
         match *self {
-            syn::Ty::Path(_, ref p) => p,
-            ref p => panic!("Expected syn::Ty::Path, but found {:?}", p),
+            syn::Type::Path(ref p) => p.get_path(),
+            ref p => panic!("Expected syn::Type::Path, but found {:?}", p),
         }
     }
 }
@@ -149,6 +165,12 @@ impl GetPath for syn::Ty {
 impl GetPath for syn::Path {
     fn get_path(&self) -> &syn::Path {
         self
+    }
+}
+
+impl GetPath for syn::TypePath {
+    fn get_path(&self) -> &syn::Path {
+        &self.path
     }
 }
 
@@ -162,9 +184,20 @@ impl<T: GetPath> GetIdent for T {
     }
 }
 
+impl GetIdent for ImplItem {
+    fn get_ident(&self) -> &syn::Ident {
+        match self {
+            ImplItem::Const(i) => &i.ident,
+            ImplItem::Method(i) => &i.sig.ident,
+            ImplItem::Type(i) => &i.ident,
+            _ => panic!("{:?} has no ident", self),
+        }
+    }
+}
+
 /// Gets the Ty syntax token for a TypeKind
 /// TODO: This function is serving too many purposes. Refactor it
-fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> syn::Ty {
+fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> syn::Type {
     let mut v = String::new();
     if !required {
         v.push_str("Option<");
@@ -218,14 +251,12 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
         v.push('>');
     }
 
-    syn::parse_type(v.as_str()).unwrap()
+    syn::parse_str(v.as_str()).unwrap()
 }
 
 /// A standard `'b` lifetime
 pub fn lifetime_b() -> syn::Lifetime {
-    syn::Lifetime {
-        ident: syn::Ident::new("'b"),
-    }
+    parse_quote!('b)
 }
 
 pub trait HasLifetime {
@@ -234,8 +265,11 @@ pub trait HasLifetime {
 
 impl<T: GetPath> HasLifetime for T {
     fn has_lifetime(&self) -> bool {
-        match self.get_path().segments[0].parameters {
-            syn::PathParameters::AngleBracketed(ref params) => !params.lifetimes.is_empty(),
+        match self.get_path().segments[0].arguments {
+            syn::PathArguments::AngleBracketed(ref params) => params
+                .args
+                .iter()
+                .any(|a| matches!(a, syn::GenericArgument::Lifetime(_))),
             _ => false,
         }
     }
@@ -248,37 +282,64 @@ pub fn generics_b() -> syn::Generics {
 
 /// Generics with no parameters.
 pub fn generics_none() -> syn::Generics {
-    generics(vec![], vec![])
-}
-
-/// Generics with the given lifetimes and type bounds.
-pub fn generics(lifetimes: Vec<syn::Lifetime>, types: Vec<syn::TyParam>) -> syn::Generics {
     syn::Generics {
-        lifetimes: lifetimes
-            .into_iter()
-            .map(|l| syn::LifetimeDef {
-                attrs: vec![],
-                lifetime: l,
-                bounds: vec![],
-            })
-            .collect(),
-        ty_params: types,
-        where_clause: syn::WhereClause::none(),
+        lt_token: None,
+        params: Punctuated::default(),
+        gt_token: None,
+        where_clause: None,
     }
 }
 
+/// Generics with the given lifetimes and type bounds.
+pub fn generics(lifetimes: Vec<syn::Lifetime>, types: Vec<syn::TypeParam>) -> syn::Generics {
+    let params: Punctuated<_, _> = lifetimes
+        .into_iter()
+        .map(|l| {
+            syn::GenericParam::Lifetime(syn::LifetimeDef {
+                attrs: vec![],
+                lifetime: l,
+                colon_token: None,
+                bounds: Punctuated::default(),
+            })
+        })
+        .chain(types.into_iter().map(syn::GenericParam::Type))
+        .collect();
+
+    let has_params = !params.is_empty();
+
+    syn::Generics {
+        lt_token: if has_params {
+            Some(Lt(Span::call_site()))
+        } else {
+            None
+        },
+        params,
+        gt_token: if has_params {
+            Some(Gt(Span::call_site()))
+        } else {
+            None
+        },
+        where_clause: None,
+    }
+
+    // parse_quote!(<#(#lifetimes),* #(#types),*>)
+}
+
 /// AST for a path type with lifetimes and type parameters.
-pub fn ty_path(ty: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Ty>) -> syn::Ty {
-    syn::Ty::Path(None, path(ty, lifetimes, types))
+pub fn ty_path(ty: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Type>) -> syn::Type {
+    syn::Type::Path(syn::TypePath {
+        qself: None,
+        path: path(ty, lifetimes, types),
+    })
 }
 
 /// AST for a path type with a `'b` lifetime.
-pub fn ty_b(ty: &str) -> syn::Ty {
+pub fn ty_b(ty: &str) -> syn::Type {
     ty_path(ty, vec![lifetime_b()], vec![])
 }
 
 /// AST for a simple path type.
-pub fn ty(ty: &str) -> syn::Ty {
+pub fn ty(ty: &str) -> syn::Type {
     ty_path(ty, vec![], vec![])
 }
 
@@ -289,13 +350,13 @@ pub trait IntoStmt {
 
 impl IntoStmt for syn::Item {
     fn into_stmt(self) -> syn::Stmt {
-        syn::Stmt::Item(Box::new(self))
+        syn::Stmt::Item(self)
     }
 }
 
 impl IntoStmt for syn::Expr {
     fn into_stmt(self) -> syn::Stmt {
-        syn::Stmt::Expr(Box::new(self))
+        syn::Stmt::Expr(self)
     }
 }
 

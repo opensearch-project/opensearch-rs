@@ -223,8 +223,6 @@ script = '''
 //! semver = "0.11.0"
 //! toml_edit = "0.2.0"
 //! ```
-extern crate glob;
-extern crate semver;
 
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};

@@ -16,13 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-use crate::generator::code_gen::url::url_builder::PathString;
+use crate::generator::{
+    code_gen::url::url_builder::PathString,
+    output::{merge_file, write_file},
+};
+use lazy_static::lazy_static;
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
+use semver::Version;
 use serde::{
     de::{MapAccess, Visitor},
     Deserialize, Deserializer, Serialize,
 };
 use serde_json::Value;
 use std::{
+    cmp::Ordering,
     collections::{BTreeMap, BTreeSet, HashMap, HashSet},
     fmt,
     fs::{self, File},
@@ -31,18 +39,10 @@ use std::{
     marker::PhantomData,
     str::FromStr,
 };
-
-#[cfg(test)]
-use quote::ToTokens;
-use quote::Tokens;
-use semver::Version;
 use void::Void;
 
 pub mod code_gen;
 pub mod output;
-
-use output::{merge_file, write_file};
-use std::cmp::Ordering;
 
 lazy_static! {
     static ref VERSION: Version = semver::Version::parse(env!("CARGO_PKG_VERSION")).unwrap();
@@ -108,17 +108,15 @@ pub enum HttpMethod {
 
 /// Converts a `HttpMethod` in the REST spec, into the AST for
 /// a `Method` in the opensearch client
-impl quote::ToTokens for HttpMethod {
-    fn to_tokens(&self, tokens: &mut quote::Tokens) {
-        tokens.append("Method");
-        tokens.append("::");
+impl ToTokens for HttpMethod {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         match *self {
-            HttpMethod::Head => tokens.append("Head"),
-            HttpMethod::Get => tokens.append("Get"),
-            HttpMethod::Post => tokens.append("Post"),
-            HttpMethod::Put => tokens.append("Put"),
-            HttpMethod::Patch => tokens.append("Patch"),
-            HttpMethod::Delete => tokens.append("Delete"),
+            HttpMethod::Head => tokens.append_all(quote!(Method::Head)),
+            HttpMethod::Get => tokens.append_all(quote!(Method::Get)),
+            HttpMethod::Post => tokens.append_all(quote!(Method::Post)),
+            HttpMethod::Put => tokens.append_all(quote!(Method::Put)),
+            HttpMethod::Patch => tokens.append_all(quote!(Method::Patch)),
+            HttpMethod::Delete => tokens.append_all(quote!(Method::Delete)),
         }
     }
 }
@@ -237,7 +235,7 @@ impl Deprecated {
         }
     }
 
-    pub fn attr(d: &Option<Self>) -> (Option<Tokens>, Option<Tokens>) {
+    pub fn attr(d: &Option<Self>) -> (Option<TokenStream>, Option<TokenStream>) {
         match d.as_ref() {
             Some(d) => {
                 let message = &d.description;
@@ -416,14 +414,14 @@ impl Stability {
 
     /// Returns the (optional) feature configuration for this stability level as an outer
     /// attribute, for use e.g. on function definitions.
-    pub fn outer_cfg_attr(self) -> Option<Tokens> {
+    pub fn outer_cfg_attr(self) -> Option<TokenStream> {
         let feature_name = self.feature_name();
         feature_name.map(|name| quote!(#[cfg(feature = #name)]))
     }
 
     /// Returns the (optional) feature configuration for this stability level as an inner
     /// attribute, for use e.g. at the top of a module source file
-    pub fn inner_cfg_attr(self) -> Option<Tokens> {
+    pub fn inner_cfg_attr(self) -> Option<TokenStream> {
         let feature_name = self.feature_name();
         feature_name.map(|name| quote!(#![cfg(feature = #name)]))
     }
@@ -756,8 +754,8 @@ where
 
 /// Asserts that the expected generated AST matches the actual generated AST
 #[cfg(test)]
-pub fn ast_eq<T: ToTokens>(expected: Tokens, actual: T) {
-    assert_eq!(expected, quote!(#actual));
+pub fn ast_eq<T: ToTokens>(expected: TokenStream, actual: T) {
+    pretty_assertions::assert_eq!(expected.to_string(), actual.to_token_stream().to_string());
 }
 
 #[cfg(test)]

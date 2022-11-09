@@ -31,6 +31,7 @@
 use crate::skip::SkippedFeaturesAndTests;
 
 use super::Step;
+use lazy_static::lazy_static;
 use regex::Regex;
 use yaml_rust::Yaml;
 

@@ -31,7 +31,9 @@
 use super::Step;
 use crate::step::Expr;
 use inflector::Inflector;
-use quote::{ToTokens, Tokens};
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::parse_quote;
 use yaml_rust::Yaml;
 
 pub struct Transformation {
@@ -42,18 +44,11 @@ pub struct Transformation {
 }
 
 impl Transformation {
-    pub fn transform(&self) -> syn::Ident {
-        let mut transform = String::new();
-        transform.push_str(&self.function);
-        transform.push('(');
-        for expr in &self.exprs {
-            transform.push_str("json");
-            transform.push_str(expr.expression().as_str());
-            transform.push_str(".as_str().unwrap()");
-            transform.push(',');
-        }
-        transform.push(')');
-        syn::Ident::from(transform.as_str())
+    pub fn transform(&self) -> syn::Expr {
+        let func = syn::Ident::new(&self.function, Span::call_site());
+        let exprs = self.exprs.iter().map(|e| e.expression());
+
+        parse_quote!(#func ( #(json #exprs .as_str().unwrap()),* ))
     }
 }
 
@@ -119,17 +114,17 @@ impl TransformAndSet {
             .ok_or_else(|| failure::err_msg(format!("expected string value but found {:?}", v)))?;
 
         Ok(TransformAndSet {
-            ident: syn::Ident::from(ident),
+            ident: syn::Ident::new(ident, Span::call_site()),
             transformation: transformation.into(),
         })
     }
 }
 
 impl ToTokens for TransformAndSet {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let ident = &self.ident;
         let transform = &self.transformation.transform();
-        tokens.append(quote! {
+        tokens.append_all(quote! {
             let #ident = {
                 let transform = #transform;
                 json!(transform)

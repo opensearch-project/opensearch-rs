@@ -49,6 +49,8 @@ use std::ops::Deref;
 use sysinfo::SystemExt;
 use url::Url;
 
+use crate::assert_response_success;
+
 fn cluster_addr() -> String {
     match std::env::var("OPENSEARCH_URL") {
         Ok(server) => server,

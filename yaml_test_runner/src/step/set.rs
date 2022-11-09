@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::Expr;
-use quote::{ToTokens, Tokens};
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct Set {
@@ -60,17 +61,17 @@ impl Set {
             .ok_or_else(|| failure::err_msg(format!("expected string value but found {:?}", v)))?;
 
         Ok(Set {
-            ident: syn::Ident::from(id),
+            ident: syn::Ident::new(id, Span::call_site()),
             expr: expr.into(),
         })
     }
 }
 
 impl ToTokens for Set {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let ident = &self.ident;
-        let expr = syn::Ident::from(self.expr.expression().as_str());
-        tokens.append(quote! {
+        let expr = self.expr.expression();
+        tokens.append_all(quote! {
             let #ident = json#expr.clone();
         });
     }

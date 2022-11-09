@@ -33,7 +33,6 @@
  * limitations under the License.
  */
 use crate::generator::{code_gen::*, Path, Type, TypeKind};
-use quote::ToTokens;
 use serde::{Deserialize, Deserializer};
 use std::{collections::BTreeMap, fmt, iter::Iterator, str};
 
@@ -172,7 +171,7 @@ impl<'a> UrlBuilder<'a> {
         // collection of let {name}_str = [self.]{name}.[join(",")|to_string()];
         let let_params_exprs = Self::let_parameters_exprs(&self.path, self.parts);
 
-        let mut let_encoded_params_exprs = Self::let_encoded_exprs(&self.path, self.parts);
+        let let_encoded_params_exprs = Self::let_encoded_exprs(&self.path, self.parts);
 
         let url_ident = ident("p");
         let len_expr = {
@@ -184,15 +183,15 @@ impl<'a> UrlBuilder<'a> {
         };
         let let_stmt = Self::let_p_stmt(url_ident.clone(), len_expr);
 
-        let mut push_stmts = Self::push_str_stmts(url_ident.clone(), &self.path);
-        let return_expr = syn::Stmt::Expr(Box::new(parse_expr(quote!(#url_ident.into()))));
+        let push_stmts = Self::push_str_stmts(url_ident.clone(), &self.path);
 
-        let mut stmts = let_params_exprs;
-        stmts.append(&mut let_encoded_params_exprs);
-        stmts.push(let_stmt);
-        stmts.append(&mut push_stmts);
-        stmts.push(return_expr);
-        syn::Block { stmts }
+        parse_quote!({
+            #(#let_params_exprs)*
+            #(#let_encoded_params_exprs)*
+            #let_stmt
+            #(#push_stmts)*
+            #url_ident.into()
+        })
     }
 
     /// Build the AST for a literal path
@@ -207,8 +206,7 @@ impl<'a> UrlBuilder<'a> {
             .collect();
 
         let path = path.join("");
-        let lit = syn::Lit::Str(path, syn::StrStyle::Cooked);
-        parse_expr(quote!(#lit.into()))
+        parse_quote!(#path.into())
     }
 
     /// Get the number of chars in all literal parts for the url.
@@ -221,7 +219,7 @@ impl<'a> UrlBuilder<'a> {
             })
             .fold(0, |acc, p| acc + p.len());
 
-        syn::ExprKind::Lit(syn::Lit::Int(len as u64, syn::IntTy::Usize)).into()
+        parse_quote!(#len)
     }
 
     /// Creates the AST for a let expression to percent encode path parts
@@ -235,31 +233,9 @@ impl<'a> UrlBuilder<'a> {
                         _ => path_none(format!("{}_str", name).as_str()).into_expr(),
                     };
 
-                    let encoded_ident = ident(format!("encoded_{}", name));
-                    let percent_encode_call: syn::Expr = syn::ExprKind::Call(
-                        Box::new(path_none("percent_encode").into_expr()),
-                        vec![
-                            syn::ExprKind::MethodCall(ident("as_bytes"), vec![], vec![path_expr])
-                                .into(),
-                            path_none("PARTS_ENCODED").into_expr(),
-                        ],
-                    )
-                    .into();
+                    let encoded_ident = ident(&format!("encoded_{}", name));
 
-                    let into_call: syn::Expr =
-                        syn::ExprKind::MethodCall(ident("into"), vec![], vec![percent_encode_call])
-                            .into();
-
-                    Some(syn::Stmt::Local(Box::new(syn::Local {
-                        pat: Box::new(syn::Pat::Ident(
-                            syn::BindingMode::ByValue(syn::Mutability::Immutable),
-                            encoded_ident,
-                            None,
-                        )),
-                        ty: Some(Box::new(ty_path("Cow", vec![], vec![ty("str")]))),
-                        init: Some(Box::new(into_call)),
-                        attrs: vec![],
-                    })))
+                    Some(parse_quote!(let #encoded_ident: Cow<str> = percent_encode(#path_expr.as_bytes(), PARTS_ENCODED).into();))
                 }
                 _ => None,
             })
@@ -283,52 +259,21 @@ impl<'a> UrlBuilder<'a> {
                         return None;
                     }
 
-                    let tokens = quote!(#name_ident);
+                    let name_str_ident = ident(&format!("{}_str", name));
+
                     // build a different expression, depending on the type of parameter
-                    let (ident, init) = match ty {
+                    let init: syn::Expr = match ty {
                         TypeKind::List => {
                             // Join list values together
-                            let name_str = format!("{}_str", &name);
-                            let name_str_ident = ident(&name_str);
-                            let join_call = syn::ExprKind::MethodCall(
-                                ident("join"),
-                                vec![],
-                                vec![
-                                    parse_expr(tokens),
-                                    syn::ExprKind::Lit(syn::Lit::Str(
-                                        ",".into(),
-                                        syn::StrStyle::Cooked,
-                                    ))
-                                    .into(),
-                                ],
-                            )
-                            .into();
-
-                            (name_str_ident, join_call)
+                            parse_quote!(#name_ident.join(","))
                         }
                         _ => {
                             // Handle enums, long, int, etc. by calling to_string()
-                            let to_string_call = syn::ExprKind::MethodCall(
-                                ident("to_string"),
-                                vec![],
-                                vec![parse_expr(tokens)],
-                            )
-                            .into();
-
-                            (ident(format!("{}_str", name)), to_string_call)
+                            parse_quote!(#name_ident.to_string())
                         }
                     };
 
-                    Some(syn::Stmt::Local(Box::new(syn::Local {
-                        pat: Box::new(syn::Pat::Ident(
-                            syn::BindingMode::ByValue(syn::Mutability::Immutable),
-                            ident,
-                            None,
-                        )),
-                        ty: None,
-                        init: Some(Box::new(init)),
-                        attrs: vec![],
-                    })))
+                    Some(parse_quote!(let #name_str_ident = #init;))
                 }
                 _ => None,
             })
@@ -340,15 +285,8 @@ impl<'a> UrlBuilder<'a> {
         url.iter()
             .filter_map(|p| match *p {
                 PathPart::Param(p) => {
-                    let name = format!("encoded_{}", valid_name(p));
-                    Some(
-                        syn::ExprKind::MethodCall(
-                            ident("len"),
-                            vec![],
-                            vec![path_none(name.as_ref()).into_expr()],
-                        )
-                        .into(),
-                    )
+                    let name = ident(&format!("encoded_{}", valid_name(p)));
+                    Some(parse_quote!(#name.len()))
                 }
                 _ => None,
             })
@@ -362,42 +300,16 @@ impl<'a> UrlBuilder<'a> {
             _ => {
                 let mut len_iter = len_exprs.into_iter();
 
-                let first_expr = Box::new(len_iter.next().unwrap());
+                let first_expr = len_iter.next().unwrap();
 
-                *(len_iter.map(Box::new).fold(first_expr, |acc, p| {
-                    Box::new(syn::ExprKind::Binary(syn::BinOp::Add, acc, p).into())
-                }))
+                len_iter.fold(first_expr, |acc, p| parse_quote!(#acc + #p))
             }
         }
     }
 
     /// Get a statement to build a `String` with a capacity of the given expression.
     fn let_p_stmt(url_ident: syn::Ident, len_expr: syn::Expr) -> syn::Stmt {
-        let string_with_capacity = syn::ExprKind::Call(
-            Box::new(
-                syn::ExprKind::Path(None, {
-                    let mut method = path_none("String");
-                    method
-                        .segments
-                        .push(syn::PathSegment::from("with_capacity"));
-                    method
-                })
-                .into(),
-            ),
-            vec![len_expr],
-        )
-        .into();
-
-        syn::Stmt::Local(Box::new(syn::Local {
-            pat: Box::new(syn::Pat::Ident(
-                syn::BindingMode::ByValue(syn::Mutability::Mutable),
-                url_ident,
-                None,
-            )),
-            ty: None,
-            init: Some(Box::new(string_with_capacity)),
-            attrs: vec![],
-        }))
+        parse_quote!(let mut #url_ident = String::with_capacity(#len_expr);)
     }
 
     /// Get a list of statements that append each part to a `String` in order.
@@ -405,22 +317,17 @@ impl<'a> UrlBuilder<'a> {
         url.iter()
             .map(|p| match *p {
                 PathPart::Literal(p) => {
-                    let push = if p.len() == 1 {
-                        let lit = syn::Lit::Char(p.chars().next().unwrap());
-                        quote!(#url_ident.push(#lit))
+                    if p.len() == 1 {
+                        let lit = p.chars().next().unwrap();
+                        parse_quote!(#url_ident.push(#lit);)
                     } else {
-                        let lit = syn::Lit::Str(p.to_string(), syn::StrStyle::Cooked);
-                        quote!(#url_ident.push_str(#lit))
-                    };
-
-                    syn::Stmt::Semi(Box::new(parse_expr(push)))
+                        let lit = p.to_string();
+                        parse_quote!(#url_ident.push_str(#lit);)
+                    }
                 }
                 PathPart::Param(p) => {
-                    let name = format!("encoded_{}", valid_name(p));
-                    let ident = ident(name);
-                    syn::Stmt::Semi(Box::new(parse_expr(
-                        quote!(#url_ident.push_str(#ident.as_ref())),
-                    )))
+                    let ident = ident(&format!("encoded_{}", valid_name(p)));
+                    parse_quote!(#url_ident.push_str(#ident.as_ref());)
                 }
             })
             .collect()
@@ -444,30 +351,32 @@ pub trait IntoExpr {
 
 impl IntoExpr for syn::Path {
     fn into_expr(self) -> syn::Expr {
-        syn::ExprKind::Path(None, self).into()
+        syn::Expr::Path(syn::ExprPath {
+            attrs: vec![],
+            qself: None,
+            path: self,
+        })
     }
 }
 
 impl IntoExpr for syn::Block {
     fn into_expr(self) -> syn::Expr {
-        syn::ExprKind::Block(syn::Unsafety::Normal, self).into()
+        syn::Expr::Block(syn::ExprBlock {
+            attrs: vec![],
+            label: None,
+            block: self,
+        })
     }
 }
 
-impl IntoExpr for syn::Ty {
+impl IntoExpr for syn::Type {
     fn into_expr(self) -> syn::Expr {
-        // TODO: Must be a nicer conversion than this
-        let mut tokens = quote::Tokens::new();
-        self.to_tokens(&mut tokens);
-        parse_expr(tokens)
+        parse_quote!(#self)
     }
 }
 
 impl IntoExpr for syn::Pat {
     fn into_expr(self) -> syn::Expr {
-        // TODO: Must be a nicer conversion than this
-        let mut tokens = quote::Tokens::new();
-        self.to_tokens(&mut tokens);
-        parse_expr(tokens)
+        parse_quote!(#self)
     }
 }

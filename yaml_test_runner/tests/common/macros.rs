@@ -29,7 +29,6 @@
  */
 
 /// Asserts that a [Response] has a status code >=200 and <300
-
 #[macro_export]
 macro_rules! assert_response_success {
     ($response:ident) => {{
@@ -133,9 +132,9 @@ macro_rules! assert_match {
 macro_rules! assert_numeric_match {
     ($expected:expr, $actual:expr) => {{
         if $expected.is_i64() {
-            assert_match!($expected, $actual);
+            crate::assert_match!($expected, $actual);
         } else {
-            assert_match!($expected, $actual as f64);
+            crate::assert_match!($expected, $actual as f64);
         }
     }};
 }

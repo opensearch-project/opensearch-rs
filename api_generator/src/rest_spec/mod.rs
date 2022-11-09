@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-extern crate reqwest;
-use self::reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use flate2::read::GzDecoder;
 use globset::Glob;
-use reqwest::Response;
+use reqwest::{
+    blocking::{ClientBuilder, Response},
+    header::{HeaderMap, HeaderValue, USER_AGENT},
+};
 use std::{fs::File, io, path::Path};
 use tar::{Archive, Entry};
 
@@ -35,7 +36,7 @@ pub fn download_specs(branch: &str, download_dir: &Path) -> Result<(), failure::
         USER_AGENT,
         HeaderValue::from_str(&format!("opensearch-rs/{}", env!("CARGO_PKG_NAME")))?,
     );
-    let client = reqwest::ClientBuilder::new()
+    let client = ClientBuilder::new()
         .default_headers(headers)
         .build()
         .unwrap();

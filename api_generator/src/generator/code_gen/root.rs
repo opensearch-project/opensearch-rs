@@ -19,16 +19,17 @@
 use super::{request::request_builder::RequestBuilder, use_declarations};
 use crate::generator::Api;
 use inflector::Inflector;
-use quote::Tokens;
+use proc_macro2::TokenStream;
+use quote::{quote, TokenStreamExt};
 use std::path::Path;
 
 /// Generates the source code for the methods on the root of Elasticsearch
 pub fn generate(api: &Api, docs_dir: &Path) -> Result<String, failure::Error> {
-    let mut tokens = Tokens::new();
-    tokens.append(use_declarations());
+    let mut tokens = TokenStream::new();
+    tokens.append_all(use_declarations());
 
     // AST for builder structs and methods
-    let (builders, methods): (Vec<Tokens>, Vec<Tokens>) = api
+    let (builders, methods): (Vec<TokenStream>, Vec<TokenStream>) = api
         .root
         .endpoints()
         .iter()
@@ -47,7 +48,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<String, failure::Error> {
         })
         .unzip();
 
-    tokens.append(quote!(
+    tokens.append_all(quote!(
         #(#builders)*
 
         impl OpenSearch {

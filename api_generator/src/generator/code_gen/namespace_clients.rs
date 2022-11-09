@@ -18,8 +18,10 @@
  */
 use crate::generator::{code_gen::request::request_builder::RequestBuilder, Api};
 use inflector::Inflector;
-use quote::Tokens;
+use proc_macro2::TokenStream;
+use quote::{quote, TokenStreamExt};
 use std::path::Path;
+use syn::parse_quote;
 
 use super::{doc, ident, stability_doc, use_declarations};
 
@@ -28,16 +30,16 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
     let mut output = Vec::new();
 
     for (namespace_name, namespace) in &api.namespaces {
-        let mut tokens = Tokens::new();
+        let mut tokens = TokenStream::new();
         if let Some(attr) = namespace.stability.inner_cfg_attr() {
-            tokens.append(attr);
+            tokens.append_all(attr);
         }
         if let Some(mut attr) = stability_doc(namespace.stability) {
-            attr.style = syn::AttrStyle::Inner;
-            tokens.append(quote! { #attr });
+            attr.style = syn::AttrStyle::Inner(parse_quote!(!));
+            tokens.append_all(quote!(#attr));
         }
 
-        tokens.append(use_declarations());
+        tokens.append_all(use_declarations());
 
         let namespace_pascal_case = namespace_name.to_pascal_case();
         let namespace_replaced_pascal_case = namespace_name.replace('_', " ").to_pascal_case();
@@ -51,18 +53,18 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
             name => name,
         };
 
-        let namespace_doc = doc(format!("Namespace client for {} APIs", &name_for_docs));
-        let namespace_fn_doc = doc(format!(
+        let namespace_doc = doc(&format!("Namespace client for {} APIs", &name_for_docs));
+        let namespace_fn_doc = doc(&format!(
             "Creates a namespace client for {} APIs",
             &name_for_docs
         ));
-        let new_namespace_client_doc = doc(format!(
+        let new_namespace_client_doc = doc(&format!(
             "Creates a new instance of [{}]",
             &namespace_pascal_case
         ));
         let namespace_name = ident(namespace_name);
 
-        let (builders, methods): (Vec<Tokens>, Vec<Tokens>) = namespace
+        let (builders, methods): (Vec<TokenStream>, Vec<TokenStream>) = namespace
             .endpoints()
             .iter()
             .map(|(name, endpoint)| {
@@ -82,7 +84,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, fai
 
         let cfg_attr = namespace.stability.outer_cfg_attr();
         let cfg_doc = stability_doc(namespace.stability);
-        tokens.append(quote!(
+        tokens.append_all(quote!(
             #(#builders)*
 
             #namespace_doc

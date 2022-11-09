@@ -30,7 +30,8 @@
 
 use super::Step;
 use crate::step::{json_string_from_yaml, Expr};
-use quote::{ToTokens, Tokens};
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
 
 pub struct Contains {
@@ -60,40 +61,36 @@ impl Contains {
 }
 
 impl ToTokens for Contains {
-    fn to_tokens(&self, tokens: &mut Tokens) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let expr = self.expr.expression();
-        let ident = syn::Ident::from(expr.as_str());
 
         match &self.value {
             Yaml::Real(r) => {
                 let f = r.parse::<f64>().unwrap();
-                tokens.append(quote! {
-                    assert_contains!(json#ident, json!(#f));
+                tokens.append_all(quote! {
+                    assert_contains!(json#expr, json!(#f));
                 });
             }
             Yaml::Integer(i) => {
-                tokens.append(quote! {
-                    assert_contains!(json#ident, json!(#i));
+                tokens.append_all(quote! {
+                    assert_contains!(json#expr, json!(#i));
                 });
             }
             Yaml::String(s) => {
-                tokens.append(quote! {
-                    assert_contains!(json#ident, json!(#s));
+                tokens.append_all(quote! {
+                    assert_contains!(json#expr, json!(#s));
                 });
             }
             Yaml::Boolean(b) => {
-                tokens.append(quote! {
-                    assert_contains!(json#ident, json!(#b));
+                tokens.append_all(quote! {
+                    assert_contains!(json#expr, json!(#b));
                 });
             }
             yaml if yaml.is_array() || yaml.as_hash().is_some() => {
-                let json = {
-                    let s = json_string_from_yaml(yaml);
-                    syn::Ident::from(s)
-                };
+                let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
 
-                tokens.append(quote! {
-                    assert_contains!(json#ident, json!(#json));
+                tokens.append_all(quote! {
+                    assert_contains!(json#expr, json!(#json));
                 });
             }
             yaml => {

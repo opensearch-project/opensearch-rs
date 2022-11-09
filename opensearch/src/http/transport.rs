@@ -49,6 +49,7 @@ use crate::{
 };
 use base64::write::EncoderWriter as Base64Encoder;
 use bytes::BytesMut;
+use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use serde::Serialize;
 use std::{

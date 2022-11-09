@@ -23,8 +23,6 @@
 //! DETACH=true .ci/run-opensearch.sh
 #![cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 
-extern crate os_type;
-
 pub mod common;
 use common::*;
 

@@ -17,15 +17,20 @@
  * under the License.
  */
 use crate::generator::{
-    code_gen,
     code_gen::{url::enum_builder::EnumBuilder, *},
     ApiEndpoint, Deprecated, HttpMethod, Type, TypeKind,
 };
 use inflector::Inflector;
-use quote::{ToTokens, Tokens};
+use quote::ToTokens;
 use reqwest::Url;
 use std::{collections::BTreeMap, fs, path::Path, str};
-use syn::{Field, FieldValue, ImplItem, TraitBoundModifier, TyParamBound};
+use syn::{parse::Parser, Field, FieldValue, ImplItem};
+
+macro_rules! parse_named_field {
+    ($($tt:tt)*) => {
+        Field::parse_named.parse2(quote!($($tt)*)).unwrap()
+    };
+}
 
 /// Builder that generates the AST for a request builder struct
 pub struct RequestBuilder<'a> {
@@ -96,7 +101,7 @@ impl<'a> RequestBuilder<'a> {
         match methods.len() {
             1 => {
                 let method = *methods.first().unwrap();
-                let mut tokens = Tokens::new();
+                let mut tokens = TokenStream::new();
                 method.to_tokens(&mut tokens);
                 parse_expr(tokens)
             }
@@ -118,7 +123,7 @@ impl<'a> RequestBuilder<'a> {
     }
 
     /// Create the AST for an expression that builds a struct of query string parameters
-    fn create_query_string_expression(endpoint_params: &BTreeMap<String, Type>) -> Tokens {
+    fn create_query_string_expression(endpoint_params: &BTreeMap<String, Type>) -> TokenStream {
         if endpoint_params.is_empty() {
             quote!(None::<()>)
         } else {
@@ -154,7 +159,7 @@ impl<'a> RequestBuilder<'a> {
             });
 
             let query_ctor = endpoint_params.iter().map(|(param_name, _)| {
-                let field_name = ident(valid_name(param_name).to_lowercase());
+                let field_name = ident(&valid_name(param_name).to_lowercase());
                 quote! {
                     #field_name: self.#field_name
                 }
@@ -182,7 +187,7 @@ impl<'a> RequestBuilder<'a> {
         builder_ident: &syn::Ident,
         enum_builder: &EnumBuilder,
         default_fields: &[&syn::Ident],
-    ) -> Tokens {
+    ) -> TokenStream {
         let (enum_ty, _, _) = enum_builder.clone().build();
         let default_fields = Self::create_default_fields(default_fields);
 
@@ -203,7 +208,7 @@ impl<'a> RequestBuilder<'a> {
         };
 
         if enum_builder.contains_single_parameterless_part() {
-            let doc = doc(format!("Creates a new instance of [{}]", &builder_name));
+            let doc = doc(&format!("Creates a new instance of [{}]", &builder_name));
             quote!(
                 #doc
                 pub fn new(transport: &'a Transport) -> Self {
@@ -218,7 +223,7 @@ impl<'a> RequestBuilder<'a> {
                 }
             )
         } else {
-            let doc = doc(format!(
+            let doc = doc(&format!(
                 "Creates a new instance of [{}] with the specified API parts",
                 &builder_name
             ));
@@ -240,7 +245,6 @@ impl<'a> RequestBuilder<'a> {
 
     /// Creates the AST for the body fn for a builder struct that supports sending a body
     fn create_body_fn(
-        builder_name: &str,
         builder_ident: &syn::Ident,
         default_fields: &[&syn::Ident],
         accepts_nd_body: bool,
@@ -248,239 +252,96 @@ impl<'a> RequestBuilder<'a> {
         let fields = default_fields
             .iter()
             .filter(|&&part| part != &ident("body"))
-            .map(|&part| syn::FieldValue {
-                attrs: vec![],
-                ident: ident(part),
-                expr: syn::ExprKind::Path(
-                    None,
-                    path_none(ident(format!("self.{}", part.as_ref())).as_ref()),
-                )
-                .into(),
-                is_shorthand: false,
-            });
+            .map::<syn::FieldValue, _>(|&part| parse_quote!(#part: self.#part));
 
-        let (fn_arg, field_arg, ret_ty) = if accepts_nd_body {
+        let (fn_arg, field_arg, body_ty, t_constraint): (
+            syn::Type,
+            TokenStream,
+            syn::Type,
+            syn::Type,
+        ) = if accepts_nd_body {
             (
-                syn::parse_type("Vec<T>").unwrap(),
+                parse_quote!(Vec<T>),
                 quote!(Some(NdBody(body))),
-                syn::FunctionRetTy::Ty(code_gen::ty(
-                    format!("{}<'a, 'b, NdBody<T>> where T: Body", &builder_name).as_ref(),
-                )),
+                parse_quote!(NdBody<T>),
+                parse_quote!(Body),
             )
         } else {
             (
-                syn::parse_type("T").unwrap(),
+                parse_quote!(T),
                 quote!(Some(body.into())),
-                syn::FunctionRetTy::Ty(code_gen::ty(
-                    format!("{}<'a, 'b, JsonBody<T>> where T: Serialize", &builder_name).as_ref(),
-                )),
+                parse_quote!(JsonBody<T>),
+                parse_quote!(Serialize),
             )
         };
 
-        syn::ImplItem {
-            ident: ident("body<T>"),
-            vis: syn::Visibility::Public,
-            defaultness: syn::Defaultness::Final,
-            attrs: vec![doc("The body for the API call")],
-            node: syn::ImplItemKind::Method(
-                syn::MethodSig {
-                    unsafety: syn::Unsafety::Normal,
-                    constness: syn::Constness::NotConst,
-                    abi: None,
-                    decl: syn::FnDecl {
-                        inputs: vec![
-                            syn::FnArg::SelfValue(syn::Mutability::Immutable),
-                            syn::FnArg::Captured(syn::Pat::Path(None, path_none("body")), fn_arg),
-                        ],
-                        output: ret_ty,
-                        variadic: false,
-                    },
-                    generics: generics_none(),
-                },
-                // generates a fn body of the form
-                // --------
-                // <builder_name> {
-                //     body: body,
-                //     ... assign rest of fields
-                // }
-                // ---------
-                syn::Block {
-                    stmts: vec![syn::Stmt::Expr(Box::new(parse_expr(quote!(
-                            #builder_ident {
-                                transport: self.transport,
-                                parts: self.parts,
-                                body: #field_arg,
-                                #(#fields),*,
-                            }
-                    ))))],
-                },
-            ),
+        parse_quote! {
+            #[doc = "The body for the API call"]
+            pub fn body<T>(self, body: #fn_arg) -> #builder_ident<'a, 'b, #body_ty>
+            where T: #t_constraint {
+                #builder_ident {
+                    transport: self.transport,
+                    parts: self.parts,
+                    body: #field_arg,
+                    #(#fields),*,
+                }
+            }
         }
     }
 
     /// Creates the AST for a builder fn to add a HTTP header
     fn create_header_fn(field: &syn::Ident) -> syn::ImplItem {
-        let doc_attr = doc("Adds a HTTP header");
-
-        syn::ImplItem {
-            ident: ident("header"),
-            vis: syn::Visibility::Public,
-            defaultness: syn::Defaultness::Final,
-            attrs: vec![doc_attr],
-            node: syn::ImplItemKind::Method(
-                syn::MethodSig {
-                    unsafety: syn::Unsafety::Normal,
-                    constness: syn::Constness::NotConst,
-                    abi: None,
-                    decl: syn::FnDecl {
-                        inputs: vec![
-                            syn::FnArg::SelfValue(syn::Mutability::Mutable),
-                            syn::FnArg::Captured(
-                                syn::Pat::Path(None, path_none("key")),
-                                syn::parse_type("HeaderName").unwrap(),
-                            ),
-                            syn::FnArg::Captured(
-                                syn::Pat::Path(None, path_none("value")),
-                                syn::parse_type("HeaderValue").unwrap(),
-                            ),
-                        ],
-                        output: syn::FunctionRetTy::Ty(code_gen::ty("Self")),
-                        variadic: false,
-                    },
-                    generics: generics_none(),
-                },
-                syn::Block {
-                    stmts: vec![
-                        syn::Stmt::Semi(Box::new(parse_expr(
-                            quote!(self.#field.insert(key, value)),
-                        ))),
-                        syn::Stmt::Expr(Box::new(parse_expr(quote!(self)))),
-                    ],
-                },
-            ),
+        parse_quote! {
+            #[doc = "Adds a HTTP header"]
+            pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+                self.#field.insert(key, value);
+                self
+            }
         }
     }
 
     /// Creates the AST for a builder fn to add a request timeout
     fn create_request_timeout_fn(field: &syn::Ident) -> syn::ImplItem {
-        let doc_attr = doc("Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished.");
-
-        syn::ImplItem {
-            ident: ident("request_timeout"),
-            vis: syn::Visibility::Public,
-            defaultness: syn::Defaultness::Final,
-            attrs: vec![doc_attr],
-            node: syn::ImplItemKind::Method(
-                syn::MethodSig {
-                    unsafety: syn::Unsafety::Normal,
-                    constness: syn::Constness::NotConst,
-                    abi: None,
-                    decl: syn::FnDecl {
-                        inputs: vec![
-                            syn::FnArg::SelfValue(syn::Mutability::Mutable),
-                            syn::FnArg::Captured(
-                                syn::Pat::Path(None, path_none("timeout")),
-                                syn::parse_type("Duration").unwrap(),
-                            ),
-                        ],
-                        output: syn::FunctionRetTy::Ty(code_gen::ty("Self")),
-                        variadic: false,
-                    },
-                    generics: generics_none(),
-                },
-                syn::Block {
-                    stmts: vec![
-                        syn::Stmt::Semi(Box::new(parse_expr(quote!(self.#field = Some(timeout))))),
-                        syn::Stmt::Expr(Box::new(parse_expr(quote!(self)))),
-                    ],
-                },
-            ),
+        parse_quote! {
+            #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+            pub fn request_timeout(mut self, timeout: Duration) -> Self {
+                self.#field = Some(timeout);
+                self
+            }
         }
     }
 
     /// Creates the AST for a builder fn for a builder impl
     fn create_impl_fn(f: (&String, &Type)) -> syn::ImplItem {
-        let name = valid_name(f.0).to_lowercase();
-        let (ty, value_ident, fn_generics) = {
+        let ident = ident(&valid_name(f.0).to_lowercase());
+
+        let (ty, value, fn_generics) = {
             let ty = typekind_to_ty(f.0, &f.1.ty, true, true);
             match ty {
-                syn::Ty::Path(ref _q, ref p) => {
-                    if p.get_ident().as_ref() == "Into" {
-                        let ty = syn::parse_type("T").unwrap();
-                        let ident = code_gen::ident(format!("{}.into()", &name));
-                        let ty_param = syn::TyParam {
-                            ident: code_gen::ident("T"),
-                            default: None,
-                            attrs: vec![],
-                            bounds: vec![TyParamBound::Trait(
-                                syn::PolyTraitRef {
-                                    trait_ref: p.clone(),
-                                    bound_lifetimes: vec![],
-                                },
-                                TraitBoundModifier::None,
-                            )],
-                        };
-                        let generics = generics(vec![], vec![ty_param]);
-                        (ty, ident, generics)
+                syn::Type::Path(ref p) => {
+                    if p.get_ident() == "Into" {
+                        let ty = parse_quote!(T);
+                        let value = quote!(#ident.into());
+                        let generics = parse_quote!(<T: #p>);
+                        (ty, value, generics)
                     } else {
-                        (ty, ident(&name), generics_none())
+                        (ty, quote!(#ident), generics_none())
                     }
                 }
-                _ => (ty, ident(&name), generics_none()),
+                _ => (ty, quote!(#ident), generics_none()),
             }
         };
-        let impl_ident = ident(&name);
-        let field_ident = ident(&name);
-        let mut attrs = vec![];
 
-        if let Some(docs) = &f.1.description {
-            attrs.push(doc_escaped(docs));
-        }
-        if let Some(deprecated) = &f.1.deprecated {
-            attrs.push(syn::Attribute {
-                style: syn::AttrStyle::Outer,
-                value: syn::MetaItem::NameValue(ident("deprecated"), lit(&deprecated.description)),
-                is_sugared_doc: false,
-            });
-        }
+        let doc_attr = f.1.description.as_ref().map(doc_escaped);
+        let (deprecated_attr, _) = Deprecated::attr(&f.1.deprecated);
 
-        syn::ImplItem {
-            ident: impl_ident,
-            vis: syn::Visibility::Public,
-            defaultness: syn::Defaultness::Final,
-            attrs,
-            node: syn::ImplItemKind::Method(
-                syn::MethodSig {
-                    unsafety: syn::Unsafety::Normal,
-                    constness: syn::Constness::NotConst,
-                    abi: None,
-                    decl: syn::FnDecl {
-                        inputs: vec![
-                            syn::FnArg::SelfValue(syn::Mutability::Mutable),
-                            syn::FnArg::Captured(
-                                syn::Pat::Path(None, path_none(name.as_str())),
-                                ty,
-                            ),
-                        ],
-                        output: syn::FunctionRetTy::Ty(code_gen::ty("Self")),
-                        variadic: false,
-                    },
-                    generics: fn_generics,
-                },
-                // generates a fn body of the form
-                // --------
-                // self.<field> = <field>;
-                // self
-                // ---------
-                syn::Block {
-                    stmts: vec![
-                        syn::Stmt::Semi(Box::new(parse_expr(
-                            quote!(self.#field_ident = Some(#value_ident)),
-                        ))),
-                        syn::Stmt::Expr(Box::new(parse_expr(quote!(self)))),
-                    ],
-                },
-            ),
+        parse_quote! {
+            #doc_attr
+            #deprecated_attr
+            pub fn #ident #fn_generics (mut self, #ident: #ty) -> Self {
+                self.#ident = Some(#value);
+                self
+            }
         }
     }
 
@@ -491,7 +352,7 @@ impl<'a> RequestBuilder<'a> {
         common_params: &BTreeMap<String, Type>,
         enum_builder: &EnumBuilder,
         accepts_nd_body: bool,
-    ) -> Tokens {
+    ) -> TokenStream {
         let mut common_fields: Vec<Field> = common_params
             .iter()
             .map(Self::create_struct_field)
@@ -515,26 +376,11 @@ impl<'a> RequestBuilder<'a> {
         let request_timeout_ident = ident("request_timeout");
 
         // add a field for HTTP headers
-        fields.push(syn::Field {
-            ident: Some(headers_field_ident.clone()),
-            vis: syn::Visibility::Inherited,
-            attrs: vec![],
-            ty: syn::parse_type("HeaderMap").unwrap(),
-        });
-        fields.push(syn::Field {
-            ident: Some(request_timeout_ident.clone()),
-            vis: syn::Visibility::Inherited,
-            attrs: vec![],
-            ty: syn::parse_type("Option<Duration>").unwrap(),
-        });
+        fields.push(parse_named_field!(#headers_field_ident: HeaderMap));
+        fields.push(parse_named_field!(#request_timeout_ident: Option<Duration>));
 
         if supports_body {
-            fields.push(syn::Field {
-                ident: Some(ident("body")),
-                vis: syn::Visibility::Inherited,
-                attrs: vec![],
-                ty: syn::parse_type("Option<B>").unwrap(),
-            })
+            fields.push(parse_named_field!(body: Option<B>));
         }
 
         // Combine common fields with struct fields, sort and deduplicate
@@ -558,19 +404,14 @@ impl<'a> RequestBuilder<'a> {
 
         // add a body impl if supported
         if supports_body {
-            let body_fn = Self::create_body_fn(
-                builder_name,
-                &builder_ident,
-                &default_fields,
-                accepts_nd_body,
-            );
+            let body_fn = Self::create_body_fn(&builder_ident, &default_fields, accepts_nd_body);
             builder_fns.push(body_fn);
         }
 
         // Combine common fns with builder fns, sort and deduplicate.
         builder_fns.append(&mut common_builder_fns);
-        builder_fns.sort_by(|a, b| a.ident.cmp(&b.ident));
-        builder_fns.dedup_by(|a, b| a.ident.eq(&b.ident));
+        builder_fns.sort_by(|a, b| a.get_ident().cmp(b.get_ident()));
+        builder_fns.dedup_by(|a, b| a.get_ident().eq(b.get_ident()));
 
         let new_fn =
             Self::create_new_fn(builder_name, &builder_ident, enum_builder, &default_fields);
@@ -613,22 +454,22 @@ impl<'a> RequestBuilder<'a> {
             endpoint.documentation.description.as_ref(),
             endpoint.documentation.url.as_ref(),
         ) {
-            (Some(d), Some(u)) if Url::parse(u).is_ok() => lit(format!(
+            (Some(d), Some(u)) if Url::parse(u).is_ok() => lit(&format!(
                 "Builder for the [{} API]({})\n\n{}",
                 api_name_for_docs, u, d
             )),
-            (Some(d), None) => lit(format!(
+            (Some(d), None) => lit(&format!(
                 "Builder for the {} API\n\n{}",
                 api_name_for_docs, d
             )),
-            (None, Some(u)) if Url::parse(u).is_ok() => lit(format!(
+            (None, Some(u)) if Url::parse(u).is_ok() => lit(&format!(
                 "Builder for the [{} API]({})",
                 api_name_for_docs, u
             )),
-            _ => lit(format!("Builder for the {} API", api_name_for_docs)),
+            _ => lit(&format!("Builder for the {} API", api_name_for_docs)),
         };
 
-        let send_doc = lit(format!(
+        let send_doc = lit(&format!(
             "Creates an asynchronous call to the {} API that can be awaited",
             api_name_for_docs
         ));
@@ -689,7 +530,7 @@ impl<'a> RequestBuilder<'a> {
         endpoint: &ApiEndpoint,
         is_root_method: bool,
         enum_builder: &EnumBuilder,
-    ) -> Tokens {
+    ) -> TokenStream {
         let cfg_attr = endpoint.stability.outer_cfg_attr();
         let cfg_doc = stability_doc(endpoint.stability);
         let (deprecated_attr, allow_deprecated_attr) = Deprecated::attr(&endpoint.deprecated);
@@ -731,19 +572,19 @@ impl<'a> RequestBuilder<'a> {
             endpoint.documentation.description.as_ref(),
             endpoint.documentation.url.as_ref(),
         ) {
-            (Some(d), Some(u)) if Url::parse(u).is_ok() => doc(format!(
+            (Some(d), Some(u)) if Url::parse(u).is_ok() => doc(&format!(
                 "[{} API]({})\n\n{}{}",
                 api_name_for_docs, u, d, markdown_doc
             )),
-            (Some(d), None) => doc(format!(
+            (Some(d), None) => doc(&format!(
                 "{} API\n\n{}{}",
                 api_name_for_docs, d, markdown_doc
             )),
-            (None, Some(u)) if Url::parse(u).is_ok() => doc(format!(
+            (None, Some(u)) if Url::parse(u).is_ok() => doc(&format!(
                 "[{} API]({}){}",
                 api_name_for_docs, u, markdown_doc
             )),
-            _ => doc(format!("{} API{}", api_name_for_docs, markdown_doc)),
+            _ => doc(&format!("{} API{}", api_name_for_docs, markdown_doc)),
         };
 
         let clone_expr = quote!(self.transport());
@@ -776,12 +617,9 @@ impl<'a> RequestBuilder<'a> {
 
     /// Creates the AST for a field for a struct
     fn create_struct_field(f: (&String, &Type)) -> syn::Field {
-        syn::Field {
-            ident: Some(ident(valid_name(f.0).to_lowercase())),
-            vis: syn::Visibility::Inherited,
-            attrs: vec![],
-            ty: typekind_to_ty(f.0, &f.1.ty, false, false),
-        }
+        let ident = ident(&valid_name(f.0).to_lowercase());
+        let ty = typekind_to_ty(f.0, &f.1.ty, false, false);
+        parse_named_field!(#ident: #ty)
     }
 
     /// Creates the AST for field values initialized with a default value.
@@ -790,18 +628,13 @@ impl<'a> RequestBuilder<'a> {
         default_fields
             .iter()
             .filter(|&&part| part != &ident("headers"))
-            .map(|part| syn::FieldValue {
-                attrs: vec![],
-                ident: ident(part),
-                expr: syn::ExprKind::Path(None, path_none(ident("None").as_ref())).into(),
-                is_shorthand: false,
-            })
+            .map(|part| parse_quote!(#part: None))
             .collect()
     }
 
     /// builds the AST that represent the builder structs
     /// and the ctor function for the builder struct on the root/namespace client
-    pub fn build(self) -> (Tokens, Tokens) {
+    pub fn build(self) -> (TokenStream, TokenStream) {
         let builder_struct = Self::create_builder_struct(
             self.builder_name,
             self.endpoint,

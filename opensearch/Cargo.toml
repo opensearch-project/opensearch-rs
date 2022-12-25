@@ -29,7 +29,7 @@ rustls-tls = ["reqwest/rustls-tls"]
 aws-auth = ["aws-sigv4", "aws-types"]
 
 [dependencies]
-base64 = "^0.13"
+base64 = "^0.20"
 bytes = "^1.0"
 dyn-clone = "~1"
 lazy_static = "1.4"

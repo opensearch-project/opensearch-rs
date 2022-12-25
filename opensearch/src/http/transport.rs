@@ -414,7 +414,8 @@ impl Transport {
                 Credentials::ApiKey(i, k) => {
                     let mut header_value = b"ApiKey ".to_vec();
                     {
-                        let mut encoder = Base64Encoder::new(&mut header_value, base64::STANDARD);
+                        let mut encoder =
+                            Base64Encoder::from(&mut header_value, &base64::engine::DEFAULT_ENGINE);
                         write!(encoder, "{}:", i).unwrap();
                         write!(encoder, "{}", k).unwrap();
                     }

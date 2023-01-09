@@ -29,7 +29,7 @@ semver = "1.0"
 serde = "~1"
 serde_yaml = "0.9"
 serde_json = { version = "~1", features = ["arbitrary_precision"] }
-simple_logger = "2.1.0"
+simple_logger = "4.0.0"
 syn = { version = "~1.0", features = ["full"] }
 sysinfo = "0.26"
 url = "2.1.1"

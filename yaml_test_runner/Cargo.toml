@@ -12,7 +12,7 @@ license = "Apache-2.0"
 opensearch = { path = "../opensearch", features = ["experimental-apis"]}
 api_generator = { path = "./../api_generator" }
 
-base64 = "^0.13"
+base64 = "^0.20"
 clap = "~2"
 failure = "0.1.6"
 itertools = "0.10.0"

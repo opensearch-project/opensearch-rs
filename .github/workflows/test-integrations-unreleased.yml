@@ -9,10 +9,11 @@ jobs:
       fail-fast: false
       matrix:
         entry:
-          - { opensearch_ref: '1.x' }
           - { opensearch_ref: '2.0' }
           - { opensearch_ref: '2.x' }
           - { opensearch_ref: 'main' }
+        # Unresolved pathological failure, to be re-enabled on resolution: https://github.com/opensearch-project/opensearch-rs/issues/97
+        # - { opensearch_ref: '1.x' }
     steps:
       - name: Checkout OpenSearch
         uses: actions/checkout@v2

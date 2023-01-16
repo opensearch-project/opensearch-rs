@@ -11,15 +11,15 @@
 
 use std::time::SystemTime;
 
+use aws_credential_types::{
+    Credentials, 
+    provider::{ProvideCredentials, SharedCredentialsProvider}
+};
 use aws_sigv4::{
     http_request::{sign, SignableBody, SignableRequest, SigningParams, SigningSettings},
     signing_params::BuildError,
 };
-use aws_types::{
-    credentials::{ProvideCredentials, SharedCredentialsProvider},
-    region::Region,
-    Credentials,
-};
+use aws_types::region::Region;
 use reqwest::Request;
 
 const SERVICE_NAME: &str = "es";

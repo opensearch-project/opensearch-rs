@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Dependencies
 - Bumps `simple_logger` from 2.3.0 to 4.0.0
 - Bumps `serde_with` from ~1 to ~2
+- Bumps `base64` from ^0.20 to ^0.21
 
 ### Changed
 - Update base64 dependency from ^0.13 to ^0.20 ([#95](https://github.com/opensearch-project/opensearch-rs/pull/95))

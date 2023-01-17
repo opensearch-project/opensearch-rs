@@ -54,7 +54,7 @@ hyper = { version = "0.14", default-features = false, features = ["tcp", "stream
 os_type = "2.2"
 regex="1.4"
 sysinfo = "0.26.4"
-textwrap = "^0.15"
+textwrap = "^0.16"
 tokio = { version = "1.0", default-features = false, features = ["macros", "net", "time", "rt-multi-thread"] }
 xml-rs = "^0.8"
 

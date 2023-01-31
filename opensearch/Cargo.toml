@@ -26,7 +26,7 @@ native-tls = ["reqwest/native-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 
 # AWS SigV4 Auth support
-aws-auth = ["aws-sigv4", "aws-types"]
+aws-auth = ["aws-credential-types", "aws-sigv4", "aws-types"]
 
 [dependencies]
 base64 = "^0.21"
@@ -40,11 +40,12 @@ serde = { version = "~1", features = ["derive"] }
 serde_json = "~1"
 serde_with = "~2"
 void = "1.0.2"
-aws-sigv4 = { version = ">= 0.10", optional = true }
-aws-types = { version = ">= 0.10", optional = true }
+aws-credential-types = { version = ">= 0.53", optional = true }
+aws-sigv4 = { version = ">= 0.53", optional = true }
+aws-types = { version = ">= 0.53", optional = true }
 
 [dev-dependencies]
-aws-config = ">= 0.10"
+aws-config = ">= 0.53"
 chrono = { version = "^0.4", features = ["serde"] }
 clap = "~2"
 failure = "0.1.5"

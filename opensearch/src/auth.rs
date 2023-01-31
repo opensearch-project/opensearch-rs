@@ -52,7 +52,7 @@ pub enum Credentials {
     /// This requires the `aws-auth` feature to be enabled.
     #[cfg(feature = "aws-auth")]
     AwsSigV4(
-        aws_types::credentials::SharedCredentialsProvider,
+        aws_credential_types::provider::SharedCredentialsProvider,
         aws_types::region::Region,
     ),
 }

@@ -27,7 +27,7 @@
  * Modifications Copyright OpenSearch Contributors. See
  * GitHub history for details.
  */
-#![cfg(feature = "integration")]
+#![cfg(feature = "_integration")]
 
 pub mod common;
 use common::*;

@@ -1,9 +1,10 @@
-name: Integration with Unreleased OpenSearch
+name: Integration Tests with Unreleased OpenSearch
 
 on: [push, pull_request]
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

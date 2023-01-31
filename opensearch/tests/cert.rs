@@ -21,7 +21,7 @@
 //!
 //!
 //! DETACH=true .ci/run-opensearch.sh
-#![cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+#![cfg(all(feature = "integration", any(feature = "native-tls", feature = "rustls-tls")))]
 
 pub mod common;
 use common::*;

@@ -1,0 +1,23 @@
+name: Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            components: rustfmt, clippy
+      - run: |
+          cargo test
+      - uses: codecov/codecov-action@v3
+        with:
+          files: ./test_results/opensearch.lcov
+          flags: integration

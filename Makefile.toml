@@ -54,7 +54,7 @@ category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ]}
 command = "cargo"
-args = ["test", "-p", "opensearch"]
+args = ["test", "--features", "integration", "-p", "opensearch"]
 dependencies = ["start-opensearch"]
 
 [tasks.run-api-generator]

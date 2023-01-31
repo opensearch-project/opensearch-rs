@@ -28,6 +28,8 @@
  * GitHub history for details.
  */
 
+ #![cfg(feature = "integration")]
+
 pub mod common;
 use common::*;
 

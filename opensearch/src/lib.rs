@@ -340,19 +340,24 @@
 //! ```
 //!
 //! ```rust,no_run
+//! # use aws_config::meta::region::RegionProviderChain;
 //! # use opensearch::{
 //! #     auth::Credentials,
 //! #     Error, OpenSearch,
 //! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 //! # };
 //! # use url::Url;
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # use std::convert::TryInto;
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let creds = aws_config::load_from_env().await;
 //! let url = Url::parse("https://example.com")?;
 //! let conn_pool = SingleNodeConnectionPool::new(url);
+//! # #[cfg(feature = "aws-auth")] {
 //! let transport = TransportBuilder::new(conn_pool)
 //!     .auth(creds.try_into()?).build()?;
 //! let client = OpenSearch::new(transport);
+//! # }
 //! # Ok(())
 //! # }
 //! ```

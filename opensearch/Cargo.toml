@@ -28,6 +28,9 @@ rustls-tls = ["reqwest/rustls-tls"]
 # AWS SigV4 Auth support
 aws-auth = ["aws-credential-types", "aws-sigv4", "aws-types"]
 
+# Integration tests against an actual instance of OpenSearch
+integration = []
+
 [dependencies]
 base64 = "^0.21"
 bytes = "^1.0"

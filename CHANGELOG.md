@@ -12,6 +12,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `textwrap` from ^0.15 to ^0.16
 - Bumps `base64` from ^0.13 to ^0.20 ([#95](https://github.com/opensearch-project/opensearch-rs/pull/95), [#105](https://github.com/opensearch-project/opensearch-rs/pull/105))
 - Bumps `aws-*` from >=0.10 to >=0.53 ([#108](https://github.com/opensearch-project/opensearch-rs/pull/108))
+- Bumps `toml` from 0.5.6 to 0.7.1
 
 ### Changed
 

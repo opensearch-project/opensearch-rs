@@ -47,7 +47,7 @@ use crate::{
         Method,
     },
 };
-use base64::write::EncoderWriter as Base64Encoder;
+use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
 use bytes::BytesMut;
 use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
@@ -414,8 +414,7 @@ impl Transport {
                 Credentials::ApiKey(i, k) => {
                     let mut header_value = b"ApiKey ".to_vec();
                     {
-                        let mut encoder =
-                            Base64Encoder::from(&mut header_value, &base64::engine::DEFAULT_ENGINE);
+                        let mut encoder = Base64Encoder::new(&mut header_value, &BASE64_STANDARD);
                         write!(encoder, "{}:", i).unwrap();
                         write!(encoder, "{}", k).unwrap();
                     }

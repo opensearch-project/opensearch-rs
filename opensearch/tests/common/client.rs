@@ -42,7 +42,7 @@ use opensearch::{
 };
 use reqwest::StatusCode;
 use serde_json::json;
-use sysinfo::{RefreshKind, System, SystemExt};
+use sysinfo::{ProcessRefreshKind, RefreshKind, System, SystemExt};
 use url::Url;
 
 /// Gets the address to the Elasticsearch instance from environment variables
@@ -56,8 +56,9 @@ pub fn cluster_addr() -> String {
 
 /// Checks if Fiddler proxy process is running
 fn running_proxy() -> bool {
-    let system = System::new_with_specifics(RefreshKind::new().with_processes());
-    !system.get_process_by_name("Fiddler").is_empty()
+    let system = System::new_with_specifics(RefreshKind::new().with_processes(ProcessRefreshKind::default()));
+    let has_fiddler = system.processes_by_name("Fiddler").next().is_some();
+    has_fiddler
 }
 
 pub fn create_default_builder() -> TransportBuilder {

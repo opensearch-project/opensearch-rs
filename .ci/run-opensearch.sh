@@ -33,6 +33,18 @@ environment=($(cat <<-END
 END
 ))
 
+if [[ "$SECURE_INTEGRATION" == "true" ]]; then
+  environment+=($(cat <<-END
+    --env DISABLE_SECURITY_PLUGIN=false
+END
+))
+else
+  environment+=($(cat <<-END
+    --env DISABLE_SECURITY_PLUGIN=true
+END
+))
+fi
+
 NUMBER_OF_NODES=${NUMBER_OF_NODES-1}
 http_port=9200
 for (( i=0; i<$NUMBER_OF_NODES; i++, http_port++ )); do
@@ -59,9 +71,14 @@ END
     CLUSTER_TAG=$CLUSTER-secure-$SECURE_INTEGRATION
     echo -e "\033[34;1mINFO: building $CLUSTER container\033[0m"
     echo 'cluster is' $CLUSTER
+
+    # Copy certificates and keys
+    cp $ssl_ca_pem root-ca.pem
+    cp $ssl_cert_pem esnode.pem
+    cp $ssl_key_pem esnode-key.pem
+
     docker build \
       --file=.ci/$CLUSTER/Dockerfile \
-      --build-arg SECURE_INTEGRATION=$SECURE_INTEGRATION \
       --build-arg STACK_VERSION=$STACK_VERSION \
       --tag=$CLUSTER_TAG \
       .
@@ -80,7 +97,7 @@ END
   docker run \
     --name "$node_name" \
     --network "$network_name" \
-    --env "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+    --env "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g" \
     "${environment[@]}" \
     "${volumes[@]}" \
     --publish "$http_port":9200 \

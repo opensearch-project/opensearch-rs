@@ -7,6 +7,12 @@ export CLUSTER="${1:=opensearch}"
 export STACK_VERSION="${2:-latest}"
 export SECURE_INTEGRATION="${3:-false}"
 
+if [[ "$SECURE_INTEGRATION" == "true" ]]; then
+  export DISABLE_SECURITY="false"
+else
+  export DISABLE_SECURITY="true"
+fi
+
 script_path=$(dirname $(realpath -s $0))
 source $script_path/functions/imports.sh
 set -euo pipefail

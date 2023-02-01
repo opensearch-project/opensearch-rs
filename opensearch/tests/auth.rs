@@ -34,8 +34,6 @@ use common::*;
 use opensearch::auth::Credentials;
 
 use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
-// use std::fs::File;
-// use std::io::Read;
 use std::io::Write;
 
 #[tokio::test]

@@ -154,6 +154,8 @@ pub struct TransportBuilder {
     disable_proxy: bool,
     headers: HeaderMap,
     timeout: Option<Duration>,
+    #[cfg(feature = "aws-auth")]
+    service_name: String,
 }
 
 impl TransportBuilder {
@@ -174,6 +176,8 @@ impl TransportBuilder {
             disable_proxy: false,
             headers: HeaderMap::new(),
             timeout: None,
+            #[cfg(feature = "aws-auth")]
+            service_name: "es".to_string(),
         }
     }
 
@@ -238,6 +242,15 @@ impl TransportBuilder {
     /// Default is no timeout.
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
+        self
+    }
+
+    /// Sets a global AWS service name.
+    ///
+    /// Default is "es". Other supported services are "aoss" for OpenSearch Serverless.
+    #[cfg(feature = "aws-auth")]
+    pub fn service_name(mut self, service_name: &str) -> Self {
+        self.service_name = service_name.to_string();
         self
     }
 
@@ -313,6 +326,8 @@ impl TransportBuilder {
             client,
             conn_pool: self.conn_pool,
             credentials: self.credentials,
+            #[cfg(feature = "aws-auth")]
+            service_name: self.service_name,
         })
     }
 }
@@ -352,6 +367,8 @@ pub struct Transport {
     client: reqwest::Client,
     credentials: Option<Credentials>,
     conn_pool: Box<dyn ConnectionPool>,
+    #[cfg(feature = "aws-auth")]
+    service_name: String,
 }
 
 impl Transport {
@@ -460,9 +477,14 @@ impl Transport {
 
         #[cfg(feature = "aws-auth")]
         if let Some(Credentials::AwsSigV4(credentials_provider, region)) = &self.credentials {
-            super::aws_auth::sign_request(&mut request, credentials_provider, region)
-                .await
-                .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
+            super::aws_auth::sign_request(
+                &mut request,
+                credentials_provider,
+                &self.service_name,
+                region,
+            )
+            .await
+            .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
         }
 
         let response = self.client.execute(request).await;

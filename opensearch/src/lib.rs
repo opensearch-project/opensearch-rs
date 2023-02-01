@@ -58,7 +58,7 @@
 //! - **experimental-apis**: Enables experimental APIs. Experimental APIs are just that - an experiment. An experimental
 //!   API might have breaking changes in any future version, or it might even be removed entirely. This feature also
 //!   enables `beta-apis`.
-//! - **aws-auth**: Enables authentication with Amazon OpenSearch.
+//! - **aws-auth**: Enables authentication with Amazon OpenSearch and OpenSearch Serverless.
 //!   Performs AWS SigV4 signing using credential types from `aws-types`.
 //!
 //! # Getting started
@@ -327,9 +327,9 @@
 //! # }
 //! ```
 //!
-//! ## Amazon OpenSearch
+//! ## Amazon OpenSearch and OpenSearch Serverless
 //!
-//! For authenticating against an Amazon OpenSearch endpoint using AWS SigV4 request signing,
+//! For authenticating against an Amazon OpenSearch or OpenSearch Serverless endpoint using AWS SigV4 request signing,
 //! you must enable the `aws-auth` feature, then pass the AWS credentials to the [TransportBuilder](http::transport::TransportBuilder).
 //! The easiest way to retrieve AWS credentials in the required format is to use [aws-config](https://docs.rs/aws-config/latest/aws_config/).
 //!
@@ -349,14 +349,15 @@
 //! # use std::convert::TryInto;
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(feature = "aws-auth")] {
 //! let creds = aws_config::load_from_env().await;
-//! let url = Url::parse("https://example.com")?;
+//! let url = Url::parse("https://...")?;
 //! let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
 //! let aws_config = aws_config::from_env().region(region_provider).load().await.clone();
 //! let conn_pool = SingleNodeConnectionPool::new(url);
-//! # #[cfg(feature = "aws-auth")] {
 //! let transport = TransportBuilder::new(conn_pool)
 //!     .auth(aws_config.clone().try_into()?)
+//!     .service_name("es") // use "aoss" for OpenSearch Serverless
 //!     .build()?;
 //! let client = OpenSearch::new(transport);
 //! # }

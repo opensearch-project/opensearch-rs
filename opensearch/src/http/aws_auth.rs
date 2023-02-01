@@ -12,29 +12,33 @@
 use std::time::SystemTime;
 
 use aws_credential_types::{
-    Credentials, 
-    provider::{ProvideCredentials, SharedCredentialsProvider}
+    provider::{ProvideCredentials, SharedCredentialsProvider},
+    Credentials,
 };
 use aws_sigv4::{
-    http_request::{sign, SignableBody, SignableRequest, SigningParams, SigningSettings},
+    http_request::{
+        sign, PayloadChecksumKind, SignableBody, SignableRequest, SigningParams, SigningSettings,
+    },
     signing_params::BuildError,
 };
 use aws_types::region::Region;
 use reqwest::Request;
 
-const SERVICE_NAME: &str = "es";
-
 fn get_signing_params<'a>(
     credentials: &'a Credentials,
+    service_name: &'a str,
     region: &'a Region,
 ) -> Result<SigningParams<'a>, BuildError> {
+    let mut signing_settings = SigningSettings::default();
+    signing_settings.payload_checksum_kind = PayloadChecksumKind::XAmzSha256; // required for OpenSearch Serverless
+
     let mut builder = SigningParams::builder()
         .access_key(credentials.access_key_id())
         .secret_key(credentials.secret_access_key())
-        .service_name(SERVICE_NAME)
+        .service_name(service_name)
         .region(region.as_ref())
         .time(SystemTime::now())
-        .settings(SigningSettings::default());
+        .settings(signing_settings);
 
     builder.set_security_token(credentials.session_token());
 
@@ -44,11 +48,12 @@ fn get_signing_params<'a>(
 pub async fn sign_request(
     request: &mut Request,
     credentials_provider: &SharedCredentialsProvider,
+    service_name: &str,
     region: &Region,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let credentials = credentials_provider.provide_credentials().await?;
 
-    let params = get_signing_params(&credentials, region)?;
+    let params = get_signing_params(&credentials, service_name, region)?;
 
     let uri = request.url().as_str().parse()?;
 

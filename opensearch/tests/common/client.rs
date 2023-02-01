@@ -56,7 +56,9 @@ pub fn cluster_addr() -> String {
 
 /// Checks if Fiddler proxy process is running
 fn running_proxy() -> bool {
-    let system = System::new_with_specifics(RefreshKind::new().with_processes(ProcessRefreshKind::default()));
+    let system = System::new_with_specifics(
+        RefreshKind::new().with_processes(ProcessRefreshKind::default()),
+    );
     let has_fiddler = system.processes_by_name("Fiddler").next().is_some();
     has_fiddler
 }

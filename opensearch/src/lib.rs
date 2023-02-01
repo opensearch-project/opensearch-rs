@@ -58,7 +58,8 @@
 //! - **experimental-apis**: Enables experimental APIs. Experimental APIs are just that - an experiment. An experimental
 //!   API might have breaking changes in any future version, or it might even be removed entirely. This feature also
 //!   enables `beta-apis`.
-//! - **aws-auth**: Enables AWS authentication. Performs AWS SigV4 signing using credential types from `aws-types`.
+//! - **aws-auth**: Enables authentication with Amazon OpenSearch.
+//!   Performs AWS SigV4 signing using credential types from `aws-types`.
 //!
 //! # Getting started
 //!
@@ -137,7 +138,6 @@
 //!
 //! ```rust,no_run
 //! # use opensearch::{
-//! #     auth::Credentials,
 //! #     Error, OpenSearch,
 //! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 //! # };
@@ -160,7 +160,7 @@
 //! The following makes an API call to the cat indices API
 //!
 //! ```rust,no_run
-//! # use opensearch::{auth::Credentials, OpenSearch, Error, cat::CatIndicesParts};
+//! # use opensearch::{OpenSearch, Error, cat::CatIndicesParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -189,7 +189,7 @@
 //! Indexing a single document can be achieved with the index API
 //!
 //! ```rust,no_run
-//! # use opensearch::{auth::Credentials, OpenSearch, Error, SearchParts, IndexParts};
+//! # use opensearch::{OpenSearch, Error, SearchParts, IndexParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -215,7 +215,7 @@
 //! to be sent in one API call
 //!
 //! ```rust,no_run
-//! # use opensearch::{auth::Credentials, OpenSearch, Error, IndexParts, BulkParts, http::request::JsonBody};
+//! # use opensearch::{OpenSearch, Error, IndexParts, BulkParts, http::request::JsonBody};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -258,7 +258,7 @@
 //! `{"query":{"match":{"message":"OpenSearch"}}}`
 //!
 //! ```rust,no_run
-//! # use opensearch::{auth::Credentials, OpenSearch, Error, SearchParts};
+//! # use opensearch::{OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -305,7 +305,7 @@
 //! [OpenSearch::send] can be used
 //!
 //! ```rust,no_run
-//! # use opensearch::{auth::Credentials, http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};
+//! # use opensearch::{http::{Method,headers::HeaderMap}, OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use serde_json::{json, Value};
 //! # #[tokio::main]
@@ -327,9 +327,9 @@
 //! # }
 //! ```
 //!
-//! ## AWS Authentication
+//! ## Amazon OpenSearch
 //!
-//! For authenticating against an OpenSearch endpoint using AWS SigV4 request signing,
+//! For authenticating against an Amazon OpenSearch endpoint using AWS SigV4 request signing,
 //! you must enable the `aws-auth` feature, then pass the AWS credentials to the [TransportBuilder](http::transport::TransportBuilder).
 //! The easiest way to retrieve AWS credentials in the required format is to use [aws-config](https://docs.rs/aws-config/latest/aws_config/).
 //!
@@ -342,7 +342,6 @@
 //! ```rust,no_run
 //! # use aws_config::meta::region::RegionProviderChain;
 //! # use opensearch::{
-//! #     auth::Credentials,
 //! #     Error, OpenSearch,
 //! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
 //! # };
@@ -352,10 +351,13 @@
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let creds = aws_config::load_from_env().await;
 //! let url = Url::parse("https://example.com")?;
+//! let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
+//! let aws_config = aws_config::from_env().region(region_provider).load().await.clone();
 //! let conn_pool = SingleNodeConnectionPool::new(url);
 //! # #[cfg(feature = "aws-auth")] {
 //! let transport = TransportBuilder::new(conn_pool)
-//!     .auth(creds.try_into()?).build()?;
+//!     .auth(aws_config.clone().try_into()?)
+//!     .build()?;
 //! let client = OpenSearch::new(transport);
 //! # }
 //! # Ok(())

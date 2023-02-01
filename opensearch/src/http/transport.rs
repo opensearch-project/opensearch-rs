@@ -108,7 +108,7 @@ impl fmt::Display for BuildError {
     }
 }
 
-/// Default address to Elasticsearch running on `http://localhost:9200`
+/// Default address to OpenSearch running on `http://localhost:9200`
 pub static DEFAULT_ADDRESS: &str = "http://localhost:9200";
 
 lazy_static! {

@@ -8,6 +8,7 @@
 OpenSearch Rust Client
 
 - [Welcome!](#welcome)
+- [User Guide](#user-guide)
 - [Compatibility with OpenSearch](#compatibility-with-opensearch)
 - [Code of Conduct](#code-of-conduct)
 - [Security](#security)
@@ -16,7 +17,11 @@ OpenSearch Rust Client
 
 ## Welcome!
 
-**opensearch-rs** is [a community-driven, open source fork](https://aws.amazon.com/blogs/opensource/introducing-opensearch/) of elasticsearch-rs licensed under the [Apache v2.0 License](LICENSE.txt). For more information, see [opensearch.org](https://opensearch.org/).
+The opensearch-rs client is [a community-driven, open source fork](https://aws.amazon.com/blogs/opensource/introducing-opensearch/) of elasticsearch-rs, licensed under the [Apache v2.0 License](LICENSE.txt). For more information, see [opensearch.org](https://opensearch.org/).
+
+## User Guide
+
+See [User Guide](USER_GUIDE.md).
 
 ## Compatibility with OpenSearch
 

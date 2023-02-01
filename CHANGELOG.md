@@ -16,6 +16,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `toml` from 0.5.6 to 0.7.1
 
 ### Changed
+- Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))
 
 ### Deprecated
 

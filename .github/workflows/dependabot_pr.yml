@@ -1,4 +1,4 @@
-name: Dependabot PR actions
+name: Dependabot PR Actions
 on: 
   pull_request:
     types:

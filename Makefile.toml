@@ -54,7 +54,7 @@ category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ]}
 command = "cargo"
-args = ["test", "-p", "opensearch"]
+args = ["test", "--features", "_integration", "-p", "opensearch"]
 dependencies = ["start-opensearch"]
 
 [tasks.run-api-generator]
@@ -153,6 +153,18 @@ clear = true
 description = "Runs opensearch package tests against a given OpenSearch version"
 dependencies = ["test-opensearch"]
 run_task = "stop-opensearch"
+
+[tasks.run-unittest]
+private = true
+command = "cargo"
+args = ["test"]
+
+[tasks.unittest]
+category = "OpenSearch"
+clear = true
+description = "Runs workspace unit tests"
+dependencies = ["set-coverage-vars", "create-test-results-dir", "run-unittest"]
+run_task = "convert-coverage-data"
 
 [tasks.generate-yaml-tests]
 category = "OpenSearch"

@@ -1,6 +1,10 @@
 ARG STACK_VERSION
 FROM "opensearchproject/opensearch:$STACK_VERSION"
-ARG SECURE_INTEGRATION
-ARG opensearch_path=/usr/share/opensearch
-ARG opensearch_yml=$opensearch_path/config/opensearch.yml
-RUN if [ "$SECURE_INTEGRATION" != "true" ] ; then $opensearch_path/bin/opensearch-plugin remove opensearch-security; fi
+
+USER root
+COPY root-ca.pem /usr/share/opensearch/config/root-ca.pem
+COPY esnode.pem /usr/share/opensearch/config/esnode.pem
+COPY esnode-key.pem /usr/share/opensearch/config/esnode-key.pem
+RUN chmod a+wr /usr/share/opensearch/config/*pem
+
+USER opensearch

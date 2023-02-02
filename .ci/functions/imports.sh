@@ -19,8 +19,10 @@ if [[ -z $opensearch_node_name ]]; then
 
   if [[ "$SECURE_INTEGRATION" == "true" ]]; then
     export OPENSEARCH_URL_EXTENSION="https"
+    export DISABLE_SECURITY="false"
   else
     export OPENSEARCH_URL_EXTENSION="http"
+    export DISABLE_SECURITY="true"
   fi
 
   export opensearch_image=opensearchproject/opensearch
@@ -33,6 +35,9 @@ if [[ -z $opensearch_node_name ]]; then
   export ssl_cert="${script_path}/certs/testnode.crt"
   export ssl_key="${script_path}/certs/testnode.key"
   export ssl_ca="${script_path}/certs/ca.crt"
+  export ssl_cert_pem="${script_path}/certs/testnode.pem"
+  export ssl_key_pem="${script_path}/certs/testnode-key.pem"
+  export ssl_ca_pem="${script_path}/certs/ca.pem"
 
   echo -e "\033[34;1mINFO:\033[0m Running $CLUSTER $STACK_VERSION\033[0m"
 fi

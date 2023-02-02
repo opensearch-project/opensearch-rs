@@ -8,7 +8,8 @@ STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"
 CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 # RUST_BACKTRACE is set to "full" in cargo make's builtin makefiles/stable.toml
 RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"]}}
-OPENSEARCH_URL = { value = "http://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
+OPENSEARCH_PROTOCOL_SUFFIX = { value = "s", condition = { env_true = ["SECURE_INTEGRATION"] }}
+OPENSEARCH_URL = { value = "http${OPENSEARCH_PROTOCOL_SUFFIX}://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
 
 [tasks.run-yaml-test-runner]
 category = "OpenSearch"

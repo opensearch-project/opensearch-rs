@@ -73,7 +73,6 @@ END
     echo 'cluster is' $CLUSTER
 
     # Copy certificates and keys
-    cp $ssl_ca_pem root-ca.pem
     cp $ssl_cert_pem esnode.pem
     cp $ssl_key_pem esnode-key.pem
 
@@ -82,6 +81,10 @@ END
       --build-arg STACK_VERSION=$STACK_VERSION \
       --tag=$CLUSTER_TAG \
       .
+     
+    # Cleanup certificates and keys
+    rm esnode.pem
+    rm esnode-key.pem
   else
     CLUSTER_TAG=$CLUSTER_TAG:test
   fi

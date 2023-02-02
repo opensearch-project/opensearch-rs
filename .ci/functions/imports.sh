@@ -37,7 +37,6 @@ if [[ -z $opensearch_node_name ]]; then
   export ssl_ca="${script_path}/certs/ca.crt"
   export ssl_cert_pem="${script_path}/certs/testnode.pem"
   export ssl_key_pem="${script_path}/certs/testnode-key.pem"
-  export ssl_ca_pem="${script_path}/certs/ca.pem"
 
   echo -e "\033[34;1mINFO:\033[0m Running $CLUSTER $STACK_VERSION\033[0m"
 fi

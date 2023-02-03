@@ -40,13 +40,6 @@ jobs:
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
 
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: nightly
-            override: true
-            components: rustfmt, clippy
-
       - name: Integ OpenSearch ${{ matrix.entry.opensearch_ref }} secured=false
         run: "./.ci/run-tests opensearch SNAPSHOT false"
 

@@ -8,8 +8,8 @@ STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"
 CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 # RUST_BACKTRACE is set to "full" in cargo make's builtin makefiles/stable.toml
 RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"]}}
-OPENSEARCH_PROTOCOL_SUFFIX = { value = "s", condition = { env_true = ["SECURE_INTEGRATION"] }}
-OPENSEARCH_URL = { value = "http${OPENSEARCH_PROTOCOL_SUFFIX}://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
+OPENSEARCH_PROTOCOL = { source = "${SECURE_INTEGRATION}", default_value = "https", mapping = { "false" = "http", "true" = "https" }}
+OPENSEARCH_URL = { value = "${OPENSEARCH_PROTOCOL}://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
 
 [tasks.run-yaml-test-runner]
 category = "OpenSearch"
@@ -55,7 +55,7 @@ category = "OpenSearch"
 private = true
 condition = { env_set = [ "OPENSEARCH_URL" ]}
 command = "cargo"
-args = ["test", "--features", "_integration", "-p", "opensearch"]
+args = ["test", "-p", "opensearch"]
 dependencies = ["start-opensearch"]
 
 [tasks.run-api-generator]
@@ -158,7 +158,7 @@ run_task = "stop-opensearch"
 [tasks.run-unittest]
 private = true
 command = "cargo"
-args = ["test"]
+args = ["test", "--lib", "--bins"]
 
 [tasks.unittest]
 category = "OpenSearch"

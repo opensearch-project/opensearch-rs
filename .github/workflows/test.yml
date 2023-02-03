@@ -16,9 +16,19 @@ jobs:
             components: rustfmt, clippy, llvm-tools-preview
       - name: Setup Tools
         run: cargo install grcov cargo-make
-      - name: Run Tests
+      - name: Run Unit Tests
         run: |
           cargo make unittest
+      - name: Prepare for integration tests
+        run: |
+          CLEANUP="false" DETACH="true" ./.ci/run-opensearch.sh
+      - name: Run Integration Tests
+        run: |
+          cargo make test
+      - name: Cleanup after integration tests
+        if: always()
+        run: |
+          CLEANUP="true" DETACH="false" ./.ci/run-opensearch.sh
       - name: Upload Coverage Data
         uses: codecov/codecov-action@v3
         with:

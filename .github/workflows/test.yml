@@ -12,10 +12,14 @@ jobs:
       - name: Install latest stable toolchain
         uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            components: rustfmt, clippy, llvm-tools-preview
+          toolchain: stable
+          components: rustfmt, clippy, llvm-tools-preview
+      - name: Install cargo-make
+        uses: davidB/rust-cargo-make@v1
+      - name: Cargo Cache
+        uses: Swatinem/rust-cache@v2
       - name: Setup Tools
-        run: cargo install grcov cargo-make
+        run: cargo install grcov
       - name: Run Unit Tests
         run: |
           cargo make unittest

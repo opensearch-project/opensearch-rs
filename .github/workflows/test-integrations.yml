@@ -29,11 +29,6 @@ jobs:
           sudo sysctl -w vm.swappiness=1
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
-      - name: Install latest stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
-            components: rustfmt, clippy
       - name: Integ OpenSearch ${{ matrix.entry.version }} secured=${{ matrix.secured }}
         run: "./.ci/run-tests opensearch ${{ matrix.entry.version }} ${{ matrix.secured }}"
       - uses: codecov/codecov-action@v3

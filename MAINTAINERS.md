@@ -10,3 +10,4 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Thomas Farr        | [Xtansia](https://github.com/Xtansia)     | Amazon      |
 | Vacha Shah         | [VachaShah](https://github.com/VachaShah) | Amazon      |
 | Aditya Jindal      | [aditjind](https://github.com/aditjind)   | aditjind    |
+| Andriy Redko       | [reta](https://github.com/reta)           | Aiven       |

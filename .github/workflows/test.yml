@@ -1,40 +1,52 @@
 name: Unit Tests
-on: [push, pull_request]
+
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+
 jobs:
   tests:
     name: Test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
-      - name: Checkout
+      - name: Checkout Rust Client
         uses: actions/checkout@v3
-      - name: Install latest stable toolchain
-        uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
-          components: rustfmt, clippy, llvm-tools-preview
-      - name: Install cargo-make
-        uses: davidB/rust-cargo-make@v1
-      - name: Cargo Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Setup Tools
-        run: cargo install grcov
+          path: client
+
+      - name: Setup Rust tools
+        uses: ./client/.github/actions/setup-rust-tools
+
       - name: Run Unit Tests
-        run: |
-          cargo make unittest
-      - name: Prepare for integration tests
-        run: |
-          CLEANUP="false" DETACH="true" ./.ci/run-opensearch.sh
+        working-directory: client
+        run: cargo make unittest
+
+      - name: Run OpenSearch
+        id: opensearch
+        uses: ./client/.github/actions/run-released-opensearch
+        with:
+          version: 2.4.0
+          secured: true
+
       - name: Run Integration Tests
-        run: |
-          cargo make test
-      - name: Cleanup after integration tests
-        if: always()
-        run: |
-          CLEANUP="true" DETACH="false" ./.ci/run-opensearch.sh
+        working-directory: client
+        run: cargo make test
+        env:
+          OPENSEARCH_URL: ${{ steps.opensearch.outputs.opensearch_url }}
+
       - name: Upload Coverage Data
         uses: codecov/codecov-action@v3
         with:
           files: ./test_results/opensearch.lcov
           flags: unit
+
+      - name: Save server logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: opensearch-logs
+          path: |
+            opensearch-*/logs/*
+        

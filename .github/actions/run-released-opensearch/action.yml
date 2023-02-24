@@ -1,0 +1,71 @@
+name: Run OpenSearch
+description: Runs a released version of OpenSearch
+inputs:
+  version:
+    description: The version of OpenSearch to run
+    required: true
+  secured:
+    description: Whether to enable the security plugin
+    required: true
+outputs:
+  opensearch_url:
+    description: The URL where the OpenSearch node is accessible
+    value: ${{ steps.configure-security.outputs.url }}
+runs:
+  using: composite
+  steps:
+    - name: Restore cached OpenSearch distro
+      id: cache-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: opensearch-${{ inputs.version }}
+        key: opensearch-${{ inputs.version }}
+
+    - name: Download OpenSearch
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        curl -sSLO https://artifacts.opensearch.org/releases/bundle/opensearch/${{ inputs.version }}/opensearch-${{ inputs.version }}-linux-x64.tar.gz \
+        && tar -xzf opensearch-*.tar.gz \
+        && rm -f opensearch-*.tar.gz
+    
+    - name: Save cached OpenSearch distro
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v3
+      with:
+        path: opensearch-${{ inputs.version }}
+        key: opensearch-${{ inputs.version }}
+    
+    - name: Configure security
+      id: configure-security
+      shell: bash
+      run: |
+        if ${{ inputs.secured == 'true' }}; then
+          bash ./opensearch-*/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s
+          cp ./client/.ci/certs/testnode.pem ./opensearch-*/config/esnode.pem
+          cp ./client/.ci/certs/testnode-key.pem ./opensearch-*/config/esnode-key.pem
+          echo "url=https://localhost:9200" >> $GITHUB_OUTPUT
+        else
+          echo "url=http://localhost:9200" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run OpenSearch
+      shell: bash
+      run: |
+        ./opensearch-*/bin/opensearch \
+          -Enode.attr.testattr=test \
+          -Epath.repo=/tmp \
+          -Erepositories.url.allowed_urls=http://snapshot.test* \
+          -Eaction.destructive_requires_name=false \
+          -Eplugins.security.disabled=${{ inputs.secured == 'false' }} \
+          -Eplugins.security.audit.type=log4j \
+          -d
+        for attempt in {1..20}; do
+          sleep 5
+          if curl -ksS -u admin:admin ${{ steps.configure-security.outputs.url }}; then
+            echo '=====> ready'
+            exit 0
+          fi
+          echo '=====> waiting...'
+        done
+        exit 1

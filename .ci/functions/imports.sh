@@ -8,7 +8,6 @@
 if [[ -z $opensearch_node_name ]]; then
   # only set these once
   set -euo pipefail
-  export RUNSCRIPTS=${RUNSCRIPTS-}
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}
   export CLUSTER=${CLUSTER-opensearch}
@@ -19,10 +18,8 @@ if [[ -z $opensearch_node_name ]]; then
 
   if [[ "$SECURE_INTEGRATION" == "true" ]]; then
     export OPENSEARCH_URL_EXTENSION="https"
-    export DISABLE_SECURITY="false"
   else
     export OPENSEARCH_URL_EXTENSION="http"
-    export DISABLE_SECURITY="true"
   fi
 
   export opensearch_image=opensearchproject/opensearch

@@ -1,6 +1,10 @@
 name: Integration Tests with Unreleased OpenSearch
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
 
 jobs:
   test:
@@ -9,41 +13,81 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        entry:
-          - { opensearch_ref: '2.0' }
-          - { opensearch_ref: '2.x' }
-          - { opensearch_ref: 'main' }
-        # Unresolved pathological failure, to be re-enabled on resolution: https://github.com/opensearch-project/opensearch-rs/issues/97
-        # - { opensearch_ref: '1.x' }
+        opensearch_ref: ['1.x', '2.0', '2.x', 'main']
     steps:
       - name: Checkout OpenSearch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opensearch-project/opensearch
-          ref: ${{ matrix.entry.opensearch_ref }}
+          ref: ${{ matrix.opensearch_ref }}
           path: opensearch
 
-        # This step builds the docker image tagged as opensearch:test. It will be further used in /ci/run-tests to test against unreleased OpenSearch.
-        # Reference: https://github.com/opensearch-project/OpenSearch/blob/2.0/distribution/docker/build.gradle#L190
+      - name: Get OpenSearch branch top
+        id: get-key
+        working-directory: opensearch
+        run: echo key=`git log -1 --format='%H'` >> $GITHUB_OUTPUT
+
+      - name: Restore cached build
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: opensearch/distribution/archives/linux-tar/build/distributions
+          key: ${{ steps.get-key.outputs.key }}
+
       - name: Assemble OpenSearch
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        working-directory: opensearch
+        run: ./gradlew :distribution:archives:linux-tar:assemble
+
+      - name: Save cached build
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: opensearch/distribution/archives/linux-tar/build/distributions
+          key: ${{ steps.get-key.outputs.key }}
+
+      - name: Run OpenSearch
+        working-directory: opensearch/distribution/archives/linux-tar/build/distributions
         run: |
-          cd opensearch
-          ./gradlew assemble
+          tar xf opensearch-min-*
+          ./opensearch-*/bin/opensearch \
+            -Enode.attr.testattr=test \
+            -Epath.repo=/tmp \
+            -Erepositories.url.allowed_urls=http://snapshot.test* \
+            -d
+          for attempt in {1..20}; do
+            sleep 5
+            if curl -s localhost:9200; then
+              echo '=====> ready'
+              exit 0
+            fi
+            echo '=====> waiting...'
+          done
+          exit 1
 
       - name: Checkout Rust Client
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          path: client
 
-      - name: Increase system limits
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
+      - name: Setup Rust tools
+        uses: ./client/.github/actions/setup-rust-tools
 
-      - name: Integ OpenSearch ${{ matrix.entry.opensearch_ref }} secured=false
-        run: "./.ci/run-tests opensearch SNAPSHOT false"
+      - name: Run integration tests
+        working-directory: client
+        run: cargo make test-yaml
+        env:
+          OPENSEARCH_URL: http://localhost:9200
 
       - uses: codecov/codecov-action@v3
         with:
-          files: ./test_results/opensearch.lcov
+          files: ./client/test_results/opensearch.lcov
           flags: integration
+
+      - name: Save server logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: opensearch-logs-${{ matrix.opensearch_ref }}
+          path: |
+            opensearch/distribution/archives/linux-tar/build/distributions/**/logs/*

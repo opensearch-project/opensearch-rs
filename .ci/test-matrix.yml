@@ -1,9 +1,0 @@
----
-
-STACK_VERSION:
-  - 2.x-SNAPSHOT
-
-RUST_TOOLCHAIN:
-  - latest
-
-exclude: ~

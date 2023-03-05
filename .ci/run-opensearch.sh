@@ -30,6 +30,7 @@ environment=($(cat <<-END
   --env path.repo=/tmp
   --env repositories.url.allowed_urls=http://snapshot.test*
   --env action.destructive_requires_name=false
+  --env plugins.security.audit.type=log4j
 END
 ))
 

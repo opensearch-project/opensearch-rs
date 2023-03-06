@@ -15,6 +15,11 @@ jobs:
       matrix:
         opensearch_ref: ['1.x', '2.0', '2.x', 'main']
     steps:
+      - name: Checkout Rust Client
+        uses: actions/checkout@v3
+        with:
+          path: client
+
       - name: Checkout OpenSearch
         uses: actions/checkout@v3
         with:
@@ -47,14 +52,19 @@ jobs:
           key: ${{ steps.get-key.outputs.key }}
 
       - name: Run OpenSearch
-        working-directory: opensearch/distribution/archives/linux-tar/build/distributions
+        shell: bash -eo pipefail {0}
         run: |
-          tar xf opensearch-min-*
-          ./opensearch-*/bin/opensearch \
-            -Enode.attr.testattr=test \
-            -Epath.repo=/tmp \
-            -Erepositories.url.allowed_urls=http://snapshot.test* \
-            -d
+          tar xf opensearch/distribution/archives/linux-tar/build/distributions/opensearch-min-*
+          cp ./client/.ci/opensearch/opensearch.yml ./opensearch-*/config/opensearch.yml
+
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+          sudo prlimit --pid $$ --memlock=unlimited:unlimited
+
+          opensearch-*/bin/opensearch -d
+
           for attempt in {1..20}; do
             sleep 5
             if curl -s localhost:9200; then
@@ -64,11 +74,6 @@ jobs:
             echo '=====> waiting...'
           done
           exit 1
-
-      - name: Checkout Rust Client
-        uses: actions/checkout@v3
-        with:
-          path: client
 
       - name: Setup Rust tools
         uses: ./client/.github/actions/setup-rust-tools

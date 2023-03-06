@@ -10,7 +10,7 @@ inputs:
 outputs:
   opensearch_url:
     description: The URL where the OpenSearch node is accessible
-    value: ${{ steps.configure-security.outputs.url }}
+    value: ${{ steps.configure.outputs.url }}
 runs:
   using: composite
   steps:
@@ -36,33 +36,36 @@ runs:
         path: opensearch-${{ inputs.version }}
         key: opensearch-${{ inputs.version }}
     
-    - name: Configure security
-      id: configure-security
-      shell: bash
+    - name: Configure OpenSearch
+      id: configure
+      shell: bash -eo pipefail {0}
       run: |
+        cp ./client/.ci/opensearch/opensearch.yml ./opensearch-*/config/ \
+        && bash opensearch-*/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s \
+        && sed -i'' 's/plugins.security.audit.type:.*/plugins.security.audit.type: log4j/' ./opensearch-*/config/opensearch.yml \
+        && cp ./client/.ci/opensearch/*.pem ./opensearch-*/config/
+
         if ${{ inputs.secured == 'true' }}; then
-          bash ./opensearch-*/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s
-          cp ./client/.ci/certs/testnode.pem ./opensearch-*/config/esnode.pem
-          cp ./client/.ci/certs/testnode-key.pem ./opensearch-*/config/esnode-key.pem
           echo "url=https://localhost:9200" >> $GITHUB_OUTPUT
         else
+          echo "plugins.security.disabled: true" >> ./opensearch-*/config/opensearch.yml
           echo "url=http://localhost:9200" >> $GITHUB_OUTPUT
         fi
 
     - name: Run OpenSearch
-      shell: bash
+      shell: bash -eo pipefail {0}
       run: |
-        ./opensearch-*/bin/opensearch \
-          -Enode.attr.testattr=test \
-          -Epath.repo=/tmp \
-          -Erepositories.url.allowed_urls=http://snapshot.test* \
-          -Eaction.destructive_requires_name=false \
-          -Eplugins.security.disabled=${{ inputs.secured == 'false' }} \
-          -Eplugins.security.audit.type=log4j \
-          -d
+        sudo swapoff -a
+        sudo sysctl -w vm.swappiness=1
+        sudo sysctl -w fs.file-max=262144
+        sudo sysctl -w vm.max_map_count=262144    
+        sudo prlimit --pid $$ --memlock=unlimited:unlimited
+        
+        opensearch-*/bin/opensearch -d
+        
         for attempt in {1..20}; do
           sleep 5
-          if curl -ksS -u admin:admin ${{ steps.configure-security.outputs.url }}; then
+          if curl -ksS -u admin:admin ${{ steps.configure.outputs.url }}; then
             echo '=====> ready'
             exit 0
           fi

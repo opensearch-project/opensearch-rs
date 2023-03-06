@@ -10,7 +10,6 @@ if [[ -z $opensearch_node_name ]]; then
   set -euo pipefail
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}
-  export CLUSTER=${CLUSTER-opensearch}
   export SECURE_INTEGRATION=${SECURE_INTEGRATION-true}
   export STACK_VERSION=${STACK_VERSION-latest}
 
@@ -29,13 +28,7 @@ if [[ -z $opensearch_node_name ]]; then
 
   export network_name=search-rest-test
 
-  export ssl_cert="${script_path}/certs/testnode.crt"
-  export ssl_key="${script_path}/certs/testnode.key"
-  export ssl_ca="${script_path}/certs/ca.crt"
-  export ssl_cert_pem="${script_path}/certs/testnode.pem"
-  export ssl_key_pem="${script_path}/certs/testnode-key.pem"
-
-  echo -e "\033[34;1mINFO:\033[0m Running $CLUSTER $STACK_VERSION\033[0m"
+  echo -e "\033[34;1mINFO:\033[0m Running opensearch $STACK_VERSION\033[0m"
 fi
 
 export script_path=$(dirname $(realpath -s $0))

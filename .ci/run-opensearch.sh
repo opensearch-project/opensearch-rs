@@ -18,28 +18,9 @@ cleanup_node $opensearch_node_name
 manager_node_name=${opensearch_node_name}
 cluster_name=search-rest-test
 
-declare -a volumes
-environment=($(cat <<-END
-  --env node.name=$opensearch_node_name
-  --env cluster.name=$cluster_name
-  --env cluster.initial_master_nodes=$manager_node_name
-  --env discovery.seed_hosts=$manager_node_name
-  --env cluster.routing.allocation.disk.threshold_enabled=false
-  --env bootstrap.memory_lock=true
-  --env node.attr.testattr=test
-  --env path.repo=/tmp
-  --env repositories.url.allowed_urls=http://snapshot.test*
-  --env action.destructive_requires_name=false
-  --env plugins.security.audit.type=log4j
-END
-))
+environment=""
 
-if [[ "$SECURE_INTEGRATION" == "true" ]]; then
-  environment+=($(cat <<-END
-    --env DISABLE_SECURITY_PLUGIN=false
-END
-))
-else
+if [[ "$SECURE_INTEGRATION" != "true" ]]; then
   environment+=($(cat <<-END
     --env DISABLE_SECURITY_PLUGIN=true
 END
@@ -52,43 +33,25 @@ for (( i=0; i<$NUMBER_OF_NODES; i++, http_port++ )); do
   node_name=${opensearch_node_name}$i
   node_url=${external_opensearch_url/9200/${http_port}}
   if [[ "$i" == "0" ]]; then node_name=$opensearch_node_name; fi
-  environment+=($(cat <<-END
-    --env node.name=$node_name
-END
-))
   echo "$i: $http_port $node_url "
-  volume_name=${node_name}-rest-test-data
-  volumes+=($(cat <<-END
-    --volume $volume_name:/usr/share/opensearch/data${i}
-END
-))
 
   # make sure we detach for all but the last node if DETACH=false (default) so all nodes are started
   local_detach="true"
   if [[ "$i" == "$((NUMBER_OF_NODES-1))" ]]; then local_detach=$DETACH; fi
 
-  CLUSTER_TAG=$CLUSTER
   if [[ "$STACK_VERSION" != *"SNAPSHOT" ]]; then
-    CLUSTER_TAG=$CLUSTER-secure-$SECURE_INTEGRATION
-    echo -e "\033[34;1mINFO: building $CLUSTER container\033[0m"
-    echo 'cluster is' $CLUSTER
-
-    # Copy certificates and keys
-    cp $ssl_cert_pem esnode.pem
-    cp $ssl_key_pem esnode-key.pem
-
-    docker build \
-      --file=.ci/$CLUSTER/Dockerfile \
-      --build-arg STACK_VERSION=$STACK_VERSION \
-      --tag=$CLUSTER_TAG \
-      .
-     
-    # Cleanup certificates and keys
-    rm esnode.pem
-    rm esnode-key.pem
+    SOURCE_IMAGE="opensearchproject/opensearch:${STACK_VERSION}"
   else
-    CLUSTER_TAG=$CLUSTER_TAG:test
+    SOURCE_IMAGE="opensearch:test"
   fi
+
+  CLUSTER_TAG=opensearch-secure-$SECURE_INTEGRATION
+  echo -e "\033[34;1mINFO: building opensearch container\033[0m"
+
+  docker build \
+    --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
+    --tag=$CLUSTER_TAG \
+    .ci/opensearch/
 
   echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
   set -x
@@ -102,8 +65,9 @@ END
     --name "$node_name" \
     --network "$network_name" \
     --env "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g" \
-    "${environment[@]}" \
-    "${volumes[@]}" \
+    ${environment[@]} \
+    --env "node.name=$node_name" \
+    --volume "${node_name}-rest-test-data":"/usr/share/opensearch/data${i}" \
     --publish "$http_port":9200 \
     --ulimit nofile=65536:65536 \
     --ulimit memlock=-1:-1 \

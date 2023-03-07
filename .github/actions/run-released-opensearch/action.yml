@@ -1,0 +1,74 @@
+name: Run OpenSearch
+description: Runs a released version of OpenSearch
+inputs:
+  version:
+    description: The version of OpenSearch to run
+    required: true
+  secured:
+    description: Whether to enable the security plugin
+    required: true
+outputs:
+  opensearch_url:
+    description: The URL where the OpenSearch node is accessible
+    value: ${{ steps.configure.outputs.url }}
+runs:
+  using: composite
+  steps:
+    - name: Restore cached OpenSearch distro
+      id: cache-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: opensearch-${{ inputs.version }}
+        key: opensearch-${{ inputs.version }}
+
+    - name: Download OpenSearch
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        curl -sSLO https://artifacts.opensearch.org/releases/bundle/opensearch/${{ inputs.version }}/opensearch-${{ inputs.version }}-linux-x64.tar.gz \
+        && tar -xzf opensearch-*.tar.gz \
+        && rm -f opensearch-*.tar.gz
+    
+    - name: Save cached OpenSearch distro
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v3
+      with:
+        path: opensearch-${{ inputs.version }}
+        key: opensearch-${{ inputs.version }}
+    
+    - name: Configure OpenSearch
+      id: configure
+      shell: bash -eo pipefail {0}
+      run: |
+        cp ./client/.ci/opensearch/opensearch.yml ./opensearch-*/config/ \
+        && bash opensearch-*/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s \
+        && sed -i'' 's/plugins.security.audit.type:.*/plugins.security.audit.type: log4j/' ./opensearch-*/config/opensearch.yml \
+        && cp ./client/.ci/opensearch/*.pem ./opensearch-*/config/
+
+        if ${{ inputs.secured == 'true' }}; then
+          echo "url=https://localhost:9200" >> $GITHUB_OUTPUT
+        else
+          echo "plugins.security.disabled: true" >> ./opensearch-*/config/opensearch.yml
+          echo "url=http://localhost:9200" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run OpenSearch
+      shell: bash -eo pipefail {0}
+      run: |
+        sudo swapoff -a
+        sudo sysctl -w vm.swappiness=1
+        sudo sysctl -w fs.file-max=262144
+        sudo sysctl -w vm.max_map_count=262144    
+        sudo prlimit --pid $$ --memlock=unlimited:unlimited
+        
+        opensearch-*/bin/opensearch -d
+        
+        for attempt in {1..20}; do
+          sleep 5
+          if curl -ksS -u admin:admin ${{ steps.configure.outputs.url }}; then
+            echo '=====> ready'
+            exit 0
+          fi
+          echo '=====> waiting...'
+        done
+        exit 1

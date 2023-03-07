@@ -43,13 +43,13 @@ use opensearch::{
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use serde_json::Value;
-use std::fs::File;
-use std::io::Read;
 use std::ops::Deref;
 use sysinfo::SystemExt;
 use url::Url;
 
 use crate::assert_response_success;
+
+const KIRK_P12: &[u8] = include_bytes!("kirk.p12");
 
 fn cluster_addr() -> String {
     match std::env::var("OPENSEARCH_URL") {
@@ -71,10 +71,7 @@ static GLOBAL_CLIENT: Lazy<OpenSearch> = Lazy::new(|| {
 
     // if the url is https, set credentials
     let credentials = if url.scheme() == "https" {
-        let mut buf = Vec::new();
-        let mut f = File::open("tests/common/kirk.p12").expect("Unable to open file");
-        f.read_to_end(&mut buf).expect("Unable to read vec");
-        let cert = ClientCertificate::Pkcs12(buf, Some("".to_string()));
+        let cert = ClientCertificate::Pkcs12(KIRK_P12.into(), Some("kirk".to_string()));
         Some(Credentials::Certificate(cert))
     } else {
         None

@@ -52,7 +52,6 @@ failure = "0.1.5"
 futures = "0.3.1"
 http = "0.2"
 hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
-os_type = "2.2"
 regex="1.4"
 sysinfo = "0.28.0"
 textwrap = "^0.16"

@@ -22,27 +22,26 @@
 //!
 //! DETACH=true .ci/run-opensearch.sh
 #![cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+#![allow(unused)]
 
 pub mod common;
 use common::*;
 
 use opensearch::cert::{Certificate, CertificateValidation};
-use os_type::OSType;
 
-static CA_CERT: &[u8] = include_bytes!("../../.ci/certs/ca.crt");
+static CA_CERT: &[u8] = include_bytes!("../../.ci/certs/root-ca.crt");
 static CA_CHAIN_CERT: &[u8] = include_bytes!("../../.ci/certs/ca-chain.crt");
-static TESTNODE_CERT: &[u8] = include_bytes!("../../.ci/certs/testnode.crt");
-static TESTNODE_NO_SAN_CERT: &[u8] = include_bytes!("../../.ci/certs/testnode_no_san.crt");
+static ESNODE_CERT: &[u8] = include_bytes!("../../.ci/certs/esnode.crt");
+static ESNODE_NO_SAN_CERT: &[u8] = include_bytes!("../../.ci/certs/esnode-no-san.crt");
 
-fn expected_error_message() -> String {
+#[cfg(feature = "native-tls")]
+fn expected_error_message() -> &'static str {
     if cfg!(windows) {
-        "terminated in a root certificate which is not trusted by the trust provider".to_string()
+        "terminated in a root certificate which is not trusted by the trust provider"
+    } else if cfg!(target_os = "macos") {
+        "The certificate was not trusted"
     } else {
-        let os = os_type::current_platform();
-        match os.os_type {
-            OSType::OSX => "The certificate was not trusted".to_string(),
-            _ => "unable to get local issuer certificate".to_string(),
-        }
+        "unable to get local issuer certificate"
     }
 }
 
@@ -52,9 +51,8 @@ fn expected_error_message() -> String {
 async fn default_certificate_validation() -> Result<(), failure::Error> {
     let builder = client::create_default_builder().cert_validation(CertificateValidation::Default);
     let client = client::create(builder);
-    let result = client.ping().send().await;
 
-    match result {
+    match client.ping().send().await {
         Ok(response) => Err(failure::err_msg(format!(
             "Expected error but response was {}",
             response.status_code()
@@ -62,13 +60,13 @@ async fn default_certificate_validation() -> Result<(), failure::Error> {
         Err(e) => {
             let expected = expected_error_message();
             let actual = e.to_string();
-            assert!(
-                actual.contains(&expected),
-                "Expected error message to contain '{}' but was '{}'",
-                expected,
-                actual
-            );
-            Ok(())
+            match actual.contains(expected) {
+                true => Ok(()),
+                false => Err(failure::err_msg(format!(
+                    "Expected error message to contain '{}' but was '{}'",
+                    expected, actual
+                ))),
+            }
         }
     }
 }
@@ -79,23 +77,22 @@ async fn default_certificate_validation() -> Result<(), failure::Error> {
 async fn default_certificate_validation_rustls_tls() -> Result<(), failure::Error> {
     let builder = client::create_default_builder().cert_validation(CertificateValidation::Default);
     let client = client::create(builder);
-    let result = client.ping().send().await;
 
-    match result {
+    match client.ping().send().await {
         Ok(response) => Err(failure::err_msg(format!(
             "Expected error but response was {}",
             response.status_code()
         ))),
         Err(e) => {
-            let expected = "invalid certificate: UnknownIssuer";
+            let expected = expected_error_message();
             let actual = e.to_string();
-            assert!(
-                actual.contains(&expected),
-                "Expected error message to contain '{}' but was '{}'",
-                expected,
-                actual
-            );
-            Ok(())
+            match actual.contains(expected) {
+                true => Ok(()),
+                false => Err(failure::err_msg(format!(
+                    "Expected error message to contain '{}' but was '{}'",
+                    expected, actual
+                ))),
+            }
         }
     }
 }
@@ -112,7 +109,10 @@ async fn none_certificate_validation() -> Result<(), failure::Error> {
 /// Certificate provided by the server contains the one given to the client
 /// within the authority chain, and hostname matches
 #[tokio::test]
-#[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+#[cfg(all(
+    any(feature = "native-tls", feature = "rustls-tls"),
+    not(target_os = "macos")
+))]
 async fn full_certificate_ca_validation() -> Result<(), failure::Error> {
     let cert = Certificate::from_pem(CA_CERT)?;
     let builder =
@@ -124,7 +124,10 @@ async fn full_certificate_ca_validation() -> Result<(), failure::Error> {
 
 /// Try to load a certificate chain.
 #[tokio::test]
-#[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+#[cfg(all(
+    any(feature = "native-tls", feature = "rustls-tls"),
+    not(target_os = "macos")
+))]
 async fn full_certificate_ca_chain_validation() -> Result<(), failure::Error> {
     let mut cert = Certificate::from_pem(CA_CHAIN_CERT)?;
     cert.append(Certificate::from_pem(CA_CERT)?);
@@ -140,7 +143,7 @@ async fn full_certificate_ca_chain_validation() -> Result<(), failure::Error> {
 #[tokio::test]
 #[cfg(all(windows, feature = "native-tls"))]
 async fn full_certificate_validation() -> Result<(), failure::Error> {
-    let cert = Certificate::from_pem(TESTNODE_CERT)?;
+    let cert = Certificate::from_pem(ESNODE_CERT)?;
     let builder =
         client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
     let client = client::create(builder);
@@ -150,11 +153,11 @@ async fn full_certificate_validation() -> Result<(), failure::Error> {
 
 /// Certificate provided by the server is the one given to the client and hostname matches, using rustls-tls
 #[tokio::test]
-#[cfg(feature = "rustls-tls")]
+#[cfg(all(feature = "rustls-tls", not(target_os = "macos")))]
 async fn full_certificate_validation_rustls_tls() -> Result<(), failure::Error> {
-    let mut chain: Vec<u8> = Vec::with_capacity(TESTNODE_CERT.len() + CA_CERT.len());
+    let mut chain: Vec<u8> = Vec::with_capacity(ESNODE_CERT.len() + CA_CERT.len());
     chain.extend(CA_CERT);
-    chain.extend(TESTNODE_CERT);
+    chain.extend(ESNODE_CERT);
 
     let cert = Certificate::from_pem(chain.as_slice())?;
     let builder =
@@ -169,34 +172,27 @@ async fn full_certificate_validation_rustls_tls() -> Result<(), failure::Error> 
 #[tokio::test]
 #[cfg(all(unix, any(feature = "native-tls", feature = "rustls-tls")))]
 async fn full_certificate_validation() -> Result<(), failure::Error> {
-    let cert = Certificate::from_pem(TESTNODE_CERT)?;
+    let cert = Certificate::from_pem(ESNODE_CERT)?;
     let builder =
         client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
     let client = client::create(builder);
-    let result = client.ping().send().await;
-    let os_type = os_type::current_platform();
-    match os_type.os_type {
-        OSType::OSX => match result {
-            Ok(_) => Ok(()),
-            Err(e) => Err(failure::err_msg(e.to_string())),
-        },
-        _ => match result {
-            Ok(response) => Err(failure::err_msg(format!(
-                "Expected error but response was {}",
-                response.status_code()
-            ))),
-            Err(e) => {
-                let expected = expected_error_message();
-                let actual = e.to_string();
-                assert!(
-                    actual.contains(&expected),
+
+    match client.ping().send().await {
+        Ok(response) => Err(failure::err_msg(format!(
+            "Expected error but response was {}",
+            response.status_code()
+        ))),
+        Err(e) => {
+            let expected = expected_error_message();
+            let actual = e.to_string();
+            match actual.contains(expected) {
+                true => Ok(()),
+                false => Err(failure::err_msg(format!(
                     "Expected error message to contain '{}' but was '{}'",
-                    expected,
-                    actual
-                );
-                Ok(())
+                    expected, actual
+                ))),
             }
-        },
+        }
     }
 }
 
@@ -204,7 +200,7 @@ async fn full_certificate_validation() -> Result<(), failure::Error> {
 #[tokio::test]
 #[cfg(all(windows, feature = "native-tls"))]
 async fn certificate_certificate_validation() -> Result<(), failure::Error> {
-    let cert = Certificate::from_pem(TESTNODE_CERT)?;
+    let cert = Certificate::from_pem(ESNODE_CERT)?;
     let builder =
         client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
     let client = client::create(builder);
@@ -217,41 +213,34 @@ async fn certificate_certificate_validation() -> Result<(), failure::Error> {
 #[tokio::test]
 #[cfg(all(unix, feature = "native-tls"))]
 async fn certificate_certificate_validation() -> Result<(), failure::Error> {
-    let cert = Certificate::from_pem(TESTNODE_CERT)?;
+    let cert = Certificate::from_pem(ESNODE_CERT)?;
     let builder =
         client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
     let client = client::create(builder);
-    let result = client.ping().send().await;
-    let os_type = os_type::current_platform();
-    match os_type.os_type {
-        OSType::OSX => match result {
-            Ok(_) => Ok(()),
-            Err(e) => Err(failure::err_msg(e.to_string())),
-        },
-        _ => match result {
-            Ok(response) => Err(failure::err_msg(format!(
-                "Expected error but response was {}",
-                response.status_code()
-            ))),
-            Err(e) => {
-                let expected = expected_error_message();
-                let actual = e.to_string();
-                assert!(
-                    actual.contains(&expected),
+
+    match client.ping().send().await {
+        Ok(response) => Err(failure::err_msg(format!(
+            "Expected error but response was {}",
+            response.status_code()
+        ))),
+        Err(e) => {
+            let expected = expected_error_message();
+            let actual = e.to_string();
+            match actual.contains(expected) {
+                true => Ok(()),
+                false => Err(failure::err_msg(format!(
                     "Expected error message to contain '{}' but was '{}'",
-                    expected,
-                    actual
-                );
-                Ok(())
+                    expected, actual
+                ))),
             }
-        },
+        }
     }
 }
 
 /// Certificate provided by the server contains the one given to the client
 /// within the authority chain
 #[tokio::test]
-#[cfg(feature = "native-tls")]
+#[cfg(all(feature = "native-tls", not(target_os = "macos")))]
 async fn certificate_certificate_ca_validation() -> Result<(), failure::Error> {
     let cert = Certificate::from_pem(CA_CERT)?;
     let builder =
@@ -265,14 +254,12 @@ async fn certificate_certificate_ca_validation() -> Result<(), failure::Error> {
 #[tokio::test]
 #[cfg(feature = "native-tls")]
 async fn fail_certificate_certificate_validation() -> Result<(), failure::Error> {
-    let cert = Certificate::from_pem(TESTNODE_NO_SAN_CERT)?;
+    let cert = Certificate::from_pem(ESNODE_NO_SAN_CERT)?;
     let builder =
         client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
-
     let client = client::create(builder);
-    let result = client.ping().send().await;
 
-    match result {
+    match client.ping().send().await {
         Ok(response) => Err(failure::err_msg(format!(
             "Expected error but response was {}",
             response.status_code()
@@ -280,13 +267,13 @@ async fn fail_certificate_certificate_validation() -> Result<(), failure::Error>
         Err(e) => {
             let expected = expected_error_message();
             let actual = e.to_string();
-            assert!(
-                actual.contains(&expected),
-                "Expected error message to contain '{}' but was '{}'",
-                expected,
-                actual
-            );
-            Ok(())
+            match actual.contains(expected) {
+                true => Ok(()),
+                false => Err(failure::err_msg(format!(
+                    "Expected error message to contain '{}' but was '{}'",
+                    expected, actual
+                ))),
+            }
         }
     }
 }

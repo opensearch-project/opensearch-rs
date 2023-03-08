@@ -56,7 +56,7 @@ for (( i=0; i<$NUMBER_OF_NODES; i++, http_port++ )); do
   echo -e "\033[34;1mINFO:\033[0m Starting container $node_name \033[0m"
   set -x
   if [[ "$SECURE_INTEGRATION" == "true" ]]; then
-    healthcmd="curl -vvv -s --insecure -u admin:admin --fail https://localhost:9200/_cluster/health || exit 1"
+    healthcmd="curl -vvv -s --cacert /usr/share/opensearch/config/root-ca.pem -u admin:admin --fail https://localhost:9200/_cluster/health || exit 1"
   else
     healthcmd="curl -vvv -s --fail http://localhost:9200/_cluster/health || exit 1"
   fi

@@ -1,5 +1,5 @@
 [![Clippy](https://github.com/opensearch-project/opensearch-rs/actions/workflows/clippy_check.yml/badge.svg)](https://github.com/opensearch-project/opensearch-rs/actions/workflows/clippy_check.yml)
-[![Integration](https://github.com/opensearch-project/opensearch-rs/actions/workflows/test-integrations.yml/badge.svg)](https://github.com/opensearch-project/opensearch-rs/actions/workflows/test-integration.yml)
+[![Tests](https://github.com/opensearch-project/opensearch-rs/actions/workflows/test.yml/badge.svg)](https://github.com/opensearch-project/opensearch-rs/actions/workflows/test.yml)
 [![Chat](https://img.shields.io/badge/chat-on%20forums-blue)](https://discuss.opendistrocommunity.dev/c/clients/)
 ![PRs welcome!](https://img.shields.io/badge/PRs-welcome!-success)
 

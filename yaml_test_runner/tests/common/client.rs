@@ -49,7 +49,7 @@ use url::Url;
 
 use crate::assert_response_success;
 
-const KIRK_P12: &[u8] = include_bytes!("kirk.p12");
+const KIRK_P12: &[u8] = include_bytes!("../../../.ci/certs/kirk.p12");
 
 fn cluster_addr() -> String {
     match std::env::var("OPENSEARCH_URL") {

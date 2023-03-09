@@ -3,84 +3,18 @@ default_to_workspace = false
 
 [env]
 # Determines the version of OpenSearch docker container used
-STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"] }}
+STACK_VERSION = { value = "latest", condition = { env_not_set = ["STACK_VERSION"] } }
 # Set publish flags to dry-run by default, to force user to explicitly define for publishing
 CARGO_MAKE_CARGO_PUBLISH_FLAGS = "--dry-run"
 # RUST_BACKTRACE is set to "full" in cargo make's builtin makefiles/stable.toml
-RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"]}}
-OPENSEARCH_PROTOCOL = { source = "${SECURE_INTEGRATION}", default_value = "https", mapping = { "false" = "http", "true" = "https" }}
-OPENSEARCH_URL = { value = "${OPENSEARCH_PROTOCOL}://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] }}
+RUST_BACKTRACE = { value = "0", condition = { env_not_set = ["RUST_BACKTRACE"] } }
+SECURE_INTEGRATION = { value = "true", condition = { env_not_set = ["SECURE_INTEGRATION"] } }
+OPENSEARCH_PROTOCOL = { source = "${SECURE_INTEGRATION}", default_value = "https", mapping = { false = "http", true = "https" } }
+OPENSEARCH_URL = { value = "${OPENSEARCH_PROTOCOL}://localhost:9200", condition = { env_not_set = ["OPENSEARCH_URL"] } }
 
-[tasks.run-yaml-test-runner]
-category = "OpenSearch"
-description = '''
-Runs yaml_test_runner package to generate tests from yaml files for a given OpenSearch commit.
-The commit to use is retrieved from the running OpenSearch instance
-'''
-private = true
-command = "cargo"
-args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}"]
-dependencies = ["start-opensearch"]
-
-[tasks.test-yaml-test-runner]
-category = "OpenSearch"
-private = true
-condition = { env_set = [ "OPENSEARCH_URL" ], env_false = ["CARGO_MAKE_CI"] }
-command = "cargo"
-args = ["test", "-p", "yaml_test_runner", "--", "--test-threads", "1"]
-dependencies = ["generate-yaml-tests"]
-
-[tasks.test-yaml-test-runner-ci]
-category = "OpenSearch"
-private = true
-condition = { env_set = [ "OPENSEARCH_URL" ], env_true = ["CARGO_MAKE_CI"] }
-script = ["cargo test -p yaml_test_runner -- --test-threads 1 -Z unstable-options --format json | tee test_results/results.json"]
-dependencies = ["generate-yaml-tests"]
-
-[tasks.set-coverage-vars]
-description = "Set environment variables to enable coverage data"
-private = true
-condition = { env_true = [ "CARGO_MAKE_CI" ] }
-env = { "RUSTFLAGS" = "-C instrument-coverage", "LLVM_PROFILE_FILE" = "${CARGO_MAKE_WORKING_DIRECTORY}/test_results/opensearch-%m.profraw" }
-
-[tasks.convert-coverage-data]
-description = "Convert coverage data to lcov format"
-private = true
-condition = { env_true = [ "CARGO_MAKE_CI" ] }
-command = "grcov"
-args = ["./test_results", "-s", ".", "--binary-path", "./target/debug", "-t", "lcov", "--branch", "--ignore-not-existing", "--llvm", "-o", "./test_results/opensearch.lcov"]
-
-[tasks.test-opensearch]
-category = "OpenSearch"
-private = true
-condition = { env_set = [ "OPENSEARCH_URL" ]}
-command = "cargo"
-args = ["test", "-p", "opensearch"]
-dependencies = ["start-opensearch"]
-
-[tasks.run-api-generator]
-category = "OpenSearch"
-private = true
-command = "cargo"
-args = ["run", "-p", "api_generator"]
-
-[tasks.create-test-results-dir]
-category = "OpenSearch"
-private = true
-condition = { env_true = [ "CARGO_MAKE_CI" ] }
-script = ["[ -d test_results ] || mkdir -p test_results"]
-
-[tasks.install-cargo2junit]
-category = "OpenSearch"
-private = true
-script = ["cargo install cargo2junit"]
-
-[tasks.convert-test-results-junit]
-category = "OpenSearch"
-private = true
-condition = { env_true = [ "CARGO_MAKE_CI" ] }
-script = ["cat test_results/results.json | cargo2junit > test_results/cargo-junit.xml"]
-dependencies = ["install-cargo2junit"]
+######################
+# OpenSearch Helpers #
+######################
 
 [tasks.run-opensearch]
 category = "OpenSearch"
@@ -95,10 +29,163 @@ command = "./.ci/run-opensearch.sh"
 
 [tasks.run-opensearch.windows]
 script_runner = "cmd"
-script = [
-'''
+script = ['''
 bash -c "STACK_VERSION=%STACK_VERSION% DETACH=%DETACH% CLEANUP=%CLEANUP% bash .ci/run-opensearch.sh"
-'''
+''']
+
+[tasks.start-opensearch]
+extend = "run-opensearch"
+private = false
+description = "Starts OpenSearch docker container with the given version and distribution"
+env = { CLEANUP = false, DETACH = true }
+
+[tasks.stop-opensearch]
+extend = "run-opensearch"
+private = false
+description = "Stops OpenSearch docker container, if running"
+env = { CLEANUP = true, DETACH = false }
+
+###################
+# Code Generation #
+###################
+
+[tasks.generate-yaml-tests-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}"]
+
+[tasks.generate-yaml-tests]
+category = "OpenSearch"
+description = "Generates OpenSearch client tests from YAML tests"
+dependencies = ["start-opensearch", "generate-yaml-tests-inner", "format"]
+run_task = "stop-opensearch"
+
+[tasks.generate-api-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = ["run", "-p", "api_generator"]
+
+[tasks.generate-api]
+category = "OpenSearch"
+description = "Generates OpenSearch client from REST API specs"
+dependencies = ["generate-api-inner"]
+run_task = "format"
+
+################
+# Test Helpers #
+################
+
+[tasks.create-test-results-dir]
+category = "OpenSearch"
+private = true
+condition = { env_true = [ "CARGO_MAKE_CI" ] }
+script = ["[ -d test_results ] || mkdir -p test_results"]
+
+[tasks.set-coverage-vars]
+description = "Set environment variables to enable coverage data"
+private = true
+condition = { env_true = [ "CARGO_MAKE_CI" ] }
+env = { RUSTFLAGS = "-C instrument-coverage", LLVM_PROFILE_FILE = "${CARGO_MAKE_WORKING_DIRECTORY}/test_results/opensearch-%m.profraw" }
+
+[tasks.convert-coverage-data]
+description = "Convert coverage data to lcov format"
+private = true
+condition = { env_true = [ "CARGO_MAKE_CI" ] }
+command = "grcov"
+args = ["./test_results", "-s", ".", "--binary-path", "./target/debug", "-t", "lcov", "--branch", "--ignore-not-existing", "--llvm", "-o", "./test_results/opensearch.lcov"]
+
+#########
+# Tests #
+#########
+
+[tasks.test-yaml-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = ["test", "-p", "yaml_test_runner", "--", "--test-threads", "1"]
+
+[tasks.test-yaml]
+category = "OpenSearch"
+description = "Generates and runs yaml_test_runner package tests against a given OpenSearch version"
+condition = { env_set = [ "STACK_VERSION"] }
+dependencies = [
+    "set-coverage-vars", 
+    "create-test-results-dir", 
+    "start-opensearch", 
+    "generate-yaml-tests-inner", 
+    "format",
+    "test-yaml-inner", 
+    "convert-coverage-data"
+]
+run_task = "stop-opensearch"
+
+[tasks.test-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = [
+    "test", 
+    "--no-fail-fast", 
+    "--workspace",
+    "@@split(CARGO_MAKE_TASK_ARGS,;)"
+]
+
+[tasks.test]
+clear = true
+category = "OpenSearch"
+description = "Runs all tests (except YAML) against a given OpenSearch version"
+dependencies = [
+    "set-coverage-vars", 
+    "create-test-results-dir", 
+    "start-opensearch", 
+    "test-inner",
+    "convert-coverage-data"
+]
+run_task = "stop-opensearch"
+
+[tasks.unittest-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = ["test", "--lib", "--bins"]
+
+[tasks.unittest]
+category = "OpenSearch"
+description = "Runs workspace unit tests"
+dependencies = ["set-coverage-vars", "create-test-results-dir", "unittest-inner"]
+run_task = "convert-coverage-data"
+
+#################
+# Documentation #
+#################
+
+[tasks.docs]
+description = "Generate OpenSearch client documentation and opens in browser"
+clear = true
+category = "OpenSearch"
+command = "cargo"
+args = ["doc", "-p", "opensearch", "--no-deps", "--open", "--all-features"]
+
+##############
+# Publishing #
+##############
+
+[tasks.generate-release-notes]
+category = "OpenSearch"
+description = """
+Generates release notes for OpenSearch client using a common release notes generator docker image.
+Assumes the clients-team repo is checked out as a sibling directory of opensearch-rs
+"""
+condition = { env_set = ["OLD_VERSION", "NEW_VERSION"], files_exist = [ "${CARGO_MAKE_WORKING_DIRECTORY}/../clients-team/scripts/release-notes-generator/Dockerfile" ] }
+script_runner = "@shell"
+script = [
+"""
+cd ./../clients-team/scripts/release-notes-generator
+docker build --file ./Dockerfile --tag clients-team/release_notes_generator .
+docker run -v "${CARGO_MAKE_WORKING_DIRECTORY}/.ci/release/config.yml:/usr/src/release_notes_generator/config.yml" --rm clients-team/release_notes_generator -o ${OLD_VERSION} -n ${NEW_VERSION}
+"""
 ]
 
 [tasks.publish-opensearch]
@@ -115,90 +202,6 @@ if is_empty %{CARGO_MAKE_CARGO_PUBLISH_FLAGS}
 else
     exec cargo publish %{CARGO_MAKE_CARGO_PUBLISH_FLAGS}
 end
-"""
-]
-
-# ============
-# Public tasks
-# ============
-
-[tasks.start-opensearch]
-extend = "run-opensearch"
-private = false
-description = "Starts OpenSearch docker container with the given version and distribution"
-env = { "CLEANUP" = false, "DETACH" = true }
-
-[tasks.stop-opensearch]
-extend = "run-opensearch"
-private = false
-description = "Stops OpenSearch docker container, if running"
-env = { "CLEANUP" = true, "DETACH" = false }
-
-[tasks.test-yaml]
-category = "OpenSearch"
-description = "Generates and runs yaml_test_runner package platinum/free tests against a given OpenSearch version"
-condition = { env_set = [ "STACK_VERSION"] }
-dependencies = ["set-coverage-vars", "generate-yaml-tests", "create-test-results-dir", "test-yaml-test-runner", "test-yaml-test-runner-ci", "convert-coverage-data", "convert-test-results-junit"]
-run_task = "stop-opensearch"
-
-[tasks.test-generator]
-category = "OpenSearch"
-clear = true
-description = "Runs api_generator tests"
-command = "cargo"
-args = ["test", "-p", "api_generator"]
-
-[tasks.test]
-category = "OpenSearch"
-clear = true
-description = "Runs opensearch package tests against a given OpenSearch version"
-dependencies = ["test-opensearch"]
-run_task = "stop-opensearch"
-
-[tasks.run-unittest]
-private = true
-command = "cargo"
-args = ["test", "--lib", "--bins"]
-
-[tasks.unittest]
-category = "OpenSearch"
-clear = true
-description = "Runs workspace unit tests"
-dependencies = ["set-coverage-vars", "create-test-results-dir", "run-unittest"]
-run_task = "convert-coverage-data"
-
-[tasks.generate-yaml-tests]
-category = "OpenSearch"
-description = "Generates OpenSearch client tests from YAML tests"
-dependencies = ["run-yaml-test-runner"]
-run_task = "format"
-
-[tasks.generate-api]
-category = "OpenSearch"
-description = "Generates OpenSearch client from REST API specs"
-dependencies = ["run-api-generator"]
-run_task = "format"
-
-[tasks.docs]
-description = "Generate OpenSearch client documentation and opens in browser"
-clear = true
-category = "OpenSearch"
-command = "cargo"
-args = ["doc", "-p", "opensearch", "--no-deps", "--open", "--all-features"]
-
-[tasks.generate-release-notes]
-category = "OpenSearch"
-description = """
-Generates release notes for OpenSearch client using a common release notes generator docker image.
-Assumes the clients-team repo is checked out as a sibling directory of opensearch-rs
-"""
-condition = { env_set = ["OLD_VERSION", "NEW_VERSION"], files_exist = [ "${CARGO_MAKE_WORKING_DIRECTORY}/../clients-team/scripts/release-notes-generator/Dockerfile" ] }
-script_runner = "@shell"
-script = [
-"""
-cd ./../clients-team/scripts/release-notes-generator
-docker build --file ./Dockerfile --tag clients-team/release_notes_generator .
-docker run -v "${CARGO_MAKE_WORKING_DIRECTORY}/.ci/release/config.yml:/usr/src/release_notes_generator/config.yml" --rm clients-team/release_notes_generator -o ${OLD_VERSION} -n ${NEW_VERSION}
 """
 ]
 

@@ -20,17 +20,48 @@ runs:
         workspaces: |
           client
       
+    - name: Determine grcov artifact
+      id: determine-grcov-artifact
+      shell: bash -eo pipefail {0}
+      run: |
+        case "$RUNNER_OS" in
+          Linux)
+            triple="unknown-linux-gnu"
+            ext="tar.bz2"
+            ;;
+          macOS)
+            triple="apple-darwin"
+            ext="tar.bz2"
+            ;;
+          Windows)
+            triple="pc-windows-msvc"
+            ext="zip"
+        esac
+        echo "name=grcov-x86_64-${triple}.${ext}" >> $GITHUB_OUTPUT
+      env:
+        RUNNER_OS: ${{ runner.os }}
+
     - name: Download grcov
       uses: robinraju/release-downloader@v1.7
       with:
         repository: mozilla/grcov
         latest: true
-        fileName: 'grcov-x86_64-unknown-linux-gnu.tar.bz2'
+        fileName: ${{ steps.determine-grcov-artifact.outputs.name }}
 
     - name: Install grcov
-      shell: bash
+      shell: bash -eo pipefail {0}
       run: |
-        tar -xjf grcov-x86_64-unknown-linux-gnu.tar.bz2 \
-        && rm -f grcov-*.tar.bz2 \
-        && mv ./grcov ~/.cargo/bin/ \
-        && chmod +x ~/.cargo/bin/grcov
+        case "$FILE" in
+          *.tar.bz2)
+            tar -xjf $FILE
+            ;;
+          *.zip)
+            unzip $FILE
+            ;;
+        esac
+
+        rm -f $FILE
+        mv ./grcov* ~/.cargo/bin/
+        chmod +x ~/.cargo/bin/grcov
+      env:
+        FILE: ${{ steps.determine-grcov-artifact.outputs.name }}

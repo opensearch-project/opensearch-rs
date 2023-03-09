@@ -10,7 +10,7 @@ inputs:
 outputs:
   opensearch_url:
     description: The URL where the OpenSearch node is accessible
-    value: ${{ steps.configure.outputs.url }}
+    value: ${{ steps.opensearch.outputs.url }}
 runs:
   using: composite
   steps:
@@ -18,57 +18,32 @@ runs:
       id: cache-restore
       uses: actions/cache/restore@v3
       with:
-        path: opensearch-${{ inputs.version }}
-        key: opensearch-${{ inputs.version }}
+        path: opensearch-*
+        key: opensearch-${{ inputs.version }}-${{ runner.os }}
 
     - name: Download OpenSearch
       if: steps.cache-restore.outputs.cache-hit != 'true'
-      shell: bash
+      shell: bash -eo pipefail {0}
       run: |
-        curl -sSLO https://artifacts.opensearch.org/releases/bundle/opensearch/${{ inputs.version }}/opensearch-${{ inputs.version }}-linux-x64.tar.gz \
-        && tar -xzf opensearch-*.tar.gz \
-        && rm -f opensearch-*.tar.gz
+        if [[ "$RUNNER_OS" != "Windows" ]]; then
+          curl -sSLO https://artifacts.opensearch.org/releases/bundle/opensearch/${{ inputs.version }}/opensearch-${{ inputs.version }}-linux-x64.tar.gz
+          tar -xzf opensearch-*.tar.gz
+          rm -f opensearch-*.tar.gz
+        else
+          curl -sSLO https://artifacts.opensearch.org/releases/bundle/opensearch/${{ inputs.version }}/opensearch-${{ inputs.version }}-windows-x64.zip
+          unzip opensearch-*.zip
+          rm -f opensearch-*.zip
+        fi
     
     - name: Save cached OpenSearch distro
       if: steps.cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v3
       with:
-        path: opensearch-${{ inputs.version }}
-        key: opensearch-${{ inputs.version }}
+        path: opensearch-*
+        key: opensearch-${{ inputs.version }}-${{ runner.os }}
     
-    - name: Configure OpenSearch
-      id: configure
-      shell: bash -eo pipefail {0}
-      run: |
-        cp ./client/.ci/opensearch/opensearch.yml ./opensearch-*/config/ \
-        && bash opensearch-*/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s \
-        && sed -i'' 's/plugins.security.audit.type:.*/plugins.security.audit.type: log4j/' ./opensearch-*/config/opensearch.yml \
-        && cp ./client/.ci/opensearch/*.pem ./opensearch-*/config/
-
-        if ${{ inputs.secured == 'true' }}; then
-          echo "url=https://localhost:9200" >> $GITHUB_OUTPUT
-        else
-          echo "plugins.security.disabled: true" >> ./opensearch-*/config/opensearch.yml
-          echo "url=http://localhost:9200" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Run OpenSearch
-      shell: bash -eo pipefail {0}
-      run: |
-        sudo swapoff -a
-        sudo sysctl -w vm.swappiness=1
-        sudo sysctl -w fs.file-max=262144
-        sudo sysctl -w vm.max_map_count=262144    
-        sudo prlimit --pid $$ --memlock=unlimited:unlimited
-        
-        opensearch-*/bin/opensearch -d
-        
-        for attempt in {1..20}; do
-          sleep 5
-          if curl -ksS -u admin:admin ${{ steps.configure.outputs.url }}; then
-            echo '=====> ready'
-            exit 0
-          fi
-          echo '=====> waiting...'
-        done
-        exit 1
+    - name: Start OpenSearch
+      id: opensearch
+      uses: ./client/.github/actions/start-opensearch
+      with:
+        secured: ${{ inputs.secured }}

@@ -25,7 +25,7 @@ use std::{
     path::Path,
 };
 
-fn main() -> Result<(), failure::Error> {
+fn main() -> anyhow::Result<()> {
     simple_logger::SimpleLogger::new()
         .with_level(log::LevelFilter::Info)
         .init()

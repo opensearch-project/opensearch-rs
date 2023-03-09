@@ -40,7 +40,7 @@ use std::{fs, fs::File, io, path::Path};
 use tar::{Archive, Entry};
 
 /// Downloads the yaml tests if not already downloaded
-pub fn download_test_suites(branch: &str, download_dir: &Path) -> Result<(), failure::Error> {
+pub fn download_test_suites(branch: &str, download_dir: &Path) -> anyhow::Result<()> {
     let last_downloaded_version = download_dir.join("last_downloaded_version");
     if last_downloaded_version.exists() {
         let version = fs::read_to_string(&last_downloaded_version)
@@ -94,7 +94,7 @@ fn write_test_file(
     download_dir: &Path,
     suite_dir: &str,
     mut entry: Entry<GzDecoder<Response>>,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     let path = entry.path()?;
 
     let mut dir = {

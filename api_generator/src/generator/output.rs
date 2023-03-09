@@ -1,4 +1,5 @@
 use super::GeneratedFiles;
+use anyhow::anyhow;
 use lazy_static::lazy_static;
 use log::warn;
 use path_slash::*;
@@ -15,7 +16,7 @@ pub fn write_file(
     dir: &Path,
     file_name: &str,
     tracker: &mut GeneratedFiles,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     let mut path = dir.to_path_buf();
     path.push(PathBuf::from_slash(file_name));
 
@@ -106,7 +107,7 @@ pub fn merge_file(
     dir: &Path,
     file_name: &str,
     tracker: &mut GeneratedFiles,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     let mut path = dir.to_path_buf();
     path.push(PathBuf::from_slash(file_name));
 
@@ -120,7 +121,7 @@ pub fn merge_file(
 
         if let Some(captures) = START_REGEX.captures(&line) {
             if in_generated_section {
-                return Err(failure::format_err!(
+                return Err(anyhow!(
                     "{}:{} - Previous generated section wasn't closed",
                     file_name,
                     line_no
@@ -140,7 +141,7 @@ pub fn merge_file(
             if let Some(text) = get_content(section) {
                 output.push_str(&text);
             } else {
-                return Err(failure::format_err!(
+                return Err(anyhow!(
                     "{}:{} - No content found to generate section '{}'",
                     file_name,
                     line_no,
@@ -149,7 +150,7 @@ pub fn merge_file(
             }
         } else if END_REGEX.is_match(&line) {
             if !in_generated_section {
-                return Err(failure::format_err!(
+                return Err(anyhow!(
                     "{}:{} - Missing GENERATED-START marker",
                     file_name,
                     line_no
@@ -169,7 +170,7 @@ pub fn merge_file(
     }
 
     if in_generated_section {
-        return Err(failure::format_err!(
+        return Err(anyhow!(
             "{} - Missing GENERATED-END marker at end of file",
             file_name
         ));
@@ -189,7 +190,7 @@ mod test {
     use std::fs;
 
     #[test]
-    pub fn nominal_merge() -> Result<(), failure::Error> {
+    pub fn nominal_merge() -> anyhow::Result<()> {
         let dir = tempfile::tempdir()?;
         let dir_path = dir.path();
         let file_name = "test_merge.rs";
@@ -253,7 +254,7 @@ Contents of section bar
     }
 
     #[test]
-    fn unbalanced_sections() -> Result<(), failure::Error> {
+    fn unbalanced_sections() -> anyhow::Result<()> {
         merge_should_fail(
             r#"
 // GENERATED-BEGIN:foo
@@ -284,7 +285,7 @@ Contents of section bar
         Ok(())
     }
 
-    fn merge_should_fail(input: &str) -> Result<(), failure::Error> {
+    fn merge_should_fail(input: &str) -> anyhow::Result<()> {
         let dir = tempfile::tempdir()?;
         let dir_path = dir.path();
         let file_name = "test_merge.rs";

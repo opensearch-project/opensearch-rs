@@ -48,7 +48,7 @@ mod step;
 
 use generator::TestSuite;
 
-fn main() -> Result<(), failure::Error> {
+fn main() -> anyhow::Result<()> {
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Info)
         .init()
@@ -142,7 +142,7 @@ fn main() -> Result<(), failure::Error> {
 
 fn branch_suite_and_version_from_opensearch(
     url: &str,
-) -> Result<(String, TestSuite, semver::Version), failure::Error> {
+) -> anyhow::Result<(String, TestSuite, semver::Version)> {
     let client = ClientBuilder::new()
         .danger_accept_invalid_certs(true)
         .build()?;

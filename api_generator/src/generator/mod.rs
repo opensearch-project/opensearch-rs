@@ -533,7 +533,7 @@ pub fn generate(
     branch: &str,
     download_dir: &std::path::Path,
     generated_dir: &std::path::Path,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     // read the Api from file
     let api = read_api(branch, download_dir)?;
 
@@ -610,7 +610,7 @@ pub use bulk::*;
 }
 
 /// Reads Api from a directory of REST Api specs
-pub fn read_api(branch: &str, download_dir: &std::path::Path) -> Result<Api, failure::Error> {
+pub fn read_api(branch: &str, download_dir: &std::path::Path) -> anyhow::Result<Api> {
     let paths = fs::read_dir(download_dir)?;
     let mut namespaces = BTreeMap::<String, ApiNamespace>::new();
     let mut enums: HashSet<ApiEnum> = HashSet::new();
@@ -699,10 +699,7 @@ pub fn read_api(branch: &str, download_dir: &std::path::Path) -> Result<Api, fai
 }
 
 /// deserializes an ApiEndpoint from a file
-fn endpoint_from_file<R>(
-    name: String,
-    reader: &mut R,
-) -> Result<(String, ApiEndpoint), failure::Error>
+fn endpoint_from_file<R>(name: String, reader: &mut R) -> anyhow::Result<(String, ApiEndpoint)>
 where
     R: Read,
 {
@@ -741,7 +738,7 @@ where
 }
 
 /// deserializes Common from a file
-fn common_params_from_file<R>(name: String, reader: &mut R) -> Result<Common, failure::Error>
+fn common_params_from_file<R>(name: String, reader: &mut R) -> anyhow::Result<Common>
 where
     R: Read,
 {

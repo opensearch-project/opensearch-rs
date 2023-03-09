@@ -203,7 +203,7 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn serialize_into_jsonbody_writes_to_bytes() -> Result<(), failure::Error> {
+    fn serialize_into_jsonbody_writes_to_bytes() -> anyhow::Result<()> {
         let mut bytes = BytesMut::new();
         let body: JsonBody<_> = json!({"foo":"bar","baz":1}).into();
         body.write(&mut bytes)?;
@@ -214,7 +214,7 @@ mod tests {
     }
 
     #[test]
-    fn bodies_into_ndbody_writes_to_bytes() -> Result<(), failure::Error> {
+    fn bodies_into_ndbody_writes_to_bytes() -> anyhow::Result<()> {
         let mut bytes = BytesMut::new();
         let mut bodies: Vec<JsonBody<_>> = Vec::with_capacity(2);
         bodies.push(json!({"item":1}).into());
@@ -228,7 +228,7 @@ mod tests {
     }
 
     #[test]
-    fn bytes_body_writes_to_bytes_mut() -> Result<(), failure::Error> {
+    fn bytes_body_writes_to_bytes_mut() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let bytes = bytes::Bytes::from(&b"{\"foo\":\"bar\",\"baz\":1}"[..]);
         bytes.write(&mut bytes_mut)?;
@@ -238,7 +238,7 @@ mod tests {
     }
 
     #[test]
-    fn bytes_body_returns_usable_buf() -> Result<(), failure::Error> {
+    fn bytes_body_returns_usable_buf() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let buf = bytes::Bytes::from(&b"{\"foo\":\"bar\",\"baz\":1}"[..]);
 
@@ -251,7 +251,7 @@ mod tests {
     }
 
     #[test]
-    fn vec_body_writes_to_bytes_mut() -> Result<(), failure::Error> {
+    fn vec_body_writes_to_bytes_mut() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let bytes = b"{\"foo\":\"bar\",\"baz\":1}".to_vec();
         bytes.write(&mut bytes_mut)?;
@@ -261,7 +261,7 @@ mod tests {
     }
 
     #[test]
-    fn bytes_slice_body_writes_to_bytes_mut() -> Result<(), failure::Error> {
+    fn bytes_slice_body_writes_to_bytes_mut() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let bytes: &'static [u8] = b"{\"foo\":\"bar\",\"baz\":1}";
         bytes.write(&mut bytes_mut)?;
@@ -271,7 +271,7 @@ mod tests {
     }
 
     #[test]
-    fn string_body_writes_to_bytes_mut() -> Result<(), failure::Error> {
+    fn string_body_writes_to_bytes_mut() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let s = String::from("{\"foo\":\"bar\",\"baz\":1}");
         s.write(&mut bytes_mut)?;
@@ -281,7 +281,7 @@ mod tests {
     }
 
     #[test]
-    fn string_slice_body_writes_to_bytes_mut() -> Result<(), failure::Error> {
+    fn string_slice_body_writes_to_bytes_mut() -> anyhow::Result<()> {
         let mut bytes_mut = BytesMut::with_capacity(21);
         let s: &'static str = "{\"foo\":\"bar\",\"baz\":1}";
         s.write(&mut bytes_mut)?;

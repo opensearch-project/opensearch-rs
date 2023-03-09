@@ -32,6 +32,7 @@ use crate::{
     skip::{GlobalSkips, SkippedFeaturesAndTests},
     step::*,
 };
+use anyhow::anyhow;
 use api_generator::generator::Api;
 use inflector::Inflector;
 use lazy_static::lazy_static;
@@ -284,7 +285,7 @@ impl<'a> YamlTests<'a> {
                     },
                     None => Some(quote! {
                         #[tokio::test]
-                        async fn #fn_name() -> Result<(), failure::Error> {
+                        async fn #fn_name() -> anyhow::Result<()> {
                             let client = client::get();
                             #general_setup_call
                             #setup_call
@@ -317,7 +318,7 @@ impl<'a> YamlTests<'a> {
 
             (
                 Some(quote! {
-                    async fn #ident(client: &OpenSearch) -> Result<(), failure::Error> {
+                    async fn #ident(client: &OpenSearch) -> anyhow::Result<()> {
                         #(#tokens)*
                         Ok(())
                     }
@@ -383,7 +384,7 @@ pub fn generate_tests_from_yaml(
     base_download_dir: &Path,
     download_dir: &Path,
     generated_dir: &Path,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     let url = Url::parse(cluster_addr().as_ref()).unwrap();
     let global_skips = serde_yaml::from_str::<GlobalSkips>(include_str!("../skip.yml"))?;
     let skips = global_skips.get_skips_for(version, url.scheme() == "https");
@@ -429,15 +430,15 @@ pub fn generate_tests_from_yaml(
                 let mut test =
                     YamlTests::new(relative_path, version, &skips, test_suite, docs.len());
 
-                let results : Vec<Result<(), failure::Error>> = docs
+                let results : Vec<anyhow::Result<()>> = docs
                         .iter()
                         .map(|doc| {
                             let hash = doc
                                 .as_hash()
-                                .ok_or_else(|| failure::err_msg(format!(
+                                .ok_or_else(|| anyhow!(
                                     "expected hash but found {:?}",
                                     &doc
-                                )))?;
+                                ))?;
 
                             let (key, value) = hash.iter().next().unwrap();
                             match (key, value) {
@@ -452,12 +453,12 @@ pub fn generate_tests_from_yaml(
                                     Ok(())
                                 }
                                 (k, v) => {
-                                    Err(failure::err_msg(format!(
+                                    Err(anyhow!(
                                         "expected string key and array value in {:?}, but found {:?} and {:?}",
                                         relative_path,
                                         &k,
                                         &v,
-                                    )))
+                                    ))
                                 }
                             }
                         })
@@ -480,7 +481,7 @@ pub fn generate_tests_from_yaml(
 }
 
 /// Writes a mod.rs file in each generated directory
-fn write_mod_files(generated_dir: &Path, toplevel: bool) -> Result<(), failure::Error> {
+fn write_mod_files(generated_dir: &Path, toplevel: bool) -> anyhow::Result<()> {
     if !generated_dir.exists() {
         fs::create_dir(generated_dir)?;
     }
@@ -513,7 +514,7 @@ fn write_mod_files(generated_dir: &Path, toplevel: bool) -> Result<(), failure::
     Ok(())
 }
 
-fn test_file_path(relative_path: &Path) -> Result<PathBuf, failure::Error> {
+fn test_file_path(relative_path: &Path) -> anyhow::Result<PathBuf> {
     let mut relative = relative_path.to_path_buf();
     relative.set_extension("");
     // directories and files will form the module names so ensure they're valid module names
@@ -534,7 +535,7 @@ fn write_test_file(
     test: YamlTests,
     relative_path: &Path,
     generated_dir: &Path,
-) -> Result<(), failure::Error> {
+) -> anyhow::Result<()> {
     if test.should_skip_test("*") {
         info!(
             r#"skipping all tests in {} because it's included in skip.yml"#,

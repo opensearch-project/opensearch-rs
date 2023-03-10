@@ -30,6 +30,7 @@
 
 use super::Step;
 use crate::step::Expr;
+use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
 use yaml_rust::Yaml;
@@ -46,20 +47,20 @@ impl From<Length> for Step {
 }
 
 impl Length {
-    pub fn try_parse(yaml: &Yaml) -> Result<Length, failure::Error> {
+    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<Length> {
         let hash = yaml
             .as_hash()
-            .ok_or_else(|| failure::err_msg(format!("expected hash but found {:?}", yaml)))?;
+            .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();
 
         let expr = k
             .as_str()
-            .ok_or_else(|| failure::err_msg(format!("expected string key but found {:?}", k)))?;
+            .ok_or_else(|| anyhow!("expected string key but found {:?}", k))?;
 
         let len = v
             .as_i64()
-            .ok_or_else(|| failure::err_msg(format!("expected i64 but found {:?}", v)))?;
+            .ok_or_else(|| anyhow!("expected i64 but found {:?}", v))?;
 
         Ok(Length {
             len: len as usize,

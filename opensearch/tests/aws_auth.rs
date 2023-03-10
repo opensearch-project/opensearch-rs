@@ -23,7 +23,7 @@ use aws_types::region::Region;
 use std::convert::TryInto;
 
 #[tokio::test]
-async fn aws_auth_get() -> Result<(), failure::Error> {
+async fn aws_auth_get() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         let authorization_header = req.headers()["authorization"].to_str().unwrap();
         let re = Regex::new(r"^AWS4-HMAC-SHA256 Credential=id/\d*/us-west-1/custom/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature=[a-f,0-9].*$").unwrap();
@@ -47,7 +47,7 @@ async fn aws_auth_get() -> Result<(), failure::Error> {
 }
 
 #[tokio::test]
-async fn aws_auth_post() -> Result<(), failure::Error> {
+async fn aws_auth_post() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         let amz_content_sha256_header = req.headers()["x-amz-content-sha256"].to_str().unwrap();
         assert_eq!(
@@ -72,7 +72,7 @@ async fn aws_auth_post() -> Result<(), failure::Error> {
     Ok(())
 }
 
-fn create_aws_client(addr: &str) -> Result<OpenSearch, failure::Error> {
+fn create_aws_client(addr: &str) -> anyhow::Result<OpenSearch> {
     let aws_creds = Credentials::new("id", "secret", None, None, "token");
     let creds_provider = SharedCredentialsProvider::new(aws_creds);
     let aws_config = SdkConfig::builder()

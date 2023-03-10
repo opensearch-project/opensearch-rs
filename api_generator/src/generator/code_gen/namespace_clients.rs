@@ -26,7 +26,7 @@ use syn::parse_quote;
 use super::{doc, ident, stability_doc, use_declarations};
 
 /// Generates the source code for a namespaced client
-pub fn generate(api: &Api, docs_dir: &Path) -> Result<Vec<(String, String)>, failure::Error> {
+pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<Vec<(String, String)>> {
     let mut output = Vec::new();
 
     for (namespace_name, namespace) in &api.namespaces {

@@ -30,18 +30,16 @@
 
 //! HTTP components
 
-#[cfg(feature = "aws-auth")]
-pub(crate) mod aws_auth;
-
 pub mod headers;
+pub mod middleware;
 pub mod request;
 pub mod response;
 pub mod transport;
 
-pub use reqwest::StatusCode;
+pub use reqwest::{self, Request, StatusCode};
 pub use url::Url;
 
-/// Http methods supported by Elasticsearch
+/// Http methods supported by OpenSearch
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
     /// get

@@ -50,8 +50,7 @@ fn expected_error_message() -> &'static str {
 #[tokio::test]
 #[cfg(feature = "native-tls")]
 async fn default_certificate_validation() -> anyhow::Result<()> {
-    let builder = client::create_default_builder().cert_validation(CertificateValidation::Default);
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Default));
 
     match client.ping().send().await {
         Ok(response) => Err(anyhow!(
@@ -77,8 +76,7 @@ async fn default_certificate_validation() -> anyhow::Result<()> {
 #[tokio::test]
 #[cfg(all(feature = "rustls-tls", not(feature = "native-tls")))]
 async fn default_certificate_validation_rustls_tls() -> anyhow::Result<()> {
-    let builder = client::create_default_builder().cert_validation(CertificateValidation::Default);
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Default));
 
     match client.ping().send().await {
         Ok(response) => Err(anyhow!(
@@ -103,8 +101,7 @@ async fn default_certificate_validation_rustls_tls() -> anyhow::Result<()> {
 /// Allows any certificate through
 #[tokio::test]
 async fn none_certificate_validation() -> anyhow::Result<()> {
-    let builder = client::create_default_builder().cert_validation(CertificateValidation::None);
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::None));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -118,9 +115,7 @@ async fn none_certificate_validation() -> anyhow::Result<()> {
 ))]
 async fn full_certificate_ca_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(CA_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Full(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -135,9 +130,7 @@ async fn full_certificate_ca_chain_validation() -> anyhow::Result<()> {
     let mut cert = Certificate::from_pem(CA_CHAIN_CERT)?;
     cert.append(Certificate::from_pem(CA_CERT)?);
     assert_eq!(cert.len(), 3, "expected three certificates in CA chain");
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Full(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -147,9 +140,7 @@ async fn full_certificate_ca_chain_validation() -> anyhow::Result<()> {
 #[cfg(all(windows, feature = "native-tls"))]
 async fn full_certificate_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(ESNODE_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Full(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -163,9 +154,7 @@ async fn full_certificate_validation_rustls_tls() -> anyhow::Result<()> {
     chain.extend(ESNODE_CERT);
 
     let cert = Certificate::from_pem(chain.as_slice())?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Full(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -176,9 +165,7 @@ async fn full_certificate_validation_rustls_tls() -> anyhow::Result<()> {
 #[cfg(all(unix, feature = "native-tls"))]
 async fn full_certificate_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(ESNODE_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Full(cert));
-    let client = client::create(builder);
+    let client = client::create_with(|b| b.cert_validation(CertificateValidation::Full(cert)));
 
     match client.ping().send().await {
         Ok(response) => Err(anyhow!(
@@ -205,9 +192,8 @@ async fn full_certificate_validation() -> anyhow::Result<()> {
 #[cfg(all(windows, feature = "native-tls"))]
 async fn certificate_certificate_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(ESNODE_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
-    let client = client::create(builder);
+    let client =
+        client::create_with(|b| b.cert_validation(CertificateValidation::Certificate(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -218,9 +204,8 @@ async fn certificate_certificate_validation() -> anyhow::Result<()> {
 #[cfg(all(unix, feature = "native-tls"))]
 async fn certificate_certificate_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(ESNODE_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
-    let client = client::create(builder);
+    let client =
+        client::create_with(|b| b.cert_validation(CertificateValidation::Certificate(cert)));
 
     match client.ping().send().await {
         Ok(response) => Err(anyhow!(
@@ -248,9 +233,8 @@ async fn certificate_certificate_validation() -> anyhow::Result<()> {
 #[cfg(all(feature = "native-tls", not(target_os = "macos")))]
 async fn certificate_certificate_ca_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(CA_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
-    let client = client::create(builder);
+    let client =
+        client::create_with(|b| b.cert_validation(CertificateValidation::Certificate(cert)));
     let _response = client.ping().send().await?;
     Ok(())
 }
@@ -260,9 +244,8 @@ async fn certificate_certificate_ca_validation() -> anyhow::Result<()> {
 #[cfg(feature = "native-tls")]
 async fn fail_certificate_certificate_validation() -> anyhow::Result<()> {
     let cert = Certificate::from_pem(ESNODE_NO_SAN_CERT)?;
-    let builder =
-        client::create_default_builder().cert_validation(CertificateValidation::Certificate(cert));
-    let client = client::create(builder);
+    let client =
+        client::create_with(|b| b.cert_validation(CertificateValidation::Certificate(cert)));
 
     match client.ping().send().await {
         Ok(response) => Err(anyhow!(

@@ -30,6 +30,12 @@
 
 //! Authentication components
 
+use crate::{
+    http::middleware::{ClientInitializer, RequestInitializer},
+    BoxError,
+};
+use reqwest::Identity;
+
 /// Credentials for authentication
 #[derive(Debug, Clone)]
 pub enum Credentials {
@@ -45,16 +51,6 @@ pub enum Credentials {
     Certificate(ClientCertificate),
     /// An id and api_key to use for API key authentication
     ApiKey(String, String),
-    /// AWS credentials used for AWS SigV4 request signing.
-    ///
-    /// # Optional
-    ///
-    /// This requires the `aws-auth` feature to be enabled.
-    #[cfg(feature = "aws-auth")]
-    AwsSigV4(
-        aws_credential_types::provider::SharedCredentialsProvider,
-        aws_types::region::Region,
-    ),
 }
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -90,28 +86,50 @@ impl From<ClientCertificate> for Credentials {
     }
 }
 
-#[cfg(any(feature = "aws-auth"))]
-impl std::convert::TryFrom<&aws_types::SdkConfig> for Credentials {
-    type Error = super::Error;
-
-    fn try_from(value: &aws_types::SdkConfig) -> Result<Self, Self::Error> {
-        let credentials = value
-            .credentials_provider()
-            .ok_or_else(|| super::error::lib("SdkConfig does not have a credentials_provider"))?
-            .clone();
-        let region = value
-            .region()
-            .ok_or_else(|| super::error::lib("SdkConfig does not have a region"))?
-            .clone();
-        Ok(Credentials::AwsSigV4(credentials, region))
+impl ClientInitializer for Credentials {
+    fn init(
+        &self,
+        client: reqwest::ClientBuilder,
+    ) -> Result<reqwest::ClientBuilder, BoxError<'static>> {
+        match &self {
+            #[cfg(feature = "native-tls")]
+            Credentials::Certificate(ClientCertificate::Pkcs12(b, p)) => {
+                Ok(client.identity(Identity::from_pkcs12_der(b, p.as_deref().unwrap_or(""))?))
+            }
+            #[cfg(feature = "rustls-tls")]
+            Credentials::Certificate(ClientCertificate::Pem(b)) => {
+                Ok(client.identity(Identity::from_pem(b)?))
+            }
+            _ => Ok(client),
+        }
     }
 }
 
-#[cfg(any(feature = "aws-auth"))]
-impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
-    type Error = super::Error;
+impl RequestInitializer for Credentials {
+    fn init(
+        &self,
+        request: reqwest::RequestBuilder,
+    ) -> Result<reqwest::RequestBuilder, BoxError<'static>> {
+        Ok(match &self {
+            Credentials::Basic(u, p) => request.basic_auth(u, Some(p)),
+            Credentials::Bearer(t) => request.bearer_auth(t),
+            Credentials::ApiKey(id, key) => {
+                use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
+                use reqwest::header::{HeaderValue, AUTHORIZATION};
+                use std::io::Write;
 
-    fn try_from(value: aws_types::SdkConfig) -> Result<Self, Self::Error> {
-        Credentials::try_from(&value)
+                let mut header_value = b"ApiKey ".to_vec();
+                {
+                    let mut encoder = Base64Encoder::new(&mut header_value, &BASE64_STANDARD);
+                    write!(encoder, "{}:", id).unwrap();
+                    write!(encoder, "{}", key).unwrap();
+                }
+                request.header(
+                    AUTHORIZATION,
+                    HeaderValue::from_bytes(&header_value).unwrap(),
+                )
+            }
+            _ => request,
+        })
     }
 }

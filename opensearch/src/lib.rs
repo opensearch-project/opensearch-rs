@@ -74,7 +74,7 @@
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! opensearch = "1.0.0"
+//! opensearch = "3"
 //! ```
 //! The following _optional_ dependencies may also be useful to create requests and read responses
 //!
@@ -341,29 +341,30 @@
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! opensearch = { version = "1", features = ["aws-auth"] }
-//! aws-config = "0.10"
+//! opensearch = { version = "3", features = ["aws-auth"] }
+//! aws-config = "1"
 //! ```
 //!
 //! ```rust,no_run
-//! # use aws_config::meta::region::RegionProviderChain;
-//! # use opensearch::{
-//! #     Error, OpenSearch,
-//! #     http::transport::{TransportBuilder,SingleNodeConnectionPool},
-//! # };
-//! # use url::Url;
-//! # use std::convert::TryInto;
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! # #[cfg(feature = "aws-auth")] {
-//! let creds = aws_config::load_from_env().await;
+//! use opensearch::{
+//!     aws::{aws_config::{BehaviorVersion, self, meta::region::RegionProviderChain}, AwsSigV4Builder},
+//!     Error, OpenSearch,
+//!     http::transport::{TransportBuilder,SingleNodeConnectionPool},
+//! };
+//! use url::Url;
+//!
 //! let url = Url::parse("https://...")?;
 //! let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
-//! let aws_config = aws_config::from_env().region(region_provider).load().await.clone();
+//! let aws_config = aws_config::defaults(BehaviorVersion::latest()).region(region_provider).load().await.clone();
+//! let sigv4 = AwsSigV4Builder::from(aws_config)
+//!     .service_name("es") // use "aoss" for OpenSearch Serverless
+//!     .build()?;
 //! let conn_pool = SingleNodeConnectionPool::new(url);
 //! let transport = TransportBuilder::new(conn_pool)
-//!     .auth(aws_config.clone().try_into()?)
-//!     .service_name("es") // use "aoss" for OpenSearch Serverless
+//!     .aws_sigv4(sigv4)
 //!     .build()?;
 //! let client = OpenSearch::new(transport);
 //! # }
@@ -392,6 +393,8 @@ mod readme {
 }
 
 pub mod auth;
+#[cfg(feature = "aws-auth")]
+pub mod aws;
 pub mod cert;
 pub mod http;
 pub mod models;

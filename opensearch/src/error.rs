@@ -32,125 +32,82 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use crate::http::{transport::BuildError, StatusCode};
-use std::{error, fmt, io};
+
+use crate::http::{middleware::RequestPipelineError, transport::BuildError, StatusCode};
+
+pub type BoxError<'a> = Box<dyn std::error::Error + Send + Sync + 'a>;
 
 /// An error with the client.
 ///
 /// Errors that can occur include IO and parsing errors, as well as specific
-/// errors from Elasticsearch and internal errors from the client.
-#[derive(Debug)]
-pub struct Error {
-    kind: Kind,
-}
-
-#[derive(Debug)]
-enum Kind {
+/// errors from OpenSearch and internal errors from the client.
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
     /// An error building the client
-    Build(BuildError),
+    #[error("Error building the client: {0}")]
+    Build(#[from] BuildError),
 
     /// A general error from this library
+    #[error("Library error: {0}")]
     Lib(String),
 
-    /// HTTP library error
-    Http(reqwest::Error),
+    /// Reqwest error
+    #[error("Reqwest error: {0}")]
+    Reqwest(#[from] reqwest::Error),
+
+    /// URL parse error
+    #[error("URL parse error: {0}")]
+    UrlParse(#[from] url::ParseError),
 
     /// IO error
-    Io(io::Error),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
 
     /// JSON error
-    Json(serde_json::error::Error),
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::error::Error),
+
+    /// Request initializer error
+    #[error("Request initializer error: {0}")]
+    RequestInitializer(#[source] BoxError<'static>),
+
+    /// Request pipeline error
+    #[error("Request pipeline error: {0}")]
+    RequestPipeline(#[source] BoxError<'static>),
 }
 
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Error {
-        Error {
-            kind: Kind::Io(err),
-        }
-    }
-}
-
-impl From<reqwest::Error> for Error {
-    fn from(err: reqwest::Error) -> Error {
-        Error {
-            kind: Kind::Http(err),
-        }
-    }
-}
-
-impl From<serde_json::error::Error> for Error {
-    fn from(err: serde_json::error::Error) -> Error {
-        Error {
-            kind: Kind::Json(err),
-        }
-    }
-}
-
-impl From<url::ParseError> for Error {
-    fn from(err: url::ParseError) -> Error {
-        Error {
-            kind: Kind::Lib(err.to_string()),
-        }
-    }
-}
-
-impl From<BuildError> for Error {
-    fn from(err: BuildError) -> Error {
-        Error {
-            kind: Kind::Build(err),
+impl From<RequestPipelineError> for Error {
+    fn from(err: RequestPipelineError) -> Self {
+        match err {
+            RequestPipelineError::Reqwest(err) => Self::Reqwest(err),
+            RequestPipelineError::Pipeline(err) => Self::RequestPipeline(err),
         }
     }
 }
 
 pub(crate) fn lib(err: impl Into<String>) -> Error {
-    Error {
-        kind: Kind::Lib(err.into()),
-    }
+    Error::Lib(err.into())
 }
 
 impl Error {
     /// The status code, if the error was generated from a response
     pub fn status_code(&self) -> Option<StatusCode> {
-        match &self.kind {
-            Kind::Http(err) => err.status(),
+        match &self {
+            Self::Reqwest(err) => err.status(),
             _ => None,
         }
     }
 
     /// Returns true if the error is related to a timeout
     pub fn is_timeout(&self) -> bool {
-        match &self.kind {
-            Kind::Http(err) => err.is_timeout(),
+        match &self {
+            Self::Reqwest(err) => err.is_timeout(),
             _ => false,
         }
     }
 
     /// Returns true if the error is related to serialization or deserialization
     pub fn is_json(&self) -> bool {
-        matches!(self.kind, Kind::Json(_))
-    }
-}
-
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match &self.kind {
-            Kind::Build(err) => Some(err),
-            Kind::Lib(_) => None,
-            Kind::Http(err) => Some(err),
-            Kind::Io(err) => Some(err),
-            Kind::Json(err) => Some(err),
-        }
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match &self.kind {
-            Kind::Build(err) => err.fmt(f),
-            Kind::Lib(err) => err.fmt(f),
-            Kind::Http(err) => err.fmt(f),
-            Kind::Io(err) => err.fmt(f),
-            Kind::Json(err) => err.fmt(f),
-        }
+        matches!(self, Self::Json(_))
     }
 }

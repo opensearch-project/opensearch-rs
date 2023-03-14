@@ -12,18 +12,33 @@
 #![cfg(feature = "aws-auth")]
 
 pub mod common;
-use aws_config::SdkConfig;
-use aws_credential_types::provider::SharedCredentialsProvider;
 use aws_credential_types::Credentials as AwsCredentials;
 use aws_smithy_async::time::StaticTimeSource;
 use aws_types::region::Region;
-use common::*;
-use opensearch::{auth::Credentials, indices::IndicesCreateParts, OpenSearch};
-use regex::Regex;
-use reqwest::header::HOST;
+use common::{server::MockServer, tracing_init};
+use opensearch::{
+    aws::{AwsSigV4, AwsSigV4BuildError, AwsSigV4Builder},
+    http::headers::HOST,
+    indices::IndicesCreateParts,
+};
 use serde_json::json;
-use std::convert::TryInto;
 use test_case::test_case;
+
+fn sigv4_config_builder(service_name: &str) -> AwsSigV4Builder {
+    let aws_creds = AwsCredentials::new("test-access-key", "test-secret-key", None, None, "test");
+    let region = Region::new("ap-southeast-2");
+    let time_source = StaticTimeSource::from_secs(1673626117); // 2023-01-13 16:08:37 +0000
+
+    AwsSigV4::builder()
+        .credentials_provider(aws_creds)
+        .region(region)
+        .service_name(service_name.to_owned())
+        .time_source(time_source)
+}
+
+fn sigv4_config(service_name: &str) -> Result<AwsSigV4, AwsSigV4BuildError> {
+    sigv4_config_builder(service_name).build()
+}
 
 #[test_case("es", "10c9be415f4b9f15b12abbb16bd3e3730b2e6c76e0cf40db75d08a44ed04a3a1"; "when service name is es")]
 #[test_case("aoss", "34903aef90423aa7dd60575d3d45316c6ef2d57bbe564a152b41bf8f5917abf6"; "when service name is aoss")]
@@ -35,22 +50,12 @@ async fn aws_auth_signs_correctly(
 ) -> anyhow::Result<()> {
     tracing_init();
 
-    let (server, mut rx) = server::capturing_http();
+    let mut server = MockServer::start().await?;
 
-    let aws_creds = AwsCredentials::new("test-access-key", "test-secret-key", None, None, "test");
-    let region = Region::new("ap-southeast-2");
-    let time_source = StaticTimeSource::from_secs(1673626117); // 2023-01-13 16:08:37 +0000
     let host = format!("aaabbbcccddd111222333.ap-southeast-2.{service_name}.amazonaws.com");
+    let sigv4 = sigv4_config(service_name)?;
 
-    let transport_builder = client::create_builder(&format!("http://{}", server.addr()))
-        .auth(Credentials::AwsSigV4(
-            SharedCredentialsProvider::new(aws_creds),
-            region,
-        ))
-        .service_name(service_name)
-        .sigv4_time_source(time_source.into())
-        .header(HOST, host.parse().unwrap());
-    let client = client::create(transport_builder);
+    let client = server.client_with(|b| b.aws_sigv4(sigv4).header(HOST, host.parse().unwrap()));
 
     let _ = client
         .indices()
@@ -74,59 +79,55 @@ async fn aws_auth_signs_correctly(
         .send()
         .await?;
 
-    let sent_req = rx.recv().await.expect("should have sent a request");
+    let sent_req = server.received_request().await?;
 
-    assert_header_eq!(sent_req, "accept", "application/json");
-    assert_header_eq!(sent_req, "content-type", "application/json");
-    assert_header_eq!(sent_req, "host", host);
-    assert_header_eq!(sent_req, "x-amz-date", "20230113T160837Z");
-    assert_header_eq!(
-        sent_req,
-        "x-amz-content-sha256",
-        "4c770eaed349122a28302ff73d34437cad600acda5a9dd373efc7da2910f8564"
+    assert_eq!(sent_req.header("accept"), Some("application/json"));
+    assert_eq!(sent_req.header("content-type"), Some("application/json"));
+    assert_eq!(sent_req.header("host"), Some(host.as_str()));
+    assert_eq!(sent_req.header("x-amz-date"), Some("20230113T160837Z"));
+    assert_eq!(
+        sent_req.header("x-amz-content-sha256"),
+        Some("4c770eaed349122a28302ff73d34437cad600acda5a9dd373efc7da2910f8564")
     );
-    assert_header_eq!(sent_req, "authorization", format!("AWS4-HMAC-SHA256 Credential=test-access-key/20230113/ap-southeast-2/{service_name}/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature={expected_signature}"));
+    assert_eq!(sent_req.header("authorization"), Some(format!("AWS4-HMAC-SHA256 Credential=test-access-key/20230113/ap-southeast-2/{service_name}/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature={expected_signature}").as_str()));
 
     Ok(())
 }
 
 #[tokio::test]
 async fn aws_auth_get() -> anyhow::Result<()> {
-    let server = server::http(move |req| async move {
-        let authorization_header = req.headers()["authorization"].to_str().unwrap();
-        let re = Regex::new(r"^AWS4-HMAC-SHA256 Credential=id/\d*/us-west-1/custom/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature=[a-f,0-9].*$").unwrap();
-        assert!(
-            re.is_match(authorization_header),
-            "{}",
-            authorization_header
-        );
-        assert_header_eq!(
-            req,
-            "x-amz-content-sha256",
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        ); // SHA of empty string
-        server::empty_response()
-    });
+    tracing_init();
 
-    let client = create_aws_client(format!("http://{}", server.addr()).as_ref())?;
-    let _response = client.ping().send().await?;
+    let mut server = MockServer::start().await?;
+    let sigv4 = sigv4_config_builder("custom")
+        .ignore_header("host")
+        .build()?;
+
+    let client = server.client_with(|b| b.aws_sigv4(sigv4));
+
+    let _ = client.ping().send().await?;
+
+    let sent_req = server.received_request().await?;
+
+    assert_eq!(sent_req.header("authorization"), Some("AWS4-HMAC-SHA256 Credential=test-access-key/20230113/ap-southeast-2/custom/aws4_request, SignedHeaders=accept;content-type;x-amz-content-sha256;x-amz-date, Signature=8c882ad6cff05cb6c5bc91a030a92582787f34ef4af858a728c6f943c4ff2f21"));
+    assert_eq!(
+        sent_req.header("x-amz-content-sha256"),
+        Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    );
 
     Ok(())
 }
 
 #[tokio::test]
 async fn aws_auth_post() -> anyhow::Result<()> {
-    let server = server::http(move |req| async move {
-        assert_header_eq!(
-            req,
-            "x-amz-content-sha256",
-            "f3a842f988a653a734ebe4e57c45f19293a002241a72f0b3abbff71e4f5297b9"
-        ); // SHA of the JSON
-        server::empty_response()
-    });
+    tracing_init();
 
-    let client = create_aws_client(format!("http://{}", server.addr()).as_ref())?;
-    client
+    let mut server = MockServer::start().await?;
+    let sigv4 = sigv4_config("custom")?;
+
+    let client = server.client_with(|b| b.aws_sigv4(sigv4));
+
+    let _ = client
         .index(opensearch::IndexParts::Index("movies"))
         .body(serde_json::json!({
                 "title": "Moneyball",
@@ -137,18 +138,12 @@ async fn aws_auth_post() -> anyhow::Result<()> {
         .send()
         .await?;
 
-    Ok(())
-}
+    let sent_req = server.received_request().await?;
 
-fn create_aws_client(addr: &str) -> anyhow::Result<OpenSearch> {
-    let aws_creds = AwsCredentials::new("id", "secret", None, None, "token");
-    let creds_provider = SharedCredentialsProvider::new(aws_creds);
-    let aws_config = SdkConfig::builder()
-        .credentials_provider(creds_provider)
-        .region(Region::new("us-west-1"))
-        .build();
-    let builder = client::create_builder(addr)
-        .auth(aws_config.clone().try_into()?)
-        .service_name("custom");
-    Ok(client::create(builder))
+    assert_eq!(
+        sent_req.header("x-amz-content-sha256"),
+        Some("f3a842f988a653a734ebe4e57c45f19293a002241a72f0b3abbff71e4f5297b9")
+    ); // SHA of the JSON
+
+    Ok(())
 }

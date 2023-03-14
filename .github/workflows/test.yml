@@ -36,7 +36,7 @@ jobs:
           version: 2.8.0
           secured: true
 
-      - name: Run Tests (${{ matrix.test-args }})
+      - name: Run Tests
         working-directory: client
         run: cargo make test ${{ matrix.test-args }}
         env:

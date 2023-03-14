@@ -30,8 +30,9 @@
 
 //! HTTP transport and connection components
 
-#[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-use crate::auth::ClientCertificate;
+use super::middleware::{
+    RequestPipeline, SharedClientInitializer, SharedRequestHandler, SharedRequestInitializer,
+};
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 use crate::cert::CertificateValidation;
 use crate::{
@@ -39,75 +40,32 @@ use crate::{
     error::Error,
     http::{
         headers::{
-            HeaderMap, HeaderName, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE,
-            DEFAULT_ACCEPT, DEFAULT_CONTENT_TYPE, DEFAULT_USER_AGENT, USER_AGENT,
+            HeaderMap, HeaderName, HeaderValue, ACCEPT, CONTENT_TYPE, DEFAULT_ACCEPT,
+            DEFAULT_CONTENT_TYPE, DEFAULT_USER_AGENT, USER_AGENT,
         },
         request::Body,
         response::Response,
         Method,
     },
+    BoxError,
 };
-#[cfg(feature = "aws-auth")]
-use aws_types::sdk_config::SharedTimeSource;
-use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
 use bytes::BytesMut;
 use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use serde::Serialize;
-use std::{
-    error, fmt,
-    fmt::Debug,
-    io::{self, Write},
-    time::Duration,
-};
+use std::{fmt::Debug, sync::Arc, time::Duration};
 use url::Url;
 
 /// Error that can occur when building a [Transport]
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum BuildError {
-    /// IO error
-    Io(io::Error),
+    /// Reqwest error
+    #[error("Reqwest error: {0}")]
+    Reqwest(#[from] reqwest::Error),
 
-    /// Certificate error
-    Cert(reqwest::Error),
-}
-
-impl From<io::Error> for BuildError {
-    fn from(err: io::Error) -> BuildError {
-        BuildError::Io(err)
-    }
-}
-
-impl From<reqwest::Error> for BuildError {
-    fn from(err: reqwest::Error) -> BuildError {
-        BuildError::Cert(err)
-    }
-}
-
-impl error::Error for BuildError {
-    #[allow(warnings)]
-    fn description(&self) -> &str {
-        match *self {
-            BuildError::Io(ref err) => err.description(),
-            BuildError::Cert(ref err) => err.description(),
-        }
-    }
-
-    fn cause(&self) -> Option<&dyn error::Error> {
-        match *self {
-            BuildError::Io(ref err) => Some(err as &dyn error::Error),
-            BuildError::Cert(ref err) => Some(err as &dyn error::Error),
-        }
-    }
-}
-
-impl fmt::Display for BuildError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            BuildError::Io(ref err) => fmt::Display::fmt(err, f),
-            BuildError::Cert(ref err) => fmt::Display::fmt(err, f),
-        }
-    }
+    /// Client initializer error
+    #[error("Client initializer error: {0}")]
+    ClientInitializer(#[from] BoxError<'static>),
 }
 
 /// Default address to OpenSearch running on `http://localhost:9200`
@@ -148,7 +106,9 @@ fn build_meta() -> String {
 pub struct TransportBuilder {
     client_builder: reqwest::ClientBuilder,
     conn_pool: Box<dyn ConnectionPool>,
-    credentials: Option<Credentials>,
+    init_stack: Vec<SharedClientInitializer>,
+    req_init_stack: Vec<SharedRequestInitializer>,
+    req_handler_stack: Vec<SharedRequestHandler>,
     #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
     cert_validation: Option<CertificateValidation>,
     proxy: Option<Url>,
@@ -156,10 +116,6 @@ pub struct TransportBuilder {
     disable_proxy: bool,
     headers: HeaderMap,
     timeout: Option<Duration>,
-    #[cfg(feature = "aws-auth")]
-    sigv4_service_name: String,
-    #[cfg(feature = "aws-auth")]
-    sigv4_time_source: Option<SharedTimeSource>,
 }
 
 impl TransportBuilder {
@@ -172,7 +128,9 @@ impl TransportBuilder {
         Self {
             client_builder: reqwest::ClientBuilder::new(),
             conn_pool: Box::new(conn_pool),
-            credentials: None,
+            init_stack: Vec::new(),
+            req_init_stack: Vec::new(),
+            req_handler_stack: Vec::new(),
             #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
             cert_validation: None,
             proxy: None,
@@ -180,11 +138,22 @@ impl TransportBuilder {
             disable_proxy: false,
             headers: HeaderMap::new(),
             timeout: None,
-            #[cfg(feature = "aws-auth")]
-            sigv4_service_name: "es".to_string(),
-            #[cfg(feature = "aws-auth")]
-            sigv4_time_source: None,
         }
+    }
+
+    pub fn with_init(mut self, init: impl Into<SharedClientInitializer>) -> Self {
+        self.init_stack.push(init.into());
+        self
+    }
+
+    pub fn with_req_init(mut self, init: impl Into<SharedRequestInitializer>) -> Self {
+        self.req_init_stack.push(init.into());
+        self
+    }
+
+    pub fn with_handler(mut self, handler: impl Into<SharedRequestHandler>) -> Self {
+        self.req_handler_stack.push(handler.into());
+        self
     }
 
     /// Configures a proxy.
@@ -210,9 +179,10 @@ impl TransportBuilder {
     }
 
     /// Credentials for the client to use for authentication to OpenSearch.
-    pub fn auth(mut self, credentials: Credentials) -> Self {
-        self.credentials = Some(credentials);
-        self
+    pub fn auth(self, credentials: Credentials) -> Self {
+        let credentials = Arc::new(credentials);
+        self.with_init(credentials.clone())
+            .with_req_init(credentials)
     }
 
     /// Validation applied to the certificate provided to establish a HTTPS connection.
@@ -251,52 +221,12 @@ impl TransportBuilder {
         self
     }
 
-    /// Sets the AWS SigV4 signing service name.
-    ///
-    /// Default is "es". Other supported services are "aoss" for OpenSearch Serverless.
-    #[cfg(feature = "aws-auth")]
-    pub fn service_name(mut self, service_name: &str) -> Self {
-        self.sigv4_service_name = service_name.to_string();
-        self
-    }
-
-    /// Sets the AWS SigV4 signing time source.
-    ///
-    /// Default is `SystemTimeSource`
-    #[cfg(feature = "aws-auth")]
-    pub fn sigv4_time_source(mut self, sigv4_time_source: SharedTimeSource) -> Self {
-        self.sigv4_time_source = Some(sigv4_time_source);
-        self
-    }
-
-    /// Builds a [Transport] to use to send API calls to Elasticsearch.
+    /// Builds a [Transport] to use to send API calls to OpenSearch.
     pub fn build(self) -> Result<Transport, BuildError> {
         let mut client_builder = self.client_builder;
 
         if let Some(t) = self.timeout {
             client_builder = client_builder.timeout(t);
-        }
-
-        #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-        {
-            if let Some(Credentials::Certificate(cert)) = &self.credentials {
-                client_builder = match cert {
-                    #[cfg(feature = "native-tls")]
-                    ClientCertificate::Pkcs12(b, p) => {
-                        let password = match p {
-                            Some(pass) => pass.as_str(),
-                            None => "",
-                        };
-                        let pkcs12 = reqwest::Identity::from_pkcs12_der(b, password)?;
-                        client_builder.identity(pkcs12)
-                    }
-                    #[cfg(feature = "rustls-tls")]
-                    ClientCertificate::Pem(b) => {
-                        let pem = reqwest::Identity::from_pem(b)?;
-                        client_builder.identity(pem)
-                    }
-                }
-            }
         }
 
         #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -332,16 +262,20 @@ impl TransportBuilder {
             client_builder = client_builder.proxy(proxy);
         }
 
+        client_builder = self
+            .init_stack
+            .into_iter()
+            .try_fold(client_builder, |client_builder, init| {
+                init.init(client_builder)
+            })?;
+
         let client = client_builder.build()?;
         Ok(Transport {
             client,
-            conn_pool: self.conn_pool,
-            credentials: self.credentials,
             default_headers: self.headers,
-            #[cfg(feature = "aws-auth")]
-            sigv4_service_name: self.sigv4_service_name,
-            #[cfg(feature = "aws-auth")]
-            sigv4_time_source: self.sigv4_time_source.unwrap_or_default(),
+            conn_pool: self.conn_pool,
+            req_init_stack: self.req_init_stack.into_boxed_slice(),
+            req_handler_stack: self.req_handler_stack.into_boxed_slice(),
         })
     }
 }
@@ -353,7 +287,7 @@ impl Default for TransportBuilder {
     }
 }
 
-/// A connection to an Elasticsearch node, used to send an API request
+/// A connection to an OpenSearch node, used to send an API request
 #[derive(Debug, Clone)]
 pub struct Connection {
     url: Url,
@@ -374,18 +308,15 @@ impl Connection {
     }
 }
 
-/// A HTTP transport responsible for making the API requests to Elasticsearch,
+/// A HTTP transport responsible for making the API requests to OpenSearch,
 /// using a [Connection] selected from a [ConnectionPool]
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Transport {
     client: reqwest::Client,
-    credentials: Option<Credentials>,
-    conn_pool: Box<dyn ConnectionPool>,
     default_headers: HeaderMap,
-    #[cfg(feature = "aws-auth")]
-    sigv4_service_name: String,
-    #[cfg(feature = "aws-auth")]
-    sigv4_time_source: SharedTimeSource,
+    req_init_stack: Box<[SharedRequestInitializer]>,
+    req_handler_stack: Box<[SharedRequestHandler]>,
+    conn_pool: Box<dyn ConnectionPool>,
 }
 
 impl Transport {
@@ -430,36 +361,18 @@ impl Transport {
         let connection = self.conn_pool.next();
         let url = connection.url.join(path.trim_start_matches('/'))?;
         let reqwest_method = self.method(method);
-        let mut request_builder = self.client.request(reqwest_method, url);
+
+        let mut request_builder = self
+            .req_init_stack
+            .iter()
+            .try_fold(
+                self.client.request(reqwest_method, url),
+                |request_builder, init| init.init(request_builder),
+            )
+            .map_err(Error::RequestInitializer)?;
 
         if let Some(t) = timeout {
             request_builder = request_builder.timeout(t);
-        }
-
-        // set credentials before any headers, as credentials append to existing headers in reqwest,
-        // whilst setting headers() overwrites, so if an Authorization header has been specified
-        // on a specific request, we want it to overwrite.
-        if let Some(c) = &self.credentials {
-            request_builder = match c {
-                Credentials::Basic(u, p) => request_builder.basic_auth(u, Some(p)),
-                Credentials::Bearer(t) => request_builder.bearer_auth(t),
-                #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-                Credentials::Certificate(_) => request_builder,
-                Credentials::ApiKey(i, k) => {
-                    let mut header_value = b"ApiKey ".to_vec();
-                    {
-                        let mut encoder = Base64Encoder::new(&mut header_value, &BASE64_STANDARD);
-                        write!(encoder, "{}:", i).unwrap();
-                        write!(encoder, "{}", k).unwrap();
-                    }
-                    request_builder.header(
-                        AUTHORIZATION,
-                        HeaderValue::from_bytes(&header_value).unwrap(),
-                    )
-                }
-                #[cfg(feature = "aws-auth")]
-                Credentials::AwsSigV4(_, _) => request_builder,
-            }
         }
 
         // default headers first, overwrite with any provided
@@ -493,27 +406,11 @@ impl Transport {
             request_builder = request_builder.query(q);
         }
 
-        #[cfg_attr(not(feature = "aws-auth"), allow(unused_mut))]
-        let mut request = request_builder.build()?;
+        let response = RequestPipeline::new(&self.client, &self.req_handler_stack)
+            .run(request_builder.build()?)
+            .await?;
 
-        #[cfg(feature = "aws-auth")]
-        if let Some(Credentials::AwsSigV4(credentials_provider, region)) = &self.credentials {
-            super::aws_auth::sign_request(
-                &mut request,
-                credentials_provider,
-                &self.sigv4_service_name,
-                region,
-                &self.sigv4_time_source,
-            )
-            .await
-            .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
-        }
-
-        let response = self.client.execute(request).await;
-        match response {
-            Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e.into()),
-        }
+        Ok(Response::new(response, method))
     }
 }
 
@@ -523,7 +420,18 @@ impl Default for Transport {
     }
 }
 
-/// A pool of [Connection]s, used to make API calls to Elasticsearch.
+impl std::fmt::Debug for Transport {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Transport")
+            .field("client", &self.client)
+            // .field("req_init_stack", &self.req_init_stack)
+            // .field("req_handler_stack", &self.req_handler_stack)
+            .field("conn_pool", &self.conn_pool)
+            .finish()
+    }
+}
+
+/// A pool of [Connection]s, used to make API calls to OpenSearch.
 ///
 /// A [ConnectionPool] manages the connections, with different implementations determining how
 /// to get the next [Connection]. The simplest type of [ConnectionPool] is [SingleNodeConnectionPool],
@@ -536,7 +444,7 @@ pub trait ConnectionPool: Debug + dyn_clone::DynClone + Sync + Send {
 
 clone_trait_object!(ConnectionPool);
 
-/// A connection pool that manages the single connection to an Elasticsearch cluster.
+/// A connection pool that manages the single connection to an OpenSearch cluster.
 #[derive(Debug, Clone)]
 pub struct SingleNodeConnectionPool {
     connection: Connection,

@@ -28,23 +28,13 @@
  * GitHub history for details.
  */
 
-#![allow(unused)]
+pub mod client;
+pub mod server;
 
-pub(crate) mod client;
-pub(crate) mod server;
-
-pub(crate) static DEFAULT_USER_AGENT: &str = concat!("opensearch-rs/", env!("CARGO_PKG_VERSION"));
-
-macro_rules! assert_header_eq {
-    ($req:expr, $header:expr, $value:expr) => {
-        assert_eq!($req.headers()[$header], $value);
-    };
-}
+pub static DEFAULT_USER_AGENT: &str = concat!("opensearch-rs/", env!("CARGO_PKG_VERSION"));
 
 static TRACING: std::sync::Once = std::sync::Once::new();
 
-pub(crate) fn tracing_init() {
+pub fn tracing_init() {
     TRACING.call_once(|| tracing_subscriber::fmt::init())
 }
-
-pub(crate) use assert_header_eq;

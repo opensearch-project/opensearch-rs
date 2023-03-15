@@ -12,6 +12,8 @@ script_path=$(dirname $(realpath -s $0))
 source $script_path/functions/imports.sh
 set -euo pipefail
 
+bash $script_path/generate-certs.sh
+
 echo -e "\033[34;1mINFO:\033[0m Take down node if called twice with the same arguments (DETACH=true) or on seperate terminals \033[0m"
 cleanup_node $opensearch_node_name
 

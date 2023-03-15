@@ -11,3 +11,10 @@ yaml_test_runner/tests/free
 yaml_test_runner/tests/oss
 yaml_test_runner/tests/mod.rs
 test_results/
+
+.ci/certs/esnode.*
+.ci/certs/esnode-no-san.*
+.ci/certs/kirk.*
+.ci/certs/root-ca.*
+.ci/opensearch/*.pem
+.srl

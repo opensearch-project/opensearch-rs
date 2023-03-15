@@ -29,6 +29,8 @@ runs:
         url="http://localhost:9200"
         cp ./client/.ci/opensearch/opensearch.yml $OPENSEARCH_HOME/config/
 
+        bash ./client/.ci/generate-certs.sh
+
         if [[ -d "$OPENSEARCH_HOME/plugins/opensearch-security" ]]; then
           if [[ "$SECURED" == "true" ]]; then
             bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s

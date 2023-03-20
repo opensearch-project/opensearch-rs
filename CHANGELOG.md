@@ -16,6 +16,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `aws-*` from >=0.10 to >=0.53 ([#108](https://github.com/opensearch-project/opensearch-rs/pull/108))
 - Bumps `toml` from 0.5.6 to 0.7.1
 - Bumps `sysinfo` from 0.26.4 to 0.28.0
+- Bumps `syn` from ~1.0 to ~2.0
 
 ### Changed
 - Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))

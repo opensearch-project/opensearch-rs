@@ -19,7 +19,6 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))
-- References to unused Point-in-Time API updated ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136))
 
 ### Deprecated
 
@@ -29,6 +28,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - [BUG] cargo make test fails out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Update CI to run cargo make test fails out of the box ([#120](https://github.com/opensearch-project/opensearch-rs/pull/120))
 - Add cargo cache to Github actions to speed up builds ([#121](https://github.com/opensearch-project/opensearch-rs/pull/121))
+- [BUG] Updated Point-in-Time request builder to support current API ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136))
 
 ### Security
 

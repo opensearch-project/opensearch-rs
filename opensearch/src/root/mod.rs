@@ -438,15 +438,24 @@ where
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Close Point In Time API"]
-pub enum ClosePointInTimeParts {
-    #[doc = "No parts"]
-    None,
+pub enum ClosePointInTimeParts<'b> {
+    #[doc = "Index"]
+    Index(&'b [&'b str]),
 }
-impl ClosePointInTimeParts {
+impl<'b> ClosePointInTimeParts<'b> {
     #[doc = "Builds a relative URL path to the Close Point In Time API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            ClosePointInTimeParts::None => "/_pit".into(),
+            ClosePointInTimeParts::Index(index) => {
+                let index_str = index.join(",");
+                let encoded_index: Cow<str> =
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(23usize + encoded_index.len());
+                p.push('/');
+                p.push_str(encoded_index.as_ref());
+                p.push_str("/_search/point_in_time");
+                p.into()
+            }
         }
     }
 }
@@ -454,7 +463,7 @@ impl ClosePointInTimeParts {
 #[derive(Clone, Debug)]
 pub struct ClosePointInTime<'a, 'b, B> {
     transport: &'a Transport,
-    parts: ClosePointInTimeParts,
+    parts: ClosePointInTimeParts<'b>,
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -468,12 +477,12 @@ impl<'a, 'b, B> ClosePointInTime<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [ClosePointInTime]"]
-    pub fn new(transport: &'a Transport) -> Self {
+    #[doc = "Creates a new instance of [ClosePointInTime] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: ClosePointInTimeParts<'b>) -> Self {
         let headers = HeaderMap::new();
         ClosePointInTime {
             transport,
-            parts: ClosePointInTimeParts::None,
+            parts,
             headers,
             body: None,
             error_trace: None,
@@ -5046,8 +5055,6 @@ where
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Open Point In Time API"]
 pub enum OpenPointInTimeParts<'b> {
-    #[doc = "No parts"]
-    None,
     #[doc = "Index"]
     Index(&'b [&'b str]),
 }
@@ -5055,15 +5062,14 @@ impl<'b> OpenPointInTimeParts<'b> {
     #[doc = "Builds a relative URL path to the Open Point In Time API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            OpenPointInTimeParts::None => "/_pit".into(),
             OpenPointInTimeParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(6usize + encoded_index.len());
+                let mut p = String::with_capacity(23usize + encoded_index.len());
                 p.push('/');
                 p.push_str(encoded_index.as_ref());
-                p.push_str("/_pit");
+                p.push_str("/_search/point_in_time");
                 p.into()
             }
         }
@@ -5141,7 +5147,7 @@ where
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "The type of index that can match the wildcard pattern. Supports comma-separated values. Optional. Default is `open`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
@@ -5166,12 +5172,12 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specific the time to live for the point in time"]
+    #[doc = "The amount of time to keep the PIT. Every time you access a PIT by using the Search API, the PIT lifetime is extended by the amount of time equal to the keep_alive parameter. Required."]
     pub fn keep_alive(mut self, keep_alive: &'b str) -> Self {
         self.keep_alive = Some(keep_alive);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "The node or the shard used to perform the search. Optional. Default is random."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
@@ -5186,7 +5192,7 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
+    #[doc = "Specifies to route search requests to a specific shard. Optional. Default is the document's `_id`."]
     pub fn routing(mut self, routing: &'b str) -> Self {
         self.routing = Some(routing);
         self
@@ -8865,8 +8871,11 @@ impl OpenSearch {
         ClearScroll::new(self.transport(), parts)
     }
     #[doc = "[Close Point In Time API](https://opensearch.org/docs/)\n\nClose a point in time"]
-    pub fn close_point_in_time<'a, 'b>(&'a self) -> ClosePointInTime<'a, 'b, ()> {
-        ClosePointInTime::new(self.transport())
+    pub fn close_point_in_time<'a, 'b>(
+        &'a self,
+        parts: ClosePointInTimeParts<'b>,
+    ) -> ClosePointInTime<'a, 'b, ()> {
+        ClosePointInTime::new(self.transport(), parts)
     }
     #[doc = "[Count API](https://opensearch.org/docs/)\n\nReturns number of documents matching a query."]
     pub fn count<'a, 'b>(&'a self, parts: CountParts<'b>) -> Count<'a, 'b, ()> {
@@ -9013,7 +9022,7 @@ impl OpenSearch {
     pub fn scripts_painless_execute<'a, 'b>(&'a self) -> ScriptsPainlessExecute<'a, 'b, ()> {
         ScriptsPainlessExecute::new(self.transport())
     }
-    #[doc = "[Scroll API](https://opensearch.org/docs/)\n\nAllows to retrieve a large numbers of results from a single search request.\n\n# Examples\n\nTo initiate a scroll, make search API call with a specified `scroll` timeout,\nthen fetch the next set of hits using the `_scroll_id` returned in\nthe response. Once no more hits are returned, clear the scroll.\n\n```rust,no_run\n# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};\n# use serde_json::{json, Value};\n# async fn doc() -> Result<(), Box<dyn std::error::Error>> {\nlet client = OpenSearch::default();\n\nfn print_hits(hits: &[Value]) {\n    for hit in hits {\n        println!(\n            \"id: '{}', source: '{}', score: '{}'\",\n            hit[\"_id\"].as_str().unwrap(),\n            hit[\"_source\"],\n            hit[\"_score\"].as_f64().unwrap()\n        );\n    }\n}\n\nlet scroll = \"1m\";\nlet mut response = client\n    .search(SearchParts::Index(&[\"tweets\"]))\n    .scroll(scroll)\n    .body(json!({\n        \"query\": {\n            \"match\": {\n                \"body\": {\n                    \"query\": \"OpenSearch rust\",\n                    \"operator\": \"AND\"\n                }\n            }\n        }\n    }))\n    .send()\n    .await?;\n\nlet mut response_body = response.json::<Value>().await?;\nlet mut scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\nlet mut hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n\nprint_hits(hits);\n\nwhile hits.len() > 0 {\n    response = client\n        .scroll(ScrollParts::None)\n        .body(json!({\n            \"scroll\": scroll,\n            \"scroll_id\": scroll_id\n        }))\n        .send()\n        .await?;\n\n    response_body = response.json::<Value>().await?;\n    scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\n    hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n    print_hits(hits);\n}\n\nresponse = client\n    .clear_scroll(ClearScrollParts::None)\n    .body(json!({\n        \"scroll_id\": scroll_id\n    }))\n    .send()\n    .await?;\n    \n# Ok(())\n# }\n```"]
+    #[doc = "[Scroll API](https://opensearch.org/docs/)\n\nAllows to retrieve a large numbers of results from a single search request."]
     pub fn scroll<'a, 'b>(&'a self, parts: ScrollParts<'b>) -> Scroll<'a, 'b, ()> {
         Scroll::new(self.transport(), parts)
     }

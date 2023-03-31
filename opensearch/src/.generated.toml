@@ -1,16 +1,16 @@
 written = [
-    'cat.rs',
-    'cluster.rs',
-    'dangling_indices.rs',
-    'indices.rs',
-    'ingest.rs',
-    'nodes.rs',
-    'root/mod.rs',
-    'snapshot.rs',
-    'tasks.rs',
-    'text_structure.rs',
+    "cat.rs",
+    "cluster.rs",
+    "dangling_indices.rs",
+    "indices.rs",
+    "ingest.rs",
+    "nodes.rs",
+    "root/mod.rs",
+    "snapshot.rs",
+    "tasks.rs",
+    "text_structure.rs",
 ]
 merged = [
-    'lib.rs',
-    'params.rs',
+    "lib.rs",
+    "params.rs",
 ]

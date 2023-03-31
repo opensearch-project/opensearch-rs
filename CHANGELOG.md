@@ -19,11 +19,11 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))
+- References to unused Point-in-Time API updated ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136))
 
 ### Deprecated
 
 ### Removed
-- Dangling references to unused Point-in-Time APIs ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136))
 
 ### Fixed
 - [BUG] cargo make test fails out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))

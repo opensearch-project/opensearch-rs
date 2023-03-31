@@ -1,8 +1,8 @@
 {
-  "close_point_in_time": {
+  "delete_point_in_time": {
     "documentation": {
       "url": "https://opensearch.org/docs/",
-      "description": "Close a point in time"
+      "description": "Delete a point in time"
     },
     "stability": "stable",
     "visibility": "public",

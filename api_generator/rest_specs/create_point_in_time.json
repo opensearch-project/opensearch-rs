@@ -1,8 +1,8 @@
 {
-  "open_point_in_time": {
+  "create_point_in_time": {
     "documentation": {
       "url": "https://opensearch.org/docs/",
-      "description": "Open a point in time that can be used in subsequent searches"
+      "description": "Create a point in time that can be used in subsequent searches"
     },
     "stability": "stable",
     "visibility": "public",

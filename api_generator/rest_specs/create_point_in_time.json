@@ -1,0 +1,52 @@
+{
+  "create_point_in_time": {
+    "documentation": {
+      "url": "https://opensearch.org/docs/",
+      "description": "Create a point in time that can be used in subsequent searches"
+    },
+    "stability": "stable",
+    "visibility": "public",
+    "headers": {
+      "accept": ["application/json"]
+    },
+    "url": {
+      "paths": [
+        {
+          "path": "/{index}/_search/point_in_time",
+          "methods": ["POST"],
+          "parts": {
+            "index": {
+              "type": "list",
+              "description": "The name(s) of the target index(es) for the PIT. May contain a comma-separated list or a wildcard index pattern."
+            }
+          }
+        }
+      ]
+    },
+    "params": {
+      "preference": {
+        "type": "string",
+        "description": "The node or the shard used to perform the search. Optional. Default is random."
+      },
+      "routing": {
+        "type": "string",
+        "description": "Specifies to route search requests to a specific shard. Optional. Default is the document's `_id`."
+      },
+      "ignore_unavailable": {
+        "type": "boolean",
+        "description": "Whether specified concrete indices should be ignored when unavailable (missing or closed)"
+      },
+      "expand_wildcards": {
+        "type": "enum",
+        "options": ["open", "closed", "hidden", "none", "all"],
+        "default": "open",
+        "description": "The type of index that can match the wildcard pattern. Supports comma-separated values. Optional. Default is `open`."
+      },
+      "keep_alive": {
+        "type": "time",
+        "required": true,
+        "description": "The amount of time to keep the PIT. Every time you access a PIT by using the Search API, the PIT lifetime is extended by the amount of time equal to the keep_alive parameter. Required."
+      }
+    }
+  }
+}

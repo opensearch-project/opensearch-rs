@@ -252,6 +252,12 @@ impl<'a> UrlBuilder<'a> {
                 PathPart::Param(p) => {
                     let name = valid_name(p);
                     let name_ident = ident(name);
+                    // causes less-opaque error if user forgets to define part for URL
+                    debug_assert!(
+                        parts.contains_key(p),
+                        "path uses url part {{{}}}, but it was not defined",
+                        p
+                    );
                     let ty = &parts[p].ty;
 
                     // don't generate an assignment expression for strings

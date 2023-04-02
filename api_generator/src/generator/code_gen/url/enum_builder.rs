@@ -223,12 +223,10 @@ impl<'a> EnumBuilder<'a> {
                         }),
                         _ => syn::Pat::TupleStruct(syn::PatTupleStruct {
                             attrs: vec![],
+                            qself: None,
                             path: match_path,
-                            pat: syn::PatTuple {
-                                attrs: vec![],
-                                paren_token: Paren(Span::call_site()),
-                                elems: fields.into_iter().collect(),
-                            },
+                            paren_token: Paren(Span::call_site()),
+                            elems: fields.into_iter().collect(),
                         }),
                     };
 

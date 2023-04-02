@@ -228,6 +228,8 @@ pub enum VersionType {
     External,
     #[serde(rename = "external_gte")]
     ExternalGte,
+    #[serde(rename = "force")]
+    Force,
 }
 #[doc = "Wait until all currently queued events with the given priority are processed"]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]

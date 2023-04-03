@@ -188,7 +188,7 @@ impl GetIdent for ImplItem {
     fn get_ident(&self) -> &syn::Ident {
         match self {
             ImplItem::Const(i) => &i.ident,
-            ImplItem::Method(i) => &i.sig.ident,
+            ImplItem::Fn(i) => &i.sig.ident,
             ImplItem::Type(i) => &i.ident,
             _ => panic!("{:?} has no ident", self),
         }
@@ -295,7 +295,7 @@ pub fn generics(lifetimes: Vec<syn::Lifetime>, types: Vec<syn::TypeParam>) -> sy
     let params: Punctuated<_, _> = lifetimes
         .into_iter()
         .map(|l| {
-            syn::GenericParam::Lifetime(syn::LifetimeDef {
+            syn::GenericParam::Lifetime(syn::LifetimeParam {
                 attrs: vec![],
                 lifetime: l,
                 colon_token: None,
@@ -356,7 +356,7 @@ impl IntoStmt for syn::Item {
 
 impl IntoStmt for syn::Expr {
     fn into_stmt(self) -> syn::Stmt {
-        syn::Stmt::Expr(self)
+        syn::Stmt::Expr(self, Some(syn::token::Semi(Span::call_site())))
     }
 }
 

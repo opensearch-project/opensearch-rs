@@ -7,10 +7,12 @@ In this guide, we will look at some advanced index actions that are not covered 
 Let's create a client instance, and an index named `movies`:
 
 ```rust
-use opensearch::{OpenSearch, IndicesCreateParts};
-use opensearch::http::transport::{TransportBuilder,SingleNodeConnectionPool};
-let transport = TransportBuilder::new().single_node().url("https://localhost:9200").disable_certificate_verification().build()?;
-let client = OpenSearch::builder().transport(transport).build()?;
+// Create a client to make API calls to OpenSearch running on http://localhost:9200.
+let client = OpenSearch::default();
+// Alternatively, you can create a client to make API calls against OpenSearch running on a specific url::Url.
+let url = Url::parse("https://example.com")?;
+let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url)).cert_validation(CertificateValidation::None).build()?;
+let client = OpenSearch::new(transport);
 client.indices().create(IndicesCreateParts::Index("movies")).send().await?;
 ```
 
@@ -21,14 +23,14 @@ client.indices().create(IndicesCreateParts::Index("movies")).send().await?;
 You can clear the cache of an index or indices by using the `indices.clear_cache` API action. The following example clears the cache of the `movies` index:
 
 ```rust
-client.indices().clear_cache(IndicesClearCacheParts::Index("movies")).send().await?;
+client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).send().await?;
 ```
 
 By default, the `indices.clear_cache` API action clears all types of cache. To clear specific types of cache pass the the `query`, `fielddata`, or `request` parameter to the API action:
 
 ```rust
-client.indices().clear_cache(IndicesClearCacheParts::Index("movies").with_query(true)).send().await?;
-client.indices().clear_cache(IndicesClearCacheParts::Index("movies").with_fielddata(true).with_request(true)).send().await?;
+client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).query(true).send().await?;
+    client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).fielddata(true).request(true).send().await?;
 ```
 
 ### Flush index
@@ -36,7 +38,7 @@ client.indices().clear_cache(IndicesClearCacheParts::Index("movies").with_fieldd
 Sometimes you might want to flush an index or indices to make sure that all data in the transaction log is persisted to the index. To flush an index or indices use the `indices.flush` API action. The following example flushes the `movies` index:
 
 ```rust
-client.indices().flush(IndicesFlushParts::Index("movies")).send().await?;
+client.indices().flush(IndicesFlushParts::Index(&["movies"])).send().await?;
 ```
 
 ### Refresh index
@@ -44,7 +46,7 @@ client.indices().flush(IndicesFlushParts::Index("movies")).send().await?;
 You can refresh an index or indices to make sure that all changes are available for search. To refresh an index or indices use the `indices.refresh` API action:
 
 ```rust
-client.indices().refresh(IndicesRefreshParts::Index("movies")).send().await?;
+client.indices().refresh(IndicesRefreshParts::Index(&["movies"])).send().await?;
 ```
 
 ### Open/Close index
@@ -52,8 +54,8 @@ client.indices().refresh(IndicesRefreshParts::Index("movies")).send().await?;
 You can close an index to prevent read and write operations on the index. A closed index does not have to maintain certain data structures that an opened index require, reducing the memory and disk space required by the index. The following example closes and reopens the `movies` index:
 
 ```rust
-client.indices().close(IndicesCloseParts::Index("movies")).send().await?;
-client.indices().open(IndicesOpenParts::Index("movies")).send().await?;
+client.indices().close(IndicesCloseParts::Index(&["movies"])).send().await?;
+client.indices().open(IndicesOpenParts::Index(&["movies"])).send().await?;
 ```
 
 ### Force merge index
@@ -61,7 +63,7 @@ client.indices().open(IndicesOpenParts::Index("movies")).send().await?;
 You can force merge an index or indices to reduce the number of segments in the index. This can be useful if you have a large number of small segments in the index. Merging segments reduces the memory footprint of the index. Do note that this action is resource intensive and it is only recommended for read-only indices. The following example force merges the `movies` index:
 
 ```rust
-client.indices().forcemerge(IndicesForceMergeParts::Index("movies")).send().await?;
+client.indices().forcemerge(IndicesForcemergeParts::Index(&["movies"])).send().await?;
 ```
 
 ### Clone index
@@ -69,16 +71,16 @@ client.indices().forcemerge(IndicesForceMergeParts::Index("movies")).send().awai
 You can clone an index to create a new index with the same mappings, data, and MOST of the settings. The source index must be in read-only state for cloning. The following example blocks write operations from `movies` index, clones the said index to create a new index named `movies_clone`, then re-enables write:
 
 ```rust
-client.indices().add_block(IndicesBlockParts::Index("movies"), IndicesBlockParts::Block("write")).send().await?;
-client.indices().clone(IndicesCloneParts::Index("movies"), IndicesCloneParts::Target("movies_clone")).send().await?;
-client.indices().put_settings(IndicesPutSettingsParts::Index("movies"))
-      .body(json!({
-        "index": {
-            "blocks": {
-                "write": false
-            }
+client.indices().add_block(IndicesAddBlockParts::IndexBlock(&["movies"],"write")).send().await?;
+client.indices().clone(IndicesCloneParts::IndexTarget("movies","movies_clone")).send().await?;
+client.indices().put_settings(IndicesPutSettingsParts::Index(&["movies"]))
+    .body(json!({
+    "index": {
+        "blocks": {
+            "write": false
         }
-      })).send().await?;
+    }
+    })).send().await?;
 ```
 
 ### Split index
@@ -87,21 +89,19 @@ You can split an index into another index with more primary shards. The source i
 
 ```rust
 client.indices().create(IndicesCreateParts::Index("books"))
-     .body(json!({
-        "settings": {
-            "index": {
-                "number_of_shards": 5,
-                "number_of_routing_shards": 30,
-                "blocks": {
-                    "write": true
-                }
+    .body(json!({
+    "settings": {
+        "index": {
+            "number_of_shards": 5,
+            "number_of_routing_shards": 30,
+            "blocks": {
+                "write": true
             }
         }
-      })).send().await?;
-
-client.indices().split("books", "bigger_books").body(json!({"settings": {"index": {"number_of_shards": 10}}})).send().await?;
-
-client.indices().put_settings().index("books").body(json!({"index": {"blocks": {"write": false}}})).send().await?;
+    }
+    })).send().await?;
+    client.indices().split(IndicesSplitParts::IndexTarget("books","bigger_books")).body(json!({"settings": {"index": {"number_of_shards": 10}}})).send().await?;
+    client.indices().put_settings(IndicesPutSettingsParts::Index(&["books"])).body(json!({"index": {"blocks": {"write": false}}})).send().await?;
 ```
 
 ## Cleanup

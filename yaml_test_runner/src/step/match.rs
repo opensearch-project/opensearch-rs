@@ -117,7 +117,7 @@ impl ToTokens for Match {
                     panic!("match on $body with f64");
                 } else {
                     tokens.append_all(quote! {
-                        crate::assert_match!(json#expr, json!(#f));
+                        crate::assert_numeric_match!(json#expr, #f);
                     });
                 }
             }

@@ -41,6 +41,10 @@
       - Bad window deprecated interval
     free/search/230_interval_query.yml:
       - "*"
+    free/search/260_sort_mixed.yml:
+      # Uses values that are not able to be accurately represented as a double
+      # Causing mismatch in rounding between Rust and OpenSearch
+      - "*"
       
   when_secure:
     tests:

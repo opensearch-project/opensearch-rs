@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Alternatively, you can create a client to make API calls against OpenSearch running on a specific url::Url.
 
-    let url = Url::parse("https://example.com")?;
+    let url = Url::parse("https://localhost:9200")?; 
     let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
         .cert_validation(CertificateValidation::None)
         .build()?;

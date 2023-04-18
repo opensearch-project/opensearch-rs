@@ -4,8 +4,7 @@ Index templates are a convenient way to define settings, mappings, and aliases f
 
 ## Setup
 
-Assuming you have OpenSearch running locally on port 9200, you can create a client instance
-with the following code:
+Assuming you have OpenSearch running locally on port 9200, you can create a client instance with the following code:
 
 ```rust
 // Create a client to make API calls to OpenSearch running on http://localhost:9200.

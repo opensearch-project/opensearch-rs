@@ -36,11 +36,11 @@ use crate::{
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub struct Match {
     pub expr: Expr,
-    value: Yaml,
+    value: Value,
 }
 
 impl From<Match> for Step {
@@ -50,9 +50,9 @@ impl From<Match> for Step {
 }
 
 impl Match {
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<Match> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<Match> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();
@@ -69,7 +69,7 @@ impl ToTokens for Match {
         let expr = self.expr.expression();
 
         match &self.value {
-            Yaml::String(s) => {
+            Value::String(s) => {
                 if s.starts_with('/') {
                     let s = clean_regex(s);
                     if self.expr.is_body() {
@@ -102,26 +102,28 @@ impl ToTokens for Match {
                     };
                 }
             }
-            Yaml::Integer(i) => {
-                if self.expr.is_body() {
-                    panic!("match on $body with i64");
+            Value::Number(i) => {
+                if i.is_f64() {
+                    let f = i.as_f64().unwrap();
+                    if self.expr.is_body() {
+                        panic!("match on $body with f64");
+                    } else {
+                        tokens.append_all(quote! {
+                            crate::assert_numeric_match!(json#expr, #f);
+                        });
+                    }
                 } else {
-                    tokens.append_all(quote! {
-                        crate::assert_numeric_match!(json#expr, #i);
-                    });
+                    let i = i.as_i64().unwrap();
+                    if self.expr.is_body() {
+                        panic!("match on $body with i64");
+                    } else {
+                        tokens.append_all(quote! {
+                            crate::assert_numeric_match!(json#expr, #i);
+                        });
+                    }
                 }
             }
-            Yaml::Real(r) => {
-                let f = r.parse::<f64>().unwrap();
-                if self.expr.is_body() {
-                    panic!("match on $body with f64");
-                } else {
-                    tokens.append_all(quote! {
-                        crate::assert_numeric_match!(json#expr, #f);
-                    });
-                }
-            }
-            Yaml::Null => {
+            Value::Null => {
                 if self.expr.is_body() {
                     tokens.append_all(quote! {
                         assert!(text.is_empty(), "expected response to be null (empty) but was {}", &text);
@@ -132,7 +134,7 @@ impl ToTokens for Match {
                     });
                 }
             }
-            Yaml::Boolean(b) => {
+            Value::Bool(b) => {
                 if self.expr.is_body() {
                     panic!("match on $body with bool");
                 } else {
@@ -141,7 +143,7 @@ impl ToTokens for Match {
                     });
                 }
             }
-            yaml if yaml.is_array() || yaml.as_hash().is_some() => {
+            yaml if yaml.is_sequence() || yaml.is_mapping() => {
                 let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
 
                 if self.expr.is_body() {

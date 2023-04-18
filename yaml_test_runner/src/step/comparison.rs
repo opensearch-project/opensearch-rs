@@ -33,13 +33,13 @@ use crate::step::Expr;
 use anyhow::anyhow;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub const OPERATORS: [&str; 4] = ["lt", "lte", "gt", "gte"];
 
 pub struct Comparison {
     pub(crate) expr: Expr,
-    value: Yaml,
+    value: Value,
     op: String,
 }
 
@@ -50,9 +50,9 @@ impl From<Comparison> for Step {
 }
 
 impl Comparison {
-    pub fn try_parse(yaml: &Yaml, op: &str) -> anyhow::Result<Comparison> {
+    pub fn try_parse(yaml: &Value, op: &str) -> anyhow::Result<Comparison> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();

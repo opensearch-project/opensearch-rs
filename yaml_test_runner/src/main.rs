@@ -48,6 +48,8 @@ mod step;
 
 use generator::TestSuite;
 
+use crate::skip::GlobalSkips;
+
 fn main() -> anyhow::Result<()> {
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Info)
@@ -128,6 +130,9 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
+    let global_skips = serde_yaml::from_str::<GlobalSkips>(include_str!("../skip.yml"))?;
+    let skips = global_skips.get_skips_for(&version, url.starts_with("https://"));
+
     generator::generate_tests_from_yaml(
         &api,
         &suite,
@@ -135,6 +140,7 @@ fn main() -> anyhow::Result<()> {
         &download_dir,
         &download_dir,
         &generated_dir,
+        &skips,
     )?;
 
     Ok(())

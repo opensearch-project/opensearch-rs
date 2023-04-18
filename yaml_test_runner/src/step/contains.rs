@@ -33,11 +33,11 @@ use crate::step::{json_string_from_yaml, Expr};
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub struct Contains {
     expr: Expr,
-    value: Yaml,
+    value: Value,
 }
 
 impl From<Contains> for Step {
@@ -47,9 +47,9 @@ impl From<Contains> for Step {
 }
 
 impl Contains {
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<Contains> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<Contains> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();
@@ -66,28 +66,35 @@ impl ToTokens for Contains {
         let expr = self.expr.expression();
 
         match &self.value {
-            Yaml::Real(r) => {
-                let f = r.parse::<f64>().unwrap();
-                tokens.append_all(quote! {
-                    assert_contains!(json#expr, json!(#f));
-                });
+            Value::Number(n) => {
+                if n.is_f64() {
+                    let f = n.as_f64().unwrap();
+                    tokens.append_all(quote! {
+                        assert_contains!(json#expr, json!(#f));
+                    });
+                } else if n.is_u64() {
+                    let u = n.as_u64().unwrap();
+                    tokens.append_all(quote! {
+                        assert_contains!(json#expr, json!(#u));
+                    });
+                } else {
+                    let i = n.as_i64().unwrap();
+                    tokens.append_all(quote! {
+                        assert_contains!(json#expr, json!(#i));
+                    });
+                }
             }
-            Yaml::Integer(i) => {
-                tokens.append_all(quote! {
-                    assert_contains!(json#expr, json!(#i));
-                });
-            }
-            Yaml::String(s) => {
+            Value::String(s) => {
                 tokens.append_all(quote! {
                     assert_contains!(json#expr, json!(#s));
                 });
             }
-            Yaml::Boolean(b) => {
+            Value::Bool(b) => {
                 tokens.append_all(quote! {
                     assert_contains!(json#expr, json!(#b));
                 });
             }
-            yaml if yaml.is_array() || yaml.as_hash().is_some() => {
+            yaml if yaml.is_sequence() || yaml.is_mapping() => {
                 let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
 
                 tokens.append_all(quote! {

@@ -32,8 +32,8 @@ use crate::regex::*;
 use anyhow::anyhow;
 use api_generator::generator::Api;
 use proc_macro2::TokenStream;
+use serde_yaml::Value;
 use std::fmt::Write;
-use yaml_rust::{Yaml, YamlEmitter};
 
 mod comparison;
 mod contains;
@@ -56,11 +56,11 @@ pub use set::*;
 pub use skip::*;
 pub use transform_and_set::*;
 
-pub fn parse_steps(api: &Api, steps: &[Yaml]) -> anyhow::Result<Vec<Step>> {
+pub fn parse_steps(api: &Api, steps: &[Value]) -> anyhow::Result<Vec<Step>> {
     let mut parsed_steps: Vec<Step> = Vec::new();
     for step in steps {
         let hash = step
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", step))?;
 
         let (key, value) = {
@@ -250,16 +250,8 @@ pub fn ok_or_accumulate<T>(results: &[anyhow::Result<T>]) -> anyhow::Result<()> 
     }
 }
 
-pub fn json_string_from_yaml(yaml: &Yaml) -> String {
-    let mut s = String::new();
-    {
-        let mut emitter = YamlEmitter::new(&mut s);
-        emitter.dump(yaml).unwrap();
-    }
-
-    let value: serde_json::Value = serde_yaml::from_str(&s).unwrap();
-
-    let mut json = value.to_string();
+pub fn json_string_from_yaml(yaml: &Value) -> String {
+    let mut json = serde_json::to_string(yaml).unwrap();
     json = replace_set(json);
     json = replace_i64(json);
     json

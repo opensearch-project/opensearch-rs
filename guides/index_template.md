@@ -7,11 +7,14 @@ Index templates are a convenient way to define settings, mappings, and aliases f
 Assuming you have OpenSearch running locally on port 9200, you can create a client instance with the following code:
 
 ```rust
+// Let's create a client instance, and an index named `movies`:
+
 // Create a client to make API calls to OpenSearch running on http://localhost:9200.
-let client = OpenSearch::default();
-// Alternatively, you can create a client to make API calls against OpenSearch running on a specific url::Url.
-let url = Url::parse("https://example.com")?;
-let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url)).cert_validation(CertificateValidation::None).build()?;
+
+let url = Url::parse("https://localhost:9200")?;
+let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
+    .cert_validation(CertificateValidation::None)
+    .build()?;
 let client = OpenSearch::new(transport);
 ```
 

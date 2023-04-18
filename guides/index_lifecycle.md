@@ -16,19 +16,29 @@ docker-compose up -d
 Let's create a client instance to access this cluster:
 
 ```rust
-use opensearch::{ http::transport::TransportBuilder, OpenSearch, http::transport::SingleNodeConnectionPool, cert::CertificateValidation};
-use url::Url;
-use opensearch::{IndexParts, indices::{ IndicesCreateParts, IndicesExistsParts, IndicesPutSettingsParts, IndicesPutMappingParts, IndicesGetParts,IndicesDeleteParts}};
+use opensearch::auth::Credentials;
+use opensearch::cert::CertificateValidation;
+use opensearch::http::transport::{SingleNodeConnectionPool, TransportBuilder};
+use opensearch::OpenSearch;
+use opensearch::{
+    indices::{
+        IndicesCreateParts, IndicesDeleteParts, IndicesExistsParts, IndicesGetParts,
+        IndicesPutMappingParts, IndicesPutSettingsParts,
+    },
+    IndexParts,
+};
 use serde_json::json;
+use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client to make API calls to OpenSearch running on http://localhost:9200.
-    let client = OpenSearch::default();
-
-    // Alternatively, you can create a client to make API calls against OpenSearch running on a specific url::Url.
-    let url = Url::parse("https://example.com")?;
-    let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url)).cert_validation(CertificateValidation::None).build()?;
+    let url = Url::parse("https://localhost:9200")?;
+    let credentials = Credentials::Basic("admin".into(), "admin".into());
+    let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
+        .cert_validation(CertificateValidation::None)
+        .auth(credentials)
+        .build()?;
     let client = OpenSearch::new(transport);
     println!("{:?}", client.info().send().await?); // Check server info and make sure the client is connected
     Ok(())
@@ -66,7 +76,7 @@ client
     })).send().await?;
 ```
 
-When you create a new document for an index, OpenSearch will automatically create the index if it doesn't exist:
+When you create a new document in an index, OpenSearch will automatically create the index if it doesn't exist:
 
 ```rust
 println!("{}", client.indices().exists(IndicesExistsParts::Index(&["burner"])).send().await?.json::<bool>().await?); // => false
@@ -111,7 +121,7 @@ println!("{:#?}", client.indices().get(IndicesGetParts::Index(&["movies"])).send
 
 The response body contains the index's settings and mappings:
 
-```rust
+```json
 {
   "movies": {
     "aliases": {},
@@ -149,7 +159,7 @@ We can also delete multiple indices at once:
 
 ```rust
 client
-    .indices().delete(IndicesDeleteParts::Index(&["movies", "paintings", "burner"])).error_trace(true)
+    .indices().delete(IndicesDeleteParts::Index(&["movies", "paintings", "burner"])).ignore_unavailable(true)
     .send().await?;
 ```
 

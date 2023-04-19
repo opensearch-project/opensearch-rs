@@ -1,5 +1,5 @@
 - [User Guide](#user-guide)
-  - [All guides](#all-guides)
+  - [All Guides](#all-guides)
   - [Example](#example)
     - [Create a Client](#create-a-client)
     - [Display Server Version](#display-server-version)
@@ -12,9 +12,7 @@
 
 # User Guide
 
-## All guides
-
-We advise you to read all the manuals that relate to one part or another of your work with the client:
+## All Guides
 
 - [Advanced index actions](guides/advanced_index_actions.md)
 

@@ -28,5 +28,20 @@
  * GitHub history for details.
  */
 
+use serde_json::Value;
+
 pub mod client;
 pub mod macros;
+
+pub(crate) trait ValueExt {
+    fn n(&self, n: usize) -> Value;
+}
+
+impl ValueExt for Value {
+    fn n(&self, n: usize) -> Value {
+        match self {
+            Value::Object(_) => self[&n.to_string()].clone(),
+            _ => self[n].clone(),
+        }
+    }
+}

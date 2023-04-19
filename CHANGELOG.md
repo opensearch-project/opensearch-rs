@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Adds Github workflow for changelog verification ([#89](https://github.com/opensearch-project/opensearch-rs/pull/89))
 - Adds Github workflow for unit tests ([#112](https://github.com/opensearch-project/opensearch-rs/pull/112))
 - Adds support for OpenSearch Serverless ([#96](https://github.com/opensearch-project/opensearch-rs/pull/96))
+- Adds release workflows to publish opensearch-rs to crates.io ([#153](https://github.com/opensearch-project/opensearch-rs/pull/153))
 
 ### Dependencies
 - Bumps `simple_logger` from 2.3.0 to 4.0.0

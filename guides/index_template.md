@@ -9,11 +9,13 @@ Assuming you have OpenSearch running locally on port 9200, you can create a clie
 ```rust
 // Let's create a client instance, and an index named `movies`:
 
-// Create a client to make API calls to OpenSearch running on http://localhost:9200.
+// Create a client to make API calls to OpenSearch running on https://localhost:9200.
 
 let url = Url::parse("https://localhost:9200")?;
+let credentials = Credentials::Basic("admin".into(), "admin".into());
 let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
     .cert_validation(CertificateValidation::None)
+    .auth(credentials)
     .build()?;
 let client = OpenSearch::new(transport);
 ```

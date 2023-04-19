@@ -1,3 +1,4 @@
+use opensearch::auth::Credentials;
 use opensearch::cluster::{ClusterDeleteComponentTemplateParts, ClusterPutComponentTemplateParts};
 use opensearch::indices::{
     IndicesCreateParts, IndicesDeleteIndexTemplateParts, IndicesDeleteParts,
@@ -14,11 +15,13 @@ use url::Url;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Let's create a client instance, and an index named `movies`:
 
-    // Create a client to make API calls to OpenSearch running on http://localhost:9200.
-
-    let url = Url::parse("https://localhost:9200")?; 
+    // Create a client to make API calls to OpenSearch running on https://localhost:9200.
+    
+    let url = Url::parse("https://localhost:9200")?;
+    let credentials = Credentials::Basic("admin".into(), "admin".into());
     let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
         .cert_validation(CertificateValidation::None)
+        .auth(credentials)
         .build()?;
     let client = OpenSearch::new(transport);
 

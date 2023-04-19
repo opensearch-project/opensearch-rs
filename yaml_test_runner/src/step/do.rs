@@ -36,9 +36,9 @@ use inflector::Inflector;
 use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
+use serde_yaml::Value;
 use std::collections::BTreeMap;
 use syn::__private::TokenStreamExt;
-use yaml_rust::{Yaml, YamlEmitter};
 
 /// A catch expression on a do step
 pub struct Catch(String);
@@ -147,19 +147,19 @@ impl Do {
         read_response
     }
 
-    pub fn try_parse(api: &Api, yaml: &Yaml) -> anyhow::Result<Do> {
+    pub fn try_parse(api: &Api, yaml: &Value) -> anyhow::Result<Do> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
-        let mut call: Option<(&str, &Yaml)> = None;
+        let mut call: Option<(&str, &Value)> = None;
         let mut headers = BTreeMap::new();
         let mut warnings: Vec<String> = Vec::new();
         let mut allowed_warnings: Vec<String> = Vec::new();
         let mut catch = None;
 
-        fn to_string_vec(v: &Yaml) -> Vec<String> {
-            v.as_vec()
+        fn to_string_vec(v: &Value) -> Vec<String> {
+            v.as_sequence()
                 .map(|a| a.iter().map(|y| y.as_str().unwrap().to_string()).collect())
                 .unwrap()
         }
@@ -174,7 +174,7 @@ impl Do {
                 match key {
                     "headers" => {
                         let hash = v
-                            .as_hash()
+                            .as_mapping()
                             .ok_or_else(|| anyhow!("expected hash but found {:?}", v))?;
                         for (hk, hv) in hash.iter() {
                             let h = hk
@@ -287,15 +287,15 @@ impl ApiCall {
     pub fn try_from(
         api: &Api,
         endpoint: &ApiEndpoint,
-        yaml: &Yaml,
+        yaml: &Value,
         headers: BTreeMap<String, String>,
     ) -> anyhow::Result<ApiCall> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
-        let mut parts: Vec<(&str, &Yaml)> = vec![];
-        let mut params: Vec<(&str, &Yaml)> = vec![];
+        let mut parts: Vec<(&str, &Value)> = vec![];
+        let mut params: Vec<(&str, &Value)> = vec![];
         let mut body: Option<TokenStream> = None;
         let mut ignore: Option<u16> = None;
 
@@ -308,7 +308,7 @@ impl ApiCall {
                     ignore = match v.as_i64() {
                         Some(i) => Some(i as u16),
                         // handle ignore as an array of i64
-                        None => Some(v.as_vec().unwrap()[0].as_i64().unwrap() as u16),
+                        None => Some(v.as_sequence().unwrap()[0].as_i64().unwrap() as u16),
                     }
                 }
                 key if endpoint.params.contains_key(key) || api.common_params.contains_key(key) => {
@@ -375,7 +375,7 @@ impl ApiCall {
     fn generate_params(
         api: &Api,
         endpoint: &ApiEndpoint,
-        params: &[(&str, &Yaml)],
+        params: &[(&str, &Value)],
     ) -> anyhow::Result<Option<TokenStream>> {
         match params.len() {
             0 => Ok(None),
@@ -398,7 +398,7 @@ impl ApiCall {
                     let kind = &ty.ty;
 
                     match v {
-                        Yaml::String(ref s) => {
+                        Value::String(ref s) => {
                             let is_set_value = s.starts_with('$');
 
                             match kind {
@@ -513,7 +513,7 @@ impl ApiCall {
                                 }
                             }
                         }
-                        Yaml::Boolean(ref b) => match kind {
+                        Value::Bool(ref b) => match kind {
                             TypeKind::Enum => {
                                 let enum_name =
                                     syn::Ident::new(&n.to_pascal_case(), Span::call_site());
@@ -538,7 +538,7 @@ impl ApiCall {
                                 });
                             }
                         },
-                        Yaml::Integer(ref i) => match kind {
+                        Value::Number(ref i) if !i.is_f64() => match kind {
                             TypeKind::String => {
                                 let s = i.to_string();
                                 tokens.append_all(quote! {
@@ -546,38 +546,50 @@ impl ApiCall {
                                 })
                             }
                             TypeKind::Integer => {
-                                // yaml-rust parses all as i64
-                                let int = *i as i32;
+                                let int = i.as_i64().unwrap() as i32;
                                 tokens.append_all(quote! {
                                     .#param_ident(#int)
                                 });
                             }
                             TypeKind::Float => {
-                                // yaml-rust parses all as i64
-                                let f = *i as f32;
+                                let f = i.as_f64().unwrap() as f32;
                                 tokens.append_all(quote! {
                                     .#param_ident(#f)
                                 });
                             }
                             TypeKind::Double => {
-                                // yaml-rust parses all as i64
-                                let f = *i as f64;
+                                let f = i.as_f64().unwrap();
                                 tokens.append_all(quote! {
                                     .#param_ident(#f)
                                 });
                             }
                             _ => {
+                                let i = i.as_i64().unwrap();
                                 tokens.append_all(quote! {
                                     .#param_ident(#i)
                                 });
                             }
                         },
-                        Yaml::Array(arr) => {
+                        Value::Number(r) if r.is_f64() => match kind {
+                            TypeKind::Long | TypeKind::Number => {
+                                let f = r.as_f64().unwrap();
+                                tokens.append_all(quote! {
+                                    .#param_ident(#f as i64)
+                                });
+                            }
+                            _ => {
+                                let f = r.as_f64().unwrap();
+                                tokens.append_all(quote! {
+                                    .#param_ident(#f)
+                                });
+                            }
+                        },
+                        Value::Sequence(arr) => {
                             // only support param string arrays
                             let result: Vec<&String> = arr
                                 .iter()
                                 .map(|i| match i {
-                                    Yaml::String(s) => Ok(s),
+                                    Value::String(s) => Ok(s),
                                     y => Err(anyhow!("unsupported array value {:?}", y)),
                                 })
                                 .filter_map(Result::ok)
@@ -605,20 +617,6 @@ impl ApiCall {
                                 });
                             }
                         }
-                        Yaml::Real(r) => match kind {
-                            TypeKind::Long | TypeKind::Number => {
-                                let f = r.parse::<f64>()?;
-                                tokens.append_all(quote! {
-                                    .#param_ident(#f as i64)
-                                });
-                            }
-                            _ => {
-                                let f = r.parse::<f64>()?;
-                                tokens.append_all(quote! {
-                                    .#param_ident(#f)
-                                });
-                            }
-                        },
                         _ => println!("unsupported value {:?} for param {}", v, n),
                     }
                 }
@@ -657,7 +655,7 @@ impl ApiCall {
     fn generate_parts(
         api_call: &str,
         endpoint: &ApiEndpoint,
-        parts: &[(&str, &Yaml)],
+        parts: &[(&str, &Value)],
     ) -> anyhow::Result<Option<TokenStream>> {
         // TODO: ideally, this should share the logic from EnumBuilder
         let enum_name = {
@@ -756,7 +754,7 @@ impl ApiCall {
                     .ok_or_else(|| anyhow!(r#"no url part found for "{}" in {}"#, p, &path.path))?;
 
                 match v {
-                    Yaml::String(s) => {
+                    Value::String(s) => {
                         let is_set_value = s.starts_with('$') || s.contains("${");
 
                         match ty.ty {
@@ -790,23 +788,26 @@ impl ApiCall {
                             }
                         }
                     }
-                    Yaml::Boolean(b) => {
+                    Value::Bool(b) => {
                         let s = b.to_string();
                         Ok(quote! { #s })
                     }
-                    Yaml::Integer(i) => match ty.ty {
-                        TypeKind::Long => Ok(quote! { #i }),
+                    Value::Number(i) => match ty.ty {
+                        TypeKind::Long => {
+                            let i = i.as_u64().unwrap();
+                            Ok(quote! { #i })
+                        }
                         _ => {
                             let s = i.to_string();
                             Ok(quote! { #s })
                         }
                     },
-                    Yaml::Array(arr) => {
+                    Value::Sequence(arr) => {
                         // only support param string arrays
                         let result: Vec<_> = arr
                             .iter()
                             .map(|i| match i {
-                                Yaml::String(s) => Ok(s),
+                                Value::String(s) => Ok(s),
                                 y => Err(anyhow!("unsupported array value {:?}", y)),
                             })
                             .collect();
@@ -852,10 +853,10 @@ impl ApiCall {
     /// When reading a body from the YAML test, it'll be converted to a Yaml variant,
     /// usually a Hash. To get the JSON representation back requires converting
     /// back to JSON
-    fn generate_body(endpoint: &ApiEndpoint, v: &Yaml) -> anyhow::Result<Option<TokenStream>> {
+    fn generate_body(endpoint: &ApiEndpoint, v: &Value) -> anyhow::Result<Option<TokenStream>> {
         match v {
-            Yaml::Null => Ok(None),
-            Yaml::String(s) => {
+            Value::Null => Ok(None),
+            Value::String(s) => {
                 let json = {
                     let json = replace_set(s);
                     replace_i64(json)
@@ -886,14 +887,8 @@ impl ApiCall {
                 }
             }
             _ => {
-                let mut s = String::new();
-                {
-                    let mut emitter = YamlEmitter::new(&mut s);
-                    emitter.dump(v).unwrap();
-                }
-
                 if endpoint.supports_nd_body() {
-                    let values: Vec<serde_json::Value> = serde_yaml::from_str(&s)?;
+                    let values: Vec<serde_json::Value> = serde_yaml::from_value(v.clone())?;
                     let json = values.iter().map(|value| {
                         let mut json = serde_json::to_string(&value).unwrap();
                         if value.is_string() {
@@ -908,8 +903,7 @@ impl ApiCall {
                     });
                     Ok(Some(quote!(.body(vec![ #(#json),* ]))))
                 } else {
-                    let value: serde_json::Value = serde_yaml::from_str(&s)?;
-                    let mut json = serde_json::to_string_pretty(&value)?;
+                    let mut json = serde_json::to_string_pretty(&v)?;
                     json = replace_set(json);
                     json = replace_i64(json);
                     let ident: TokenStream = syn::parse_str(&json).unwrap();

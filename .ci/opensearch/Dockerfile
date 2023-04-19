@@ -5,7 +5,7 @@ WORKDIR /usr/share/opensearch
 
 COPY --chown=opensearch:opensearch opensearch.yml ./config/
 
-RUN ./opensearch-onetime-setup.sh
+RUN if [[ -f "./opensearch-onetime-setup.sh" ]]; then ./opensearch-onetime-setup.sh ; fi
 
 COPY --chown=opensearch:opensearch *.pem ./config/
 

@@ -33,7 +33,7 @@ use crate::step::Expr;
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub struct IsFalse {
     pub(crate) expr: Expr,
@@ -46,7 +46,7 @@ impl From<IsFalse> for Step {
 }
 
 impl IsFalse {
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<IsFalse> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<IsFalse> {
         let expr = yaml
             .as_str()
             .ok_or_else(|| anyhow!("expected string key but found {:?}", &yaml))?;

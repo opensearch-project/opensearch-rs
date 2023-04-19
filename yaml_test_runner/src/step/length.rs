@@ -33,7 +33,7 @@ use crate::step::Expr;
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub struct Length {
     pub(crate) expr: Expr,
@@ -47,9 +47,9 @@ impl From<Length> for Step {
 }
 
 impl Length {
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<Length> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<Length> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();

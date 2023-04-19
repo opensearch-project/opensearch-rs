@@ -34,8 +34,8 @@ use anyhow::anyhow;
 use inflector::Inflector;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
+use serde_yaml::Value;
 use syn::parse_quote;
-use yaml_rust::Yaml;
 
 pub struct Transformation {
     #[allow(dead_code)]
@@ -100,9 +100,9 @@ impl From<TransformAndSet> for Step {
 }
 
 impl TransformAndSet {
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<TransformAndSet> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<TransformAndSet> {
         let hash = yaml
-            .as_hash()
+            .as_mapping()
             .ok_or_else(|| anyhow!("expected hash but found {:?}", yaml))?;
 
         let (k, v) = hash.iter().next().unwrap();

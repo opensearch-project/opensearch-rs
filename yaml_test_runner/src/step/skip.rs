@@ -33,7 +33,7 @@ use crate::skip::SkippedFeaturesAndTests;
 use super::Step;
 use lazy_static::lazy_static;
 use regex::Regex;
-use yaml_rust::Yaml;
+use serde_yaml::Value;
 
 pub struct Skip {
     version_requirements: Option<semver::VersionReq>,
@@ -104,7 +104,7 @@ impl Skip {
         }
     }
 
-    pub fn try_parse(yaml: &Yaml) -> anyhow::Result<Skip> {
+    pub fn try_parse(yaml: &Value) -> anyhow::Result<Skip> {
         let version = yaml["version"]
             .as_str()
             .map_or_else(|| None, |y| Some(y.to_string()));
@@ -112,8 +112,8 @@ impl Skip {
             .as_str()
             .map_or_else(|| None, |y| Some(y.to_string()));
         let features = match &yaml["features"] {
-            Yaml::String(s) => Some(vec![s.to_string()]),
-            Yaml::Array(a) => Some(
+            Value::String(s) => Some(vec![s.to_string()]),
+            Value::Sequence(a) => Some(
                 a.iter()
                     .map(|y| y.as_str().map(|s| s.to_string()).unwrap())
                     .collect(),

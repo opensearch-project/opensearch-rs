@@ -100,29 +100,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .indices()
         .put_settings(IndicesPutSettingsParts::Index(&["movies"]))
         .body(json!({
-          "index": {
-              "blocks": {
-                  "write": false
-              }
-          }
+            "index": {
+                "blocks": {
+                    "write": false
+                }
+            }
         }))
         .send()
         .await?;
       
-    // You can split an index into another index with more primary shards. The source index must be in read-only state for splitting. The following example create the read-only `books` index with 30 routing shards and 5 shards (which is divisible by 30), splits index into `bigger_books` with 10 shards (which is also divisible by 30), then re-enables write:
+    // You can split an index into another index with more primary shards. The source index must be in read-only state for splitting. The following example creates the read-only `books` index with 30 routing shards and 5 shards (which 30 is divisible by), splits the index into `bigger_books` with 10 shards (which 30 is also divisible by), then re-enables writes:
     client
         .indices()
         .create(IndicesCreateParts::Index("books"))
         .body(json!({
-          "settings": {
-              "index": {
-                  "number_of_shards": 5,
-                  "number_of_routing_shards": 30,
-                  "blocks": {
-                      "write": true
-                  }
-              }
-          }
+            "settings": {
+                "index": {
+                    "number_of_shards": 5,
+                    "number_of_routing_shards": 30,
+                    "blocks": {
+                        "write": true
+                    }
+                }
+            }
         }))
         .send()
         .await?;

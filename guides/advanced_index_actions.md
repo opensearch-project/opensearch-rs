@@ -32,7 +32,7 @@ By default, the `indices.clear_cache` API action clears all types of cache. To c
 
 ```rust
 client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).query(true).send().await?;
-    client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).fielddata(true).request(true).send().await?;
+client.indices().clear_cache(IndicesClearCacheParts::Index(&["movies"])).fielddata(true).request(true).send().await?;
 ```
 
 ### Flush index
@@ -77,30 +77,30 @@ client.indices().add_block(IndicesAddBlockParts::IndexBlock(&["movies"],"write")
 client.indices().clone(IndicesCloneParts::IndexTarget("movies","movies_clone")).send().await?;
 client.indices().put_settings(IndicesPutSettingsParts::Index(&["movies"]))
     .body(json!({
-    "index": {
-        "blocks": {
-            "write": false
+        "index": {
+            "blocks": {
+                "write": false
+            }
         }
-    }
     })).send().await?;
 ```
 
 ### Split index
 
-You can split an index into another index with more primary shards. The source index must be in read-only state for splitting. The following example create the read-only `books` index with 30 routing shards and 5 shards (which is divisible by 30), splits index into `bigger_books` with 10 shards (which is also divisible by 30), then re-enables write:
+You can split an index into another index with more primary shards. The source index must be in read-only state for splitting. The following example creates the read-only `books` index with 30 routing shards and 5 shards (which 30 is divisible by), splits the index into `bigger_books` with 10 shards (which 30 is also divisible by), then re-enables writes:
 
 ```rust
 client.indices().create(IndicesCreateParts::Index("books"))
     .body(json!({
-    "settings": {
-        "index": {
-            "number_of_shards": 5,
-            "number_of_routing_shards": 30,
-            "blocks": {
-                "write": true
+        "settings": {
+            "index": {
+                "number_of_shards": 5,
+                "number_of_routing_shards": 30,
+                "blocks": {
+                    "write": true
+                }
             }
         }
-    }
     })).send().await?;
     client.indices().split(IndicesSplitParts::IndexTarget("books","bigger_books")).body(json!({"settings": {"index": {"number_of_shards": 10}}})).send().await?;
     client.indices().put_settings(IndicesPutSettingsParts::Index(&["books"])).body(json!({"index": {"blocks": {"write": false}}})).send().await?;

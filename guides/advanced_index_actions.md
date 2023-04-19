@@ -7,11 +7,13 @@ In this guide, we will look at some advanced index actions that are not covered 
 Let's create a client instance, and an index named `movies`:
 
 ```rust
-// Create a client to make API calls to OpenSearch running on http://localhost:9200.
-let client = OpenSearch::default();
-// Alternatively, you can create a client to make API calls against OpenSearch running on a specific url::Url.
-let url = Url::parse("https://example.com")?;
-let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url)).cert_validation(CertificateValidation::None).build()?;
+// Create a client to make API calls to OpenSearch running on https://localhost:9200.
+let url = Url::parse("https://localhost:9200")?;
+let credentials = Credentials::Basic("admin".into(), "admin".into());
+let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
+        .cert_validation(CertificateValidation::None)
+        .auth(credentials)
+        .build()?;
 let client = OpenSearch::new(transport);
 client.indices().create(IndicesCreateParts::Index("movies")).send().await?;
 ```

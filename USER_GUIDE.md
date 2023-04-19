@@ -14,7 +14,7 @@
 
 ## All Guides
 
-- [Advanced index actions](guides/advanced_index_actions.md)
+- [Advanced Index Actions](guides/advanced_index_actions.md)
 
 ## Example
 

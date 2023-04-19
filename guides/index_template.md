@@ -139,9 +139,9 @@ client.indices().put_index_template(IndicesPutIndexTemplateParts::Name("books"))
     .send()
     .await?;
 
-client.indices().put_index_template(IndicesPutIndexTemplateParts::Name("books"))
+client.indices().put_index_template(IndicesPutIndexTemplateParts::Name("books-fiction"))
     .body(json!({
-        "index_patterns": ["books-*"],
+        "index_patterns": ["books-fiction-*"],
         "composed_of": ["books_mappings"], // use the `books_mappings` component template
         "priority": 1,
         "template": {

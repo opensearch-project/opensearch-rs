@@ -159,9 +159,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     client
         .indices()
-        .put_index_template(IndicesPutIndexTemplateParts::Name("books"))
+        .put_index_template(IndicesPutIndexTemplateParts::Name("books-fiction"))
         .body(json!({
-            "index_patterns": ["books-*"],
+            "index_patterns": ["books-fiction-*"],
             "composed_of": ["books_mappings"],
             "priority": 1,
             "template": {

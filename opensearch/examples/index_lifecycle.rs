@@ -14,7 +14,7 @@ use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a client to make API calls to OpenSearch running on http://localhost:9200.
+    // Create a client to make API calls to OpenSearch running on https://localhost:9200.
     let url = Url::parse("https://localhost:9200")?;
     let credentials = Credentials::Basic("admin".into(), "admin".into());
     let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))

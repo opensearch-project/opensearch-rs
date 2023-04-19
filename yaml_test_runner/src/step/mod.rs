@@ -184,7 +184,7 @@ impl Expr {
                 if s.is_empty() {
                     write!(expr, "[\"\"]").unwrap();
                 } else if s.chars().all(char::is_numeric) {
-                    write!(expr, "[{}]", s).unwrap();
+                    write!(expr, ".n({})", s).unwrap();
                 } else if s.starts_with('$') {
                     // handle "set" values
                     let t = s

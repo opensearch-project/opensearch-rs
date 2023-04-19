@@ -155,7 +155,7 @@ impl<'a> YamlTests<'a> {
 
         quote! {
             #![allow(unused_imports, unused_variables, dead_code, deprecated, clippy::redundant_clone, clippy::approx_constant)]
-            use crate::common::client;
+            use crate::common::{client, ValueExt};
             use opensearch::*;
             use opensearch::http::{
                 headers::{HeaderName, HeaderValue},

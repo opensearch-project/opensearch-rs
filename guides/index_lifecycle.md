@@ -163,7 +163,7 @@ client
     .send().await?;
 ```
 
-_Note_: The error_trace method allows for error tracing in the server response. If a 404 error occurs when removing the index, it will be ignored and the send method will return a successful result.
+_Note_: The ignore_unavailable method allows for error tracing in the server response. If the index does not exist when removing the index, it will be ignored and the send method will return a successful result.
 
 ## Cleanup
 

@@ -1,14 +1,18 @@
 # CHANGELOG
+
 Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
 ### Added
+
 - Adds Github workflow for changelog verification ([#89](https://github.com/opensearch-project/opensearch-rs/pull/89))
 - Adds Github workflow for unit tests ([#112](https://github.com/opensearch-project/opensearch-rs/pull/112))
 - Adds support for OpenSearch Serverless ([#96](https://github.com/opensearch-project/opensearch-rs/pull/96))
+- Adds Search Guide ([#143](https://github.com/opensearch-project/opensearch-rs/pull/154))
 
 ### Dependencies
+
 - Bumps `simple_logger` from 2.3.0 to 4.0.0
 - Bumps `serde_with` from ~1 to ~2
 - Bumps `textwrap` from ^0.15 to ^0.16
@@ -19,6 +23,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `syn` from ~1.0 to ~2.0
 
 ### Changed
+
 - Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))
 
 ### Deprecated
@@ -26,6 +31,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 ### Fixed
+
 - [BUG] cargo make test fails out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Update CI to run cargo make test fails out of the box ([#120](https://github.com/opensearch-project/opensearch-rs/pull/120))
 - Add cargo cache to Github actions to speed up builds ([#121](https://github.com/opensearch-project/opensearch-rs/pull/121))
@@ -34,4 +40,4 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/2.0...HEAD
+[unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/2.0...HEAD

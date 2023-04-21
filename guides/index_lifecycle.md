@@ -163,7 +163,7 @@ client
     .send().await?;
 ```
 
-_Note_: The ignore_unavailable method allows for error tracing in the server response. If the index does not exist when removing the index, it will be ignored and the send method will return a successful result.
+_Note_: The ignore_unavailable method allows for ignoring the absence of an index in the server response. If the index does not exist when removing the index, it will be ignored and the send method will return a successful result.
 
 ## Cleanup
 

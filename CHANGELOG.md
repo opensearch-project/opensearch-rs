@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Adds Github workflow for changelog verification ([#89](https://github.com/opensearch-project/opensearch-rs/pull/89))
 - Adds Github workflow for unit tests ([#112](https://github.com/opensearch-project/opensearch-rs/pull/112))
 - Adds support for OpenSearch Serverless ([#96](https://github.com/opensearch-project/opensearch-rs/pull/96))
+- Adds delete_all & get_all Point-in-Time APIs introduced in OpenSearch 2.4 ([#157](https://github.com/opensearch-project/opensearch-rs/pull/157))
 
 ### Dependencies
 - Bumps `simple_logger` from 2.3.0 to 4.0.0
@@ -20,6 +21,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Updates users guide with complete examples ([#114](https://github.com/opensearch-project/opensearch-rs/pull/114))
+- Updates Point-in-Time APIs to match those introduced in OpenSearch 2.4 ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136), [#157](https://github.com/opensearch-project/opensearch-rs/pull/157))
 
 ### Deprecated
 
@@ -29,7 +31,6 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - [BUG] cargo make test fails out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Update CI to run cargo make test fails out of the box ([#120](https://github.com/opensearch-project/opensearch-rs/pull/120))
 - Add cargo cache to Github actions to speed up builds ([#121](https://github.com/opensearch-project/opensearch-rs/pull/121))
-- [BUG] Updated Point-in-Time request builder to support current API ([#136](https://github.com/opensearch-project/opensearch-rs/pull/136))
 - Fix f64 comparison: use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 
 ### Security

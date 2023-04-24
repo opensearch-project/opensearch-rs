@@ -944,16 +944,16 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Create Point In Time API"]
-pub enum CreatePointInTimeParts<'b> {
+#[doc = "API parts for the Create Pit API"]
+pub enum CreatePitParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
 }
-impl<'b> CreatePointInTimeParts<'b> {
-    #[doc = "Builds a relative URL path to the Create Point In Time API"]
+impl<'b> CreatePitParts<'b> {
+    #[doc = "Builds a relative URL path to the Create Pit API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            CreatePointInTimeParts::Index(index) => {
+            CreatePitParts::Index(index) => {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
@@ -966,11 +966,12 @@ impl<'b> CreatePointInTimeParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Create Point In Time API](https://opensearch.org/docs/)\n\nCreate a point in time that can be used in subsequent searches"]
+#[doc = "Builder for the [Create Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nCreates point in time context."]
 #[derive(Clone, Debug)]
-pub struct CreatePointInTime<'a, 'b, B> {
+pub struct CreatePit<'a, 'b, B> {
     transport: &'a Transport,
-    parts: CreatePointInTimeParts<'b>,
+    parts: CreatePitParts<'b>,
+    allow_partial_pit_creation: Option<bool>,
     body: Option<B>,
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -982,20 +983,21 @@ pub struct CreatePointInTime<'a, 'b, B> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
 }
-impl<'a, 'b, B> CreatePointInTime<'a, 'b, B>
+impl<'a, 'b, B> CreatePit<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [CreatePointInTime] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: CreatePointInTimeParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [CreatePit] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: CreatePitParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        CreatePointInTime {
+        CreatePit {
             transport,
             parts,
             headers,
+            allow_partial_pit_creation: None,
             body: None,
             error_trace: None,
             expand_wildcards: None,
@@ -1010,15 +1012,21 @@ where
             source: None,
         }
     }
+    #[doc = "Allow if point in time can be created with partial failures"]
+    pub fn allow_partial_pit_creation(mut self, allow_partial_pit_creation: bool) -> Self {
+        self.allow_partial_pit_creation = Some(allow_partial_pit_creation);
+        self
+    }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> CreatePointInTime<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> CreatePit<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        CreatePointInTime {
+        CreatePit {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            allow_partial_pit_creation: self.allow_partial_pit_creation,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
@@ -1063,12 +1071,12 @@ where
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "The amount of time to keep the PIT. Every time you access a PIT by using the Search API, the PIT lifetime is extended by the amount of time equal to the keep_alive parameter. Required."]
+    #[doc = "Specify the keep alive for point in time"]
     pub fn keep_alive(mut self, keep_alive: &'b str) -> Self {
         self.keep_alive = Some(keep_alive);
         self
     }
-    #[doc = "The node or the shard used to perform the search. Optional. Default is random."]
+    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
@@ -1083,8 +1091,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specifies to route search requests to a specific shard. Optional. Default is the document's `_id`."]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A comma-separated list of specific routing values"]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -1093,7 +1101,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Create Point In Time API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Create Pit API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Post;
@@ -1103,6 +1111,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                allow_partial_pit_creation: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
@@ -1113,10 +1122,12 @@ where
                 keep_alive: Option<&'b str>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                allow_partial_pit_creation: self.allow_partial_pit_creation,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
@@ -1321,6 +1332,118 @@ impl<'a, 'b> Delete<'a, 'b> {
                 version: self.version,
                 version_type: self.version_type,
                 wait_for_active_shards: self.wait_for_active_shards,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Delete All Pits API"]
+pub enum DeleteAllPitsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl DeleteAllPitsParts {
+    #[doc = "Builds a relative URL path to the Delete All Pits API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            DeleteAllPitsParts::None => "/_search/point_in_time/_all".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Delete All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes all active point in time searches."]
+#[derive(Clone, Debug)]
+pub struct DeleteAllPits<'a, 'b> {
+    transport: &'a Transport,
+    parts: DeleteAllPitsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> DeleteAllPits<'a, 'b> {
+    #[doc = "Creates a new instance of [DeleteAllPits]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        DeleteAllPits {
+            transport,
+            parts: DeleteAllPitsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to reduce the response."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Return human readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Pretty format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Delete All Pits API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Delete;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
             };
             Some(query_params)
         };
@@ -1967,33 +2090,24 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Delete Point In Time API"]
-pub enum DeletePointInTimeParts<'b> {
-    #[doc = "Index"]
-    Index(&'b [&'b str]),
+#[doc = "API parts for the Delete Pit API"]
+pub enum DeletePitParts {
+    #[doc = "No parts"]
+    None,
 }
-impl<'b> DeletePointInTimeParts<'b> {
-    #[doc = "Builds a relative URL path to the Delete Point In Time API"]
+impl DeletePitParts {
+    #[doc = "Builds a relative URL path to the Delete Pit API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DeletePointInTimeParts::Index(index) => {
-                let index_str = index.join(",");
-                let encoded_index: Cow<str> =
-                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(23usize + encoded_index.len());
-                p.push('/');
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/_search/point_in_time");
-                p.into()
-            }
+            DeletePitParts::None => "/_search/point_in_time".into(),
         }
     }
 }
-#[doc = "Builder for the [Delete Point In Time API](https://opensearch.org/docs/)\n\nDelete a point in time"]
+#[doc = "Builder for the [Delete Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes one or more point in time searches based on the IDs passed."]
 #[derive(Clone, Debug)]
-pub struct DeletePointInTime<'a, 'b, B> {
+pub struct DeletePit<'a, 'b, B> {
     transport: &'a Transport,
-    parts: DeletePointInTimeParts<'b>,
+    parts: DeletePitParts,
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -2003,16 +2117,16 @@ pub struct DeletePointInTime<'a, 'b, B> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-impl<'a, 'b, B> DeletePointInTime<'a, 'b, B>
+impl<'a, 'b, B> DeletePit<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [DeletePointInTime] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: DeletePointInTimeParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [DeletePit]"]
+    pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        DeletePointInTime {
+        DeletePit {
             transport,
-            parts,
+            parts: DeletePitParts::None,
             headers,
             body: None,
             error_trace: None,
@@ -2024,11 +2138,11 @@ where
         }
     }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> DeletePointInTime<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> DeletePit<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        DeletePointInTime {
+        DeletePit {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
@@ -2076,7 +2190,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Delete Point In Time API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Delete Pit API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Delete;
@@ -3357,6 +3471,118 @@ impl<'a, 'b> Get<'a, 'b> {
                 stored_fields: self.stored_fields,
                 version: self.version,
                 version_type: self.version_type,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Get All Pits API"]
+pub enum GetAllPitsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl GetAllPitsParts {
+    #[doc = "Builds a relative URL path to the Get All Pits API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            GetAllPitsParts::None => "/_search/point_in_time/_all".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Get All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nLists all active point in time searches."]
+#[derive(Clone, Debug)]
+pub struct GetAllPits<'a, 'b> {
+    transport: &'a Transport,
+    parts: GetAllPitsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> GetAllPits<'a, 'b> {
+    #[doc = "Creates a new instance of [GetAllPits]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        GetAllPits {
+            transport,
+            parts: GetAllPitsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to reduce the response."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Return human readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Pretty format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Get All Pits API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
             };
             Some(query_params)
         };
@@ -8878,16 +9104,17 @@ impl OpenSearch {
     pub fn create<'a, 'b>(&'a self, parts: CreateParts<'b>) -> Create<'a, 'b, ()> {
         Create::new(self.transport(), parts)
     }
-    #[doc = "[Create Point In Time API](https://opensearch.org/docs/)\n\nCreate a point in time that can be used in subsequent searches"]
-    pub fn create_point_in_time<'a, 'b>(
-        &'a self,
-        parts: CreatePointInTimeParts<'b>,
-    ) -> CreatePointInTime<'a, 'b, ()> {
-        CreatePointInTime::new(self.transport(), parts)
+    #[doc = "[Create Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nCreates point in time context."]
+    pub fn create_pit<'a, 'b>(&'a self, parts: CreatePitParts<'b>) -> CreatePit<'a, 'b, ()> {
+        CreatePit::new(self.transport(), parts)
     }
     #[doc = "[Delete API](https://opensearch.org/docs/)\n\nRemoves a document from the index."]
     pub fn delete<'a, 'b>(&'a self, parts: DeleteParts<'b>) -> Delete<'a, 'b> {
         Delete::new(self.transport(), parts)
+    }
+    #[doc = "[Delete All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes all active point in time searches."]
+    pub fn delete_all_pits<'a, 'b>(&'a self) -> DeleteAllPits<'a, 'b> {
+        DeleteAllPits::new(self.transport())
     }
     #[doc = "[Delete By Query API](https://opensearch.org/docs/)\n\nDeletes documents matching the provided query."]
     pub fn delete_by_query<'a, 'b>(
@@ -8903,12 +9130,9 @@ impl OpenSearch {
     ) -> DeleteByQueryRethrottle<'a, 'b, ()> {
         DeleteByQueryRethrottle::new(self.transport(), parts)
     }
-    #[doc = "[Delete Point In Time API](https://opensearch.org/docs/)\n\nDelete a point in time"]
-    pub fn delete_point_in_time<'a, 'b>(
-        &'a self,
-        parts: DeletePointInTimeParts<'b>,
-    ) -> DeletePointInTime<'a, 'b, ()> {
-        DeletePointInTime::new(self.transport(), parts)
+    #[doc = "[Delete Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes one or more point in time searches based on the IDs passed."]
+    pub fn delete_pit<'a, 'b>(&'a self) -> DeletePit<'a, 'b, ()> {
+        DeletePit::new(self.transport())
     }
     #[doc = "[Delete Script API](https://opensearch.org/docs/)\n\nDeletes a script."]
     pub fn delete_script<'a, 'b>(&'a self, parts: DeleteScriptParts<'b>) -> DeleteScript<'a, 'b> {
@@ -8933,6 +9157,10 @@ impl OpenSearch {
     #[doc = "[Get API](https://opensearch.org/docs/)\n\nReturns a document."]
     pub fn get<'a, 'b>(&'a self, parts: GetParts<'b>) -> Get<'a, 'b> {
         Get::new(self.transport(), parts)
+    }
+    #[doc = "[Get All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nLists all active point in time searches."]
+    pub fn get_all_pits<'a, 'b>(&'a self) -> GetAllPits<'a, 'b> {
+        GetAllPits::new(self.transport())
     }
     #[doc = "[Get Script API](https://opensearch.org/docs/)\n\nReturns a script."]
     pub fn get_script<'a, 'b>(&'a self, parts: GetScriptParts<'b>) -> GetScript<'a, 'b> {

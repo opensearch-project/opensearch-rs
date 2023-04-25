@@ -28,21 +28,19 @@
  * GitHub history for details.
  */
 
-use crate::{
-    skip::{GlobalSkips, SkippedFeaturesAndTests},
-    step::*,
-};
+use crate::{skip::SkippedFeaturesAndTests, step::*};
 use anyhow::anyhow;
 use api_generator::generator::Api;
 use inflector::Inflector;
 use lazy_static::lazy_static;
 use log::{error, info};
-use opensearch::DEFAULT_ADDRESS;
 use path_slash::PathExt;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
 use regex::Regex;
 use semver::Version;
+use serde::Deserialize;
+use serde_yaml::Value;
 use std::{
     collections::HashSet,
     fs,
@@ -50,8 +48,6 @@ use std::{
     io::Write,
     path::{Path, PathBuf},
 };
-use url::Url;
-use yaml_rust::{Yaml, YamlLoader};
 
 /// The test suite to compile
 #[derive(Debug, PartialEq, Eq)]
@@ -370,13 +366,6 @@ impl TestFn {
     }
 }
 
-fn cluster_addr() -> String {
-    match std::env::var("OPENSEARCH_URL") {
-        Ok(server) => server,
-        Err(_) => DEFAULT_ADDRESS.into(),
-    }
-}
-
 pub fn generate_tests_from_yaml(
     api: &Api,
     _suite: &TestSuite,
@@ -384,11 +373,8 @@ pub fn generate_tests_from_yaml(
     base_download_dir: &Path,
     download_dir: &Path,
     generated_dir: &Path,
+    skips: &SkippedFeaturesAndTests,
 ) -> anyhow::Result<()> {
-    let url = Url::parse(cluster_addr().as_ref()).unwrap();
-    let global_skips = serde_yaml::from_str::<GlobalSkips>(include_str!("../skip.yml"))?;
-    let skips = global_skips.get_skips_for(version, url.scheme() == "https");
-
     let paths = fs::read_dir(download_dir)?;
     for entry in paths.flatten() {
         if let Ok(file_type) = entry.file_type() {
@@ -400,6 +386,7 @@ pub fn generate_tests_from_yaml(
                     base_download_dir,
                     &entry.path(),
                     generated_dir,
+                    skips,
                 )?;
             } else if file_type.is_file() {
                 let path = entry.path();
@@ -415,18 +402,21 @@ pub fn generate_tests_from_yaml(
                 info!("Generating: {}", relative_path.display());
                 let yaml = fs::read_to_string(&entry.path()).unwrap();
 
-                // a yaml test can contain multiple yaml docs, so use yaml_rust to parse
-                let result = YamlLoader::load_from_str(&yaml);
-                if result.is_err() {
-                    error!(
-                        "skipping {}. cannot read as Yaml struct: {}",
-                        relative_path.to_slash_lossy(),
-                        result.err().unwrap().to_string()
-                    );
-                    continue;
-                }
+                let docs = match serde_yaml::Deserializer::from_str(&yaml)
+                    .map(|doc| Value::deserialize(doc))
+                    .collect::<Result<Vec<_>, _>>()
+                {
+                    Ok(docs) => docs,
+                    Err(err) => {
+                        error!(
+                            "skipping {}. contains one or more malformed YAML documents: {}",
+                            relative_path.display(),
+                            err
+                        );
+                        continue;
+                    }
+                };
 
-                let docs = result.unwrap();
                 let mut test =
                     YamlTests::new(relative_path, version, &skips, test_suite, docs.len());
 
@@ -434,7 +424,7 @@ pub fn generate_tests_from_yaml(
                         .iter()
                         .map(|doc| {
                             let hash = doc
-                                .as_hash()
+                                .as_mapping()
                                 .ok_or_else(|| anyhow!(
                                     "expected hash but found {:?}",
                                     &doc
@@ -442,7 +432,7 @@ pub fn generate_tests_from_yaml(
 
                             let (key, value) = hash.iter().next().unwrap();
                             match (key, value) {
-                                (Yaml::String(name), Yaml::Array(steps)) => {
+                                (Value::String(name), Value::Sequence(steps)) => {
                                     let steps = parse_steps(api, steps)?;
                                     let test_fn = TestFn::new(name, steps);
                                     match name.as_str() {

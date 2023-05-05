@@ -1,6 +1,6 @@
 # Document Lifecycle
 
-This guide covers OpenSearch Ruby Client API actions for Document Lifecycle. You'll learn how to create, read, update, and delete documents in your OpenSearch cluster. Whether you're new to OpenSearch or an experienced user, this guide provides the information you need to manage your document lifecycle effectively.
+This guide covers OpenSearch Rust Client API actions for Document Lifecycle. You'll learn how to create, read, update, and delete documents in your OpenSearch cluster. Whether you're new to OpenSearch or an experienced user, this guide provides the information you need to manage your document lifecycle effectively.
 
 ## Setup
 
@@ -8,16 +8,19 @@ Assuming you have OpenSearch running locally on port 9200, you can create a clie
 with the following code:
 
 ```rust
-let url = Url::parse("http://localhost:9200")?;
-let conn_pool = SingleNodeConnectionPool::new(url);
-let transport = TransportBuilder::new(conn_pool).disable_proxy().build()?;
+let url = Url::parse("https://localhost:9200")?;
+let credentials = Credentials::Basic("admin".into(), "admin".into());
+let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
+    .cert_validation(CertificateValidation::None)
+    .auth(credentials)
+    .build()?;
 let client = OpenSearch::new(transport);
 ```
 
 Next, create an index named `movies` with the default settings:
 
 ```rust
-index = 'movies'
+let index = 'movies'
 client.indices().create(IndicesCreateParts::Index(index)).send().await?;
 ```
 
@@ -30,14 +33,14 @@ To create a new document, use the `create` or `index` API action. The following 
 ```rust
 client
   .indices()
-  .create(IndexParts::IndexId(index, 1))
+  .create(IndexParts::IndexId(index, "1"))
   .body(json!({ "title": "Beauty and the Beast", "year": 1991 }))
   .send()
   .await?;
 
 client
   .indices()
-  .create(IndexParts::IndexId(index, 2))
+  .create(IndexParts::IndexId(index, "2"))
   .body(json!(
     { "title": "Beauty and the Beast - Live Action", "year":  2017 }))
   .send()
@@ -47,28 +50,29 @@ client
 Note that the `create` action is NOT idempotent. If you try to create a document with an ID that already exists, the request will fail:
 
 ```rust
-client
+let err = client
   .indices()
   .create(IndexParts::IndexId(index, 1))
   .body(json!({"title": "Just Another Movie" }))
   .send()
-  .await? {
-    Ok(_response) => {};
-    Err(e) => println!("{}", e);
-  };
+  .await?
+  .exception()
+  .await?
+  .unwrap();
+println!("{:#?}", err);
 ```
 
 The `index` action, on the other hand, is idempotent. If you try to index a document with an existing ID, the request will succeed and overwrite the existing document. Note that no new document will be created in this case. You can think of the `index` action as an upsert:
 
 ```rust
 client
-  .index(IndexParts::IndexId(index, 2))
+  .index(IndexParts::IndexId(index, "2"))
   .body(json!({ "title": "Updated Title" }))
   .send()
   .await?;
 
 client
-  .index(IndexParts::IndexId(index, 2))
+  .index(IndexParts::IndexId(index, "2"))
   .body(json!(
     { "title": "The Lion King", "year": 1994 }))
   .send()
@@ -88,7 +92,7 @@ client
   .await?;
  // OR
  client
-   .index(IndexParts::IndexId(index)).
+   .index(IndexParts::IndexId(index))
    .body(json!({ "title": "The Lion King 2", "year": 1998 }))
    .send()
    .await?;
@@ -96,7 +100,7 @@ client
 
 In this case, the ID of the created document in the `result` field of the response body:
 
-```rust
+```json
 {
   "_index": "movies",
   "_type": "_doc",
@@ -118,36 +122,39 @@ In this case, the ID of the created document in the `result` field of the respon
 To get a document, use the `get` API action. The following code gets the document with ID `1` from the `movies` index:
 
 ```rust
-response = client
-  .get(GetParts::IndexId(index, 1))
+let response = client
+  .get(GetParts::IndexId(index, "1"))
   .send()
+  .await?
+  .json::<Value>()
   .await?;
 
-let response_body = response.json::<Value>().await?
-println!("{}", response_body["_source"]);
+println!("{}", response["_source"]);
 // OUTPUT: {"title": "Beauty and the Beast", "year": 1991}
 ```
 
 You can also use `_source_include` and `_source_exclude` parameters to specify which fields to include or exclude in the response:
 
 ```rust
-response = client
-  .get(GetParts::IndexId(index, 1))
+let response = client
+  .get(GetParts::IndexId(index, "1"))
   ._source_includes("title")
   .send()
+  .await?
+  .json::<Value>()
   .await?;
 
-let response_body = response.json::<Value>().await?
-println!("{}", response_body["_source"]);
+println!("{}", response["_source"]);
 // OUTPUT: {"title"=>"Beauty and the Beast"}
 
-response = client
-  .get(GetParts::IndexId(index, 1))
+let response = client
+  .get(GetParts::IndexId(index, "1"))
   ._source_includes("title")
   .send()
+  .await?
+  .json::<Value>()
   .await?;
 
-let response_body = response.json::<Value>().await?
 println!("{}", response_body["_source"]);
 // OUTPUT: {"year"=>1991}
 ```
@@ -157,15 +164,16 @@ println!("{}", response_body["_source"]);
 To get multiple documents, use the `mget` API action:
 
 ```rust
-response = client.
+let response = client
   .mget(MgetParts::Index(index))
   .body(json!({
     { "docs": vec![{ "_id": 1 }, { "_id": 2 }] }
   }))
   .send()
+  .await?
+  .json::<Value>()
   .await?;
 
-let response_body = response.json::<Value>().await?
 for doc in response_body["docs"].iter() {
   println!("{}", doc["_source"]);
 }
@@ -177,7 +185,7 @@ To check if a document exists, use the `exists` API action. The following code c
 
 ```rust
 client
-  .exists(ExistsParts::IndexId(index, 1))
+  .exists(ExistsParts::IndexId(index, "1"))
   .send()
   .await?;
 ```
@@ -188,7 +196,7 @@ To update a document, use the `update` API action. The following code updates th
 
 ```rust
 client
-  .update(UpdateParts::IndexId(index, 1))
+  .update(UpdateParts::IndexId(index, "1"))
   .body(json!({ "doc": { "year": 1995 } }))
   .send()
   .await?
@@ -198,7 +206,7 @@ Alternatively, you can use the `script` parameter to update a document using a s
 
 ```rust
 client
-  .update(UpdateParts::IndexId(index, 1))
+  .update(UpdateParts::IndexId(index, "1"))
   .body(json!({ "script": { "source": "ctx._source.year += 5" }}))
   .send()
   .await?;
@@ -227,17 +235,7 @@ To delete a document, use the `delete` API action. The following code deletes th
 
 ```rust
 client
-  .delete(DeleteParts::IndexId(index, 1))
-  .send()
-  .await?;
-```
-
-By default, the `delete` action is not idempotent. If you try to delete a document that does not exist, or delete the same document twice, you will run into Not Found (404) error. You can make the `delete` action idempotent by setting the `ignore` parameter to `404`:
-
-```rust
-client
-  .delete(DeleteParts::IndexId(index, 1))
-  .params(vec!["ignore", 404])
+  .delete(DeleteParts::IndexId(index, "1"))
   .send()
   .await?;
 ```

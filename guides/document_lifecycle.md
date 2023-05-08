@@ -20,7 +20,7 @@ let client = OpenSearch::new(transport);
 Next, create an index named `movies` with the default settings:
 
 ```rust
-let index = 'movies'
+let index = "movies";
 client.indices().create(IndicesCreateParts::Index(index)).send().await?;
 ```
 
@@ -87,7 +87,7 @@ You can also create a new document with an auto-generated ID by omitting the `id
 client
   .indices()
   .create(IndicesCreateParts::Index(index))
-  .body(json!({ "title": "The Lion King 2", "year": 1998 })
+  .body(json!({ "title": "The Lion King 2", "year": 1998 }))
   .send()
   .await?;
  // OR
@@ -155,7 +155,7 @@ let response = client
   .json::<Value>()
   .await?;
 
-println!("{}", response_body["_source"]);
+println!("{}", response["_source"]);
 // OUTPUT: {"year"=>1991}
 ```
 
@@ -174,7 +174,7 @@ let response = client
   .json::<Value>()
   .await?;
 
-for doc in response_body["docs"].iter() {
+for doc in response["docs"].iter() {
   println!("{}", doc["_source"]);
 }
 ```
@@ -223,8 +223,8 @@ client
   .update_by_query(UpdateByQueryParts::Index(&[index]))
   .body(json!({
     "script": { "source": "ctx._source.year -= 1" },
-    "query": { "range": { "year": { "gt": 2023 } }
-  }))
+    "query": { "range": { "year": { "gt": 2023 } }}
+    }))
   .send()
   .await?;
 ```

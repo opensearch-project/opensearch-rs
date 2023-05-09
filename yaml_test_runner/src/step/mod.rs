@@ -28,7 +28,6 @@
  * GitHub history for details.
  */
 
-use crate::regex::*;
 use anyhow::anyhow;
 use api_generator::generator::Api;
 use proc_macro2::TokenStream;
@@ -248,11 +247,4 @@ pub fn ok_or_accumulate<T>(results: &[anyhow::Result<T>]) -> anyhow::Result<()> 
         msgs.dedup_by(|a, b| a == b);
         Err(anyhow!("{}", msgs.join(", ")))
     }
-}
-
-pub fn json_string_from_yaml(yaml: &Value) -> String {
-    let mut json = serde_json::to_string(yaml).unwrap();
-    json = replace_set(json);
-    json = replace_i64_u64(json);
-    json
 }

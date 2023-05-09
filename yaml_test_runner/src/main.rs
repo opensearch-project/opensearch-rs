@@ -43,6 +43,7 @@ use std::{
 mod generator;
 mod github;
 mod regex;
+mod rusty_json;
 mod skip;
 mod step;
 

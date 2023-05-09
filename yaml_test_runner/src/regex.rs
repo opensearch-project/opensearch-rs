@@ -28,7 +28,7 @@
  * GitHub history for details.
  */
 
-use ::regex::{Captures, Regex};
+use ::regex::Regex;
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -43,12 +43,6 @@ lazy_static! {
     // replace usages of ${.*} with the captured value
     pub static ref SET_DELIMITED_REGEX: Regex =
         Regex::new(r#"\$\{(.*?)\}"#).unwrap();
-
-    // include i64 suffix on whole numbers larger than i32
-    // will match on numbers with 10 or more digits, with the replace
-    // call testing against i32::max_value
-    pub static ref INT_REGEX: Regex =
-        regex::Regex::new(r"([,:\[{]\s*[-]?)(\d{10,}?)(\s*[,}\]])").unwrap();
 }
 
 /// cleans up a regex as specified in YAML to one that will work with the regex crate.
@@ -75,23 +69,4 @@ pub fn replace_set<S: AsRef<str>>(s: S) -> String {
         .into_owned();
 
     SET_REGEX.replace_all(s.as_ref(), "$1").into_owned()
-}
-
-/// Replaces all integers in a string to suffix with i64, to ensure that numbers
-/// larger than i32 will be handled correctly when passed to json! macro
-pub fn replace_i64_u64<S: AsRef<str>>(s: S) -> String {
-    INT_REGEX
-        .replace_all(s.as_ref(), |c: &Captures| match &c[2].parse::<i128>() {
-            Ok(i) if *i < i32::min_value() as i128 => {
-                format!("{}{}i64{}", &c[1], &c[2], &c[3])
-            }
-            Ok(i) if *i > i32::max_value() as i128 && *i <= i64::max_value() as i128 => {
-                format!("{}{}i64{}", &c[1], &c[2], &c[3])
-            }
-            Ok(i) if *i > i64::max_value() as i128 && *i <= u64::max_value() as i128 => {
-                format!("{}{}u64{}", &c[1], &c[2], &c[3])
-            }
-            _ => c[0].to_string(),
-        })
-        .into_owned()
 }

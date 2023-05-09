@@ -19,11 +19,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let url = Url::parse("https://localhost:9200")?;
     let credentials = Credentials::Basic("admin".into(), "admin".into());
     let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
-          .cert_validation(CertificateValidation::None)
-          .auth(credentials)
-          .build()?;
+        .cert_validation(CertificateValidation::None)
+        .auth(credentials)
+        .build()?;
     let client = OpenSearch::new(transport);
-    
+
     client
         .indices()
         .create(IndicesCreateParts::Index("movies"))
@@ -108,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }))
         .send()
         .await?;
-      
+
     // You can split an index into another index with more primary shards. The source index must be in read-only state for splitting. The following example creates the read-only `books` index with 30 routing shards and 5 shards (which 30 is divisible by), splits the index into `bigger_books` with 10 shards (which 30 is also divisible by), then re-enables writes:
     client
         .indices()
@@ -138,7 +138,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .body(json!({"index": {"blocks": {"write": false}}}))
         .send()
         .await?;
-      
+
     // Let's delete all the indices we created in this guide:
     client
         .indices()

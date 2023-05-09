@@ -29,7 +29,7 @@
  */
 
 use super::Step;
-use crate::step::{json_string_from_yaml, Expr};
+use crate::{rusty_json::rusty_json, step::Expr};
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
@@ -70,35 +70,35 @@ impl ToTokens for Contains {
                 if n.is_f64() {
                     let f = n.as_f64().unwrap();
                     tokens.append_all(quote! {
-                        assert_contains!(json#expr, json!(#f));
+                        crate::assert_contains!(json#expr, json!(#f));
                     });
                 } else if n.is_u64() {
                     let u = n.as_u64().unwrap();
                     tokens.append_all(quote! {
-                        assert_contains!(json#expr, json!(#u));
+                        crate::assert_contains!(json#expr, json!(#u));
                     });
                 } else {
                     let i = n.as_i64().unwrap();
                     tokens.append_all(quote! {
-                        assert_contains!(json#expr, json!(#i));
+                        crate::assert_contains!(json#expr, json!(#i));
                     });
                 }
             }
             Value::String(s) => {
                 tokens.append_all(quote! {
-                    assert_contains!(json#expr, json!(#s));
+                    crate::assert_contains!(json#expr, json!(#s));
                 });
             }
             Value::Bool(b) => {
                 tokens.append_all(quote! {
-                    assert_contains!(json#expr, json!(#b));
+                    crate::assert_contains!(json#expr, json!(#b));
                 });
             }
             yaml if yaml.is_sequence() || yaml.is_mapping() => {
-                let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
+                let json = rusty_json(yaml);
 
                 tokens.append_all(quote! {
-                    assert_contains!(json#expr, json!(#json));
+                    crate::assert_contains!(json#expr, json!(#json));
                 });
             }
             yaml => {

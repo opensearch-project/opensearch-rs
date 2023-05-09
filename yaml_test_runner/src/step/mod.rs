@@ -253,6 +253,6 @@ pub fn ok_or_accumulate<T>(results: &[anyhow::Result<T>]) -> anyhow::Result<()> 
 pub fn json_string_from_yaml(yaml: &Value) -> String {
     let mut json = serde_json::to_string(yaml).unwrap();
     json = replace_set(json);
-    json = replace_i64(json);
+    json = replace_i64_u64(json);
     json
 }

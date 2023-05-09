@@ -112,6 +112,15 @@ impl ToTokens for Match {
                             crate::assert_numeric_match!(json#expr, #f);
                         });
                     }
+                } else if i.is_u64() {
+                    let ui = i.as_u64().unwrap();
+                    if self.expr.is_body() {
+                        panic!("match on $body with u64");
+                    } else {
+                        tokens.append_all(quote! {
+                            crate::assert_numeric_match!(json#expr, #ui);
+                        });
+                    }
                 } else {
                     let i = i.as_i64().unwrap();
                     if self.expr.is_body() {

@@ -859,7 +859,7 @@ impl ApiCall {
             Value::String(s) => {
                 let json = {
                     let json = replace_set(s);
-                    replace_i64(json)
+                    replace_i64_u64(json)
                 };
                 if endpoint.supports_nd_body() {
                     // a newline delimited API body may be expressed
@@ -896,7 +896,7 @@ impl ApiCall {
                             syn::parse_str::<TokenStream>(&json).unwrap()
                         } else {
                             json = replace_set(json);
-                            json = replace_i64(json);
+                            json = replace_i64_u64(json);
                             let json = syn::parse_str::<TokenStream>(&json).unwrap();
                             quote!(JsonBody::from(json!(#json)))
                         }
@@ -905,7 +905,7 @@ impl ApiCall {
                 } else {
                     let mut json = serde_json::to_string_pretty(&v)?;
                     json = replace_set(json);
-                    json = replace_i64(json);
+                    json = replace_i64_u64(json);
                     let ident: TokenStream = syn::parse_str(&json).unwrap();
 
                     Ok(Some(quote!(.body(json!{#ident}))))

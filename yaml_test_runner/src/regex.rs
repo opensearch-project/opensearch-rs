@@ -28,23 +28,6 @@
  * GitHub history for details.
  */
 
-use ::regex::Regex;
-use lazy_static::lazy_static;
-
-lazy_static! {
-    // replace usages of "$.*" with the captured value
-    pub static ref SET_REGEX: Regex =
-        Regex::new(r#""\$(.*?)""#).unwrap();
-
-    // replace usages of "${.*}" with the captured value
-    pub static ref SET_QUOTED_DELIMITED_REGEX: Regex =
-        Regex::new(r#""\$\{(.*?)\}""#).unwrap();
-
-    // replace usages of ${.*} with the captured value
-    pub static ref SET_DELIMITED_REGEX: Regex =
-        Regex::new(r#"\$\{(.*?)\}"#).unwrap();
-}
-
 /// cleans up a regex as specified in YAML to one that will work with the regex crate.
 pub fn clean_regex<S: AsRef<str>>(s: S) -> String {
     s.as_ref()
@@ -56,17 +39,4 @@ pub fn clean_regex<S: AsRef<str>>(s: S) -> String {
         .replace("\\%", "%")
         .replace("\\'", "'")
         .replace("\\`", "`")
-}
-
-/// Replaces a "set" step value with a variable
-pub fn replace_set<S: AsRef<str>>(s: S) -> String {
-    let mut s = SET_QUOTED_DELIMITED_REGEX
-        .replace_all(s.as_ref(), "$1")
-        .into_owned();
-
-    s = SET_DELIMITED_REGEX
-        .replace_all(s.as_ref(), "$1")
-        .into_owned();
-
-    SET_REGEX.replace_all(s.as_ref(), "$1").into_owned()
 }

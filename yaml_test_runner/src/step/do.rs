@@ -30,8 +30,8 @@
 
 use super::{ok_or_accumulate, Step};
 use crate::{
-    regex::{clean_regex, *},
-    rusty_json::rusty_json,
+    regex::clean_regex,
+    rusty_json::{rusty_json, from_set_value},
 };
 use anyhow::anyhow;
 use api_generator::generator::{Api, ApiEndpoint, TypeKind};
@@ -256,20 +256,12 @@ impl ToTokens for ApiCall {
             .map(|(k, v)| {
                 // header names **must** be lowercase to satisfy Header lib
                 let k = k.to_lowercase();
+                let v = from_set_value(v);
 
                 // handle "set" value in headers
-                if let Some(c) = SET_DELIMITED_REGEX.captures(v) {
-                    let token = syn::Ident::new(c.get(1).unwrap().as_str(), Span::call_site());
-                    let replacement = SET_DELIMITED_REGEX.replace_all(v, "{}");
-                    quote! { .header(
-                        HeaderName::from_static(#k),
-                        HeaderValue::from_str(format!(#replacement, #token.as_str().unwrap()).as_ref())?)
-                    }
-                } else {
-                    quote! { .header(
-                        HeaderName::from_static(#k),
-                        HeaderValue::from_static(#v))
-                    }
+                quote! { .header(
+                    HeaderName::from_static(#k),
+                    HeaderValue::from_str(#v.as_ref())?)
                 }
             })
             .collect();
@@ -468,7 +460,7 @@ impl ApiCall {
                                 },
                                 TypeKind::Integer => {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap() as i32)
                                         });
@@ -490,7 +482,7 @@ impl ApiCall {
                                 }
                                 TypeKind::Number | TypeKind::Long => {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap())
                                         });
@@ -504,7 +496,7 @@ impl ApiCall {
                                 _ => {
                                     // handle set values
                                     let t = if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         quote! { #set_value.as_str().unwrap() }
                                     } else {
                                         quote! { #s }
@@ -629,32 +621,6 @@ impl ApiCall {
         }
     }
 
-    fn from_set_value(s: &str) -> TokenStream {
-        // check if the entire string is a token
-        if s.starts_with('$') {
-            let ident = syn::Ident::new(
-                s.trim_start_matches('$')
-                    .trim_start_matches('{')
-                    .trim_end_matches('}'),
-                Span::call_site(),
-            );
-            quote! { #ident }
-        } else {
-            // only part of the string is a token, so substitute
-            let token = syn::Ident::new(
-                SET_DELIMITED_REGEX
-                    .captures(s)
-                    .unwrap()
-                    .get(1)
-                    .unwrap()
-                    .as_str(),
-                Span::call_site(),
-            );
-            let replacement = SET_DELIMITED_REGEX.replace_all(s, "{}");
-            quote! { Value::String(format!(#replacement, #token.as_str().unwrap())) }
-        }
-    }
-
     fn generate_parts(
         api_call: &str,
         endpoint: &ApiEndpoint,
@@ -764,7 +730,7 @@ impl ApiCall {
                             TypeKind::List => {
                                 let values = s.split(',').map(|s| {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         quote! { #set_value.as_str().unwrap() }
                                     } else {
                                         quote! { #s }
@@ -774,7 +740,7 @@ impl ApiCall {
                             }
                             TypeKind::Long => {
                                 if is_set_value {
-                                    let set_value = Self::from_set_value(s);
+                                    let set_value = from_set_value(s);
                                     Ok(quote! { #set_value.as_i64().unwrap() })
                                 } else {
                                     let l = s.parse::<i64>().unwrap();
@@ -783,7 +749,7 @@ impl ApiCall {
                             }
                             _ => {
                                 if is_set_value {
-                                    let set_value = Self::from_set_value(s);
+                                    let set_value = from_set_value(s);
                                     Ok(quote! { #set_value.as_str().unwrap() })
                                 } else {
                                     Ok(quote! { #s })

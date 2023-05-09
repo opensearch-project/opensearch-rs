@@ -1,6 +1,40 @@
+use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
 use quote::quote;
+use regex::Regex;
 use serde_yaml::Value;
+
+lazy_static! {
+    // replace usages of "$.*" with the captured value
+    static ref SET_REGEX: Regex =
+        Regex::new(r#"\$(.+)"#).unwrap();
+
+    // replace usages of ${.*} with the captured value
+    static ref SET_DELIMITED_REGEX: Regex =
+        Regex::new(r#"\$\{([^}]+)\}"#).unwrap();
+}
+
+pub fn from_set_value(s: &str) -> TokenStream {
+    if s.starts_with('$') {
+        match SET_DELIMITED_REGEX
+            .captures(s)
+            .or_else(|| SET_REGEX.captures(s))
+        {
+            Some(c) => syn::parse_str(&c[1]).unwrap(),
+            None => quote! { #s },
+        }
+    } else if SET_DELIMITED_REGEX.is_match(s) {
+        let mut format_str = s.to_owned();
+        let mut args = Vec::<TokenStream>::new();
+        for c in SET_DELIMITED_REGEX.captures_iter(s) {
+            format_str = format_str.replace(&c[0], "{}");
+            args.push(syn::parse_str(&c[1]).unwrap());
+        }
+        quote! { format!(#format_str, #(#args),*) }
+    } else {
+        quote! { #s }
+    }
+}
 
 pub fn rusty_json(v: &Value) -> TokenStream {
     match v {
@@ -18,9 +52,7 @@ pub fn rusty_json(v: &Value) -> TokenStream {
                 quote! { #u }
             }
         }
-        Value::String(s) => {
-            quote! { #s }
-        }
+        Value::String(s) => from_set_value(s),
         Value::Mapping(m) => {
             let kvs = m.iter().map(|(k, v)| {
                 let k = match k {
@@ -38,5 +70,35 @@ pub fn rusty_json(v: &Value) -> TokenStream {
             quote! { [#(#items),*] }
         }
         _ => panic!("unsupported value {:?}", v),
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use quote::quote;
+    use super::from_set_value;
+
+    #[test]
+    fn from_set_value_correctly_interpolates_strings() {
+        assert_eq!(
+            from_set_value("foo").to_string(),
+            quote! { "foo" }.to_string()
+        );
+        assert_eq!(
+            from_set_value("$primary_term").to_string(),
+            quote! { primary_term }.to_string()
+        );
+        assert_eq!(
+            from_set_value("${primary_term}").to_string(),
+            quote! { primary_term }.to_string()
+        );
+        assert_eq!(
+            from_set_value("yoo${primary_term}foo").to_string(),
+            quote! { format!("yoo{}foo", primary_term) }.to_string()
+        );
+        assert_eq!(
+            from_set_value("yoo${primary_term}foo${foo}bar").to_string(),
+            quote! { format!("yoo{}foo{}bar", primary_term, foo) }.to_string()
+        );
     }
 }

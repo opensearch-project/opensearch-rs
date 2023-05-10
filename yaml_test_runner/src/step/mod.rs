@@ -30,6 +30,7 @@
 
 use anyhow::anyhow;
 use api_generator::generator::Api;
+use itertools::Itertools;
 use proc_macro2::TokenStream;
 use serde_yaml::Value;
 use std::fmt::Write;
@@ -232,19 +233,19 @@ impl Step {
     }
 }
 
-/// Checks whether there are any Errs in the collection, and accumulates them into one
-/// error message if there are.
-pub fn ok_or_accumulate<T>(results: &[anyhow::Result<T>]) -> anyhow::Result<()> {
-    let errs = results
-        .iter()
-        .filter_map(|r| r.as_ref().err())
-        .collect::<Vec<_>>();
-    if errs.is_empty() {
-        Ok(())
-    } else {
-        let mut msgs = errs.iter().map(|e| e.to_string()).collect::<Vec<_>>();
-        msgs.sort();
-        msgs.dedup_by(|a, b| a == b);
-        Err(anyhow!("{}", msgs.join(", ")))
+pub trait ResultIterExt<T> : Iterator<Item = anyhow::Result<T>> + Sized {
+    fn collect_results(self) -> anyhow::Result<Vec<T>> {
+        let (oks, errs): (Vec<_>, Vec<_>) = self.partition_result();
+
+        if errs.is_empty() {
+            Ok(oks)
+        } else {
+            let mut msgs = errs.iter().map(|e| e.to_string()).collect::<Vec<_>>();
+            msgs.sort();
+            msgs.dedup_by(|a, b| a == b);
+            Err(anyhow!("{}", msgs.join(", ")))
+        }
     }
 }
+
+impl<T, I> ResultIterExt<T> for I where I: Iterator<Item = anyhow::Result<T>> + Sized {}

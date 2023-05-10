@@ -28,7 +28,7 @@
  * GitHub history for details.
  */
 
-use super::{ok_or_accumulate, Step};
+use super::{ResultIterExt, Step};
 use crate::{
     regex::clean_regex,
     rusty_json::{rusty_json, from_set_value},
@@ -167,8 +167,7 @@ impl Do {
                 .unwrap()
         }
 
-        let results: Vec<anyhow::Result<()>> = hash
-            .iter()
+        hash.iter()
             .map(|(k, v)| {
                 let key = k
                     .as_str()
@@ -209,9 +208,7 @@ impl Do {
                     }
                 }
             })
-            .collect();
-
-        ok_or_accumulate(&results)?;
+            .collect_results()?;
 
         let (call, value) = call.ok_or_else(|| anyhow!("no API found in do"))?;
         let endpoint = api
@@ -401,24 +398,16 @@ impl ApiCall {
                                     if n == &"expand_wildcards" {
                                         // expand_wildcards might be defined as a comma-separated
                                         // string. e.g.
-                                        let idents: Vec<anyhow::Result<TokenStream>> = s
+                                        let idents: Vec<TokenStream> = s
                                             .split(',')
                                             .collect::<Vec<_>>()
                                             .iter()
                                             .map(|e| Self::generate_enum(n, e, &ty.options))
-                                            .collect();
+                                            .collect_results()?;
 
-                                        match ok_or_accumulate(&idents) {
-                                            Ok(_) => {
-                                                let idents =
-                                                    idents.into_iter().filter_map(Result::ok);
-
-                                                tokens.append_all(quote! {
-                                                    .#param_ident(&[#(#idents),*])
-                                                });
-                                            }
-                                            Err(e) => return Err(e.into()),
-                                        }
+                                        tokens.append_all(quote! {
+                                            .#param_ident(&[#(#idents),*])
+                                        });
                                     } else {
                                         let e = Self::generate_enum(n, s.as_str(), &ty.options)?;
                                         tokens.append_all(quote! {
@@ -591,21 +580,14 @@ impl ApiCall {
                                 .collect();
 
                             if n == &"expand_wildcards" {
-                                let result: Vec<anyhow::Result<TokenStream>> = result
+                                let result: Vec<TokenStream> = result
                                     .iter()
                                     .map(|s| Self::generate_enum(n, s.as_str(), &ty.options))
-                                    .collect();
+                                    .collect_results()?;
 
-                                match ok_or_accumulate(&result) {
-                                    Ok(_) => {
-                                        let result = result.into_iter().filter_map(Result::ok);
-
-                                        tokens.append_all(quote! {
-                                            .#param_ident(&[#(#result),*])
-                                        });
-                                    }
-                                    Err(e) => return Err(e.into()),
-                                }
+                                tokens.append_all(quote! {
+                                    .#param_ident(&[#(#result),*])
+                                });
                             } else {
                                 tokens.append_all(quote! {
                                     .#param_ident(&[#(#result),*])
@@ -707,7 +689,7 @@ impl ApiCall {
             syn::Ident::new(&v, Span::call_site())
         };
 
-        let part_tokens: Vec<anyhow::Result<TokenStream>> = parts
+        let part_tokens: Vec<TokenStream> = parts
             .iter()
             // don't rely on URL parts being ordered in the yaml test in the same order as specified
             // in the REST spec.
@@ -779,42 +761,28 @@ impl ApiCall {
                                 Value::String(s) => Ok(s),
                                 y => Err(anyhow!("unsupported array value {:?}", y)),
                             })
-                            .collect();
+                            .collect_results()?;
 
-                        match ok_or_accumulate(&result) {
-                            Ok(_) => {
-                                let result: Vec<_> =
-                                    result.into_iter().filter_map(Result::ok).collect();
-
-                                match ty.ty {
-                                    // Some APIs specify a part is a string in the REST API spec
-                                    // but is really a list, which is what a YAML test might pass
-                                    // e.g. security.get_role_mapping.
-                                    // see https://github.com/elastic/elasticsearch/pull/53207
-                                    TypeKind::String => {
-                                        let s = result.iter().join(",");
-                                        Ok(quote! { #s })
-                                    }
-                                    _ => Ok(quote! { &[#(#result),*] }),
-                                }
+                        match ty.ty {
+                            // Some APIs specify a part is a string in the REST API spec
+                            // but is really a list, which is what a YAML test might pass
+                            // e.g. security.get_role_mapping.
+                            // see https://github.com/elastic/elasticsearch/pull/53207
+                            TypeKind::String => {
+                                let s = result.iter().join(",");
+                                Ok(quote! { #s })
                             }
-                            Err(e) => Err(e.into()),
+                            _ => Ok(quote! { &[#(#result),*] }),
                         }
                     }
                     _ => Err(anyhow!("unsupported value {:?}", v)),
                 }
             })
-            .collect();
+            .collect_results()?;
 
-        match ok_or_accumulate(&part_tokens) {
-            Ok(_) => {
-                let part_tokens = part_tokens.into_iter().filter_map(Result::ok);
-                Ok(Some(
-                    quote! { #enum_name::#variant_name(#(#part_tokens),*) },
-                ))
-            }
-            Err(e) => Err(e.into()),
-        }
+        Ok(Some(
+            quote! { #enum_name::#variant_name(#(#part_tokens),*) },
+        ))
     }
 
     /// Creates the body function call from a YAML value.
@@ -823,7 +791,7 @@ impl ApiCall {
     /// usually a Hash. To get the JSON representation back requires converting
     /// back to JSON
     fn generate_body(endpoint: &ApiEndpoint, v: &Value) -> anyhow::Result<Option<TokenStream>> {
-        fn nd_body(items: &Vec<Value>) -> TokenStream {
+        fn nd_body(items: &[Value]) -> TokenStream {
             let items = items.iter().map(|v| {
                 let json = if v.is_string() {
                     rusty_json(

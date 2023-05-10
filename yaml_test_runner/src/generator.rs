@@ -403,7 +403,7 @@ pub fn generate_tests_from_yaml(
                 let yaml = fs::read_to_string(&entry.path()).unwrap();
 
                 let docs = match serde_yaml::Deserializer::from_str(&yaml)
-                    .map(|doc| Value::deserialize(doc))
+                    .map(Value::deserialize)
                     .collect::<Result<Vec<_>, _>>()
                 {
                     Ok(docs) => docs,
@@ -418,9 +418,9 @@ pub fn generate_tests_from_yaml(
                 };
 
                 let mut test =
-                    YamlTests::new(relative_path, version, &skips, test_suite, docs.len());
+                    YamlTests::new(relative_path, version, skips, test_suite, docs.len());
 
-                let results : Vec<anyhow::Result<()>> = docs
+                let result = docs
                         .iter()
                         .map(|doc| {
                             let hash = doc
@@ -452,10 +452,10 @@ pub fn generate_tests_from_yaml(
                                 }
                             }
                         })
-                        .collect();
+                        .collect_results();
 
                 //if there has been an Err in any step of the yaml test file, don't create a test for it
-                match ok_or_accumulate(&results) {
+                match result {
                     Ok(_) => write_test_file(test, relative_path, generated_dir)?,
                     Err(e) => {
                         info!("skipping {} because {}", relative_path.to_slash_lossy(), e)

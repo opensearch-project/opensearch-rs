@@ -225,15 +225,22 @@ pub enum Step {
 
 impl Step {
     /// Gets a Do step
-    pub fn r#do(&self) -> Option<&Do> {
+    pub fn as_do(&self) -> Option<&Do> {
         match self {
             Step::Do(d) => Some(d),
             _ => None,
         }
     }
+
+    pub fn as_skip(&self) -> Option<&Skip> {
+        match self {
+            Step::Skip(s) => Some(s),
+            _ => None,
+        }
+    }
 }
 
-pub trait ResultIterExt<T> : Iterator<Item = anyhow::Result<T>> + Sized {
+pub trait ResultIterExt<T>: Iterator<Item = anyhow::Result<T>> + Sized {
     fn collect_results(self) -> anyhow::Result<Vec<T>> {
         let (oks, errs): (Vec<_>, Vec<_>) = self.partition_result();
 

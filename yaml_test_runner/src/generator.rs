@@ -93,7 +93,7 @@ impl<'a> YamlTests<'a> {
     fn use_directives_from_steps(steps: &[Step]) -> Vec<String> {
         steps
             .iter()
-            .filter_map(Step::r#do)
+            .filter_map(Step::as_do)
             .filter_map(|d| d.namespace())
             .map(|s| s.to_string())
             .collect()
@@ -185,6 +185,37 @@ impl<'a> YamlTests<'a> {
         self.skip.should_skip_test(&self.path, name)
     }
 
+    fn skip_reason(&self, s: &Skip) -> Option<String> {
+        if s.skip_version(self.version) {
+            Some(format!(
+                "version \"{}\" is met. {}",
+                s.version(),
+                s.reason()
+            ))
+        } else if s.skip_features(self.skip) {
+            Some(format!(
+                "it needs features \"{:?}\" which are currently not implemented",
+                s.features()
+            ))
+        } else {
+            None
+        }
+    }
+
+    fn should_skip_suite(&self) -> Option<String> {
+        if self.should_skip_test("*") {
+            Some(format!("it's included in skip.yml"))
+        } else if let Some(setup) = &self.setup {
+            setup
+                .steps
+                .iter()
+                .filter_map(Step::as_skip)
+                .find_map(|s| self.skip_reason(s))
+        } else {
+            None
+        }
+    }
+
     fn fn_impls(
         &self,
         general_setup_call: TokenStream,
@@ -201,46 +232,26 @@ impl<'a> YamlTests<'a> {
                 if self.should_skip_test(name) {
                     info!(
                         r#"skipping "{}" in {} because it's included in skip.yml"#,
-                        name,
-                        self.path,
+                        name, self.path,
                     );
                     return None;
                 }
 
                 let fn_name = syn::Ident::new(unique_name.as_str(), Span::call_site());
                 let mut body = TokenStream::new();
-                let mut skip : Option<String> = None;
+                let mut skip: Option<String> = None;
                 let mut read_response = false;
 
                 for step in &test_fn.steps {
                     match step {
                         Step::Skip(s) => {
-                            skip = if s.skip_version(self.version) {
-                                let m = format!(
-                                    r#"skipping "{}" in {} because version "{}" is met. {}"#,
-                                    name,
-                                    &self.path,
-                                    s.version(),
-                                    s.reason()
-                                );
-                                Some(m)
-                            } else if s.skip_features(self.skip) {
-                                let m = format!(
-                                    r#"skipping "{}" in {} because it needs features "{:?}" which are currently not implemented"#,
-                                    name,
-                                    &self.path,
-                                    s.features()
-                                );
-                                Some(m)
-                            } else {
-                                None
-                            }
+                            skip = self.skip_reason(s);
                         }
                         Step::Do(d) => {
                             read_response = d.to_tokens(false, &mut body);
                         }
                         Step::Match(m) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             m.to_tokens(&mut body);
                         }
                         Step::Set(s) => {
@@ -248,27 +259,27 @@ impl<'a> YamlTests<'a> {
                             s.to_tokens(&mut body);
                         }
                         Step::Length(l) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             l.to_tokens(&mut body);
-                        },
+                        }
                         Step::IsTrue(t) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             t.to_tokens(&mut body);
-                        },
+                        }
                         Step::IsFalse(f) => {
                             read_response = Self::read_response(read_response, &mut body);
                             f.to_tokens(&mut body);
-                        },
+                        }
                         Step::Comparison(c) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             c.to_tokens(&mut body);
-                        },
+                        }
                         Step::Contains(c) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             c.to_tokens(&mut body);
-                        },
+                        }
                         Step::TransformAndSet(t) => {
-                            read_response = Self::read_response(read_response,&mut body);
+                            read_response = Self::read_response(read_response, &mut body);
                             t.to_tokens(&mut body);
                         }
                     }
@@ -276,9 +287,9 @@ impl<'a> YamlTests<'a> {
 
                 match skip {
                     Some(s) => {
-                        info!("{}", s);
+                        info!("skipping \"{}\" in {} because: {}", name, self.path, s);
                         None
-                    },
+                    }
                     None => Some(quote! {
                         #[tokio::test]
                         async fn #fn_name() -> anyhow::Result<()> {
@@ -304,7 +315,7 @@ impl<'a> YamlTests<'a> {
             let tokens = t
                 .steps
                 .iter()
-                .filter_map(Step::r#do)
+                .filter_map(Step::as_do)
                 .map(|d| {
                     let mut tokens = TokenStream::new();
                     ToTokens::to_tokens(d, &mut tokens);
@@ -526,11 +537,8 @@ fn write_test_file(
     relative_path: &Path,
     generated_dir: &Path,
 ) -> anyhow::Result<()> {
-    if test.should_skip_test("*") {
-        info!(
-            r#"skipping all tests in {} because it's included in skip.yml"#,
-            test.path,
-        );
+    if let Some(reason) = test.should_skip_suite() {
+        info!("skipping all tests in {} because: {}", test.path, reason);
         return Ok(());
     }
 

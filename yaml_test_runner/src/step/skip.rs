@@ -33,6 +33,7 @@ use crate::skip::SkippedFeaturesAndTests;
 use super::Step;
 use lazy_static::lazy_static;
 use regex::Regex;
+use semver::Op;
 use serde_yaml::Value;
 
 pub struct Skip {
@@ -134,7 +135,20 @@ impl Skip {
     /// Determines if this instance matches the version
     pub fn skip_version(&self, version: &semver::Version) -> bool {
         match &self.version_requirements {
-            Some(r) => r.matches(version),
+            Some(r) => {
+                // Hack because old pre-fork version ranges are for ES versions, but OS reset back to 1.x while still being compatible(ish) with ES 7.10
+                if let Some(es_upper) = r
+                    .comparators
+                    .iter()
+                    .find(|c| c.op == Op::LessEq && c.major >= 6)
+                {
+                    // Only skip if upper bound is >7.10
+                    return es_upper.major > 7
+                        || es_upper.major == 7 && es_upper.minor.map(|m| m > 10).unwrap_or(false);
+                }
+
+                r.matches(version)
+            }
             None => false,
         }
     }

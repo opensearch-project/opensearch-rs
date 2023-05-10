@@ -32,12 +32,13 @@ use once_cell::sync::Lazy;
 use opensearch::{
     auth::{ClientCertificate, Credentials},
     cert::CertificateValidation,
+    cluster::ClusterDeleteComponentTemplateParts,
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
         Method, StatusCode,
     },
-    indices::IndicesDeleteParts,
+    indices::{IndicesDeleteIndexTemplateParts, IndicesDeleteParts, IndicesDeleteTemplateParts},
     params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
     Error, OpenSearch, DEFAULT_ADDRESS,
@@ -125,6 +126,7 @@ pub async fn general_cluster_setup() -> Result<(), Error> {
     let client = get();
     delete_indices(client).await?;
     delete_snapshots(client).await?;
+    delete_templates(client).await?;
 
     Ok(())
 }
@@ -180,5 +182,33 @@ async fn delete_indices(client: &OpenSearch) -> Result<(), Error> {
         .await?;
 
     assert_response_success!(delete_response);
+    Ok(())
+}
+
+async fn delete_templates(client: &OpenSearch) -> Result<(), Error> {
+    let delete_response = client
+        .indices()
+        .delete_template(IndicesDeleteTemplateParts::Name("*"))
+        .send()
+        .await?;
+
+    assert_response_success!(delete_response);
+
+    let delete_response = client
+        .indices()
+        .delete_index_template(IndicesDeleteIndexTemplateParts::Name("*"))
+        .send()
+        .await?;
+
+    assert_response_success!(delete_response);
+
+    let delete_response = client
+        .cluster()
+        .delete_component_template(ClusterDeleteComponentTemplateParts::Name("*"))
+        .send()
+        .await?;
+
+    assert_response_success!(delete_response);
+
     Ok(())
 }

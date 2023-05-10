@@ -29,10 +29,7 @@
  */
 
 use super::Step;
-use crate::{
-    regex::clean_regex,
-    step::{json_string_from_yaml, Expr},
-};
+use crate::{regex::clean_regex, rusty_json::rusty_json, step::Expr};
 use anyhow::anyhow;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
@@ -112,19 +109,19 @@ impl ToTokens for Match {
                             crate::assert_numeric_match!(json#expr, #f);
                         });
                     }
-                } else if i.is_u64() {
-                    let ui = i.as_u64().unwrap();
-                    if self.expr.is_body() {
-                        panic!("match on $body with u64");
-                    } else {
-                        tokens.append_all(quote! {
-                            crate::assert_numeric_match!(json#expr, #ui);
-                        });
-                    }
-                } else {
+                } else if i.is_i64() {
                     let i = i.as_i64().unwrap();
                     if self.expr.is_body() {
                         panic!("match on $body with i64");
+                    } else {
+                        tokens.append_all(quote! {
+                            crate::assert_numeric_match!(json#expr, #i);
+                        });
+                    }
+                } else {
+                    let i = i.as_u64().unwrap();
+                    if self.expr.is_body() {
+                        panic!("match on $body with u64");
                     } else {
                         tokens.append_all(quote! {
                             crate::assert_numeric_match!(json#expr, #i);
@@ -153,7 +150,7 @@ impl ToTokens for Match {
                 }
             }
             yaml if yaml.is_sequence() || yaml.is_mapping() => {
-                let json = syn::parse_str::<TokenStream>(&json_string_from_yaml(yaml)).unwrap();
+                let json = rusty_json(yaml);
 
                 if self.expr.is_body() {
                     tokens.append_all(quote! {

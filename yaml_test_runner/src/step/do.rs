@@ -823,83 +823,51 @@ impl ApiCall {
     /// usually a Hash. To get the JSON representation back requires converting
     /// back to JSON
     fn generate_body(endpoint: &ApiEndpoint, v: &Value) -> anyhow::Result<Option<TokenStream>> {
+        fn nd_body(items: &Vec<Value>) -> TokenStream {
+            let items = items.iter().map(|v| {
+                let json = if v.is_string() {
+                    rusty_json(
+                        &serde_yaml::from_str(v.as_str().unwrap())
+                            .expect("string sequence item should be JSON/YAML"),
+                    )
+                } else {
+                    rusty_json(v)
+                };
+                quote! { JsonBody::from(json! { #json }) }
+            });
+            quote! { .body(vec![ #(#items),* ]) }
+        }
+
         match v {
             Value::Null => Ok(None),
-            Value::String(s) => Self::generate_body(endpoint, &serde_json::from_str(s)?),
+            Value::String(s) => {
+                if endpoint.supports_nd_body() {
+                    let contains_newlines = s.trim_end_matches('\n').contains('\n');
+                    let items = s
+                        .split(if contains_newlines {
+                            |c| c == '\n'
+                        } else {
+                            char::is_whitespace
+                        })
+                        .filter(|s| !s.is_empty())
+                        .map(ToOwned::to_owned)
+                        .map(Value::String)
+                        .collect::<Vec<_>>();
+
+                    Ok(Some(nd_body(&items)))
+                } else {
+                    Self::generate_body(
+                        endpoint,
+                        &serde_yaml::from_str(s).expect("body should be JSON/YAML"),
+                    )
+                }
+            }
             Value::Mapping(_) => {
                 let json = rusty_json(v);
                 Ok(Some(quote! { .body(json!{ #json }) }))
             }
-            Value::Sequence(values) if endpoint.supports_nd_body() => {
-                let items = values.iter().map(|v| {
-                    let json = if v.is_string() {
-                        rusty_json(
-                            &serde_json::from_str(v.as_str().unwrap())
-                                .expect("string sequence item should be JSON"),
-                        )
-                    } else {
-                        rusty_json(v)
-                    };
-                    quote! { JsonBody::from(json! { #json }) }
-                });
-                Ok(Some(quote! { .body(vec![ #(#items),* ]) }))
-            }
+            Value::Sequence(values) if endpoint.supports_nd_body() => Ok(Some(nd_body(values))),
             _ => panic!("Unsupported body: {:?}", v),
-            // Value::String(s) => {
-            //     let json: String = {
-            //         let json = replace_set(s);
-            //         replace_i64(json)
-            //     };
-            //     if endpoint.supports_nd_body() {
-            //         // a newline delimited API body may be expressed
-            //         // as a scalar string literal style where line breaks are significant (using |)
-            //         // or where lines breaks are folded to an empty space unless it ends on an
-            //         // empty or a more-indented line (using >)
-            //         // see https://yaml.org/spec/1.2/spec.html#id2760844
-            //         //
-            //         // need to trim the trailing newline to be able to differentiate...
-            //         let contains_newlines = json.trim_end_matches('\n').contains('\n');
-            //         let split = if contains_newlines {
-            //             json.split('\n').collect::<Vec<_>>()
-            //         } else {
-            //             json.split(char::is_whitespace).collect::<Vec<_>>()
-            //         };
-
-            //         let values = split.into_iter().filter(|s| !s.is_empty()).map(|s| {
-            //             let json = syn::parse_str::<TokenStream>(s).unwrap();
-            //             quote! { JsonBody::from(json!(#json)) }
-            //         });
-            //         Ok(Some(quote!(.body(vec![#(#values),*]))))
-            //     } else {
-            //         let json = syn::parse_str::<TokenStream>(&json).unwrap();
-            //         Ok(Some(quote!(.body(json!{#json}))))
-            //     }
-            // }
-            // _ => {
-            //     if endpoint.supports_nd_body() {
-            //         let values: Vec<serde_json::Value> = serde_yaml::from_value(v.clone())?;
-            //         let json = values.iter().map(|value| {
-            //             let mut json = serde_json::to_string(&value).unwrap();
-            //             if value.is_string() {
-            //                 json = replace_set(&json);
-            //                 syn::parse_str::<TokenStream>(&json).unwrap()
-            //             } else {
-            //                 json = replace_set(json);
-            //                 json = replace_i64(json);
-            //                 let json = syn::parse_str::<TokenStream>(&json).unwrap();
-            //                 quote!(JsonBody::from(json!(#json)))
-            //             }
-            //         });
-            //         Ok(Some(quote!(.body(vec![ #(#json),* ]))))
-            //     } else {
-            //         let mut json = serde_json::to_string_pretty(&v)?;
-            //         json = replace_set(json);
-            //         json = replace_i64(json);
-            //         let ident: TokenStream = syn::parse_str(&json).unwrap();
-
-            //         Ok(Some(quote!(.body(json!{#ident}))))
-            //     }
-            // }
         }
     }
 }

@@ -38,7 +38,7 @@ use opensearch::{
         transport::{SingleNodeConnectionPool, TransportBuilder},
         Method, StatusCode,
     },
-    indices::{IndicesDeleteParts, IndicesDeleteTemplateParts, IndicesDeleteIndexTemplateParts},
+    indices::{IndicesDeleteIndexTemplateParts, IndicesDeleteParts, IndicesDeleteTemplateParts},
     params::ExpandWildcards,
     snapshot::{SnapshotDeleteParts, SnapshotDeleteRepositoryParts},
     Error, OpenSearch, DEFAULT_ADDRESS,

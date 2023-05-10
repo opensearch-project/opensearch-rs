@@ -31,7 +31,7 @@
 use super::{ResultIterExt, Step};
 use crate::{
     regex::clean_regex,
-    rusty_json::{rusty_json, from_set_value},
+    rusty_json::{from_set_value, rusty_json},
 };
 use anyhow::anyhow;
 use api_generator::generator::{Api, ApiEndpoint, TypeKind};

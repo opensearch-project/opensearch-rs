@@ -75,8 +75,8 @@ pub fn rusty_json(v: &Value) -> TokenStream {
 
 #[cfg(test)]
 mod test {
-    use quote::quote;
     use super::from_set_value;
+    use quote::quote;
 
     #[test]
     fn from_set_value_correctly_interpolates_strings() {

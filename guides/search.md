@@ -22,9 +22,8 @@ client
 
 for n in 0..11 {
     client
-        .index(IndexParts::IndexId("movies", i))
+        .index(IndexParts::IndexId("movies", &i.to_string()))
         .body(json!({
-            "id": i,
             "title": format!("The Dark Knight {}", i),
             "director": "Christopher Nolan",
             "year": 2008 + i
@@ -34,9 +33,8 @@ for n in 0..11 {
 }
 
 client
-    .index(IndexParts::IndexId("movies", i))
+    .index(IndexParts::IndexId("movies", &i.to_string()))
     .body(json!({
-        "id": 11,
         "title": "The Godfather",
         "director": "Francis Ford Coppola",
         "year": "1972"
@@ -45,9 +43,8 @@ client
     .await?;
 
 client
-    .index(IndexParts::IndexId("movies", i))
+    .index(IndexParts::IndexId("movies", &i.to_string()))
     .body(json!({
-        "id": 12,
         "title": "The Shawshank Redemption",
         "director": "Frank Darabont",
         "year": "1994"
@@ -55,6 +52,7 @@ client
     .send()
     .await?;
 
+// Refresh the index to make the documents searchable
 client
     .indices
     .refresh(IndicesRefreshParts::Index(&["movies"]))
@@ -214,6 +212,44 @@ println!("{:?}", page_3_hits);
 ### Pagination with scroll
 
 When retrieving large amounts of non-real-time data, you can use the `scroll` parameter to paginate through the search results.
+
+```rust
+let page_1 = client
+    .search(SearchParts::Index(&["movies"]))
+    .scroll("1m")
+    .size(2)
+    .body(search_body)
+    .send()
+    .await?
+    .json::<Value>()
+    .await?;
+
+let page_2 = client
+    .scroll(ScrollParts::None)
+    .body(json!({
+        "scroll_id": page_1["_scroll_id"].as_str().unwrap(),
+        "scroll": "1m"
+    }))
+    .send()
+    .await?
+    .json::<Value>()
+    .await?;
+
+let page_3 = client
+    .scroll(ScrollParts::None)
+    .body(json!({
+        "scroll_id": page_2["_scroll_id"].as_str().unwrap(),
+        "scroll": "1m"
+    }))
+    .send()
+    .await?
+    .json::<Value>()
+    .await?;
+```
+
+### Pagination with Point in Time
+
+The scroll example above has one weakness: if the index is updated while you are scrolling through the results, they will be paginated inconsistently. To avoid this, you should use the "Point in Time" feature. The following example demonstrates how to use the point_in_time and pit_id parameters to paginate through the search results:
 
 ```rust
 // Create a point in time

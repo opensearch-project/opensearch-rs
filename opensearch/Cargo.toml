@@ -53,7 +53,7 @@ futures = "0.3.1"
 http = "0.2"
 hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
 regex="1.4"
-sysinfo = "0.28.0"
+sysinfo = "0.29.0"
 textwrap = "^0.16"
 tokio = { version = "1.0", default-features = false, features = ["macros", "net", "time", "rt-multi-thread"] }
 xml-rs = "^0.8"

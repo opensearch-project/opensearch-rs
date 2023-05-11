@@ -264,7 +264,7 @@ let pit_id = client
 
 // Get the first 3 pages of results, including pit info in the search body
 let page_1 = client
-    .search(SearchParts::Index(&["movies"]))
+    .search(SearchParts::None)
     .size(2)
     .body(json!({
         "query": {
@@ -292,7 +292,7 @@ let page_1_hits = page_1["hits"]["hits"].as_array().unwrap();
 println!("{:?}", page_1_hits);
 
 let page_2 = client
-    .search(SearchParts::Index(&["movies"]))
+    .search(SearchParts::None)
     .size(2)
     .body(json!({
         "query": {
@@ -321,7 +321,7 @@ let page_2_hits = page_2["hits"]["hits"].as_array().unwrap();
 println!("{:?}", page_2_hits);
 
 let page_3 = client
-    .search(SearchParts::Index(&["movies"]))
+    .search(SearchParts::None)
     .size(2)
     .body(json!({
         "query": {

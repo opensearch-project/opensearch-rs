@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Dependencies
 - Bumps `sysinfo` from 0.28.0 to 0.29.0
+- Bumps `serde_with` from ~2 to ~3
 
 ### Changed
 

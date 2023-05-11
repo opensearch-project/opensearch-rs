@@ -8,6 +8,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Dependencies
 
 ### Changed
+- Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))
 
 ### Deprecated
 

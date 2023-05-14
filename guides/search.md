@@ -20,7 +20,7 @@ client
   .send()
   .await?;
 
-for n in 0..11 {
+for i in 0..11 {
     client
         .index(IndexParts::IndexId("movies", &i.to_string()))
         .body(json!({
@@ -33,7 +33,7 @@ for n in 0..11 {
 }
 
 client
-    .index(IndexParts::IndexId("movies", &i.to_string()))
+    .index(IndexParts::Index("movies"))
     .body(json!({
         "title": "The Godfather",
         "director": "Francis Ford Coppola",
@@ -43,7 +43,7 @@ client
     .await?;
 
 client
-    .index(IndexParts::IndexId("movies", &i.to_string()))
+    .index(IndexParts::Index("movies"))
     .body(json!({
         "title": "The Shawshank Redemption",
         "director": "Frank Darabont",
@@ -54,10 +54,10 @@ client
 
 // Refresh the index to make the documents searchable
 client
-    .indices
+    .indices()
     .refresh(IndicesRefreshParts::Index(&["movies"]))
     .send()
-    .await?
+    .await?;
 ```
 
 ## Search API
@@ -103,26 +103,24 @@ OpenSearch query DSL allows you to specify complex queries. Check out the [OpenS
 The search API allows you to paginate through the search results. The following example searches for documents that match the query `dark knight`, sorted by `year` in ascending order, and returns the first 2 results after skipping the first 5 results:
 
 ```rust
-let search_body = json!({
-    "query": {
-        "match": {
-            "title": "dark knight"
-        }
-    },
-    "sort": [
-        {
-            "year": {
-                "order": "asc"
-            }
-        }
-    ]
-});
-
 let response = client
     .search(SearchParts::Index(&["movies"]))
     .from(5)
     .size(2)
-    .body(search_body)
+    .body(json!({
+        "query": {
+            "match": {
+                "title": "dark knight"
+            }
+        },
+        "sort": [
+            {
+                "year": {
+                    "order": "asc"
+                }
+            }
+        ]
+    }))
     .send()
     .await?
     .json::<Value>()
@@ -218,7 +216,20 @@ let page_1 = client
     .search(SearchParts::Index(&["movies"]))
     .scroll("1m")
     .size(2)
-    .body(search_body)
+    .body(json!({
+        "query": {
+            "match": {
+                "title": "dark knight"
+            }
+        },
+        "sort": [
+            {
+                "year": {
+                    "order": "asc"
+                }
+            }
+        ]
+    }))
     .send()
     .await?
     .json::<Value>()
@@ -226,10 +237,8 @@ let page_1 = client
 
 let page_2 = client
     .scroll(ScrollParts::None)
-    .body(json!({
-        "scroll_id": page_1["_scroll_id"].as_str().unwrap(),
-        "scroll": "1m"
-    }))
+    .scroll_id(page_1["_scroll_id"].as_str().unwrap())
+    .scroll("1m")
     .send()
     .await?
     .json::<Value>()
@@ -237,10 +246,8 @@ let page_2 = client
 
 let page_3 = client
     .scroll(ScrollParts::None)
-    .body(json!({
-        "scroll_id": page_2["_scroll_id"].as_str().unwrap(),
-        "scroll": "1m"
-    }))
+    .scroll_id(page_2["_scroll_id"].as_str().unwrap())
+    .scroll("1m")
     .send()
     .await?
     .json::<Value>()
@@ -362,7 +369,7 @@ page_3_hits
 
 // Delete the point in time
 client
-    .delete_pit(DeletePitParts::None)
+    .delete_pit()
     .body(json!({ "pit_id": pit_id }))
     .send()
     .await?;

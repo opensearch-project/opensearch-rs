@@ -145,8 +145,6 @@ ops.push(
 client.bulk(BulkParts::None).body(vec![ops]).send().await?;
 ```
 
-Note that the updated data is specified in the `doc` field of the `data` object.
-
 ### Deleting multiple documents
 
 ```rust

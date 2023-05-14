@@ -43,6 +43,7 @@ use std::{
 mod generator;
 mod github;
 mod regex;
+mod rusty_json;
 mod skip;
 mod step;
 
@@ -157,7 +158,10 @@ fn branch_suite_and_version_from_opensearch(
 
     let response = client.get(url).basic_auth("admin", Some("admin")).send()?;
     let json: Value = response.json()?;
-    let branch = json["version"]["build_hash"].as_str().unwrap().to_string();
+    let branch = match json["version"]["build_hash"].as_str() {
+        Some(build_hash) if build_hash != "unknown" => build_hash.to_string(),
+        _ => "main".to_string(),
+    };
 
     // any prerelease part needs to be trimmed because the semver crate only allows
     // a version with a prerelease to match against predicates, if at least one predicate

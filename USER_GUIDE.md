@@ -1,4 +1,5 @@
 - [User Guide](#user-guide)
+  - [All Guides](#all-guides)
   - [Example](#example)
     - [Create a Client](#create-a-client)
     - [Display Server Version](#display-server-version)
@@ -10,6 +11,10 @@
     - [Create a Client](#create-a-client-1)
 
 # User Guide
+
+## All Guides
+
+- [Advanced Index Actions](guides/advanced_index_actions.md)
 
 ## Example
 

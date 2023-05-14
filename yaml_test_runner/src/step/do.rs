@@ -28,8 +28,11 @@
  * GitHub history for details.
  */
 
-use super::{ok_or_accumulate, Step};
-use crate::regex::{clean_regex, *};
+use super::{ResultIterExt, Step};
+use crate::{
+    regex::clean_regex,
+    rusty_json::{from_set_value, rusty_json},
+};
 use anyhow::anyhow;
 use api_generator::generator::{Api, ApiEndpoint, TypeKind};
 use inflector::Inflector;
@@ -164,8 +167,7 @@ impl Do {
                 .unwrap()
         }
 
-        let results: Vec<anyhow::Result<()>> = hash
-            .iter()
+        hash.iter()
             .map(|(k, v)| {
                 let key = k
                     .as_str()
@@ -206,9 +208,7 @@ impl Do {
                     }
                 }
             })
-            .collect();
-
-        ok_or_accumulate(&results)?;
+            .collect_results()?;
 
         let (call, value) = call.ok_or_else(|| anyhow!("no API found in do"))?;
         let endpoint = api
@@ -253,20 +253,12 @@ impl ToTokens for ApiCall {
             .map(|(k, v)| {
                 // header names **must** be lowercase to satisfy Header lib
                 let k = k.to_lowercase();
+                let v = from_set_value(v);
 
                 // handle "set" value in headers
-                if let Some(c) = SET_DELIMITED_REGEX.captures(v) {
-                    let token = syn::Ident::new(c.get(1).unwrap().as_str(), Span::call_site());
-                    let replacement = SET_DELIMITED_REGEX.replace_all(v, "{}");
-                    quote! { .header(
-                        HeaderName::from_static(#k),
-                        HeaderValue::from_str(format!(#replacement, #token.as_str().unwrap()).as_ref())?)
-                    }
-                } else {
-                    quote! { .header(
-                        HeaderName::from_static(#k),
-                        HeaderValue::from_static(#v))
-                    }
+                quote! { .header(
+                    HeaderName::from_static(#k),
+                    HeaderValue::from_str(#v.as_ref())?)
                 }
             })
             .collect();
@@ -406,24 +398,16 @@ impl ApiCall {
                                     if n == &"expand_wildcards" {
                                         // expand_wildcards might be defined as a comma-separated
                                         // string. e.g.
-                                        let idents: Vec<anyhow::Result<TokenStream>> = s
+                                        let idents: Vec<TokenStream> = s
                                             .split(',')
                                             .collect::<Vec<_>>()
                                             .iter()
                                             .map(|e| Self::generate_enum(n, e, &ty.options))
-                                            .collect();
+                                            .collect_results()?;
 
-                                        match ok_or_accumulate(&idents) {
-                                            Ok(_) => {
-                                                let idents =
-                                                    idents.into_iter().filter_map(Result::ok);
-
-                                                tokens.append_all(quote! {
-                                                    .#param_ident(&[#(#idents),*])
-                                                });
-                                            }
-                                            Err(e) => return Err(e.into()),
-                                        }
+                                        tokens.append_all(quote! {
+                                            .#param_ident(&[#(#idents),*])
+                                        });
                                     } else {
                                         let e = Self::generate_enum(n, s.as_str(), &ty.options)?;
                                         tokens.append_all(quote! {
@@ -465,7 +449,7 @@ impl ApiCall {
                                 },
                                 TypeKind::Integer => {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap() as i32)
                                         });
@@ -487,7 +471,7 @@ impl ApiCall {
                                 }
                                 TypeKind::Number | TypeKind::Long => {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap())
                                         });
@@ -501,7 +485,7 @@ impl ApiCall {
                                 _ => {
                                     // handle set values
                                     let t = if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         quote! { #set_value.as_str().unwrap() }
                                     } else {
                                         quote! { #s }
@@ -596,21 +580,14 @@ impl ApiCall {
                                 .collect();
 
                             if n == &"expand_wildcards" {
-                                let result: Vec<anyhow::Result<TokenStream>> = result
+                                let result: Vec<TokenStream> = result
                                     .iter()
                                     .map(|s| Self::generate_enum(n, s.as_str(), &ty.options))
-                                    .collect();
+                                    .collect_results()?;
 
-                                match ok_or_accumulate(&result) {
-                                    Ok(_) => {
-                                        let result = result.into_iter().filter_map(Result::ok);
-
-                                        tokens.append_all(quote! {
-                                            .#param_ident(&[#(#result),*])
-                                        });
-                                    }
-                                    Err(e) => return Err(e.into()),
-                                }
+                                tokens.append_all(quote! {
+                                    .#param_ident(&[#(#result),*])
+                                });
                             } else {
                                 tokens.append_all(quote! {
                                     .#param_ident(&[#(#result),*])
@@ -623,32 +600,6 @@ impl ApiCall {
 
                 Ok(Some(tokens))
             }
-        }
-    }
-
-    fn from_set_value(s: &str) -> TokenStream {
-        // check if the entire string is a token
-        if s.starts_with('$') {
-            let ident = syn::Ident::new(
-                s.trim_start_matches('$')
-                    .trim_start_matches('{')
-                    .trim_end_matches('}'),
-                Span::call_site(),
-            );
-            quote! { #ident }
-        } else {
-            // only part of the string is a token, so substitute
-            let token = syn::Ident::new(
-                SET_DELIMITED_REGEX
-                    .captures(s)
-                    .unwrap()
-                    .get(1)
-                    .unwrap()
-                    .as_str(),
-                Span::call_site(),
-            );
-            let replacement = SET_DELIMITED_REGEX.replace_all(s, "{}");
-            quote! { Value::String(format!(#replacement, #token.as_str().unwrap())) }
         }
     }
 
@@ -738,7 +689,7 @@ impl ApiCall {
             syn::Ident::new(&v, Span::call_site())
         };
 
-        let part_tokens: Vec<anyhow::Result<TokenStream>> = parts
+        let part_tokens: Vec<TokenStream> = parts
             .iter()
             // don't rely on URL parts being ordered in the yaml test in the same order as specified
             // in the REST spec.
@@ -761,7 +712,7 @@ impl ApiCall {
                             TypeKind::List => {
                                 let values = s.split(',').map(|s| {
                                     if is_set_value {
-                                        let set_value = Self::from_set_value(s);
+                                        let set_value = from_set_value(s);
                                         quote! { #set_value.as_str().unwrap() }
                                     } else {
                                         quote! { #s }
@@ -771,7 +722,7 @@ impl ApiCall {
                             }
                             TypeKind::Long => {
                                 if is_set_value {
-                                    let set_value = Self::from_set_value(s);
+                                    let set_value = from_set_value(s);
                                     Ok(quote! { #set_value.as_i64().unwrap() })
                                 } else {
                                     let l = s.parse::<i64>().unwrap();
@@ -780,7 +731,7 @@ impl ApiCall {
                             }
                             _ => {
                                 if is_set_value {
-                                    let set_value = Self::from_set_value(s);
+                                    let set_value = from_set_value(s);
                                     Ok(quote! { #set_value.as_str().unwrap() })
                                 } else {
                                     Ok(quote! { #s })
@@ -810,42 +761,28 @@ impl ApiCall {
                                 Value::String(s) => Ok(s),
                                 y => Err(anyhow!("unsupported array value {:?}", y)),
                             })
-                            .collect();
+                            .collect_results()?;
 
-                        match ok_or_accumulate(&result) {
-                            Ok(_) => {
-                                let result: Vec<_> =
-                                    result.into_iter().filter_map(Result::ok).collect();
-
-                                match ty.ty {
-                                    // Some APIs specify a part is a string in the REST API spec
-                                    // but is really a list, which is what a YAML test might pass
-                                    // e.g. security.get_role_mapping.
-                                    // see https://github.com/elastic/elasticsearch/pull/53207
-                                    TypeKind::String => {
-                                        let s = result.iter().join(",");
-                                        Ok(quote! { #s })
-                                    }
-                                    _ => Ok(quote! { &[#(#result),*] }),
-                                }
+                        match ty.ty {
+                            // Some APIs specify a part is a string in the REST API spec
+                            // but is really a list, which is what a YAML test might pass
+                            // e.g. security.get_role_mapping.
+                            // see https://github.com/elastic/elasticsearch/pull/53207
+                            TypeKind::String => {
+                                let s = result.iter().join(",");
+                                Ok(quote! { #s })
                             }
-                            Err(e) => Err(e.into()),
+                            _ => Ok(quote! { &[#(#result),*] }),
                         }
                     }
                     _ => Err(anyhow!("unsupported value {:?}", v)),
                 }
             })
-            .collect();
+            .collect_results()?;
 
-        match ok_or_accumulate(&part_tokens) {
-            Ok(_) => {
-                let part_tokens = part_tokens.into_iter().filter_map(Result::ok);
-                Ok(Some(
-                    quote! { #enum_name::#variant_name(#(#part_tokens),*) },
-                ))
-            }
-            Err(e) => Err(e.into()),
-        }
+        Ok(Some(
+            quote! { #enum_name::#variant_name(#(#part_tokens),*) },
+        ))
     }
 
     /// Creates the body function call from a YAML value.
@@ -854,63 +791,51 @@ impl ApiCall {
     /// usually a Hash. To get the JSON representation back requires converting
     /// back to JSON
     fn generate_body(endpoint: &ApiEndpoint, v: &Value) -> anyhow::Result<Option<TokenStream>> {
+        fn nd_body(items: &[Value]) -> TokenStream {
+            let items = items.iter().map(|v| {
+                let json = if v.is_string() {
+                    rusty_json(
+                        &serde_yaml::from_str(v.as_str().unwrap())
+                            .expect("string sequence item should be JSON/YAML"),
+                    )
+                } else {
+                    rusty_json(v)
+                };
+                quote! { JsonBody::from(json! { #json }) }
+            });
+            quote! { .body(vec![ #(#items),* ]) }
+        }
+
         match v {
             Value::Null => Ok(None),
             Value::String(s) => {
-                let json = {
-                    let json = replace_set(s);
-                    replace_i64(json)
-                };
                 if endpoint.supports_nd_body() {
-                    // a newline delimited API body may be expressed
-                    // as a scalar string literal style where line breaks are significant (using |)
-                    // or where lines breaks are folded to an empty space unless it ends on an
-                    // empty or a more-indented line (using >)
-                    // see https://yaml.org/spec/1.2/spec.html#id2760844
-                    //
-                    // need to trim the trailing newline to be able to differentiate...
-                    let contains_newlines = json.trim_end_matches('\n').contains('\n');
-                    let split = if contains_newlines {
-                        json.split('\n').collect::<Vec<_>>()
-                    } else {
-                        json.split(char::is_whitespace).collect::<Vec<_>>()
-                    };
-
-                    let values = split.into_iter().filter(|s| !s.is_empty()).map(|s| {
-                        let json = syn::parse_str::<TokenStream>(s).unwrap();
-                        quote! { JsonBody::from(json!(#json)) }
-                    });
-                    Ok(Some(quote!(.body(vec![#(#values),*]))))
-                } else {
-                    let json = syn::parse_str::<TokenStream>(&json).unwrap();
-                    Ok(Some(quote!(.body(json!{#json}))))
-                }
-            }
-            _ => {
-                if endpoint.supports_nd_body() {
-                    let values: Vec<serde_json::Value> = serde_yaml::from_value(v.clone())?;
-                    let json = values.iter().map(|value| {
-                        let mut json = serde_json::to_string(&value).unwrap();
-                        if value.is_string() {
-                            json = replace_set(&json);
-                            syn::parse_str::<TokenStream>(&json).unwrap()
+                    let contains_newlines = s.trim_end_matches('\n').contains('\n');
+                    let items = s
+                        .split(if contains_newlines {
+                            |c| c == '\n'
                         } else {
-                            json = replace_set(json);
-                            json = replace_i64(json);
-                            let json = syn::parse_str::<TokenStream>(&json).unwrap();
-                            quote!(JsonBody::from(json!(#json)))
-                        }
-                    });
-                    Ok(Some(quote!(.body(vec![ #(#json),* ]))))
-                } else {
-                    let mut json = serde_json::to_string_pretty(&v)?;
-                    json = replace_set(json);
-                    json = replace_i64(json);
-                    let ident: TokenStream = syn::parse_str(&json).unwrap();
+                            char::is_whitespace
+                        })
+                        .filter(|s| !s.is_empty())
+                        .map(ToOwned::to_owned)
+                        .map(Value::String)
+                        .collect::<Vec<_>>();
 
-                    Ok(Some(quote!(.body(json!{#ident}))))
+                    Ok(Some(nd_body(&items)))
+                } else {
+                    Self::generate_body(
+                        endpoint,
+                        &serde_yaml::from_str(s).expect("body should be JSON/YAML"),
+                    )
                 }
             }
+            Value::Mapping(_) => {
+                let json = rusty_json(v);
+                Ok(Some(quote! { .body(json!{ #json }) }))
+            }
+            Value::Sequence(values) if endpoint.supports_nd_body() => Ok(Some(nd_body(values))),
+            _ => panic!("Unsupported body: {:?}", v),
         }
     }
 }

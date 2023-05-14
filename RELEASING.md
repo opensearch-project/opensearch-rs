@@ -32,3 +32,10 @@ Repositories create consistent release labels, such as `v1.0.0`, `v1.1.0` and `v
 ## Releasing
 
 The release process is standard across repositories in this org and is run by a release manager volunteering from amongst [MAINTAINERS](MAINTAINERS.md).
+
+1. Create a tag, e.g. v2.1.0, and push it to the GitHub repo.
+1. The [release-drafter.yml](.github/workflows/release-drafter.yml) will be automatically kicked off and is responsible for drafting a new release on GitHub.
+1. Before creating a draft release, this workflow creates a GitHub issue asking for approval from the [maintainers](MAINTAINERS.md). See sample [issue](https://github.com/gaiksaya/opensearch-rs/issues/2). The maintainers need to approve in order to continue the workflow run.
+1. This draft release triggers the [jenkins release workflow](https://build.ci.opensearch.org/job/opensearch-rs-release/) as a result of which opensearch-rs client is released on [crates](https://crates.io/crates/opensearch).
+1. Once the above release workflow is successful, the drafted release on GitHub is published automatically.
+1. Increment "version" in Cargo.toml to the next patch release, e.g. v2.1.1. See [example](https://github.com/opensearch-project/opensearch-rs/pull/53)

@@ -10,6 +10,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `serde_with` from ~2 to ~3
 
 ### Changed
+- Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))
 
 ### Deprecated
 

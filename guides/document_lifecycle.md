@@ -32,15 +32,13 @@ To create a new document, use the `create` or `index` API action. The following 
 
 ```rust
 client
-  .indices()
-  .create(IndexParts::IndexId(index, "1"))
+  .create(CreateParts::IndexId(index, "1"))
   .body(json!({ "title": "Beauty and the Beast", "year": 1991 }))
   .send()
   .await?;
 
 client
-  .indices()
-  .create(IndexParts::IndexId(index, "2"))
+  .create(CreateParts::IndexId(index, "2"))
   .body(json!(
     { "title": "Beauty and the Beast - Live Action", "year":  2017 }))
   .send()
@@ -85,17 +83,10 @@ You can also create a new document with an auto-generated ID by omitting the `id
 
 ```rust
 client
-  .indices()
-  .create(IndicesCreateParts::Index(index))
+  .index(IndexParts::Index(index))
   .body(json!({ "title": "The Lion King 2", "year": 1998 }))
   .send()
   .await?;
- // OR
- client
-   .index(IndexParts::IndexId(index))
-   .body(json!({ "title": "The Lion King 2", "year": 1998 }))
-   .send()
-   .await?;
 ```
 
 In this case, the ID of the created document in the `result` field of the response body:
@@ -138,7 +129,7 @@ You can also use `_source_include` and `_source_exclude` parameters to specify w
 ```rust
 let response = client
   .get(GetParts::IndexId(index, "1"))
-  ._source_includes("title")
+  ._source_includes(&["title"])
   .send()
   .await?
   .json::<Value>()
@@ -149,7 +140,7 @@ println!("{}", response["_source"]);
 
 let response = client
   .get(GetParts::IndexId(index, "1"))
-  ._source_includes("title")
+  ._source_includes(&["title"])
   .send()
   .await?
   .json::<Value>()
@@ -167,14 +158,14 @@ To get multiple documents, use the `mget` API action:
 let response = client
   .mget(MgetParts::Index(index))
   .body(json!({
-    { "docs": vec![{ "_id": 1 }, { "_id": 2 }] }
+    "docs": [{ "_id": 1 }, { "_id": 2 }]
   }))
   .send()
   .await?
   .json::<Value>()
   .await?;
 
-for doc in response["docs"].iter() {
+for doc in response["docs"].as_array().unwrap(){
   println!("{}", doc["_source"]);
 }
 ```
@@ -199,7 +190,7 @@ client
   .update(UpdateParts::IndexId(index, "1"))
   .body(json!({ "doc": { "year": 1995 } }))
   .send()
-  .await?
+  .await?;
 ```
 
 Alternatively, you can use the `script` parameter to update a document using a script. The following code increments the `year` field of the of document with ID `1` by 5 using painless script, the default scripting language in OpenSearch:

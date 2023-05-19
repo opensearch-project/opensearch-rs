@@ -49,8 +49,7 @@ Note that the `create` action is NOT idempotent. If you try to create a document
 
 ```rust
 let err = client
-  .indices()
-  .create(IndexParts::IndexId(index, 1))
+  .create(CreateParts::IndexId(index, "1"))
   .body(json!({"title": "Just Another Movie" }))
   .send()
   .await?

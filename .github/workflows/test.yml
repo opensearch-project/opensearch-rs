@@ -5,10 +5,13 @@ on:
     branches-ignore:
       - 'dependabot/**'
   pull_request:
+  schedule:
+    - cron: '0 8 * * *'
 
 jobs:
   test:
     name: Test
+    if: github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +58,7 @@ jobs:
 
   test-yaml:
     name: YAML Tests (Released OpenSearch)
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -104,6 +108,14 @@ jobs:
       matrix:
         opensearch_ref: ['1.x', '2.0', '2.x', 'main']
     steps:
+      - name: GitHub App token
+        id: github_app_token
+        uses: tibdex/github-app-token@v1.5.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation_id: 22958780
+
       - name: Checkout Rust Client
         uses: actions/checkout@v3
         with:
@@ -170,3 +182,12 @@ jobs:
           name: opensearch-logs-${{ matrix.opensearch_ref }}
           path: |
             opensearch-*/logs/*
+
+      - name: Create issue about failure
+        if: failure() && github.event_name == 'schedule'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ steps.github_app_token.outputs.token }}
+        with:
+          filename: .github/test-failure-issue-template.md
+          update_existing: true

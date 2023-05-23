@@ -190,5 +190,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.github_app_token.outputs.token }}
         with:
-          filename: .github/test-failure-issue-template.md
+          filename: ./client/.github/test-failure-issue-template.md
           update_existing: true

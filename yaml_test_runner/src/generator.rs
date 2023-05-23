@@ -134,8 +134,8 @@ impl<'a> YamlTests<'a> {
 
     /// Generates the AST for the Yaml test file
     pub fn build(self) -> TokenStream {
-        let (setup_fn, setup_call) = Self::generate_fixture(&self.setup);
-        let (teardown_fn, teardown_call) = Self::generate_fixture(&self.teardown);
+        let (setup_fn, setup_call) = self.generate_fixture(&self.setup);
+        let (teardown_fn, teardown_call) = self.generate_fixture(&self.teardown);
         let general_setup_call = quote!(client::general_cluster_setup().await?;);
 
         let tests = self.fn_impls(general_setup_call, setup_call, teardown_call);
@@ -238,52 +238,7 @@ impl<'a> YamlTests<'a> {
                 }
 
                 let fn_name = syn::Ident::new(unique_name.as_str(), Span::call_site());
-                let mut body = TokenStream::new();
-                let mut skip: Option<String> = None;
-                let mut read_response = false;
-
-                for step in &test_fn.steps {
-                    match step {
-                        Step::Skip(s) => {
-                            skip = self.skip_reason(s);
-                        }
-                        Step::Do(d) => {
-                            read_response = d.to_tokens(false, &mut body);
-                        }
-                        Step::Match(m) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            m.to_tokens(&mut body);
-                        }
-                        Step::Set(s) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            s.to_tokens(&mut body);
-                        }
-                        Step::Length(l) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            l.to_tokens(&mut body);
-                        }
-                        Step::IsTrue(t) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            t.to_tokens(&mut body);
-                        }
-                        Step::IsFalse(f) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            f.to_tokens(&mut body);
-                        }
-                        Step::Comparison(c) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            c.to_tokens(&mut body);
-                        }
-                        Step::Contains(c) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            c.to_tokens(&mut body);
-                        }
-                        Step::TransformAndSet(t) => {
-                            read_response = Self::read_response(read_response, &mut body);
-                            t.to_tokens(&mut body);
-                        }
-                    }
-                }
+                let (body, skip) = self.generate_test_fn_body(&test_fn.steps);
 
                 match skip {
                     Some(s) => {
@@ -307,26 +262,19 @@ impl<'a> YamlTests<'a> {
     }
 
     /// Generates the AST for the fixture fn and its invocation
-    fn generate_fixture(test_fn: &Option<TestFn>) -> (Option<TokenStream>, Option<TokenStream>) {
+    fn generate_fixture(
+        &self,
+        test_fn: &Option<TestFn>,
+    ) -> (Option<TokenStream>, Option<TokenStream>) {
         if let Some(t) = test_fn {
             let ident = syn::Ident::new(t.name.as_str(), Span::call_site());
 
-            // TODO: collect up the do calls for now. We do also need to handle skip, etc.
-            let tokens = t
-                .steps
-                .iter()
-                .filter_map(Step::as_do)
-                .map(|d| {
-                    let mut tokens = TokenStream::new();
-                    ToTokens::to_tokens(d, &mut tokens);
-                    tokens
-                })
-                .collect::<Vec<_>>();
+            let (body, _) = self.generate_test_fn_body(&t.steps);
 
             (
                 Some(quote! {
                     async fn #ident(client: &OpenSearch) -> anyhow::Result<()> {
-                        #(#tokens)*
+                        #body
                         Ok(())
                     }
                 }),
@@ -335,6 +283,57 @@ impl<'a> YamlTests<'a> {
         } else {
             (None, None)
         }
+    }
+
+    fn generate_test_fn_body(&self, steps: &[Step]) -> (TokenStream, Option<String>) {
+        let mut body = TokenStream::new();
+        let mut skip = None;
+        let mut read_response = false;
+
+        for step in steps {
+            match step {
+                Step::Skip(s) => {
+                    skip = self.skip_reason(s);
+                }
+                Step::Do(d) => {
+                    read_response = d.to_tokens(false, &mut body);
+                }
+                Step::Match(m) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    m.to_tokens(&mut body);
+                }
+                Step::Set(s) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    s.to_tokens(&mut body);
+                }
+                Step::Length(l) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    l.to_tokens(&mut body);
+                }
+                Step::IsTrue(t) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    t.to_tokens(&mut body);
+                }
+                Step::IsFalse(f) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    f.to_tokens(&mut body);
+                }
+                Step::Comparison(c) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    c.to_tokens(&mut body);
+                }
+                Step::Contains(c) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    c.to_tokens(&mut body);
+                }
+                Step::TransformAndSet(t) => {
+                    read_response = Self::read_response(read_response, &mut body);
+                    t.to_tokens(&mut body);
+                }
+            }
+        }
+
+        (body, skip)
     }
 }
 

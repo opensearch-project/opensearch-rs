@@ -50,7 +50,7 @@ client
 
 As you can see, each bulk operation is comprised of two objects. The first object contains the operation type and the target document's `_index` and `_id`. The second object contains the document's data. As a result, the body of the request above contains six objects for three index actions.
 
-Alternatively, the `bulk` method can accept `BulkOperations` where each represents a single `BulkOperation`. The following code is equivalent to the previous example:
+Alternatively, you may use the `BulkOperation` helper type along with its `BulkOperations` container type as a type-safe abstraction over this format. The following code is equivalent to the previous example:
 
 ```rust
 let mut ops = BulkOperations::new();
@@ -143,6 +143,7 @@ ops.push(BulkOperation::update(
 
 client.bulk(BulkParts::Index(movies)).body(vec![ops]).send().await?;
 ```
+
 Note that the updated data is specified in the `doc` field of the source object.
 
 ### Deleting multiple documents

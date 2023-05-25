@@ -139,7 +139,7 @@ println!("{}", response["_source"]);
 
 let response = client
   .get(GetParts::IndexId(index, "1"))
-  ._source_includes(&["title"])
+  ._source_excludes(&["title"])
   .send()
   .await?
   .json::<Value>()

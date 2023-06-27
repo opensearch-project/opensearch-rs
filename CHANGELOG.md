@@ -8,6 +8,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Dependencies
 - Bumps `sysinfo` from 0.28.0 to 0.29.0
 - Bumps `serde_with` from ~2 to ~3
+- Bumps `itertools` from 0.10.0 to 0.11.0
 
 ### Changed
 - Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))

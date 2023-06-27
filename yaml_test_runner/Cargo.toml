@@ -15,7 +15,7 @@ api_generator = { path = "./../api_generator" }
 anyhow = "1.0"
 base64 = "^0.21"
 clap = "~2"
-itertools = "0.10.0"
+itertools = "0.11.0"
 Inflector = "0.11.4"
 lazy_static = "1.4.0"
 log = "0.4.8"

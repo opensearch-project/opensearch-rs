@@ -25,6 +25,7 @@ runs:
           brew install -q coreutils
         fi
         OPENSEARCH_HOME=$(realpath ./opensearch-*)
+        OPENSEARCH_JAVA_OPTS="-Djava.net.preferIPv4Stack=true"
 
         url="http://localhost:9200"
         cp ./client/.ci/opensearch/opensearch.yml $OPENSEARCH_HOME/config/
@@ -47,7 +48,6 @@ runs:
         fi
 
         echo "url=$url" >> $GITHUB_OUTPUT
-
         if [[ "$RUNNER_OS" == "Linux" ]]; then
           sudo swapoff -a
           sudo sysctl -w vm.swappiness=1
@@ -59,12 +59,12 @@ runs:
         if [[ "$RUNNER_OS" != "Windows" ]]; then
           $OPENSEARCH_HOME/bin/opensearch &
         else
-          cmd.exe /C "$(cygpath -alw $OPENSEARCH_HOME/bin/opensearch.bat) -d" &
+          $OPENSEARCH_HOME/bin/opensearch.bat -d &
         fi
 
         for attempt in {1..20}; do
           sleep 5
-          if curl -sS --cacert ./client/.ci/certs/root-ca.crt -u admin:admin $url; then
+          if curl -k -sS --cacert ./client/.ci/certs/root-ca.crt -u admin:admin $url; then
             echo '=====> ready'
             exit 0
           fi

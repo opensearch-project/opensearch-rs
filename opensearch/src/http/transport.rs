@@ -58,6 +58,7 @@ use std::{
     io::{self, Write},
     time::Duration,
 };
+use reqwest_middleware::Error::{Middleware, Reqwest};
 use url::Url;
 
 /// Error that can occur when building a [Transport]

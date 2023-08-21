@@ -156,6 +156,7 @@ impl error::Error for Error {
             Kind::Build(err) => Some(err),
             Kind::Lib(_) => None,
             Kind::Http(err) => Some(err),
+            Kind::Middleware(err) => Some(err),
             Kind::Io(err) => Some(err),
             Kind::Json(err) => Some(err),
         }
@@ -168,6 +169,7 @@ impl fmt::Display for Error {
             Kind::Build(err) => err.fmt(f),
             Kind::Lib(err) => err.fmt(f),
             Kind::Http(err) => err.fmt(f),
+            Kind::Middleware(err) => err.fmt(f),
             Kind::Io(err) => err.fmt(f),
             Kind::Json(err) => err.fmt(f),
         }

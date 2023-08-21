@@ -58,7 +58,7 @@ enum Kind {
     /// HTTP library error
     Http(reqwest::Error),
 
-    /// Middleware Error
+    /// Middleware Error 
     Middleware(reqwest_middleware::Error),
 
     /// IO error
@@ -88,7 +88,7 @@ impl From<reqwest_middleware::Error> for Error {
     fn from(err: reqwest_middleware::Error) -> Error {
         match err {
             Middleware(e) => Error{
-                kind: Kind::Middleware(e)
+                kind: Kind::Middleware(Middleware(e))
             },
             Reqwest(e) => Error {
                 kind: Kind::Http(e),

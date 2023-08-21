@@ -491,10 +491,7 @@ impl Transport {
         let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => match e {
-                Middleware(e1) => Err(e1.into()),
-                Reqwest(e1) => Err(e1.into()),
-            }
+            Err(e) => Err(e),
         }
     }
 }

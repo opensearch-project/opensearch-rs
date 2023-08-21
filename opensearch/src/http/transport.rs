@@ -397,6 +397,12 @@ impl Transport {
         Ok(transport)
     }
 
+    impl From<reqwest_middleware::Error> for Box<dyn StdError + Send + Sync> {
+        fn from(err: reqwest_middleware::Error) -> Self {
+            Box::new(err)
+        }
+    }
+
     /// Creates an asynchronous request that can be awaited
     pub async fn send<B, Q>(
         &self,
@@ -406,7 +412,7 @@ impl Transport {
         query_string: Option<&Q>,
         body: Option<B>,
         timeout: Option<Duration>,
-    ) -> Result<Response, ReqwestError>
+    ) -> Result<Response, Error>
     where
         B: Body,
         Q: Serialize + ?Sized,
@@ -491,7 +497,7 @@ impl Transport {
         let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 }

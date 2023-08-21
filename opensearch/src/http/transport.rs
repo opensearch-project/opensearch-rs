@@ -323,7 +323,7 @@ impl TransportBuilder {
 
         let client = client_builder.build()?;
         Ok(Transport {
-            client,
+            client.into(),
             conn_pool: self.conn_pool,
             credentials: self.credentials,
             #[cfg(feature = "aws-auth")]

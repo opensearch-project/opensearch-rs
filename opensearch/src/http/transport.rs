@@ -144,7 +144,7 @@ fn build_meta() -> String {
 
 /// Builds a HTTP transport to make API calls to OpenSearch
 pub struct TransportBuilder {
-    pub client_builder: reqwest::ClientBuilder,
+    client_builder: reqwest::ClientBuilder,
     conn_pool: Box<dyn ConnectionPool>,
     credentials: Option<Credentials>,
     #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -364,7 +364,7 @@ impl Connection {
 /// using a [Connection] selected from a [ConnectionPool]
 #[derive(Debug, Clone)]
 pub struct Transport {
-    client: reqwest::Client,
+    pub client: reqwest::Client,
     credentials: Option<Credentials>,
     conn_pool: Box<dyn ConnectionPool>,
     #[cfg(feature = "aws-auth")]

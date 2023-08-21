@@ -492,8 +492,8 @@ impl Transport {
         match response {
             Ok(r) => Ok(Response::new(r, method)),
             Err(e) => match e {
-                Middleware(e1) => Err(e1),
-                Reqwest(e1) => Err(e1),
+                Middleware(e1) => Err(e1.into()),
+                Reqwest(e1) => Err(e1.into()),
             }
         }
     }

@@ -364,7 +364,7 @@ impl Connection {
 /// using a [Connection] selected from a [ConnectionPool]
 #[derive(Debug, Clone)]
 pub struct Transport {
-    pub client: reqwest::Client,
+    pub client: reqwest_middleware::ClientWithMiddleware,
     credentials: Option<Credentials>,
     conn_pool: Box<dyn ConnectionPool>,
     #[cfg(feature = "aws-auth")]

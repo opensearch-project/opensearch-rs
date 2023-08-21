@@ -323,7 +323,7 @@ impl TransportBuilder {
 
         let client = client_builder.build()?;
         Ok(Transport {
-            client.into(),
+            client: client.into(),
             conn_pool: self.conn_pool,
             credentials: self.credentials,
             #[cfg(feature = "aws-auth")]
@@ -490,7 +490,7 @@ impl Transport {
         let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e.into()),
+            Err(e) => Err(e.to_string()),
         }
     }
 }

@@ -58,7 +58,7 @@ use std::{
     io::{self, Write},
     time::Duration,
 };
-use reqwest_middleware::Error::{Middleware, Reqwest};
+use reqwest_middleware::{Error as ReqwestError};
 use url::Url;
 
 /// Error that can occur when building a [Transport]
@@ -406,7 +406,7 @@ impl Transport {
         query_string: Option<&Q>,
         body: Option<B>,
         timeout: Option<Duration>,
-    ) -> Result<Response, Error>
+    ) -> Result<Response, ReqwestError>
     where
         B: Body,
         Q: Serialize + ?Sized,

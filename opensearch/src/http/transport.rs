@@ -333,6 +333,12 @@ impl TransportBuilder {
     }
 }
 
+impl From<reqwest_middleware::Error> for Box<dyn StdError + Send + Sync> {
+    fn from(err: reqwest_middleware::Error) -> Self {
+        Box::new(err)
+    }
+}
+
 impl Default for TransportBuilder {
     /// Creates a default implementation using the default implementation of [SingleNodeConnectionPool].
     fn default() -> Self {
@@ -397,11 +403,6 @@ impl Transport {
         Ok(transport)
     }
 
-    impl From<reqwest_middleware::Error> for Box<dyn StdError + Send + Sync> {
-        fn from(err: reqwest_middleware::Error) -> Self {
-            Box::new(err)
-        }
-    }
 
     /// Creates an asynchronous request that can be awaited
     pub async fn send<B, Q>(

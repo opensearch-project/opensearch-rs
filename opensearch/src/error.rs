@@ -34,6 +34,7 @@
  */
 use crate::http::{transport::BuildError, StatusCode};
 use std::{error, fmt, io};
+use reqwest_middleware;
 
 /// An error with the client.
 ///
@@ -55,6 +56,9 @@ enum Kind {
     /// HTTP library error
     Http(reqwest::Error),
 
+    /// Middleware Error
+    Middleware(reqwest_middleware::Error),
+
     /// IO error
     Io(io::Error),
 
@@ -74,6 +78,19 @@ impl From<reqwest::Error> for Error {
     fn from(err: reqwest::Error) -> Error {
         Error {
             kind: Kind::Http(err),
+        }
+    }
+}
+
+impl From<reqwest_middleware::Error> for Error {
+    fn from(err: reqwest_middleware::Error) -> Error {
+        match err {
+            Middleware(e) => Error{
+                kind: Kind::Middleware(e)
+            },
+            Reqwest(e) => Error {
+                kind: Kind::Http(e),
+            }
         }
     }
 }

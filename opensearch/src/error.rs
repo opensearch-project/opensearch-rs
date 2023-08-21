@@ -35,6 +35,8 @@
 use crate::http::{transport::BuildError, StatusCode};
 use std::{error, fmt, io};
 use reqwest_middleware;
+use reqwest_middleware::Error::Reqwest;
+use reqwest_middleware::Error::Middleware;
 
 /// An error with the client.
 ///

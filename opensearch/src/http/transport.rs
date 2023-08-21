@@ -333,7 +333,7 @@ impl TransportBuilder {
     }
 }
 
-impl From<reqwest_middleware::Error> for Box<dyn StdError + Send + Sync> {
+impl From<reqwest_middleware::Error> for Box<dyn Error + Send + Sync> {
     fn from(err: reqwest_middleware::Error) -> Self {
         Box::new(err)
     }

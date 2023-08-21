@@ -490,7 +490,7 @@ impl Transport {
         let response = self.client.execute(request).await;
         match response {
             Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e.to_string()),
+            Err(e) => Err(e.into()),
         }
     }
 }

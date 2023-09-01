@@ -29,34 +29,34 @@ rustls-tls = ["reqwest/rustls-tls"]
 aws-auth = ["aws-credential-types", "aws-sigv4", "aws-types"]
 
 [dependencies]
-base64 = "^0.21"
-bytes = "^1.0"
-dyn-clone = "~1"
+base64 = "0.21"
+bytes = "1.0"
+dyn-clone = "1"
 lazy_static = "1.4"
 percent-encoding = "2.1.0"
-reqwest = { version = "~0.11", default-features = false, features = ["gzip", "json"] }
-url = "^2.1"
-serde = { version = "~1", features = ["derive"] }
-serde_json = "~1"
-serde_with = "~3"
+reqwest = { version = "0.11", default-features = false, features = ["gzip", "json"] }
+url = "2.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_with = "3"
 void = "1.0.2"
-aws-credential-types = { version = ">= 0.53", optional = true }
-aws-sigv4 = { version = ">= 0.53", optional = true }
-aws-types = { version = ">= 0.53", optional = true }
+aws-credential-types = { version = "0.53", optional = true }
+aws-sigv4 = { version = "0.53", optional = true }
+aws-types = { version = "0.53", optional = true }
 
 [dev-dependencies]
 anyhow = "1.0"
-aws-config = ">= 0.53"
-chrono = { version = "^0.4", features = ["serde"] }
-clap = "~2"
+aws-config = "0.53"
+chrono = { version = "0.4", features = ["serde"] }
+clap = "2"
 futures = "0.3.1"
 http = "0.2"
 hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
 regex="1.4"
 sysinfo = "0.29.0"
-textwrap = "^0.16"
+textwrap = "0.16"
 tokio = { version = "1.0", default-features = false, features = ["macros", "net", "time", "rt-multi-thread"] }
-xml-rs = "^0.8"
+xml-rs = "0.8"
 
 [build-dependencies]
 rustc_version = "0.4"

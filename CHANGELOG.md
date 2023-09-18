@@ -10,6 +10,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `serde_with` from ~2 to ~3
 - Bumps `itertools` from 0.10.0 to 0.11.0
 - Bumps `syn` from 1.0 to 2.0
+- Bumps `toml` from 0.7.1 to 0.8.0
 
 ### Changed
 - Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))

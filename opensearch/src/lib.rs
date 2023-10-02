@@ -388,6 +388,7 @@ mod readme {
 pub mod auth;
 pub mod cert;
 pub mod http;
+pub mod models;
 pub mod params;
 
 // GENERATED-BEGIN:namespace-modules

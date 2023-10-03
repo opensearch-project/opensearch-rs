@@ -19,7 +19,8 @@ OPENSEARCH_URL = { value = "${OPENSEARCH_PROTOCOL}://localhost:9200", condition 
 [tasks.generate-certs]
 category = "OpenSearch"
 description = "Generates SSL certificates used for integration tests"
-command = "bash ./.ci/generate-certs.sh"
+command = "bash"
+args =["./.ci/generate-certs.sh"]
 
 [tasks.run-opensearch]
 category = "OpenSearch"

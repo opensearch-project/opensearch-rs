@@ -26,6 +26,7 @@
 //! | Rust client | OpenSearch |
 //! |-------------|---------------|
 //! | 1.x         | 1.x           |
+//! | 2.x         | 2.x           | 
 //!
 //! A major version of the client is compatible with the same major version of OpenSearch.
 //! Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,
@@ -42,6 +43,10 @@
 //! In the latter case, a 1.4.0 client won't contain API functions for APIs that are introduced in
 //! OpenSearch 1.5.0+, but for all other APIs available in OpenSearch, the respective API
 //! functions on the client will be compatible.
+//! 
+//! In some instances, the a new major version of OpenSearch may remain compatible with an
+//! older major version of the client, which may not warrant a need to update the client.
+//! Information about this will be available in COMPATIBILITY.md.
 //!
 //! **No compatibility assurances are given between different major versions of the client and
 //! OpenSearch**. Major differences likely exist between major versions of OpenSearch, particularly

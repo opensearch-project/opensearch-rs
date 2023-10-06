@@ -35,13 +35,14 @@ fn main() -> anyhow::Result<()> {
     let download_dir = fs::canonicalize(Path::new("./api_generator/rest_specs"))?;
     let generated_dir = fs::canonicalize(Path::new("./opensearch/src"))?;
     let last_downloaded_version = Path::new("./api_generator/rest_specs/last_downloaded_version");
+    let default_specification_download_branch = String::from("main");
 
     let mut download_specs = false;
     let mut answer = String::new();
     let default_branch = if last_downloaded_version.exists() {
         fs::read_to_string(last_downloaded_version)?
     } else {
-        String::from("master")
+        default_specification_download_branch
     };
     let mut branch = default_branch.clone();
 

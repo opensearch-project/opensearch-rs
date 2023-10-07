@@ -46,7 +46,7 @@
 //! 
 //! In some instances, the a new major version of OpenSearch may remain compatible with an
 //! older major version of the client, which may not warrant a need to update the client.
-//! Information about this will be available in COMPATIBILITY.md.
+//! Please consult COMPATIBILITY.md for more details.
 //!
 //! **No compatibility assurances are given between different major versions of the client and
 //! OpenSearch**. Major differences likely exist between major versions of OpenSearch, particularly

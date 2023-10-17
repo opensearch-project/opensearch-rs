@@ -23,10 +23,11 @@
 //!
 //! # Versions and Compatibility
 //!
-//! | Rust client | OpenSearch |
+//! | Rust client | OpenSearch    |
 //! |-------------|---------------|
 //! | 1.x         | 1.x           |
-//! | 2.x         | 2.x           | 
+//! | 2.x         | 2.x, 1.x^     |
+//! - ^: With the exception of some previously deprecated APIs 
 //!
 //! A major version of the client is compatible with the same major version of OpenSearch.
 //! Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,

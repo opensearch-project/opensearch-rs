@@ -45,7 +45,7 @@
 //! OpenSearch 1.5.0+, but for all other APIs available in OpenSearch, the respective API
 //! functions on the client will be compatible.
 //! 
-//! In some instances, the a new major version of OpenSearch may remain compatible with an
+//! In some instances, a new major version of OpenSearch may remain compatible with an
 //! older major version of the client, which may not warrant a need to update the client.
 //! Please consult COMPATIBILITY.md for more details.
 //!

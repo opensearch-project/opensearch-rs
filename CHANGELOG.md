@@ -5,6 +5,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 - Added InfoResponse structure ([#187](https://github.com/opensearch-project/opensearch-rs/pull/187))
+- Added documentation on how to make raw json requests ([#196](https://github.com/opensearch-project/opensearch-rs/pull/196))
 ### Dependencies
 - Bumps `sysinfo` from 0.28.0 to 0.29.0
 - Bumps `serde_with` from ~2 to ~3

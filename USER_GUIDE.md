@@ -7,6 +7,7 @@
     - [Add a Document to the Index](#add-a-document-to-the-index)
     - [Search for a Document](#search-for-a-document)
     - [Delete the Index](#delete-the-index)
+    - [Make raw json requests](#make-raw-json-requests)
   - [Amazon OpenSearch and OpenSearch Serverless](#amazon-opensearch-and-opensearch-serverless)
     - [Create a Client](#create-a-client-1)
 
@@ -106,6 +107,77 @@ client
     .delete(opensearch::indices::IndicesDeleteParts::Index(&["movies"]))
     .send()
     .await?;
+```
+
+### Make raw json requests
+Make raw http requests
+
+```rust
+  let response = client
+      .send(
+          Method::Delete,
+          "/movies",
+          HeaderMap::new(),
+          Option::<&String>::None,
+          Option::<&String>::None,
+          None,
+      )
+      .await?;
+
+  // create index
+  let response = client
+      .send(
+          Method::Put,
+          "/movies",
+          HeaderMap::new(),
+          Option::<&String>::None,
+          Option::<&String>::None,
+          None,
+      )
+      .await?;
+  assert_eq!(response.status_code().as_u16(), 200_u16);
+
+  // Add a document
+  let document =
+      r#"{
+        "name" : "Mission Impossible",
+        "year" : "2001"
+      }"#;
+
+  let response = client
+      .send(
+          Method::Post,
+          "/movies/_doc",
+          HeaderMap::new(),
+          Option::<&String>::None,
+          Some(document),
+          None,
+      )
+      .await?;
+
+  assert_eq!(response.status_code().as_u16(), 201_u16);
+
+  // query document
+  let query = json!({
+      "query": {
+        "match": {
+             "name" : "Mission Impossible"
+         }
+    }
+  });
+
+  let response = client
+      .send(
+          Method::Get,
+          "/movies/_search",
+          HeaderMap::new(),
+          Option::<&String>::None,
+          Some(query.to_string()),
+          None,
+      )
+      .await?;
+    
+  assert_eq!(response.status_code().as_u16(), 200_u16);
 ```
 
 ## Amazon OpenSearch and OpenSearch Serverless

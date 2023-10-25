@@ -7,7 +7,7 @@
     - [Add a Document to the Index](#add-a-document-to-the-index)
     - [Search for a Document](#search-for-a-document)
     - [Delete the Index](#delete-the-index)
-    - [Make raw json requests](#make-raw-json-requests)
+    - [Make Raw Json Requests](#make-raw-json-requests)
   - [Amazon OpenSearch and OpenSearch Serverless](#amazon-opensearch-and-opensearch-serverless)
     - [Create a Client](#create-a-client-1)
 
@@ -109,75 +109,92 @@ client
     .await?;
 ```
 
-### Make raw json requests
-Make raw http requests
+### Make Raw Json Requests
+
+To invoke an API that is not supported by the client, use `client.send` method to do so. See [examples/json](./opensearch/examples/json.rs) for a complete working example.
+
+#### GET
+The following example returns the server version information via `GET /`.
+```rust
+let info: Value = client
+    .send(
+        Method::Get,
+        "/",
+        HeaderMap::new(),
+        Option::<&String>::None,
+        Option::<&String>::None,
+        None,
+    )
+    .await?
+    .json()
+    .await?;
+
+println!("Welcome to {} {}" , info["version"]["distribution"] , info["version"]["number"]);
+
+```
+#### PUT
+The following example creates an index.
 
 ```rust
-  let response = client
-      .send(
-          Method::Delete,
-          "/movies",
-          HeaderMap::new(),
-          Option::<&String>::None,
-          Option::<&String>::None,
-          None,
-      )
-      .await?;
-
-  // create index
-  let response = client
-      .send(
-          Method::Put,
-          "/movies",
-          HeaderMap::new(),
-          Option::<&String>::None,
-          Option::<&String>::None,
-          None,
-      )
-      .await?;
-  assert_eq!(response.status_code().as_u16(), 200_u16);
-
-  // Add a document
-  let document =
-      r#"{
-        "name" : "Mission Impossible",
-        "year" : "2001"
-      }"#;
-
-  let response = client
-      .send(
-          Method::Post,
-          "/movies/_doc",
-          HeaderMap::new(),
-          Option::<&String>::None,
-          Some(document),
-          None,
-      )
-      .await?;
-
-  assert_eq!(response.status_code().as_u16(), 201_u16);
-
-  // query document
-  let query = json!({
-      "query": {
-        "match": {
-             "name" : "Mission Impossible"
-         }
-    }
+let index_body = json!({
+      "settings": {
+          "index": {
+              "number_of_shards" : 4
+          }
+      }
   });
 
-  let response = client
-      .send(
-          Method::Get,
-          "/movies/_search",
-          HeaderMap::new(),
-          Option::<&String>::None,
-          Some(query.to_string()),
-          None,
-      )
-      .await?;
-    
-  assert_eq!(response.status_code().as_u16(), 200_u16);
+client
+    .send(
+        Method::Put,
+        "/movies",
+        HeaderMap::new(),
+        Option::<&String>::None,
+        Some(index_body.to_string()),
+        None,
+    )
+    .await?;
+```
+#### POST
+The following example searches for a document.
+
+```rust
+let q = "miller";
+
+let query = json!({
+    "size": 5,
+    "query": {
+        "multi_match": {
+            "query": q,
+            "fields": ["title^2", "director"]
+        }
+    }
+});
+client
+    .send(
+        Method::Post,
+        "/movies/_search",
+        HeaderMap::new(),
+        Option::<&String>::None,
+        Some(query.to_string()),
+        None,
+    )
+    .await?;
+```
+
+#### DELETE
+The following example deletes an index.
+```rust
+client
+  .send(
+      Method::Delete,
+      "/movies",
+      HeaderMap::new(),
+      Option::<&String>::None,
+      Option::<&String>::None,
+      None,
+  )
+  .await?;
 ```
 
 ## Amazon OpenSearch and OpenSearch Serverless

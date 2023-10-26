@@ -111,18 +111,18 @@ client
 
 ### Make Raw Json Requests
 
-To invoke an API that is not supported by the client, use `client.send` method to do so. See [examples/json](./opensearch/examples/json.rs) for a complete working example.
+To invoke an API that is not supported by the client, use the `client.send` method to do so. See [examples/json](./opensearch/examples/json.rs) for a complete working example.
 
 #### GET
 The following example returns the server version information via `GET /`.
 ```rust
 let info: Value = client
-    .send(
+    .send::<(), ()>(
         Method::Get,
         "/",
         HeaderMap::new(),
-        Option::<&String>::None,
-        Option::<&String>::None,
+        None,
+        None,
         None,
     )
     .await?
@@ -136,21 +136,21 @@ println!("Welcome to {} {}" , info["version"]["distribution"] , info["version"][
 The following example creates an index.
 
 ```rust
-let index_body = json!({
+let index_body: JsonBody<_>  = json!({
       "settings": {
           "index": {
               "number_of_shards" : 4
           }
       }
-  });
+  }).into();
 
 client
     .send(
         Method::Put,
         "/movies",
         HeaderMap::new(),
-        Option::<&String>::None,
-        Some(index_body.to_string()),
+        Option::<&()>::None,
+        Some(index_body),
         None,
     )
     .await?;
@@ -161,7 +161,7 @@ The following example searches for a document.
 ```rust
 let q = "miller";
 
-let query = json!({
+let query: JsonBody<_>  = json!({
     "size": 5,
     "query": {
         "multi_match": {
@@ -169,14 +169,14 @@ let query = json!({
             "fields": ["title^2", "director"]
         }
     }
-});
+}).into();
 client
     .send(
         Method::Post,
         "/movies/_search",
         HeaderMap::new(),
-        Option::<&String>::None,
-        Some(query.to_string()),
+        Option::<&()>::None,
+        Some(query),
         None,
     )
     .await?;
@@ -186,12 +186,12 @@ client
 The following example deletes an index.
 ```rust
 client
-  .send(
+  .send::<(), ()>(
       Method::Delete,
       "/movies",
       HeaderMap::new(),
-      Option::<&String>::None,
-      Option::<&String>::None,
+      None,
+      None,
       None,
   )
   .await?;

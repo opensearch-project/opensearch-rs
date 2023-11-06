@@ -9,70 +9,83 @@
  * GitHub history for details.
  */
 
-use std::time::SystemTime;
-
-use aws_credential_types::{
-    provider::{ProvideCredentials, SharedCredentialsProvider},
-    Credentials,
-};
+use crate::http::headers::HeaderValue;
+use aws_credential_types::provider::{ProvideCredentials, SharedCredentialsProvider};
 use aws_sigv4::{
     http_request::{
         sign, PayloadChecksumKind, SignableBody, SignableRequest, SigningParams, SigningSettings,
     },
-    signing_params::BuildError,
+    sign::v4,
 };
-use aws_types::region::Region;
+use aws_smithy_runtime_api::client::identity::Identity;
+use aws_types::{region::Region, sdk_config::SharedTimeSource};
 use reqwest::Request;
-
-fn get_signing_params<'a>(
-    credentials: &'a Credentials,
-    service_name: &'a str,
-    region: &'a Region,
-) -> Result<SigningParams<'a>, BuildError> {
-    let mut signing_settings = SigningSettings::default();
-    signing_settings.payload_checksum_kind = PayloadChecksumKind::XAmzSha256; // required for OpenSearch Serverless
-
-    let mut builder = SigningParams::builder()
-        .access_key(credentials.access_key_id())
-        .secret_key(credentials.secret_access_key())
-        .service_name(service_name)
-        .region(region.as_ref())
-        .time(SystemTime::now())
-        .settings(signing_settings);
-
-    builder.set_security_token(credentials.session_token());
-
-    builder.build()
-}
 
 pub async fn sign_request(
     request: &mut Request,
     credentials_provider: &SharedCredentialsProvider,
     service_name: &str,
     region: &Region,
+    time_source: &SharedTimeSource,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let credentials = credentials_provider.provide_credentials().await?;
+    let identity = {
+        let c = credentials_provider.provide_credentials().await?;
+        let e = c.expiry();
+        Identity::new(c, e)
+    };
 
-    let params = get_signing_params(&credentials, service_name, region)?;
+    let signing_settings = {
+        let mut s = SigningSettings::default();
+        s.payload_checksum_kind = PayloadChecksumKind::XAmzSha256; // required for OpenSearch Serverless
+        s
+    };
 
-    let uri = request.url().as_str().parse()?;
+    let params = {
+        let p = v4::SigningParams::builder()
+            .identity(&identity)
+            .name(service_name)
+            .region(region.as_ref())
+            .time(time_source.now())
+            .settings(signing_settings)
+            .build()?;
+        SigningParams::V4(p)
+    };
 
-    let signable_request = SignableRequest::new(
-        request.method(),
-        &uri,
-        request.headers(),
-        SignableBody::Bytes(request.body().and_then(|b| b.as_bytes()).unwrap_or(&[])),
-    );
+    let signable_request = {
+        let method = request.method().as_str();
+        let uri = request.url().as_str();
+        let headers = request.headers().iter().map(|(k, v)| {
+            (
+                k.as_str(),
+                std::str::from_utf8(v.as_bytes()).expect("only utf-8 headers are signable"),
+            )
+        });
+        let body = match request.body() {
+            Some(b) => match b.as_bytes() {
+                Some(bytes) => SignableBody::Bytes(bytes),
+                None => SignableBody::UnsignedPayload, // Body is not in memory (ie. streaming), so we can't sign it
+            },
+            None => SignableBody::Bytes(&[]),
+        };
 
-    let (mut instructions, _) = sign(signable_request, &params)?.into_parts();
+        SignableRequest::new(method, uri, headers, body)?
+    };
 
-    if let Some(new_headers) = instructions.take_headers() {
-        for (name, value) in new_headers.into_iter() {
-            request.headers_mut().insert(
-                name.expect("AWS signing header name must never be None"),
-                value,
-            );
-        }
+    let (new_headers, new_query_params) = {
+        let (instructions, _) = sign(signable_request, &params)?.into_parts();
+        instructions.into_parts()
+    };
+
+    for header in new_headers.into_iter() {
+        let mut value = HeaderValue::from_str(header.value())
+            .expect("AWS signing header value must be a valid header");
+        value.set_sensitive(header.sensitive());
+
+        request.headers_mut().insert(header.name(), value);
+    }
+
+    for (key, value) in new_query_params.into_iter() {
+        request.url_mut().query_pairs_mut().append_pair(key, &value);
     }
 
     Ok(())

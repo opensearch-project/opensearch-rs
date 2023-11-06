@@ -47,6 +47,8 @@ use crate::{
         Method,
     },
 };
+#[cfg(feature = "aws-auth")]
+use aws_types::sdk_config::SharedTimeSource;
 use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
 use bytes::BytesMut;
 use dyn_clone::clone_trait_object;
@@ -155,7 +157,9 @@ pub struct TransportBuilder {
     headers: HeaderMap,
     timeout: Option<Duration>,
     #[cfg(feature = "aws-auth")]
-    service_name: String,
+    sigv4_service_name: String,
+    #[cfg(feature = "aws-auth")]
+    sigv4_time_source: Option<SharedTimeSource>,
 }
 
 impl TransportBuilder {
@@ -177,7 +181,9 @@ impl TransportBuilder {
             headers: HeaderMap::new(),
             timeout: None,
             #[cfg(feature = "aws-auth")]
-            service_name: "es".to_string(),
+            sigv4_service_name: "es".to_string(),
+            #[cfg(feature = "aws-auth")]
+            sigv4_time_source: None,
         }
     }
 
@@ -245,22 +251,27 @@ impl TransportBuilder {
         self
     }
 
-    /// Sets a global AWS service name.
+    /// Sets the AWS SigV4 signing service name.
     ///
     /// Default is "es". Other supported services are "aoss" for OpenSearch Serverless.
     #[cfg(feature = "aws-auth")]
     pub fn service_name(mut self, service_name: &str) -> Self {
-        self.service_name = service_name.to_string();
+        self.sigv4_service_name = service_name.to_string();
+        self
+    }
+
+    /// Sets the AWS SigV4 signing time source.
+    ///
+    /// Default is `SystemTimeSource`
+    #[cfg(feature = "aws-auth")]
+    pub fn sigv4_time_source(mut self, sigv4_time_source: SharedTimeSource) -> Self {
+        self.sigv4_time_source = Some(sigv4_time_source);
         self
     }
 
     /// Builds a [Transport] to use to send API calls to Elasticsearch.
     pub fn build(self) -> Result<Transport, BuildError> {
         let mut client_builder = self.client_builder;
-
-        if !self.headers.is_empty() {
-            client_builder = client_builder.default_headers(self.headers);
-        }
 
         if let Some(t) = self.timeout {
             client_builder = client_builder.timeout(t);
@@ -326,8 +337,11 @@ impl TransportBuilder {
             client,
             conn_pool: self.conn_pool,
             credentials: self.credentials,
+            default_headers: self.headers,
             #[cfg(feature = "aws-auth")]
-            service_name: self.service_name,
+            sigv4_service_name: self.sigv4_service_name,
+            #[cfg(feature = "aws-auth")]
+            sigv4_time_source: self.sigv4_time_source.unwrap_or_default(),
         })
     }
 }
@@ -367,8 +381,11 @@ pub struct Transport {
     client: reqwest::Client,
     credentials: Option<Credentials>,
     conn_pool: Box<dyn ConnectionPool>,
+    default_headers: HeaderMap,
     #[cfg(feature = "aws-auth")]
-    service_name: String,
+    sigv4_service_name: String,
+    #[cfg(feature = "aws-auth")]
+    sigv4_time_source: SharedTimeSource,
 }
 
 impl Transport {
@@ -446,10 +463,14 @@ impl Transport {
         }
 
         // default headers first, overwrite with any provided
-        let mut request_headers = HeaderMap::with_capacity(4 + headers.len());
+        let mut request_headers =
+            HeaderMap::with_capacity(4 + self.default_headers.len() + headers.len());
         request_headers.insert(CONTENT_TYPE, HeaderValue::from_static(DEFAULT_CONTENT_TYPE));
         request_headers.insert(ACCEPT, HeaderValue::from_static(DEFAULT_ACCEPT));
         request_headers.insert(USER_AGENT, HeaderValue::from_static(DEFAULT_USER_AGENT));
+        for (name, value) in self.default_headers.iter() {
+            request_headers.insert(name, value.clone());
+        }
         for (name, value) in headers {
             request_headers.insert(name.unwrap(), value);
         }
@@ -480,8 +501,9 @@ impl Transport {
             super::aws_auth::sign_request(
                 &mut request,
                 credentials_provider,
-                &self.service_name,
+                &self.sigv4_service_name,
                 region,
+                &self.sigv4_time_source,
             )
             .await
             .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;

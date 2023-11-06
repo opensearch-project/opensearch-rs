@@ -52,9 +52,9 @@ use std::time::Duration;
 #[tokio::test]
 async fn default_user_agent_content_type_accept_headers() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        assert_eq!(req.headers()["user-agent"], DEFAULT_USER_AGENT);
-        assert_eq!(req.headers()["content-type"], "application/json");
-        assert_eq!(req.headers()["accept"], "application/json");
+        assert_header_eq!(req, "user-agent", DEFAULT_USER_AGENT);
+        assert_header_eq!(req, "content-type", "application/json");
+        assert_header_eq!(req, "accept", "application/json");
         http::Response::default()
     });
 
@@ -67,7 +67,7 @@ async fn default_user_agent_content_type_accept_headers() -> anyhow::Result<()> 
 #[tokio::test]
 async fn default_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        assert_eq!(req.headers()["x-opaque-id"], "foo");
+        assert_header_eq!(req, "x-opaque-id", "foo");
         http::Response::default()
     });
 
@@ -85,7 +85,7 @@ async fn default_header() -> anyhow::Result<()> {
 #[tokio::test]
 async fn override_default_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        assert_eq!(req.headers()["x-opaque-id"], "bar");
+        assert_header_eq!(req, "x-opaque-id", "bar");
         http::Response::default()
     });
 
@@ -110,7 +110,7 @@ async fn override_default_header() -> anyhow::Result<()> {
 #[tokio::test]
 async fn x_opaque_id_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        assert_eq!(req.headers()["x-opaque-id"], "foo");
+        assert_header_eq!(req, "x-opaque-id", "foo");
         http::Response::default()
     });
 

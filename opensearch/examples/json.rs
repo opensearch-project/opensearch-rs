@@ -1,12 +1,26 @@
-use serde_json::{json, Value};
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
 
-use opensearch::auth::Credentials;
-use opensearch::cert::CertificateValidation;
-use opensearch::http::headers::HeaderMap;
-use opensearch::http::transport::{SingleNodeConnectionPool, TransportBuilder};
-use opensearch::http::{Method, Url};
-use opensearch::http::request::JsonBody;
-use opensearch::OpenSearch;
+use opensearch::{
+    auth::Credentials,
+    cert::CertificateValidation,
+    http::{
+        headers::HeaderMap,
+        request::JsonBody,
+        transport::{SingleNodeConnectionPool, TransportBuilder},
+        Method, Url,
+    },
+    OpenSearch,
+};
+use serde_json::{json, Value};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -22,14 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let document_id = "1";
 
     let info: Value = client
-        .send::<(), ()>(
-            Method::Get,
-            "/",
-            HeaderMap::new(),
-            None,
-            None,
-            None,
-        )
+        .send::<(), ()>(Method::Get, "/", HeaderMap::new(), None, None, None)
         .await?
         .json()
         .await?;
@@ -40,13 +47,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // Create an index
-    let index_body : JsonBody<_> = json!({
+    let index_body: JsonBody<_> = json!({
         "settings": {
             "index": {
                 "number_of_shards" : 4
             }
         }
-    }).into();
+    })
+    .into();
 
     let create_index_response = client
         .send(
@@ -66,7 +74,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "title": "Moneyball",
         "director": "Bennett Miller",
         "year": "2011"
-    }).into();
+    })
+    .into();
     let create_document_response = client
         .send(
             Method::Put,
@@ -82,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Search for a document
     let q = "miller";
-    let query : JsonBody<_> = json!({
+    let query: JsonBody<_> = json!({
         "size": 5,
         "query": {
             "multi_match": {
@@ -90,7 +99,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "fields": ["title^2", "director"]
             }
         }
-    }).into();
+    })
+    .into();
 
     let search_response = client
         .send(
@@ -105,11 +115,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(search_response.status_code(), 200);
     let search_result = search_response.json::<Value>().await?;
-    println!("Hits: {:#?}", search_result["hits"]["hits"].as_array().unwrap());
+    println!(
+        "Hits: {:#?}",
+        search_result["hits"]["hits"].as_array().unwrap()
+    );
 
     // Delete the document
     let delete_document_response = client
-        .send::<(),()>(
+        .send::<(), ()>(
             Method::Delete,
             &format!("/{index_name}/_doc/{document_id}"),
             HeaderMap::new(),
@@ -123,7 +136,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Delete the index
     let delete_response = client
-        .send::<(),()>(
+        .send::<(), ()>(
             Method::Delete,
             &format!("/{index_name}"),
             HeaderMap::new(),

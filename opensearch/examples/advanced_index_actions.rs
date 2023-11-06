@@ -1,12 +1,24 @@
-use opensearch::auth::Credentials;
-use opensearch::indices::{
-    IndicesAddBlockParts, IndicesClearCacheParts, IndicesCloneParts, IndicesCloseParts,
-    IndicesCreateParts, IndicesDeleteParts, IndicesFlushParts, IndicesForcemergeParts,
-    IndicesOpenParts, IndicesPutSettingsParts, IndicesRefreshParts, IndicesSplitParts,
-};
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
 use opensearch::{
-    cert::CertificateValidation, http::transport::SingleNodeConnectionPool,
-    http::transport::TransportBuilder, OpenSearch,
+    auth::Credentials,
+    cert::CertificateValidation,
+    http::transport::{SingleNodeConnectionPool, TransportBuilder},
+    indices::{
+        IndicesAddBlockParts, IndicesClearCacheParts, IndicesCloneParts, IndicesCloseParts,
+        IndicesCreateParts, IndicesDeleteParts, IndicesFlushParts, IndicesForcemergeParts,
+        IndicesOpenParts, IndicesPutSettingsParts, IndicesRefreshParts, IndicesSplitParts,
+    },
+    OpenSearch,
 };
 use serde_json::json;
 use url::Url;

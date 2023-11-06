@@ -1,13 +1,23 @@
-use opensearch::auth::Credentials;
-use opensearch::cert::CertificateValidation;
-use opensearch::http::transport::{SingleNodeConnectionPool, TransportBuilder};
-use opensearch::OpenSearch;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
 use opensearch::{
+    auth::Credentials,
+    cert::CertificateValidation,
+    http::transport::{SingleNodeConnectionPool, TransportBuilder},
     indices::{
         IndicesCreateParts, IndicesDeleteParts, IndicesExistsParts, IndicesGetParts,
         IndicesPutMappingParts, IndicesPutSettingsParts,
     },
-    IndexParts,
+    IndexParts, OpenSearch,
 };
 use serde_json::json;
 use url::Url;

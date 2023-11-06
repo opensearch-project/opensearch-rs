@@ -36,7 +36,12 @@ use std::{
     convert::Infallible, future::Future, net, sync::mpsc as std_mpsc, thread, time::Duration,
 };
 
-use tokio::sync::oneshot;
+use http::Request;
+use hyper::Body;
+use tokio::sync::{
+    mpsc::{unbounded_channel, UnboundedReceiver},
+    oneshot,
+};
 
 pub use http::Response;
 use tokio::runtime;
@@ -121,4 +126,16 @@ where
     })
     .join()
     .unwrap()
+}
+
+pub fn capturing_http() -> (Server, UnboundedReceiver<Request<Body>>) {
+    let (tx, rx) = unbounded_channel();
+    let server = http(move |req| {
+        let tx = tx.clone();
+        async move {
+            tx.send(req).unwrap();
+            http::Response::default()
+        }
+    });
+    (server, rx)
 }

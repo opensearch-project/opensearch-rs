@@ -6,6 +6,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 - Added InfoResponse structure ([#187](https://github.com/opensearch-project/opensearch-rs/pull/187))
 - Added documentation on how to make raw json requests ([#196](https://github.com/opensearch-project/opensearch-rs/pull/196))
+
 ### Dependencies
 - Bumps `sysinfo` from 0.28.0 to 0.29.0
 - Bumps `serde_with` from ~2 to ~3
@@ -13,6 +14,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `syn` from 1.0 to 2.0
 - Bumps `toml` from 0.7.1 to 0.8.0
 - Bumps `dialoguer` from 0.10.2 to 0.11.0
+- Bumps `aws-*` from >=0.53 to >=0.57 ([#201](https://github.com/opensearch-project/opensearch-rs/pull/201))
 
 ### Changed
 - Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))

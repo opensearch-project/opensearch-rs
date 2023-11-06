@@ -12,15 +12,83 @@
 #![cfg(feature = "aws-auth")]
 
 pub mod common;
-use common::*;
-use opensearch::OpenSearch;
-use regex::Regex;
-
 use aws_config::SdkConfig;
 use aws_credential_types::provider::SharedCredentialsProvider;
-use aws_credential_types::Credentials;
+use aws_credential_types::Credentials as AwsCredentials;
+use aws_smithy_async::time::StaticTimeSource;
 use aws_types::region::Region;
+use common::*;
+use http::header::HOST;
+use opensearch::{auth::Credentials, indices::IndicesCreateParts, OpenSearch};
+use regex::Regex;
+use serde_json::json;
 use std::convert::TryInto;
+use test_case::test_case;
+
+#[test_case("es", "10c9be415f4b9f15b12abbb16bd3e3730b2e6c76e0cf40db75d08a44ed04a3a1"; "when service name is es")]
+#[test_case("aoss", "34903aef90423aa7dd60575d3d45316c6ef2d57bbe564a152b41bf8f5917abf6"; "when service name is aoss")]
+#[test_case("arbitrary", "156e65c504ea2b2722a481b7515062e7692d27217b477828854e715f507e6a36"; "when service name is arbitrary")]
+#[tokio::test]
+async fn aws_auth_signs_correctly(
+    service_name: &str,
+    expected_signature: &str,
+) -> anyhow::Result<()> {
+    tracing_init();
+
+    let (server, mut rx) = server::capturing_http();
+
+    let aws_creds = AwsCredentials::new("test-access-key", "test-secret-key", None, None, "test");
+    let region = Region::new("ap-southeast-2");
+    let time_source = StaticTimeSource::from_secs(1673626117); // 2023-01-13 16:08:37 +0000
+    let host = format!("aaabbbcccddd111222333.ap-southeast-2.{service_name}.amazonaws.com");
+
+    let transport_builder = client::create_builder(&format!("http://{}", server.addr()))
+        .auth(Credentials::AwsSigV4(
+            SharedCredentialsProvider::new(aws_creds),
+            region,
+        ))
+        .service_name(service_name)
+        .sigv4_time_source(time_source.into())
+        .header(HOST, host.parse().unwrap());
+    let client = client::create(transport_builder);
+
+    let _ = client
+        .indices()
+        .create(IndicesCreateParts::Index("sample-index1"))
+        .body(json!({
+            "aliases": {
+                "sample-alias1": {}
+            },
+            "mappings": {
+                "properties": {
+                    "age": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "settings": {
+                "index.number_of_replicas": 1,
+                "index.number_of_shards": 2
+            }
+        }))
+        .send()
+        .await?;
+
+    let sent_req = rx.recv().await.expect("should have sent a request");
+
+    assert_header_eq!(sent_req, "accept", "application/json");
+    assert_header_eq!(sent_req, "content-type", "application/json");
+    assert_header_eq!(sent_req, "host", host);
+    assert_header_eq!(sent_req, "x-amz-date", "20230113T160837Z");
+    assert_header_eq!(
+        sent_req,
+        "x-amz-content-sha256",
+        "4c770eaed349122a28302ff73d34437cad600acda5a9dd373efc7da2910f8564"
+    );
+    assert_header_eq!(sent_req, "authorization", format!("AWS4-HMAC-SHA256 Credential=test-access-key/20230113/ap-southeast-2/{service_name}/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature={expected_signature}"));
+
+    Ok(())
+}
 
 #[tokio::test]
 async fn aws_auth_get() -> anyhow::Result<()> {
@@ -32,9 +100,9 @@ async fn aws_auth_get() -> anyhow::Result<()> {
             "{}",
             authorization_header
         );
-        let amz_content_sha256_header = req.headers()["x-amz-content-sha256"].to_str().unwrap();
-        assert_eq!(
-            amz_content_sha256_header,
+        assert_header_eq!(
+            req,
+            "x-amz-content-sha256",
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         ); // SHA of empty string
         http::Response::default()
@@ -49,9 +117,9 @@ async fn aws_auth_get() -> anyhow::Result<()> {
 #[tokio::test]
 async fn aws_auth_post() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        let amz_content_sha256_header = req.headers()["x-amz-content-sha256"].to_str().unwrap();
-        assert_eq!(
-            amz_content_sha256_header,
+        assert_header_eq!(
+            req,
+            "x-amz-content-sha256",
             "f3a842f988a653a734ebe4e57c45f19293a002241a72f0b3abbff71e4f5297b9"
         ); // SHA of the JSON
         http::Response::default()
@@ -73,7 +141,7 @@ async fn aws_auth_post() -> anyhow::Result<()> {
 }
 
 fn create_aws_client(addr: &str) -> anyhow::Result<OpenSearch> {
-    let aws_creds = Credentials::new("id", "secret", None, None, "token");
+    let aws_creds = AwsCredentials::new("id", "secret", None, None, "token");
     let creds_provider = SharedCredentialsProvider::new(aws_creds);
     let aws_config = SdkConfig::builder()
         .credentials_provider(creds_provider)

@@ -1,12 +1,23 @@
-use opensearch::auth::Credentials;
-use opensearch::cluster::{ClusterDeleteComponentTemplateParts, ClusterPutComponentTemplateParts};
-use opensearch::indices::{
-    IndicesCreateParts, IndicesDeleteIndexTemplateParts, IndicesDeleteParts,
-    IndicesGetIndexTemplateParts, IndicesGetParts, IndicesPutIndexTemplateParts,
-};
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
 use opensearch::{
-    cert::CertificateValidation, http::transport::SingleNodeConnectionPool,
-    http::transport::TransportBuilder, OpenSearch,
+    auth::Credentials,
+    cert::CertificateValidation,
+    cluster::{ClusterDeleteComponentTemplateParts, ClusterPutComponentTemplateParts},
+    http::transport::{SingleNodeConnectionPool, TransportBuilder},
+    indices::{
+        IndicesCreateParts, IndicesDeleteIndexTemplateParts, IndicesDeleteParts,
+        IndicesGetIndexTemplateParts, IndicesGetParts, IndicesPutIndexTemplateParts,
+    },
+    OpenSearch,
 };
 use serde_json::json;
 use url::Url;

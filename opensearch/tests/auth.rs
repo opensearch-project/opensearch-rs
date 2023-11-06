@@ -45,8 +45,9 @@ async fn basic_auth_header() -> anyhow::Result<()> {
             write!(encoder, "username:password").unwrap();
         }
 
-        assert_eq!(
-            req.headers()["authorization"],
+        assert_header_eq!(
+            req,
+            "authorization",
             String::from_utf8(header_value).unwrap()
         );
         http::Response::default()
@@ -70,8 +71,9 @@ async fn api_key_header() -> anyhow::Result<()> {
             write!(encoder, "id:api_key").unwrap();
         }
 
-        assert_eq!(
-            req.headers()["authorization"],
+        assert_header_eq!(
+            req,
+            "authorization",
             String::from_utf8(header_value).unwrap()
         );
         http::Response::default()
@@ -89,7 +91,7 @@ async fn api_key_header() -> anyhow::Result<()> {
 #[tokio::test]
 async fn bearer_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
-        assert_eq!(req.headers()["authorization"], "Bearer access_token");
+        assert_header_eq!(req, "authorization", "Bearer access_token");
         http::Response::default()
     });
 

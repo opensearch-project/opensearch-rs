@@ -1,6 +1,6 @@
 [package]
 name = "opensearch"
-version = "2.2.0"
+version = "3.0.0"
 edition = "2018"
 authors = ["Elastic and Contributors", "OpenSearch Contributors"]
 description = "Official OpenSearch Rust client"

@@ -41,9 +41,9 @@ jobs:
       - name: Increment Patch Version
         run: |
           echo Incrementing $CURRENT_VERSION to $NEXT_VERSION
-          sed -i '' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" opensearch/Cargo.toml
-          sed -i '' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" api_generator/Cargo.toml
-          sed -i '' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" yaml_test_runner/Cargo.toml
+          sed -i'' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" opensearch/Cargo.toml
+          sed -i'' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" api_generator/Cargo.toml
+          sed -i'' -e "s/^version = \"$CURRENT_VERSION\"/version = \"$NEXT_VERSION\"/g" yaml_test_runner/Cargo.toml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3

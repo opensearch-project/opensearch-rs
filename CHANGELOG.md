@@ -4,6 +4,22 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 
 ### Added
+
+### Dependencies
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [2.2.0]
+
+### Added
 - Added InfoResponse structure ([#187](https://github.com/opensearch-project/opensearch-rs/pull/187))
 - Added documentation on how to make raw json requests ([#196](https://github.com/opensearch-project/opensearch-rs/pull/196))
 
@@ -18,14 +34,6 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Moved @aditjind to Emeritus maintainers ([#170](https://github.com/opensearch-project/opensearch-rs/pull/170))
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [2.1.0]
 
@@ -56,16 +64,11 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Updates GitHub workflow to additionally run `cargo make test` ([#120](https://github.com/opensearch-project/opensearch-rs/pull/120))
 - Updates GitHub workflows to use caching to speed up builds ([#121](https://github.com/opensearch-project/opensearch-rs/pull/121))
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 - Fixes `cargo make test` failing out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
 
-### Security
-
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.0.0...v2.1.0

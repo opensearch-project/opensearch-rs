@@ -53,7 +53,7 @@ chrono = { version = "0.4", features = ["serde"] }
 clap = "2"
 futures = "0.3.1"
 http = "0.2"
-hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
+hyper = { version = "1.0", default-features = false, features = ["tcp", "stream", "server"] }
 regex="1.4"
 sysinfo = "0.29.0"
 test-case = "3"

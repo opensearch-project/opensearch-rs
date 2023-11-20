@@ -52,7 +52,7 @@ aws-smithy-async = ">= 0.57, <1.0"
 chrono = { version = "0.4", features = ["serde"] }
 clap = "2"
 futures = "0.3.1"
-http = "0.2"
+http = "1.0"
 hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
 regex="1.4"
 sysinfo = "0.29.0"

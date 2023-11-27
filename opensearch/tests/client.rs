@@ -55,7 +55,7 @@ async fn default_user_agent_content_type_accept_headers() -> anyhow::Result<()> 
         assert_header_eq!(req, "user-agent", DEFAULT_USER_AGENT);
         assert_header_eq!(req, "content-type", "application/json");
         assert_header_eq!(req, "accept", "application/json");
-        http::Response::default()
+        server::empty_response()
     });
 
     let client = client::create_for_url(format!("http://{}", server.addr()).as_ref());
@@ -68,7 +68,7 @@ async fn default_user_agent_content_type_accept_headers() -> anyhow::Result<()> 
 async fn default_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         assert_header_eq!(req, "x-opaque-id", "foo");
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref()).header(
@@ -86,7 +86,7 @@ async fn default_header() -> anyhow::Result<()> {
 async fn override_default_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         assert_header_eq!(req, "x-opaque-id", "bar");
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref()).header(
@@ -111,7 +111,7 @@ async fn override_default_header() -> anyhow::Result<()> {
 async fn x_opaque_id_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         assert_header_eq!(req, "x-opaque-id", "foo");
-        http::Response::default()
+        server::empty_response()
     });
 
     let client = client::create_for_url(format!("http://{}", server.addr()).as_ref());
@@ -131,7 +131,7 @@ async fn x_opaque_id_header() -> anyhow::Result<()> {
 async fn uses_global_request_timeout() {
     let server = server::http(move |_| async move {
         std::thread::sleep(Duration::from_secs(1));
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
@@ -150,7 +150,7 @@ async fn uses_global_request_timeout() {
 async fn uses_call_request_timeout() {
     let server = server::http(move |_| async move {
         std::thread::sleep(Duration::from_secs(1));
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
@@ -173,7 +173,7 @@ async fn uses_call_request_timeout() {
 async fn call_request_timeout_supersedes_global_timeout() {
     let server = server::http(move |_| async move {
         std::thread::sleep(Duration::from_secs(1));
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
@@ -246,7 +246,7 @@ async fn serialize_querystring() -> anyhow::Result<()> {
                 req.uri().query(),
                 Some("filter_path=took%2C_shards&pretty=true&q=title%3AOpenSearch&track_total_hits=100000")
             );
-        http::Response::default()
+        server::empty_response()
     });
 
     let client = client::create_for_url(format!("http://{}", server.addr()).as_ref());

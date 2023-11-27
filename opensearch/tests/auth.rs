@@ -50,7 +50,7 @@ async fn basic_auth_header() -> anyhow::Result<()> {
             "authorization",
             String::from_utf8(header_value).unwrap()
         );
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
@@ -76,7 +76,7 @@ async fn api_key_header() -> anyhow::Result<()> {
             "authorization",
             String::from_utf8(header_value).unwrap()
         );
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
@@ -92,7 +92,7 @@ async fn api_key_header() -> anyhow::Result<()> {
 async fn bearer_header() -> anyhow::Result<()> {
     let server = server::http(move |req| async move {
         assert_header_eq!(req, "authorization", "Bearer access_token");
-        http::Response::default()
+        server::empty_response()
     });
 
     let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())

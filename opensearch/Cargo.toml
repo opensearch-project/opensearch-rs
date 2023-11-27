@@ -52,13 +52,14 @@ aws-smithy-async = "1"
 chrono = { version = "0.4", features = ["serde"] }
 clap = "2"
 futures = "0.3.1"
-http = "0.2"
-hyper = { version = "0.14", default-features = false, features = ["tcp", "stream", "server"] }
+http-body-util = "0.1.0"
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
 regex="1.4"
 sysinfo = "0.29.0"
 test-case = "3"
 textwrap = "0.16"
-tokio = { version = "1.0", default-features = false, features = ["macros", "net", "time", "rt-multi-thread", "sync"] }
+tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 xml-rs = "0.8"

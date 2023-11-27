@@ -18,9 +18,9 @@ use aws_credential_types::Credentials as AwsCredentials;
 use aws_smithy_async::time::StaticTimeSource;
 use aws_types::region::Region;
 use common::*;
-use http::header::HOST;
 use opensearch::{auth::Credentials, indices::IndicesCreateParts, OpenSearch};
 use regex::Regex;
+use reqwest::header::HOST;
 use serde_json::json;
 use std::convert::TryInto;
 use test_case::test_case;
@@ -105,7 +105,7 @@ async fn aws_auth_get() -> anyhow::Result<()> {
             "x-amz-content-sha256",
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         ); // SHA of empty string
-        http::Response::default()
+        server::empty_response()
     });
 
     let client = create_aws_client(format!("http://{}", server.addr()).as_ref())?;
@@ -122,7 +122,7 @@ async fn aws_auth_post() -> anyhow::Result<()> {
             "x-amz-content-sha256",
             "f3a842f988a653a734ebe4e57c45f19293a002241a72f0b3abbff71e4f5297b9"
         ); // SHA of the JSON
-        http::Response::default()
+        server::empty_response()
     });
 
     let client = create_aws_client(format!("http://{}", server.addr()).as_ref())?;

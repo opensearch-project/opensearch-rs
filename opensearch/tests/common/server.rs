@@ -33,23 +33,34 @@
 // https://github.com/seanmonstar/reqwest/blob/master/LICENSE-APACHE
 
 use std::{
-    convert::Infallible, future::Future, net, sync::mpsc as std_mpsc, thread, time::Duration,
+    convert::Infallible,
+    future::Future,
+    net::{self, SocketAddr},
+    sync::mpsc as std_mpsc,
+    thread,
+    time::Duration,
 };
 
-use http::Request;
-use hyper::Body;
-use tokio::sync::{
-    mpsc::{unbounded_channel, UnboundedReceiver},
-    oneshot,
+use bytes::Bytes;
+use http_body_util::Empty;
+use hyper::{
+    body::{Body, Incoming},
+    server::conn::http1,
+    service::service_fn,
+    Request, Response,
+};
+use hyper_util::rt::TokioIo;
+use tokio::{
+    net::{TcpListener, TcpStream},
+    sync::{broadcast, mpsc},
 };
 
-pub use http::Response;
 use tokio::runtime;
 
 pub struct Server {
     addr: net::SocketAddr,
     panic_rx: std_mpsc::Receiver<()>,
-    shutdown_tx: Option<oneshot::Sender<()>>,
+    shutdown_tx: Option<broadcast::Sender<()>>,
 }
 
 impl Server {
@@ -61,7 +72,7 @@ impl Server {
 impl Drop for Server {
     fn drop(&mut self) {
         if let Some(tx) = self.shutdown_tx.take() {
-            let _ = tx.send(());
+            tx.send(()).unwrap();
         }
 
         if !::std::thread::panicking() {
@@ -72,46 +83,62 @@ impl Drop for Server {
     }
 }
 
-pub fn http<F, Fut>(func: F) -> Server
+pub fn http<F, Fut, B>(func: F) -> Server
 where
-    F: Fn(http::Request<hyper::Body>) -> Fut + Clone + Send + 'static,
-    Fut: Future<Output = http::Response<hyper::Body>> + Send + 'static,
+    F: Fn(Request<Incoming>) -> Fut + Clone + Send + 'static,
+    Fut: Future<Output = Response<B>> + Send + 'static,
+    B: Body + Send + 'static,
+    B::Data: Send,
+    B::Error: std::error::Error + Send + Sync,
 {
-    //Spawn new runtime in thread to prevent reactor execution context conflict
+    let thread_name = thread::current().name().unwrap_or("<unknown>").to_owned();
+
     thread::spawn(move || {
         let rt = runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .expect("new rt");
+        let _ = rt.enter();
 
-        let srv = {
-            let _guard = rt.enter();
-            hyper::Server::bind(&([127, 0, 0, 1], 0).into()).serve(hyper::service::make_service_fn(
-                move |_| {
-                    let func = func.clone();
-                    async move {
-                        Ok::<_, Infallible>(hyper::service::service_fn(move |req| {
-                            let fut = func(req);
-                            async move { Ok::<_, Infallible>(fut.await) }
-                        }))
+        let (shutdown_tx, mut shutdown_rx) = broadcast::channel(1);
+        let listener = rt
+            .block_on(TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], 0))))
+            .unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        let srv = async move {
+            loop {
+                let (stream, _) = tokio::select! {
+                    res = listener.accept() => res?,
+                    _ = shutdown_rx.recv() => break
+                };
+                let io = TokioIo::new(stream);
+
+                let mut func = func.clone();
+                let mut shutdown_rx = shutdown_rx.resubscribe();
+
+                tokio::task::spawn(async move {
+                    let conn = http1::Builder::new().serve_connection(
+                        io,
+                        service_fn(move |req| {
+                            let func = func.clone();
+                            async move { Ok::<_, Infallible>(func(req).await) }
+                        }),
+                    );
+                    tokio::pin!(conn);
+                    tokio::select! {
+                        res = conn.as_mut() => {},
+                        _ = shutdown_rx.recv() => conn.as_mut().graceful_shutdown()
                     }
-                },
-            ))
+                });
+            }
+            Ok::<(), anyhow::Error>(())
         };
 
-        let addr = srv.local_addr();
-        let (shutdown_tx, shutdown_rx) = oneshot::channel();
-        let srv = srv.with_graceful_shutdown(async move {
-            let _ = shutdown_rx.await;
-        });
-
         let (panic_tx, panic_rx) = std_mpsc::channel();
-        let tname = format!(
-            "test({})-support-server",
-            thread::current().name().unwrap_or("<unknown>")
-        );
+        let thread_name = format!("test({})-support-server", thread_name);
         thread::Builder::new()
-            .name(tname)
+            .name(thread_name)
             .spawn(move || {
                 rt.block_on(srv).unwrap();
                 let _ = panic_tx.send(());
@@ -128,14 +155,18 @@ where
     .unwrap()
 }
 
-pub fn capturing_http() -> (Server, UnboundedReceiver<Request<Body>>) {
-    let (tx, rx) = unbounded_channel();
+pub fn capturing_http() -> (Server, mpsc::UnboundedReceiver<Request<Incoming>>) {
+    let (tx, rx) = mpsc::unbounded_channel();
     let server = http(move |req| {
         let tx = tx.clone();
         async move {
             tx.send(req).unwrap();
-            http::Response::default()
+            empty_response()
         }
     });
     (server, rx)
+}
+
+pub fn empty_response() -> Response<Empty<Bytes>> {
+    Default::default()
 }

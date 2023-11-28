@@ -17,6 +17,11 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
+## [2.1.1]
+
+### Dependencies
+- Bound `aws-*` to code-compatible versions `>=0.53,<0.57` ([#225](https://github.com/opensearch-project/opensearch-rs/pull/225))
+
 ## [2.1.0]
 
 ### Added

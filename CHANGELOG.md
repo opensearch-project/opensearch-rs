@@ -56,5 +56,5 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/2.1.0...HEAD
-[2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/2.0.0...2.1.0
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.0.0...v2.1.0

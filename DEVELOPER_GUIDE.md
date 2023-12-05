@@ -47,6 +47,20 @@ The following information will help in getting up and running.
   cargo install --force cargo-make
   ```
 
+- [**Packages**]()
+
+  Use your preferred package manager to install the following packages:
+  
+  Linux
+  - `build-essential`
+  - `pkg-config`
+  - `libssl-dev`
+  
+  Example using apt:
+  ```sh
+  sudo apt install build-essential pkg-config libssl-dev
+  ```
+
 - [**Docker**](https://www.docker.com/)
 
   Docker is used to start instances of OpenSearch required for integration tests using [OpenSearch docker images](https://hub.docker.com/r/opensearchproject/opensearch).
@@ -58,13 +72,13 @@ The following information will help in getting up and running.
 Run unit tests.
 
 ```sh
-cargo test
+cargo make test
 ```
 
 To include optional features, such as AWS auth use the following.
 
 ```sh
-cargo test --features "aws-auth"
+cargo make test --features "aws-auth"
 ```
 
 ### Cargo Make

@@ -50,6 +50,8 @@ The following information will help in getting up and running.
 - [**Packages**]()
 
   Use your preferred package manager to install the following packages:
+  
+  Linux
   - `build-essential`
   - `pkg-config`
   - `libssl-dev`

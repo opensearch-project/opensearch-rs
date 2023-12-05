@@ -61,7 +61,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixes `cargo make test` failing out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
-- Fixes `DEVELOPER_GUIDE.md` to include complete information about setting up([#194](https://github.com/opensearch-project/opensearch-rs/pull/194))
+- Fixes `DEVELOPER_GUIDE.md` to include complete information about setting up ([#194](https://github.com/opensearch-project/opensearch-rs/pull/194))
 ### Security
 
 [Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...HEAD

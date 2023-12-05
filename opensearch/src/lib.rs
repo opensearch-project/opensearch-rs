@@ -27,7 +27,7 @@
 //! |-------------|---------------|
 //! | 1.x         | 1.x           |
 //! | 2.x         | 2.x, 1.x^     |
-//! - ^: With the exception of some previously deprecated APIs 
+//! - ^: With the exception of some previously deprecated APIs
 //!
 //! A major version of the client is compatible with the same major version of OpenSearch.
 //! Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,
@@ -44,7 +44,7 @@
 //! In the latter case, a 1.4.0 client won't contain API functions for APIs that are introduced in
 //! OpenSearch 1.5.0+, but for all other APIs available in OpenSearch, the respective API
 //! functions on the client will be compatible.
-//! 
+//!
 //! In some instances, a new major version of OpenSearch may remain compatible with an
 //! older major version of the client, which may not warrant a need to update the client.
 //! Please consult COMPATIBILITY.md for more details.

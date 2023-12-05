@@ -7,6 +7,7 @@
     - [Add a Document to the Index](#add-a-document-to-the-index)
     - [Search for a Document](#search-for-a-document)
     - [Delete the Index](#delete-the-index)
+    - [Make Raw Json Requests](#make-raw-json-requests)
   - [Amazon OpenSearch and OpenSearch Serverless](#amazon-opensearch-and-opensearch-serverless)
     - [Create a Client](#create-a-client-1)
 
@@ -106,6 +107,94 @@ client
     .delete(opensearch::indices::IndicesDeleteParts::Index(&["movies"]))
     .send()
     .await?;
+```
+
+### Make Raw Json Requests
+
+To invoke an API that is not supported by the client, use the `client.send` method to do so. See [examples/json](./opensearch/examples/json.rs) for a complete working example.
+
+#### GET
+The following example returns the server version information via `GET /`.
+```rust
+let info: Value = client
+    .send::<(), ()>(
+        Method::Get,
+        "/",
+        HeaderMap::new(),
+        None,
+        None,
+        None,
+    )
+    .await?
+    .json()
+    .await?;
+
+println!("Welcome to {} {}" , info["version"]["distribution"] , info["version"]["number"]);
+
+```
+#### PUT
+The following example creates an index.
+
+```rust
+let index_body: JsonBody<_>  = json!({
+      "settings": {
+          "index": {
+              "number_of_shards" : 4
+          }
+      }
+  }).into();
+
+client
+    .send(
+        Method::Put,
+        "/movies",
+        HeaderMap::new(),
+        Option::<&()>::None,
+        Some(index_body),
+        None,
+    )
+    .await?;
+```
+#### POST
+The following example searches for a document.
+
+```rust
+let q = "miller";
+
+let query: JsonBody<_>  = json!({
+    "size": 5,
+    "query": {
+        "multi_match": {
+            "query": q,
+            "fields": ["title^2", "director"]
+        }
+    }
+}).into();
+client
+    .send(
+        Method::Post,
+        "/movies/_search",
+        HeaderMap::new(),
+        Option::<&()>::None,
+        Some(query),
+        None,
+    )
+    .await?;
+```
+
+#### DELETE
+The following example deletes an index.
+```rust
+client
+  .send::<(), ()>(
+      Method::Delete,
+      "/movies",
+      HeaderMap::new(),
+      None,
+      None,
+      None,
+  )
+  .await?;
 ```
 
 ## Amazon OpenSearch and OpenSearch Serverless

@@ -66,7 +66,7 @@ pub fn download_test_suites(branch: &str, download_dir: &Path) -> anyhow::Result
         .build()
         .unwrap();
 
-    let response = client.get(&url).send()?;
+    let response = client.get(url).send()?;
     let tar = GzDecoder::new(response);
     let mut archive = Archive::new(tar);
 

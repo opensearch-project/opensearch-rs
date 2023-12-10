@@ -29,77 +29,58 @@
  */
 
 pub mod common;
-use common::*;
 
+use crate::common::server::MockServer;
 use opensearch::auth::Credentials;
-
-use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
-use std::io::Write;
 
 #[tokio::test]
 async fn basic_auth_header() -> anyhow::Result<()> {
-    let server = server::http(move |req| async move {
-        let mut header_value = b"Basic ".to_vec();
-        {
-            let mut encoder = Base64Encoder::new(&mut header_value, &BASE64_STANDARD);
-            write!(encoder, "username:password").unwrap();
-        }
+    let mut server = MockServer::start()?;
 
-        assert_header_eq!(
-            req,
-            "authorization",
-            String::from_utf8(header_value).unwrap()
-        );
-        server::empty_response()
-    });
+    let client =
+        server.client_with(|b| b.auth(Credentials::Basic("username".into(), "password".into())));
 
-    let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
-        .auth(Credentials::Basic("username".into(), "password".into()));
+    let _ = client.ping().send().await?;
 
-    let client = client::create(builder);
-    let _response = client.ping().send().await?;
+    let request = server.received_request().await?;
+
+    assert_eq!(
+        request.header("authorization"),
+        Some("Basic dXNlcm5hbWU6cGFzc3dvcmQ=")
+    );
 
     Ok(())
 }
 
 #[tokio::test]
 async fn api_key_header() -> anyhow::Result<()> {
-    let server = server::http(move |req| async move {
-        let mut header_value = b"ApiKey ".to_vec();
-        {
-            let mut encoder = Base64Encoder::new(&mut header_value, &BASE64_STANDARD);
-            write!(encoder, "id:api_key").unwrap();
-        }
+    let mut server = MockServer::start()?;
 
-        assert_header_eq!(
-            req,
-            "authorization",
-            String::from_utf8(header_value).unwrap()
-        );
-        server::empty_response()
-    });
+    let client = server.client_with(|b| b.auth(Credentials::ApiKey("id".into(), "api_key".into())));
 
-    let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
-        .auth(Credentials::ApiKey("id".into(), "api_key".into()));
+    let _ = client.ping().send().await?;
 
-    let client = client::create(builder);
-    let _response = client.ping().send().await?;
+    let request = server.received_request().await?;
+
+    assert_eq!(
+        request.header("authorization"),
+        Some("ApiKey aWQ6YXBpX2tleQ==")
+    );
 
     Ok(())
 }
 
 #[tokio::test]
 async fn bearer_header() -> anyhow::Result<()> {
-    let server = server::http(move |req| async move {
-        assert_header_eq!(req, "authorization", "Bearer access_token");
-        server::empty_response()
-    });
+    let mut server = MockServer::start()?;
 
-    let builder = client::create_builder(format!("http://{}", server.addr()).as_ref())
-        .auth(Credentials::Bearer("access_token".into()));
+    let client = server.client_with(|b| b.auth(Credentials::Bearer("access_token".into())));
 
-    let client = client::create(builder);
-    let _response = client.ping().send().await?;
+    let _ = client.ping().send().await?;
+
+    let request = server.received_request().await?;
+
+    assert_eq!(request.header("authorization"), Some("Bearer access_token"));
 
     Ok(())
 }

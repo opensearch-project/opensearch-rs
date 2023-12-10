@@ -38,8 +38,7 @@ use serde_json::{json, Value};
 /// Responses in the range 400-599 return Response body
 #[tokio::test]
 async fn bad_request_returns_response() -> anyhow::Result<()> {
-    let client = client::create_default();
-    let response = client
+    let response = client::create()
         .explain(ExplainParts::IndexId("non_existent_index", "id"))
         .body(json!({}))
         .send()
@@ -63,8 +62,7 @@ async fn bad_request_returns_response() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn deserialize_exception() -> anyhow::Result<()> {
-    let client = client::create_default();
-    let response = client
+    let response = client::create()
         .explain(ExplainParts::IndexId("non_existent_index", "id"))
         .error_trace(true)
         .body(json!({}))

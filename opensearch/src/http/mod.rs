@@ -38,7 +38,7 @@ pub mod request;
 pub mod response;
 pub mod transport;
 
-pub use reqwest::StatusCode;
+pub use reqwest::{self, Request, StatusCode};
 pub use url::Url;
 
 /// Http methods supported by OpenSearch

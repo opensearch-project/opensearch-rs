@@ -97,11 +97,11 @@ impl std::convert::TryFrom<&aws_types::SdkConfig> for Credentials {
     fn try_from(value: &aws_types::SdkConfig) -> Result<Self, Self::Error> {
         let credentials = value
             .credentials_provider()
-            .ok_or_else(|| super::error::lib("SdkConfig does not have a credentials_provider"))?
+            .ok_or(crate::http::aws_auth::AwsSigV4Error::MissingCredentialsProvider)?
             .clone();
         let region = value
             .region()
-            .ok_or_else(|| super::error::lib("SdkConfig does not have a region"))?
+            .ok_or(crate::http::aws_auth::AwsSigV4Error::MissingRegion)?
             .clone();
         Ok(Credentials::AwsSigV4(credentials, region))
     }

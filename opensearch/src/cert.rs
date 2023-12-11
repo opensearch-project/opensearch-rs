@@ -233,7 +233,10 @@ impl Certificate {
                 END_CERTIFICATE if begin => {
                     begin = false;
                     cert.push(line);
-                    certs.push(reqwest::Certificate::from_pem(cert.join("\n").as_bytes())?);
+                    certs.push(
+                        reqwest::Certificate::from_pem(cert.join("\n").as_bytes())
+                            .map_err(CertificateError::MalformedCertificate)?,
+                    );
                     cert = Vec::new();
                 }
                 _ if begin => cert.push(line),
@@ -242,9 +245,7 @@ impl Certificate {
         }
 
         if certs.is_empty() {
-            Err(crate::error::lib(
-                "could not find PEM certificate in input data",
-            ))
+            Err(CertificateError::MissingPemCertificate.into())
         } else {
             Ok(Self(certs))
         }
@@ -252,7 +253,9 @@ impl Certificate {
 
     /// Create a `Certificate` from a binary DER encoded certificate.
     pub fn from_der(der: &[u8]) -> Result<Self, Error> {
-        Ok(Self(vec![reqwest::Certificate::from_der(der)?]))
+        Ok(Self(vec![
+            reqwest::Certificate::from_der(der).map_err(CertificateError::MalformedCertificate)?
+        ]))
     }
 
     /// Append a `Certificate` to the chain.
@@ -278,4 +281,12 @@ impl Deref for Certificate {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum CertificateError {
+    #[error("could not find PEM certificate in input data")]
+    MissingPemCertificate,
+    #[error("malformed certificate: {0}")]
+    MalformedCertificate(reqwest::Error),
 }

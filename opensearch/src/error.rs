@@ -32,125 +32,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use crate::http::{transport::BuildError, StatusCode};
-use std::{error, fmt, io};
+
+use crate::{
+    cert::CertificateError,
+    http::{transport, StatusCode},
+};
+
+pub(crate) type BoxError<'a> = Box<dyn std::error::Error + Send + Sync + 'a>;
 
 /// An error with the client.
 ///
 /// Errors that can occur include IO and parsing errors, as well as specific
 /// errors from OpenSearch and internal errors from the client.
-#[derive(Debug)]
-pub struct Error {
-    kind: Kind,
-}
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub struct Error(Kind);
 
-#[derive(Debug)]
-enum Kind {
-    /// An error building the client
-    Build(BuildError),
-
-    /// A general error from this library
-    Lib(String),
-
-    /// HTTP library error
-    Http(reqwest::Error),
-
-    /// IO error
-    Io(io::Error),
-
-    /// JSON error
-    Json(serde_json::error::Error),
-}
-
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Error {
-        Error {
-            kind: Kind::Io(err),
-        }
+impl<E> From<E> for Error
+where
+    Kind: From<E>,
+{
+    fn from(error: E) -> Self {
+        Self(Kind::from(error))
     }
 }
 
-impl From<reqwest::Error> for Error {
-    fn from(err: reqwest::Error) -> Error {
-        Error {
-            kind: Kind::Http(err),
-        }
-    }
-}
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Kind {
+    #[error("transport builder error: {0}")]
+    TransportBuilder(#[from] transport::BuildError),
 
-impl From<serde_json::error::Error> for Error {
-    fn from(err: serde_json::error::Error) -> Error {
-        Error {
-            kind: Kind::Json(err),
-        }
-    }
-}
+    #[error("certificate error: {0}")]
+    Certificate(#[from] CertificateError),
 
-impl From<url::ParseError> for Error {
-    fn from(err: url::ParseError) -> Error {
-        Error {
-            kind: Kind::Lib(err.to_string()),
-        }
-    }
-}
+    #[error("reqwest error: {0}")]
+    Reqwest(#[from] reqwest::Error),
 
-impl From<BuildError> for Error {
-    fn from(err: BuildError) -> Error {
-        Error {
-            kind: Kind::Build(err),
-        }
-    }
-}
+    #[error("URL parse error: {0}")]
+    UrlParse(#[from] url::ParseError),
 
-pub(crate) fn lib(err: impl Into<String>) -> Error {
-    Error {
-        kind: Kind::Lib(err.into()),
-    }
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::error::Error),
+
+    #[cfg(feature = "aws-auth")]
+    #[error("AwsSigV4 error: {0}")]
+    AwsSigV4(#[from] crate::http::aws_auth::AwsSigV4Error),
 }
 
 impl Error {
     /// The status code, if the error was generated from a response
     pub fn status_code(&self) -> Option<StatusCode> {
-        match &self.kind {
-            Kind::Http(err) => err.status(),
+        match &self.0 {
+            Kind::Reqwest(err) => err.status(),
             _ => None,
         }
     }
 
     /// Returns true if the error is related to a timeout
     pub fn is_timeout(&self) -> bool {
-        match &self.kind {
-            Kind::Http(err) => err.is_timeout(),
+        match &self.0 {
+            Kind::Reqwest(err) => err.is_timeout(),
             _ => false,
         }
     }
 
     /// Returns true if the error is related to serialization or deserialization
     pub fn is_json(&self) -> bool {
-        matches!(self.kind, Kind::Json(_))
-    }
-}
-
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match &self.kind {
-            Kind::Build(err) => Some(err),
-            Kind::Lib(_) => None,
-            Kind::Http(err) => Some(err),
-            Kind::Io(err) => Some(err),
-            Kind::Json(err) => Some(err),
-        }
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match &self.kind {
-            Kind::Build(err) => err.fmt(f),
-            Kind::Lib(err) => err.fmt(f),
-            Kind::Http(err) => err.fmt(f),
-            Kind::Io(err) => err.fmt(f),
-            Kind::Json(err) => err.fmt(f),
-        }
+        matches!(self.0, Kind::Json(_))
     }
 }

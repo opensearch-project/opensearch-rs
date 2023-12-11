@@ -269,7 +269,7 @@ impl TransportBuilder {
         self
     }
 
-    /// Builds a [Transport] to use to send API calls to Elasticsearch.
+    /// Builds a [Transport] to use to send API calls to OpenSearch.
     pub fn build(self) -> Result<Transport, BuildError> {
         let mut client_builder = self.client_builder;
 
@@ -353,7 +353,7 @@ impl Default for TransportBuilder {
     }
 }
 
-/// A connection to an Elasticsearch node, used to send an API request
+/// A connection to an OpenSearch node, used to send an API request
 #[derive(Debug, Clone)]
 pub struct Connection {
     url: Url,
@@ -374,7 +374,7 @@ impl Connection {
     }
 }
 
-/// A HTTP transport responsible for making the API requests to Elasticsearch,
+/// A HTTP transport responsible for making the API requests to OpenSearch,
 /// using a [Connection] selected from a [ConnectionPool]
 #[derive(Debug, Clone)]
 pub struct Transport {
@@ -523,7 +523,7 @@ impl Default for Transport {
     }
 }
 
-/// A pool of [Connection]s, used to make API calls to Elasticsearch.
+/// A pool of [Connection]s, used to make API calls to OpenSearch.
 ///
 /// A [ConnectionPool] manages the connections, with different implementations determining how
 /// to get the next [Connection]. The simplest type of [ConnectionPool] is [SingleNodeConnectionPool],
@@ -536,7 +536,7 @@ pub trait ConnectionPool: Debug + dyn_clone::DynClone + Sync + Send {
 
 clone_trait_object!(ConnectionPool);
 
-/// A connection pool that manages the single connection to an Elasticsearch cluster.
+/// A connection pool that manages the single connection to an OpenSearch cluster.
 #[derive(Debug, Clone)]
 pub struct SingleNodeConnectionPool {
     connection: Connection,

@@ -41,7 +41,7 @@ pub mod transport;
 pub use reqwest::StatusCode;
 pub use url::Url;
 
-/// Http methods supported by Elasticsearch
+/// Http methods supported by OpenSearch
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
     /// get

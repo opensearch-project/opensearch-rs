@@ -38,7 +38,7 @@ use std::{error, fmt, io};
 /// An error with the client.
 ///
 /// Errors that can occur include IO and parsing errors, as well as specific
-/// errors from Elasticsearch and internal errors from the client.
+/// errors from OpenSearch and internal errors from the client.
 #[derive(Debug)]
 pub struct Error {
     kind: Kind,

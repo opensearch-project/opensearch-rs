@@ -45,7 +45,7 @@ pub(crate) const PARTS_ENCODED: &AsciiSet = &percent_encoding::NON_ALPHANUMERIC
 
 /// Body of an API call.
 ///
-/// Some Elasticsearch APIs accept a body as part of the API call. Most APIs
+/// Some OpenSearch APIs accept a body as part of the API call. Most APIs
 /// expect JSON, however, there are some APIs that expect newline-delimited JSON (NDJSON).
 /// The [Body] trait allows modelling different API body implementations.
 pub trait Body {

@@ -32,7 +32,7 @@
 // Licensed under Apache License, Version 2.0
 // https://github.com/seanmonstar/reqwest/blob/master/LICENSE-APACHE
 
-use std::{net::SocketAddr, sync::mpsc as std_mpsc, thread, time::Duration};
+use std::{convert::identity, net::SocketAddr, sync::mpsc as std_mpsc, thread, time::Duration};
 
 use bytes::Bytes;
 use http_body_util::Empty;
@@ -166,12 +166,12 @@ impl MockServer {
         MockServerBuilder::default()
     }
 
-    pub fn start() -> anyhow::Result<MockServer> {
-        MockServerBuilder::default().start()
+    pub fn start() -> anyhow::Result<Self> {
+        Self::builder().start()
     }
 
     pub fn client(&self) -> OpenSearch {
-        self.client_builder().build()
+        self.client_with(identity)
     }
 
     pub fn client_with(

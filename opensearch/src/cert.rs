@@ -233,11 +233,15 @@ impl Certificate {
                 END_CERTIFICATE if begin => {
                     begin = false;
                     cert.push(line);
-                    certs.push(
-                        reqwest::Certificate::from_pem(cert.join("\n").as_bytes())
-                            .map_err(CertificateError::MalformedCertificate)?,
-                    );
-                    cert = Vec::new();
+
+                    {
+                        let cert = reqwest::Certificate::from_pem(cert.join("\n").as_bytes())
+                            .map_err(CertificateError::MalformedCertificate)?;
+
+                        certs.push(cert);
+                    }
+
+                    cert.clear();
                 }
                 _ if begin => cert.push(line),
                 _ => {}

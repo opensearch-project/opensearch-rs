@@ -127,7 +127,7 @@ impl Serialize for BulkHeader {
 /// ops.push(BulkOperation::index(json!({
 ///         "user": "kimchy",
 ///         "post_date": "2009-11-15T00:00:00Z",
-///         "message": "Trying out Elasticsearch, so far so good?"
+///         "message": "Trying out OpenSearch, so far so good?"
 ///     }))
 ///     .id("1")
 ///     .pipeline("process_tweet")
@@ -307,7 +307,7 @@ impl<B> BulkIndexOperation<B> {
 
     /// Specify the id for the document
     ///
-    /// If an id is not specified, Elasticsearch will generate an id for the document
+    /// If an id is not specified, OpenSearch will generate an id for the document
     /// which will be returned in the response.
     pub fn id<S>(mut self, id: S) -> Self
     where

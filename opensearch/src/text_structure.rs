@@ -62,7 +62,7 @@ impl TextStructureFindStructureParts {
         }
     }
 }
-#[doc = "Builder for the [Text Structure Find Structure API](https://opensearch.org/docs/)\n\nFinds the structure of a text file. The text file must contain data that is suitable to be ingested into Elasticsearch."]
+#[doc = "Builder for the [Text Structure Find Structure API](https://opensearch.org/docs/)\n\nFinds the structure of a text file. The text file must contain data that is suitable to be ingested into OpenSearch."]
 #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
 #[cfg(feature = "experimental-apis")]
 #[derive(Clone, Debug)]
@@ -342,7 +342,7 @@ impl<'a> TextStructure<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Text Structure Find Structure API](https://opensearch.org/docs/)\n\nFinds the structure of a text file. The text file must contain data that is suitable to be ingested into Elasticsearch."]
+    #[doc = "[Text Structure Find Structure API](https://opensearch.org/docs/)\n\nFinds the structure of a text file. The text file must contain data that is suitable to be ingested into OpenSearch."]
     #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
     #[cfg(feature = "experimental-apis")]
     pub fn find_structure<'b>(&'a self) -> TextStructureFindStructure<'a, 'b, ()> {

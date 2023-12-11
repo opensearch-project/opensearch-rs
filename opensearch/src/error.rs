@@ -58,15 +58,15 @@ where
 }
 
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Kind {
+enum Kind {
     #[error("transport builder error: {0}")]
     TransportBuilder(#[from] transport::BuildError),
 
     #[error("certificate error: {0}")]
     Certificate(#[from] CertificateError),
 
-    #[error("reqwest error: {0}")]
-    Reqwest(#[from] reqwest::Error),
+    #[error("http error: {0}")]
+    Http(#[from] reqwest::Error),
 
     #[error("URL parse error: {0}")]
     UrlParse(#[from] url::ParseError),
@@ -82,11 +82,13 @@ pub(crate) enum Kind {
     AwsSigV4(#[from] crate::http::aws_auth::AwsSigV4Error),
 }
 
+use Kind::*;
+
 impl Error {
     /// The status code, if the error was generated from a response
     pub fn status_code(&self) -> Option<StatusCode> {
         match &self.0 {
-            Kind::Reqwest(err) => err.status(),
+            Http(err) => err.status(),
             _ => None,
         }
     }
@@ -94,13 +96,13 @@ impl Error {
     /// Returns true if the error is related to a timeout
     pub fn is_timeout(&self) -> bool {
         match &self.0 {
-            Kind::Reqwest(err) => err.is_timeout(),
+            Http(err) => err.is_timeout(),
             _ => false,
         }
     }
 
     /// Returns true if the error is related to serialization or deserialization
     pub fn is_json(&self) -> bool {
-        matches!(self.0, Kind::Json(_))
+        matches!(self.0, Json(_))
     }
 }

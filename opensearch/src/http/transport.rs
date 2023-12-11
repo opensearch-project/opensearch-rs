@@ -62,8 +62,8 @@ use url::Url;
 pub(crate) enum BuildError {
     #[error("proxy configuration error: {0}")]
     Proxy(#[source] reqwest::Error),
-    #[error("reqwest configuration error: {0}")]
-    Reqwest(#[source] reqwest::Error),
+    #[error("client configuration error: {0}")]
+    ClientBuilder(#[source] reqwest::Error),
 }
 
 /// Default address to OpenSearch running on `http://localhost:9200`
@@ -290,7 +290,7 @@ impl TransportBuilder {
             client_builder = client_builder.proxy(proxy);
         }
 
-        let client = client_builder.build().map_err(BuildError::Reqwest)?;
+        let client = client_builder.build().map_err(BuildError::ClientBuilder)?;
         Ok(Transport {
             client,
             conn_pool: self.conn_pool,
@@ -466,11 +466,9 @@ impl Transport {
             .await?;
         }
 
-        let response = self.client.execute(request).await;
-        match response {
-            Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e.into()),
-        }
+        let response = self.client.execute(request).await?;
+
+        Ok(Response::new(response, method))
     }
 }
 

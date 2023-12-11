@@ -28,7 +28,7 @@
  * GitHub history for details.
  */
 
-//! HTTP header names and values, including those specific to Elasticsearch
+//! HTTP header names and values, including those specific to OpenSearch
 
 pub use reqwest::header::*;
 

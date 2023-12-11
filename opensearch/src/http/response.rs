@@ -43,14 +43,14 @@ use serde_json::Value;
 use std::{collections::BTreeMap, fmt, str::FromStr};
 use void::Void;
 
-/// A response from Elasticsearch
+/// A response from OpenSearch
 pub struct Response {
     response: reqwest::Response,
     method: Method,
 }
 
 impl Response {
-    /// Creates a new instance of an Elasticsearch response
+    /// Creates a new instance of an OpenSearch response
     pub fn new(response: reqwest::Response, method: Method) -> Self {
         Self { response, method }
     }
@@ -75,7 +75,7 @@ impl Response {
             .unwrap()
     }
 
-    /// Turn the response into an [Error] if Elasticsearch returned an error.
+    /// Turn the response into an [Error] if OpenSearch returned an error.
     pub fn error_for_status_code(self) -> Result<Self, ClientError> {
         match self.response.error_for_status_ref() {
             Ok(_) => Ok(self),
@@ -83,7 +83,7 @@ impl Response {
         }
     }
 
-    /// Turn the response into an [Error] if Elasticsearch returned an error.
+    /// Turn the response into an [Error] if OpenSearch returned an error.
     pub fn error_for_status_code_ref(&self) -> Result<&Self, ClientError> {
         match self.response.error_for_status_ref() {
             Ok(_) => Ok(self),
@@ -92,7 +92,7 @@ impl Response {
     }
 
     /// Asynchronously reads the response body into an [Exception] if
-    /// Elasticsearch returned a HTTP status code in the 400-599 range.
+    /// OpenSearch returned a HTTP status code in the 400-599 range.
     ///
     /// Reading the response body consumes `self`
     pub async fn exception(self) -> Result<Option<Exception>, ClientError> {
@@ -153,7 +153,7 @@ impl Response {
 
     /// Gets the Deprecation warning response headers
     ///
-    /// Deprecation headers signal the use of Elasticsearch functionality
+    /// Deprecation headers signal the use of OpenSearch functionality
     /// or features that are deprecated and will be removed in a future release.
     pub fn warning_headers(&self) -> impl Iterator<Item = &str> {
         self.response.headers().get_all("Warning").iter().map(|w| {
@@ -176,7 +176,7 @@ impl fmt::Debug for Response {
     }
 }
 
-/// An exception raised by Elasticsearch.
+/// An exception raised by OpenSearch.
 ///
 /// Contains details that indicate why the exception was raised which can help to determine
 /// what subsequent action to take.
@@ -200,7 +200,7 @@ impl Exception {
     }
 }
 
-/// Details about the exception raised by Elasticsearch
+/// Details about the exception raised by OpenSearch
 #[serde_with::skip_serializing_none]
 #[derive(Debug, PartialEq, Deserialize, Serialize, Clone)]
 pub struct Error {
@@ -265,14 +265,14 @@ impl Error {
 
     /// Additional details about the cause.
     ///
-    /// Elasticsearch can return additional details about an exception, depending
+    /// OpenSearch can return additional details about an exception, depending
     /// on context, which do not map to fields on [Error]. These are collected here
     pub fn additional_details(&self) -> &BTreeMap<String, Value> {
         &self.additional_details
     }
 }
 
-// An error in an Elasticsearch exception can be returned as a simple message string only, or
+// An error in an OpenSearch exception can be returned as a simple message string only, or
 // as a JSON object. Handle both cases by corralling the simple message into the reason field
 impl FromStr for Error {
     type Err = Void;
@@ -370,7 +370,7 @@ impl Cause {
 
     /// Additional details about the cause.
     ///
-    /// Elasticsearch can return additional details about an exception, depending
+    /// OpenSearch can return additional details about an exception, depending
     /// on context, which do not map to fields on [Error]. These are collected here
     pub fn additional_details(&self) -> &BTreeMap<String, Value> {
         &self.additional_details

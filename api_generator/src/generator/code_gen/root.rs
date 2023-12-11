@@ -23,7 +23,7 @@ use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::path::Path;
 
-/// Generates the source code for the methods on the root of Elasticsearch
+/// Generates the source code for the methods on the root of OpenSearch
 pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<String> {
     let mut tokens = TokenStream::new();
     tokens.append_all(use_declarations());

@@ -35,12 +35,12 @@ use opensearch::{
     http::{
         response::Response,
         transport::{SingleNodeConnectionPool, TransportBuilder},
+        StatusCode,
     },
     indices::IndicesExistsParts,
     params::Refresh,
     BulkOperation, BulkParts, Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use reqwest::StatusCode;
 use serde_json::json;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System, SystemExt};
 use url::Url;
@@ -63,45 +63,75 @@ fn running_proxy() -> bool {
     has_fiddler
 }
 
-pub fn create_default_builder() -> TransportBuilder {
-    create_builder(cluster_addr().as_str())
-}
+pub struct TestClientBuilder(TransportBuilder);
 
-pub fn create_builder(addr: &str) -> TransportBuilder {
-    let url = Url::parse(addr).unwrap();
-    let conn_pool = SingleNodeConnectionPool::new(url.clone());
-    let mut builder = TransportBuilder::new(conn_pool);
-    // assume if we're running with HTTPS then authentication is also enabled and disable
-    // certificate validation - we'll change this for tests that need to.
-    if url.scheme() == "https" {
-        builder = builder.auth(Credentials::Basic("admin".into(), "admin".into()));
+impl TestClientBuilder {
+    pub fn new() -> Self {
+        Self::with_url(&cluster_addr())
+    }
 
-        #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
-        {
-            builder = builder.cert_validation(CertificateValidation::None);
+    pub fn with_url(url: &str) -> Self {
+        let url = Url::parse(url).unwrap();
+        let secure = url.scheme() == "https";
+        let conn_pool = SingleNodeConnectionPool::new(url);
+        let mut builder = TransportBuilder::new(conn_pool);
+
+        // assume if we're running with HTTPS then authentication is also enabled and disable
+        // certificate validation - we'll change this for tests that need to.
+        if secure {
+            builder = builder.auth(Credentials::Basic("admin".into(), "admin".into()));
+
+            #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+            {
+                builder = builder.cert_validation(CertificateValidation::None);
+            }
         }
+
+        Self(builder)
     }
 
-    builder
-}
-
-pub fn create_default() -> OpenSearch {
-    create_for_url(cluster_addr().as_str())
-}
-
-pub fn create_for_url(url: &str) -> OpenSearch {
-    let builder = create_builder(url);
-    create(builder)
-}
-
-pub fn create(mut builder: TransportBuilder) -> OpenSearch {
-    if running_proxy() {
-        let proxy_url = Url::parse("http://localhost:8888").unwrap();
-        builder = builder.proxy(proxy_url, None, None);
+    pub fn with(mut self, configurator: impl FnOnce(TransportBuilder) -> TransportBuilder) -> Self {
+        self.0 = configurator(self.0);
+        self
     }
 
-    let transport = builder.build().unwrap();
-    OpenSearch::new(transport)
+    pub fn build(self) -> OpenSearch {
+        let mut builder = self.0;
+
+        if running_proxy() {
+            let proxy_url = Url::parse("http://localhost:8888").unwrap();
+            builder = builder.proxy(proxy_url, None, None);
+        }
+
+        let transport = builder.build().unwrap();
+        OpenSearch::new(transport)
+    }
+}
+
+impl Default for TestClientBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub fn builder() -> TestClientBuilder {
+    TestClientBuilder::new()
+}
+
+pub fn builder_with_url(url: &str) -> TestClientBuilder {
+    TestClientBuilder::with_url(url)
+}
+
+pub fn create() -> OpenSearch {
+    builder().build()
+}
+
+pub fn create_with(configurator: impl FnOnce(TransportBuilder) -> TransportBuilder) -> OpenSearch {
+    builder().with(configurator).build()
+}
+
+pub fn create_with_url(url: &str) -> OpenSearch {
+    builder_with_url(url).build()
 }
 
 /// index some documents into a posts index. If the posts index already exists, do nothing.

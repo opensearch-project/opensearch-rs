@@ -20,18 +20,14 @@ OPENSEARCH_URL = { value = "${OPENSEARCH_PROTOCOL}://localhost:9200", condition 
 category = "OpenSearch"
 description = "Generates SSL certificates used for integration tests"
 command = "bash"
-args =["./.ci/generate-certs.sh"]
+args = ["./.ci/generate-certs.sh"]
 
 [tasks.run-opensearch]
 category = "OpenSearch"
 private = true
 condition = { env_set = [ "STACK_VERSION"], env_false = ["CARGO_MAKE_CI"] }
-
-[tasks.run-opensearch.linux]
-command = "./.ci/run-opensearch.sh"
-
-[tasks.run-opensearch.mac]
-command = "./.ci/run-opensearch.sh"
+command = "bash"
+args = ["./.ci/run-opensearch.sh"]
 
 [tasks.run-opensearch.windows]
 script_runner = "cmd"

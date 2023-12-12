@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-use crate::http::headers::HeaderValue;
+use crate::{http::headers::HeaderValue, BoxError};
 use aws_credential_types::provider::{ProvideCredentials, SharedCredentialsProvider};
 use aws_sigv4::{
     http_request::{
@@ -21,15 +21,32 @@ use aws_smithy_runtime_api::client::identity::Identity;
 use aws_types::{region::Region, sdk_config::SharedTimeSource};
 use reqwest::Request;
 
-pub async fn sign_request(
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum AwsSigV4Error {
+    #[error("SdkConfig is does not have a credentials provider configured")]
+    MissingCredentialsProvider,
+    #[error("SdkConfig is does not have a region configured")]
+    MissingRegion,
+    #[error("signing error: {0}")]
+    SigningError(#[source] BoxError<'static>),
+}
+
+fn signing_error<E: Into<BoxError<'static>>>(e: E) -> AwsSigV4Error {
+    AwsSigV4Error::SigningError(e.into())
+}
+
+pub(crate) async fn sign_request(
     request: &mut Request,
     credentials_provider: &SharedCredentialsProvider,
     service_name: &str,
     region: &Region,
     time_source: &SharedTimeSource,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<(), AwsSigV4Error> {
     let identity = {
-        let c = credentials_provider.provide_credentials().await?;
+        let c = credentials_provider
+            .provide_credentials()
+            .await
+            .map_err(signing_error)?;
         let e = c.expiry();
         Identity::new(c, e)
     };
@@ -47,7 +64,8 @@ pub async fn sign_request(
             .region(region.as_ref())
             .time(time_source.now())
             .settings(signing_settings)
-            .build()?;
+            .build()
+            .map_err(signing_error)?;
         SigningParams::V4(p)
     };
 
@@ -68,11 +86,13 @@ pub async fn sign_request(
             None => SignableBody::Bytes(&[]),
         };
 
-        SignableRequest::new(method, uri, headers, body)?
+        SignableRequest::new(method, uri, headers, body).map_err(signing_error)?
     };
 
     let (new_headers, new_query_params) = {
-        let (instructions, _) = sign(signable_request, &params)?.into_parts();
+        let (instructions, _) = sign(signable_request, &params)
+            .map_err(signing_error)?
+            .into_parts();
         instructions.into_parts()
     };
 

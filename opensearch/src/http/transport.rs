@@ -36,6 +36,7 @@ use crate::auth::ClientCertificate;
 use crate::cert::CertificateValidation;
 use crate::{
     auth::Credentials,
+    cert::CertificateError,
     error::Error,
     http::{
         headers::{
@@ -54,60 +55,15 @@ use bytes::BytesMut;
 use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use serde::Serialize;
-use std::{
-    error, fmt,
-    fmt::Debug,
-    io::{self, Write},
-    time::Duration,
-};
+use std::{fmt::Debug, io::Write, time::Duration};
 use url::Url;
 
-/// Error that can occur when building a [Transport]
-#[derive(Debug)]
-pub enum BuildError {
-    /// IO error
-    Io(io::Error),
-
-    /// Certificate error
-    Cert(reqwest::Error),
-}
-
-impl From<io::Error> for BuildError {
-    fn from(err: io::Error) -> BuildError {
-        BuildError::Io(err)
-    }
-}
-
-impl From<reqwest::Error> for BuildError {
-    fn from(err: reqwest::Error) -> BuildError {
-        BuildError::Cert(err)
-    }
-}
-
-impl error::Error for BuildError {
-    #[allow(warnings)]
-    fn description(&self) -> &str {
-        match *self {
-            BuildError::Io(ref err) => err.description(),
-            BuildError::Cert(ref err) => err.description(),
-        }
-    }
-
-    fn cause(&self) -> Option<&dyn error::Error> {
-        match *self {
-            BuildError::Io(ref err) => Some(err as &dyn error::Error),
-            BuildError::Cert(ref err) => Some(err as &dyn error::Error),
-        }
-    }
-}
-
-impl fmt::Display for BuildError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            BuildError::Io(ref err) => fmt::Display::fmt(err, f),
-            BuildError::Cert(ref err) => fmt::Display::fmt(err, f),
-        }
-    }
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum BuildError {
+    #[error("proxy configuration error: {0}")]
+    Proxy(#[source] reqwest::Error),
+    #[error("client configuration error: {0}")]
+    ClientBuilder(#[source] reqwest::Error),
 }
 
 /// Default address to OpenSearch running on `http://localhost:9200`
@@ -270,7 +226,7 @@ impl TransportBuilder {
     }
 
     /// Builds a [Transport] to use to send API calls to OpenSearch.
-    pub fn build(self) -> Result<Transport, BuildError> {
+    pub fn build(self) -> Result<Transport, Error> {
         let mut client_builder = self.client_builder;
 
         if let Some(t) = self.timeout {
@@ -287,12 +243,14 @@ impl TransportBuilder {
                             Some(pass) => pass.as_str(),
                             None => "",
                         };
-                        let pkcs12 = reqwest::Identity::from_pkcs12_der(b, password)?;
+                        let pkcs12 = reqwest::Identity::from_pkcs12_der(b, password)
+                            .map_err(CertificateError::MalformedCertificate)?;
                         client_builder.identity(pkcs12)
                     }
                     #[cfg(feature = "rustls-tls")]
                     ClientCertificate::Pem(b) => {
-                        let pem = reqwest::Identity::from_pem(b)?;
+                        let pem = reqwest::Identity::from_pem(b)
+                            .map_err(CertificateError::MalformedCertificate)?;
                         client_builder.identity(pem)
                     }
                 }
@@ -322,7 +280,7 @@ impl TransportBuilder {
         if self.disable_proxy {
             client_builder = client_builder.no_proxy();
         } else if let Some(url) = self.proxy {
-            let mut proxy = reqwest::Proxy::all(url)?;
+            let mut proxy = reqwest::Proxy::all(url).map_err(BuildError::Proxy)?;
             if let Some(c) = self.proxy_credentials {
                 proxy = match c {
                     Credentials::Basic(u, p) => proxy.basic_auth(&u, &p),
@@ -332,7 +290,7 @@ impl TransportBuilder {
             client_builder = client_builder.proxy(proxy);
         }
 
-        let client = client_builder.build()?;
+        let client = client_builder.build().map_err(BuildError::ClientBuilder)?;
         Ok(Transport {
             client,
             conn_pool: self.conn_pool,
@@ -505,15 +463,12 @@ impl Transport {
                 region,
                 &self.sigv4_time_source,
             )
-            .await
-            .map_err(|e| crate::error::lib(format!("AWSV4 Signing Failed: {}", e)))?;
+            .await?;
         }
 
-        let response = self.client.execute(request).await;
-        match response {
-            Ok(r) => Ok(Response::new(r, method)),
-            Err(e) => Err(e.into()),
-        }
+        let response = self.client.execute(request).await?;
+
+        Ok(Response::new(response, method))
     }
 }
 

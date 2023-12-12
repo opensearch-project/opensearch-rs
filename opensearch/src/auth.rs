@@ -90,7 +90,7 @@ impl From<ClientCertificate> for Credentials {
     }
 }
 
-#[cfg(any(feature = "aws-auth"))]
+#[cfg(feature = "aws-auth")]
 impl std::convert::TryFrom<&aws_types::SdkConfig> for Credentials {
     type Error = super::Error;
 
@@ -107,7 +107,7 @@ impl std::convert::TryFrom<&aws_types::SdkConfig> for Credentials {
     }
 }
 
-#[cfg(any(feature = "aws-auth"))]
+#[cfg(feature = "aws-auth")]
 impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
     type Error = super::Error;
 

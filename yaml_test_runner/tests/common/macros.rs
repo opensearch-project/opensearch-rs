@@ -132,9 +132,9 @@ macro_rules! assert_match {
 macro_rules! assert_numeric_match {
     ($expected:expr, $actual:expr) => {{
         if $expected.is_i64() {
-            crate::assert_match!($expected, $actual);
+            $crate::assert_match!($expected, $actual);
         } else {
-            crate::assert_match!($expected, $actual as f64);
+            $crate::assert_match!($expected, $actual as f64);
         }
     }};
 }

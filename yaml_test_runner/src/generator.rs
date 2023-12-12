@@ -204,7 +204,7 @@ impl<'a> YamlTests<'a> {
 
     fn should_skip_suite(&self) -> Option<String> {
         if self.should_skip_test("*") {
-            Some(format!("it's included in skip.yml"))
+            Some("it's included in skip.yml".into())
         } else if let Some(setup) = &self.setup {
             setup
                 .steps
@@ -508,7 +508,7 @@ fn write_mod_files(generated_dir: &Path, toplevel: bool) -> anyhow::Result<()> {
     mods.sort();
 
     let path = generated_dir.join("mod.rs");
-    let mut file = File::create(&path)?;
+    let mut file = File::create(path)?;
     let generated_mods: String = mods.join("\n");
     file.write_all(generated_mods.as_bytes())?;
     Ok(())

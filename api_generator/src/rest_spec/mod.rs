@@ -27,7 +27,7 @@ use tar::{Archive, Entry};
 
 pub fn download_specs(branch: &str, download_dir: &Path) -> anyhow::Result<()> {
     let url = format!(
-        "https://api.github.com/repos/elastic/elasticsearch/tarball/{}",
+        "https://api.github.com/repos/opensearch-project/opensearch/tarball/{}",
         branch
     );
 

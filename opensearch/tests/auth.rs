@@ -104,7 +104,7 @@ async fn bearer_header() -> anyhow::Result<()> {
     Ok(())
 }
 
-// TODO: test PKI authentication. Could configure a HttpsConnector, maybe using https://github.com/sfackler/hyper-openssl?, or send to PKI configured Elasticsearch.
+// TODO: test PKI authentication. Could configure a HttpsConnector, maybe using https://github.com/sfackler/hyper-openssl?, or send to PKI configured OpenSearch.
 //#[tokio::test]
 //async fn client_certificate() -> anyhow::Result<()> {
 //    let server = server::http(move |req| {

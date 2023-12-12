@@ -45,7 +45,7 @@ use serde_json::json;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System, SystemExt};
 use url::Url;
 
-/// Gets the address to the Elasticsearch instance from environment variables
+/// Gets the address to the OpenSearch instance from environment variables
 /// and assumes an instance running locally on the default port otherwise
 pub fn cluster_addr() -> String {
     match std::env::var("OPENSEARCH_URL") {

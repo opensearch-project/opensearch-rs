@@ -37,15 +37,13 @@ pub(crate) enum RequestPipelineErrorKind {
 }
 
 #[async_trait]
-pub trait RequestHandler: dyn_clone::DynClone + std::fmt::Debug + Send + Sync + 'static {
+pub trait RequestHandler: std::fmt::Debug + Send + Sync + 'static {
     async fn handle(
         &self,
         request: Request,
         next: RequestPipeline<'_>,
     ) -> Result<Response, RequestPipelineError>;
 }
-
-dyn_clone::clone_trait_object!(RequestHandler);
 
 #[derive(Clone)]
 pub struct RequestHandlerFn<F>(F);
@@ -67,7 +65,6 @@ where
             Request,
             RequestPipeline<'a>,
         ) -> BoxFuture<'a, Result<Response, RequestPipelineError>>
-        + Clone
         + Send
         + Sync
         + 'static,
@@ -81,13 +78,44 @@ where
     }
 }
 
+#[async_trait]
+impl<R> RequestHandler for std::sync::Arc<R>
+where
+    R: RequestHandler,
+{
+    async fn handle(
+        &self,
+        request: Request,
+        next: RequestPipeline<'_>,
+    ) -> Result<Response, RequestPipelineError> {
+        self.as_ref().handle(request, next).await
+    }
+}
+
+#[async_trait]
+impl RequestHandler for std::sync::Arc<dyn RequestHandler> {
+    async fn handle(
+        &self,
+        request: Request,
+        next: RequestPipeline<'_>,
+    ) -> Result<Response, RequestPipelineError> {
+        self.as_ref().handle(request, next).await
+    }
+}
+
+pub(crate) trait BoxedRequestHandler: RequestHandler + dyn_clone::DynClone {}
+
+impl<T> BoxedRequestHandler for T where T: RequestHandler + Clone {}
+
+dyn_clone::clone_trait_object!(BoxedRequestHandler);
+
 pub struct RequestPipeline<'a> {
     pub client: &'a Client,
-    pipeline: &'a [Box<dyn RequestHandler>],
+    pipeline: &'a [Box<dyn BoxedRequestHandler>],
 }
 
 impl<'a> RequestPipeline<'a> {
-    pub(crate) fn new(client: &'a Client, pipeline: &'a [Box<dyn RequestHandler>]) -> Self {
+    pub(crate) fn new(client: &'a Client, pipeline: &'a [Box<dyn BoxedRequestHandler>]) -> Self {
         Self { client, pipeline }
     }
 

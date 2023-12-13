@@ -13,7 +13,7 @@ use super::InitializerResult;
 use crate::BoxError;
 use reqwest::RequestBuilder;
 
-pub trait RequestInitializer: Clone + std::fmt::Debug + Send + Sync + 'static {
+pub trait RequestInitializer: std::fmt::Debug + Send + Sync + 'static {
     type Result: InitializerResult<RequestBuilder>;
 
     fn init(&self, request: RequestBuilder) -> Self::Result;
@@ -34,13 +34,35 @@ impl<F> std::fmt::Debug for RequestInitializerFn<F> {
 
 impl<F, R> RequestInitializer for RequestInitializerFn<F>
 where
-    F: Fn(RequestBuilder) -> R + Clone + Send + Sync + 'static,
+    F: Fn(RequestBuilder) -> R + Send + Sync + 'static,
     R: InitializerResult<RequestBuilder>,
 {
     type Result = R;
 
     fn init(&self, request: RequestBuilder) -> Self::Result {
         self.0(request)
+    }
+}
+
+impl<R> RequestInitializer for std::sync::Arc<R>
+where
+    R: RequestInitializer,
+{
+    type Result = R::Result;
+
+    fn init(&self, request: RequestBuilder) -> Self::Result {
+        self.as_ref().init(request)
+    }
+}
+
+impl<R> RequestInitializer for std::sync::Arc<dyn RequestInitializer<Result = R>>
+where
+    R: InitializerResult<RequestBuilder> + 'static,
+{
+    type Result = R;
+
+    fn init(&self, request: RequestBuilder) -> Self::Result {
+        self.as_ref().init(request)
     }
 }
 
@@ -52,7 +74,7 @@ pub(crate) trait BoxedRequestInitializer:
 
 impl<T> BoxedRequestInitializer for T
 where
-    T: RequestInitializer,
+    T: RequestInitializer + Clone,
 {
     fn init(&self, request: RequestBuilder) -> Result<RequestBuilder, BoxError<'static>> {
         RequestInitializer::init(self, request)

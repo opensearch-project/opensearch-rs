@@ -121,7 +121,7 @@ pub struct TransportBuilder {
     sigv4_time_source: Option<SharedTimeSource>,
     init_stack: Vec<Box<dyn BoxedClientInitializer>>,
     req_init_stack: Vec<Box<dyn BoxedRequestInitializer>>,
-    req_handler_stack: Vec<Box<dyn RequestHandler>>,
+    req_handler_stack: Vec<Box<dyn BoxedRequestHandler>>,
 }
 
 impl TransportBuilder {
@@ -301,7 +301,7 @@ impl TransportBuilder {
     ///     .build()?;
     /// # Ok::<(), opensearch::Error>(())
     /// ```
-    pub fn with_req_init(mut self, init: impl RequestInitializer) -> Self {
+    pub fn with_req_init(mut self, init: impl RequestInitializer + Clone) -> Self {
         self.req_init_stack.push(Box::new(init));
         self
     }
@@ -363,7 +363,7 @@ impl TransportBuilder {
     ///     .build()?;
     /// # Ok::<(), opensearch::Error>(())
     /// ```
-    pub fn with_handler(mut self, handler: impl RequestHandler) -> Self {
+    pub fn with_handler(mut self, handler: impl RequestHandler + Clone) -> Self {
         self.req_handler_stack.push(Box::new(handler));
         self
     }
@@ -541,7 +541,7 @@ pub struct Transport {
     #[cfg(feature = "aws-auth")]
     sigv4_time_source: SharedTimeSource,
     req_init_stack: Box<[Box<dyn BoxedRequestInitializer>]>,
-    req_handler_stack: Box<[Box<dyn RequestHandler>]>,
+    req_handler_stack: Box<[Box<dyn BoxedRequestHandler>]>,
 }
 
 impl Transport {

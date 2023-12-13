@@ -35,7 +35,10 @@
 
 use crate::{
     cert::CertificateError,
-    http::{transport, StatusCode},
+    http::{
+        middleware::{RequestPipelineError, RequestPipelineErrorKind},
+        transport, StatusCode,
+    },
 };
 
 pub(crate) type BoxError<'a> = Box<dyn std::error::Error + Send + Sync + 'a>;
@@ -53,7 +56,7 @@ where
     Kind: From<E>,
 {
     fn from(error: E) -> Self {
-        Self(Kind::from(error))
+        Self(error.into())
     }
 }
 
@@ -80,11 +83,32 @@ enum Kind {
     #[cfg(feature = "aws-auth")]
     #[error("AwsSigV4 error: {0}")]
     AwsSigV4(#[from] crate::http::aws_auth::AwsSigV4Error),
+
+    #[error("request initializer error: {0}")]
+    RequestInitializer(#[source] BoxError<'static>),
+
+    #[error("request pipeline error: {0}")]
+    RequestPipeline(#[source] BoxError<'static>),
+}
+
+impl From<RequestPipelineError> for Kind {
+    fn from(err: RequestPipelineError) -> Self {
+        use RequestPipelineErrorKind::*;
+
+        match err.0 {
+            Pipeline(err) => Self::RequestPipeline(err),
+            Http(err) => Self::Http(err),
+        }
+    }
 }
 
 use Kind::*;
 
 impl Error {
+    pub(crate) fn request_initializer(err: BoxError<'static>) -> Self {
+        Self(RequestInitializer(err))
+    }
+
     /// The status code, if the error was generated from a response
     pub fn status_code(&self) -> Option<StatusCode> {
         match &self.0 {

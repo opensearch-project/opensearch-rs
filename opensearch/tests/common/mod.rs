@@ -28,6 +28,8 @@
  * GitHub history for details.
  */
 
+#![allow(unused)]
+
 pub mod client;
 pub mod server;
 

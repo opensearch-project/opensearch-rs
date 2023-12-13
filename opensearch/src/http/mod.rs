@@ -34,6 +34,7 @@
 pub(crate) mod aws_auth;
 
 pub mod headers;
+pub mod middleware;
 pub mod request;
 pub mod response;
 pub mod transport;

@@ -104,3 +104,9 @@ impl OpenSearch {
             .await
     }
 }
+
+// Ensure that the client is `Send` and `Sync`
+const _: () = {
+    const fn is_send_sync<T: Send + Sync>() {}
+    is_send_sync::<OpenSearch>()
+};

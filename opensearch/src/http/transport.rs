@@ -119,9 +119,9 @@ pub struct TransportBuilder {
     sigv4_service_name: String,
     #[cfg(feature = "aws-auth")]
     sigv4_time_source: Option<SharedTimeSource>,
-    init_stack: Vec<Box<dyn BoxedClientInitializer>>,
-    req_init_stack: Vec<Box<dyn BoxedRequestInitializer>>,
-    req_handler_stack: Vec<Box<dyn BoxedRequestHandler>>,
+    client_initializers: Vec<Box<dyn BoxedClientInitializer>>,
+    request_initializers: Vec<Box<dyn BoxedRequestInitializer>>,
+    request_handlers: Vec<Box<dyn BoxedRequestHandler>>,
 }
 
 impl TransportBuilder {
@@ -145,9 +145,9 @@ impl TransportBuilder {
             sigv4_service_name: "es".to_string(),
             #[cfg(feature = "aws-auth")]
             sigv4_time_source: None,
-            init_stack: Vec::new(),
-            req_init_stack: Vec::new(),
-            req_handler_stack: Vec::new(),
+            client_initializers: Vec::new(),
+            request_initializers: Vec::new(),
+            request_handlers: Vec::new(),
         }
     }
 
@@ -258,14 +258,14 @@ impl TransportBuilder {
     /// }
     ///
     /// let transport: Transport = TransportBuilder::default()
-    ///     .with_init(Initializer)
-    ///     .with_init(might_fail)
-    ///     .with_init(|client_builder: reqwest::ClientBuilder| client_builder.redirect(reqwest::redirect::Policy::limited(1)))
+    ///     .with_client_initializer(Initializer)
+    ///     .with_client_initializer(might_fail)
+    ///     .with_client_initializer(|client_builder: reqwest::ClientBuilder| client_builder.redirect(reqwest::redirect::Policy::limited(1)))
     ///     .build()?;
     /// # Ok::<(), opensearch::Error>(())
     /// ```
-    pub fn with_init(mut self, init: impl ClientInitializer) -> Self {
-        self.init_stack.push(Box::new(init));
+    pub fn with_client_initializer(mut self, init: impl ClientInitializer) -> Self {
+        self.client_initializers.push(Box::new(init));
         self
     }
 
@@ -297,12 +297,12 @@ impl TransportBuilder {
     /// }
     ///
     /// let transport: Transport = TransportBuilder::default()
-    ///     .with_req_init(Counter::new())
+    ///     .with_initializer(Counter::new())
     ///     .build()?;
     /// # Ok::<(), opensearch::Error>(())
     /// ```
-    pub fn with_req_init(mut self, init: impl RequestInitializer + Clone) -> Self {
-        self.req_init_stack.push(Box::new(init));
+    pub fn with_initializer(mut self, init: impl RequestInitializer + Clone) -> Self {
+        self.request_initializers.push(Box::new(init));
         self
     }
 
@@ -317,29 +317,29 @@ impl TransportBuilder {
     ///
     /// let counter = Arc::new(AtomicUsize::new(0));
     /// let transport: Transport = TransportBuilder::default()
-    ///     .with_req_init_fn(move |request_builder: reqwest::RequestBuilder| {
+    ///     .with_initializer_fn(move |request_builder: reqwest::RequestBuilder| {
     ///         let counter = counter.fetch_add(1, Ordering::SeqCst);
     ///         request_builder.header("x-request-id", format!("req-{}", counter))
     ///     })
     ///     .build()?;
     /// # Ok::<(), opensearch::Error>(())
     /// ```
-    pub fn with_req_init_fn<F, R>(self, init: F) -> Self
+    pub fn with_initializer_fn<F, R>(self, init: F) -> Self
     where
         F: Fn(reqwest::RequestBuilder) -> R + Clone + Send + Sync + 'static,
         R: InitializerResult<reqwest::RequestBuilder>,
     {
-        self.with_req_init(request_initializer_fn(init))
+        self.with_initializer(request_initializer_fn(init))
     }
 
     /// Adds a [RequestHandler] to the stack of handlers that will be called when an underlying [reqwest::Request] is being sent.
     ///
     /// Handlers are called in the order they are added.
-    /// 
+    ///
     /// # Example
     /// ```rust,no_run
     /// use opensearch::http::{
-    ///     middleware::{async_trait, RequestHandler, RequestPipeline, RequestPipelineError},
+    ///     middleware::{async_trait, RequestHandler, RequestHandlerChain, RequestHandlerError},
     ///     reqwest::{Request, Response},
     ///     transport::{Transport, TransportBuilder},
     /// };
@@ -349,7 +349,7 @@ impl TransportBuilder {
     ///
     /// #[async_trait]
     /// impl RequestHandler for Logger {
-    ///     async fn handle(&self, request: Request, next: RequestPipeline<'_>) -> Result<Response, RequestPipelineError> {
+    ///     async fn handle(&self, request: Request, next: RequestHandlerChain<'_>) -> Result<Response, RequestHandlerError> {
     ///         println!("sending request to {}", request.url());
     ///         let now = std::time::Instant::now();
     ///         let res = next.run(request).await?;
@@ -364,24 +364,24 @@ impl TransportBuilder {
     /// # Ok::<(), opensearch::Error>(())
     /// ```
     pub fn with_handler(mut self, handler: impl RequestHandler + Clone) -> Self {
-        self.req_handler_stack.push(Box::new(handler));
+        self.request_handlers.push(Box::new(handler));
         self
     }
 
     /// Adds a [RequestHandler] to the stack of handlers that will be called when an underlying [reqwest::Request] is being sent.
     ///
     /// Handlers are called in the order they are added.
-    /// 
+    ///
     /// # Example
     /// ```rust,no_run
     /// use opensearch::http::{
-    ///     middleware::{RequestHandler, RequestPipeline, RequestPipelineError},
+    ///     middleware::{RequestHandler, RequestHandlerChain, RequestHandlerError},
     ///     reqwest::{Request, Response},
     ///     transport::{Transport, TransportBuilder},
     /// };
     /// use std::{future::Future, pin::Pin};
     ///
-    /// fn logger(req: Request, next: RequestPipeline<'_>) -> Pin<Box<dyn Future<Output = Result<Response, RequestPipelineError>> + Send + '_>> {
+    /// fn logger(req: Request, next: RequestHandlerChain<'_>) -> Pin<Box<dyn Future<Output = Result<Response, RequestHandlerError>> + Send + '_>> {
     ///     Box::pin(async move {
     ///         println!("sending request to {}", req.url());
     ///         let now = std::time::Instant::now();
@@ -400,9 +400,8 @@ impl TransportBuilder {
     where
         F: for<'a> Fn(
                 reqwest::Request,
-                RequestPipeline<'a>,
-            )
-                -> BoxFuture<'a, Result<reqwest::Response, RequestPipelineError>>
+                RequestHandlerChain<'a>,
+            ) -> BoxFuture<'a, Result<reqwest::Response, RequestHandlerError>>
             + Clone
             + Send
             + Sync
@@ -477,7 +476,7 @@ impl TransportBuilder {
         }
 
         client_builder = self
-            .init_stack
+            .client_initializers
             .into_iter()
             .try_fold(client_builder, |client_builder, init| {
                 init.init(client_builder)
@@ -494,8 +493,8 @@ impl TransportBuilder {
             sigv4_service_name: self.sigv4_service_name,
             #[cfg(feature = "aws-auth")]
             sigv4_time_source: self.sigv4_time_source.unwrap_or_default(),
-            req_init_stack: self.req_init_stack.into_boxed_slice(),
-            req_handler_stack: self.req_handler_stack.into_boxed_slice(),
+            request_initializers: self.request_initializers.into_boxed_slice(),
+            request_handlers: self.request_handlers.into_boxed_slice(),
         })
     }
 }
@@ -540,8 +539,8 @@ pub struct Transport {
     sigv4_service_name: String,
     #[cfg(feature = "aws-auth")]
     sigv4_time_source: SharedTimeSource,
-    req_init_stack: Box<[Box<dyn BoxedRequestInitializer>]>,
-    req_handler_stack: Box<[Box<dyn BoxedRequestHandler>]>,
+    request_initializers: Box<[Box<dyn BoxedRequestInitializer>]>,
+    request_handlers: Box<[Box<dyn BoxedRequestHandler>]>,
 }
 
 impl Transport {
@@ -650,7 +649,7 @@ impl Transport {
         }
 
         request_builder = self
-            .req_init_stack
+            .request_initializers
             .iter()
             .try_fold(request_builder, |request_builder, init| {
                 init.init(request_builder)
@@ -672,7 +671,7 @@ impl Transport {
             .await?;
         }
 
-        let response = RequestPipeline::new(&self.client, &self.req_handler_stack)
+        let response = RequestHandlerChain::new(&self.client, &self.request_handlers)
             .run(request)
             .await?;
 

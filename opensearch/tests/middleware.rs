@@ -17,7 +17,7 @@ use std::sync::{
 };
 
 use opensearch::http::middleware::{
-    async_trait, RequestHandler, RequestInitializer, RequestPipeline, RequestPipelineError,
+    async_trait, RequestHandler, RequestHandlerChain, RequestHandlerError, RequestInitializer,
 };
 use reqwest::RequestBuilder;
 
@@ -50,8 +50,8 @@ async fn request_initializer() -> anyhow::Result<()> {
     };
 
     let client = server.client_with(|b| {
-        b.with_req_init(Counter(Arc::new(AtomicUsize::new(101))))
-            .with_req_init_fn(counter_fn)
+        b.with_initializer(Counter(Arc::new(AtomicUsize::new(101))))
+            .with_initializer_fn(counter_fn)
     });
 
     client.ping().send().await?;
@@ -79,8 +79,8 @@ async fn request_handler() -> anyhow::Result<()> {
         async fn handle(
             &self,
             request: reqwest::Request,
-            next: RequestPipeline<'_>,
-        ) -> Result<reqwest::Response, RequestPipelineError> {
+            next: RequestHandlerChain<'_>,
+        ) -> Result<reqwest::Response, RequestHandlerError> {
             self.0.fetch_add(1, Ordering::SeqCst);
             next.run(request).await
         }

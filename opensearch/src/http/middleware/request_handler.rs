@@ -15,25 +15,25 @@ use reqwest::{Client, Request, Response};
 
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct RequestPipelineError(pub(crate) RequestPipelineErrorKind);
+pub struct RequestHandlerError(pub(crate) RequestHandlerErrorKind);
 
-impl RequestPipelineError {
+impl RequestHandlerError {
     pub fn new(err: impl Into<BoxError<'static>>) -> Self {
-        Self(RequestPipelineErrorKind::Pipeline(err.into()))
+        Self(RequestHandlerErrorKind::Handler(err.into()))
     }
 
     fn http(err: reqwest::Error) -> Self {
-        Self(RequestPipelineErrorKind::Http(err))
+        Self(RequestHandlerErrorKind::Http(err))
     }
 }
 
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum RequestPipelineErrorKind {
+pub(crate) enum RequestHandlerErrorKind {
     #[error("http error: {0}")]
     Http(#[source] reqwest::Error),
 
-    #[error("pipeline error: {0}")]
-    Pipeline(#[source] BoxError<'static>),
+    #[error("handler error: {0}")]
+    Handler(#[source] BoxError<'static>),
 }
 
 #[async_trait]
@@ -41,8 +41,8 @@ pub trait RequestHandler: std::fmt::Debug + Send + Sync + 'static {
     async fn handle(
         &self,
         request: Request,
-        next: RequestPipeline<'_>,
-    ) -> Result<Response, RequestPipelineError>;
+        next: RequestHandlerChain<'_>,
+    ) -> Result<Response, RequestHandlerError>;
 }
 
 #[derive(Clone)]
@@ -63,8 +63,8 @@ impl<F> RequestHandler for RequestHandlerFn<F>
 where
     F: for<'a> Fn(
             Request,
-            RequestPipeline<'a>,
-        ) -> BoxFuture<'a, Result<Response, RequestPipelineError>>
+            RequestHandlerChain<'a>,
+        ) -> BoxFuture<'a, Result<Response, RequestHandlerError>>
         + Send
         + Sync
         + 'static,
@@ -72,8 +72,8 @@ where
     async fn handle(
         &self,
         request: Request,
-        next: RequestPipeline<'_>,
-    ) -> Result<Response, RequestPipelineError> {
+        next: RequestHandlerChain<'_>,
+    ) -> Result<Response, RequestHandlerError> {
         self.0(request, next).await
     }
 }
@@ -86,8 +86,8 @@ where
     async fn handle(
         &self,
         request: Request,
-        next: RequestPipeline<'_>,
-    ) -> Result<Response, RequestPipelineError> {
+        next: RequestHandlerChain<'_>,
+    ) -> Result<Response, RequestHandlerError> {
         self.as_ref().handle(request, next).await
     }
 }
@@ -97,8 +97,8 @@ impl RequestHandler for std::sync::Arc<dyn RequestHandler> {
     async fn handle(
         &self,
         request: Request,
-        next: RequestPipeline<'_>,
-    ) -> Result<Response, RequestPipelineError> {
+        next: RequestHandlerChain<'_>,
+    ) -> Result<Response, RequestHandlerError> {
         self.as_ref().handle(request, next).await
     }
 }
@@ -109,25 +109,29 @@ impl<T> BoxedRequestHandler for T where T: RequestHandler + Clone {}
 
 dyn_clone::clone_trait_object!(BoxedRequestHandler);
 
-pub struct RequestPipeline<'a> {
-    pub client: &'a Client,
-    pipeline: &'a [Box<dyn BoxedRequestHandler>],
+pub struct RequestHandlerChain<'a> {
+    client: &'a Client,
+    chain: &'a [Box<dyn BoxedRequestHandler>],
 }
 
-impl<'a> RequestPipeline<'a> {
-    pub(crate) fn new(client: &'a Client, pipeline: &'a [Box<dyn BoxedRequestHandler>]) -> Self {
-        Self { client, pipeline }
+impl<'a> RequestHandlerChain<'a> {
+    pub(crate) fn new(client: &'a Client, chain: &'a [Box<dyn BoxedRequestHandler>]) -> Self {
+        Self { client, chain }
     }
 
-    pub async fn run(mut self, request: Request) -> Result<Response, RequestPipelineError> {
-        if let Some((head, tail)) = self.pipeline.split_first() {
-            self.pipeline = tail;
+    pub fn client(&self) -> &'a Client {
+        self.client
+    }
+
+    pub async fn run(mut self, request: Request) -> Result<Response, RequestHandlerError> {
+        if let Some((head, tail)) = self.chain.split_first() {
+            self.chain = tail;
             head.handle(request, self).await
         } else {
             self.client
                 .execute(request)
                 .await
-                .map_err(RequestPipelineError::http)
+                .map_err(RequestHandlerError::http)
         }
     }
 }

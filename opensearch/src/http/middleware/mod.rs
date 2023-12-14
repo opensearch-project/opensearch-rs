@@ -10,11 +10,11 @@
  */
 
 mod initializers;
-mod request_pipeline;
+mod request_handler;
 
 pub use async_trait::async_trait;
 pub use initializers::*;
-pub use request_pipeline::*;
+pub use request_handler::*;
 
 pub(crate) type BoxFuture<'a, T> =
     std::pin::Pin<Box<dyn std::future::Future<Output = T> + Send + 'a>>;

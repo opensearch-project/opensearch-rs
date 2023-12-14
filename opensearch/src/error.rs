@@ -36,7 +36,7 @@
 use crate::{
     cert::CertificateError,
     http::{
-        middleware::{RequestPipelineError, RequestPipelineErrorKind},
+        middleware::{RequestHandlerError, RequestHandlerErrorKind},
         transport, StatusCode,
     },
 };
@@ -87,16 +87,16 @@ enum Kind {
     #[error("request initializer error: {0}")]
     RequestInitializer(#[source] BoxError<'static>),
 
-    #[error("request pipeline error: {0}")]
-    RequestPipeline(#[source] BoxError<'static>),
+    #[error("request handler error: {0}")]
+    RequestHandler(#[source] BoxError<'static>),
 }
 
-impl From<RequestPipelineError> for Kind {
-    fn from(err: RequestPipelineError) -> Self {
-        use RequestPipelineErrorKind::*;
+impl From<RequestHandlerError> for Kind {
+    fn from(err: RequestHandlerError) -> Self {
+        use RequestHandlerErrorKind::*;
 
         match err.0 {
-            Pipeline(err) => Self::RequestPipeline(err),
+            Handler(err) => Self::RequestHandler(err),
             Http(err) => Self::Http(err),
         }
     }

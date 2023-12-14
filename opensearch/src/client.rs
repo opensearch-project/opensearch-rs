@@ -105,8 +105,12 @@ impl OpenSearch {
     }
 }
 
-// Ensure that the client is `Send` and `Sync`
-const _: () = {
-    const fn is_send_sync<T: Send + Sync>() {}
-    is_send_sync::<OpenSearch>()
-};
+#[cfg(test)]
+mod test {
+    #[test]
+    fn client_is_send_sync() {
+        // Ensure that the client is `Send` and `Sync`
+        fn is_send_sync<T: Send + Sync>() {}
+        is_send_sync::<super::OpenSearch>()
+    }
+}

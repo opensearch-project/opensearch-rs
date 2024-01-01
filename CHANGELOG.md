@@ -11,6 +11,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `aws-*` dependencies to `1` ([#219](https://github.com/opensearch-project/opensearch-rs/pull/219))
 - Bumps `itertools` from 0.11.0 to 0.12.0
 - Bumps `hyper` from 0.14 to 1 in tests ([#221](https://github.com/opensearch-project/opensearch-rs/pull/221))
+- Bumps `sysinfo` from 0.29.0 to 0.30.3
 
 ### Changed
 

@@ -42,7 +42,7 @@ use opensearch::{
     BulkOperation, BulkParts, Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use serde_json::json;
-use sysinfo::{ProcessRefreshKind, RefreshKind, System, SystemExt};
+use sysinfo::{ProcessRefreshKind, RefreshKind, System};
 use url::Url;
 
 /// Gets the address to the OpenSearch instance from environment variables

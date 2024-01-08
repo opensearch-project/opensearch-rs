@@ -31,7 +31,7 @@ serde_yaml = "0.9"
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 simple_logger = "4.0.0"
 syn = { version = "2.0", features = ["full"] }
-sysinfo = "0.29"
+sysinfo = "0.30"
 url = "2.1.1"
 tar = "0.4"
 flate2 = "1"

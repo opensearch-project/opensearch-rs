@@ -36,7 +36,7 @@ use opensearch::{
     http::transport::{SingleNodeConnectionPool, TransportBuilder},
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
-use sysinfo::{ProcessRefreshKind, RefreshKind, System, SystemExt};
+use sysinfo::{ProcessRefreshKind, RefreshKind, System};
 use url::Url;
 
 #[tokio::main]

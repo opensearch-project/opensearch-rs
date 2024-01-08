@@ -45,7 +45,6 @@ use opensearch::{
 };
 use serde_json::Value;
 use std::ops::Deref;
-use sysinfo::SystemExt;
 use url::Url;
 
 use crate::assert_response_success;

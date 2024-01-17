@@ -29,6 +29,7 @@ rustls-tls = ["reqwest/rustls-tls"]
 aws-auth = ["aws-credential-types", "aws-sigv4", "aws-smithy-runtime-api", "aws-types"]
 
 [dependencies]
+async-trait = "0.1"
 base64 = "0.21"
 bytes = "1.0"
 dyn-clone = "1"

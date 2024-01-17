@@ -37,12 +37,13 @@ use crate::cert::CertificateValidation;
 use crate::{
     auth::Credentials,
     cert::CertificateError,
-    error::Error,
+    error::{BoxError, Error},
     http::{
         headers::{
             HeaderMap, HeaderName, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE,
             DEFAULT_ACCEPT, DEFAULT_CONTENT_TYPE, DEFAULT_USER_AGENT, USER_AGENT,
         },
+        middleware::*,
         request::Body,
         response::Response,
         Method,
@@ -54,6 +55,7 @@ use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
 use bytes::BytesMut;
 use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
+use reqwest::ClientBuilder;
 use serde::Serialize;
 use std::{fmt::Debug, io::Write, time::Duration};
 use url::Url;
@@ -64,6 +66,8 @@ pub(crate) enum BuildError {
     Proxy(#[source] reqwest::Error),
     #[error("client configuration error: {0}")]
     ClientBuilder(#[source] reqwest::Error),
+    #[error("client initializer error: {0}")]
+    ClientInitializer(#[source] BoxError<'static>),
 }
 
 /// Default address to OpenSearch running on `http://localhost:9200`
@@ -102,7 +106,6 @@ fn build_meta() -> String {
 
 /// Builds a HTTP transport to make API calls to OpenSearch
 pub struct TransportBuilder {
-    client_builder: reqwest::ClientBuilder,
     conn_pool: Box<dyn ConnectionPool>,
     credentials: Option<Credentials>,
     #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -116,6 +119,9 @@ pub struct TransportBuilder {
     sigv4_service_name: String,
     #[cfg(feature = "aws-auth")]
     sigv4_time_source: Option<SharedTimeSource>,
+    client_initializers: Vec<Box<dyn BoxedClientInitializer>>,
+    request_initializers: Vec<Box<dyn BoxedRequestInitializer>>,
+    request_handlers: Vec<Box<dyn BoxedRequestHandler>>,
 }
 
 impl TransportBuilder {
@@ -126,7 +132,6 @@ impl TransportBuilder {
         P: ConnectionPool + Debug + Clone + Send + 'static,
     {
         Self {
-            client_builder: reqwest::ClientBuilder::new(),
             conn_pool: Box::new(conn_pool),
             credentials: None,
             #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
@@ -140,6 +145,9 @@ impl TransportBuilder {
             sigv4_service_name: "es".to_string(),
             #[cfg(feature = "aws-auth")]
             sigv4_time_source: None,
+            client_initializers: Vec::new(),
+            request_initializers: Vec::new(),
+            request_handlers: Vec::new(),
         }
     }
 
@@ -225,9 +233,186 @@ impl TransportBuilder {
         self
     }
 
+    /// Adds a [ClientInitializer] to the stack of initializers that will be called when the underlying [reqwest::Client] is being constructed.
+    ///
+    /// Initializers are called in the order they are added.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use opensearch::http::{middleware::*, transport::*};
+    ///
+    /// struct Initializer;
+    ///
+    /// impl ClientInitializer for Initializer {
+    ///     type Result = Result<reqwest::ClientBuilder, std::net::AddrParseError>;
+    ///
+    ///     fn init(self, builder: reqwest::ClientBuilder) -> Self::Result {
+    ///         let addr = "12.4.1.8".parse::<std::net::IpAddr>()?;
+    ///         Ok(builder.local_address(addr))
+    ///     }
+    /// }
+    ///
+    /// fn might_fail(builder: reqwest::ClientBuilder) -> Result<reqwest::ClientBuilder, Box<dyn std::error::Error + Send + Sync>> {
+    ///     let url = std::env::var("PROXY_URL")?;
+    ///     Ok(builder.proxy(reqwest::Proxy::all(url)?))
+    /// }
+    ///
+    /// let transport: Transport = TransportBuilder::default()
+    ///     .with_client_initializer(Initializer)
+    ///     .with_client_initializer(might_fail)
+    ///     .with_client_initializer(|client_builder: reqwest::ClientBuilder| client_builder.redirect(reqwest::redirect::Policy::limited(1)))
+    ///     .build()?;
+    /// # Ok::<(), opensearch::Error>(())
+    /// ```
+    pub fn with_client_initializer(mut self, init: impl ClientInitializer) -> Self {
+        self.client_initializers.push(Box::new(init));
+        self
+    }
+
+    /// Adds a [RequestInitializer] to the stack of initializers that will be called when an underlying [reqwest::Request] is being constructed.
+    ///
+    /// Initializers are called in the order they are added.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use opensearch::http::{middleware::*, transport::*};
+    /// use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
+    ///
+    /// #[derive(Debug, Clone)]
+    /// struct Counter(Arc<AtomicUsize>);
+    ///
+    /// impl Counter {
+    ///     fn new() -> Self {
+    ///         Self(Arc::new(AtomicUsize::new(0)))
+    ///     }
+    /// }
+    ///
+    /// impl RequestInitializer for Counter {
+    ///     type Result = reqwest::RequestBuilder;
+    ///
+    ///     fn init(&self, request: reqwest::RequestBuilder) -> Self::Result {
+    ///         let counter = self.0.fetch_add(1, Ordering::SeqCst);
+    ///         request.header("x-request-id", format!("req-{}", counter))
+    ///     }
+    /// }
+    ///
+    /// let transport: Transport = TransportBuilder::default()
+    ///     .with_initializer(Counter::new())
+    ///     .build()?;
+    /// # Ok::<(), opensearch::Error>(())
+    /// ```
+    pub fn with_initializer(mut self, init: impl RequestInitializer + Clone) -> Self {
+        self.request_initializers.push(Box::new(init));
+        self
+    }
+
+    /// Adds a [RequestInitializer] to the stack of initializers that will be called when an underlying [reqwest::Request] is being constructed.
+    ///
+    /// Initializers are called in the order they are added.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use opensearch::http::{middleware::*, transport::*};
+    /// use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
+    ///
+    /// let counter = Arc::new(AtomicUsize::new(0));
+    /// let transport: Transport = TransportBuilder::default()
+    ///     .with_initializer_fn(move |request_builder: reqwest::RequestBuilder| {
+    ///         let counter = counter.fetch_add(1, Ordering::SeqCst);
+    ///         request_builder.header("x-request-id", format!("req-{}", counter))
+    ///     })
+    ///     .build()?;
+    /// # Ok::<(), opensearch::Error>(())
+    /// ```
+    pub fn with_initializer_fn<F, R>(self, init: F) -> Self
+    where
+        F: Fn(reqwest::RequestBuilder) -> R + Clone + Send + Sync + 'static,
+        R: InitializerResult<reqwest::RequestBuilder>,
+    {
+        self.with_initializer(request_initializer_fn(init))
+    }
+
+    /// Adds a [RequestHandler] to the stack of handlers that will be called when an underlying [reqwest::Request] is being sent.
+    ///
+    /// Handlers are called in the order they are added.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use opensearch::http::{
+    ///     middleware::{async_trait, RequestHandler, RequestHandlerChain, RequestHandlerError},
+    ///     reqwest::{Request, Response},
+    ///     transport::{Transport, TransportBuilder},
+    /// };
+    ///
+    /// #[derive(Debug, Clone)]
+    /// struct Logger;
+    ///
+    /// #[async_trait]
+    /// impl RequestHandler for Logger {
+    ///     async fn handle(&self, request: Request, next: RequestHandlerChain<'_>) -> Result<Response, RequestHandlerError> {
+    ///         println!("sending request to {}", request.url());
+    ///         let now = std::time::Instant::now();
+    ///         let res = next.run(request).await?;
+    ///         println!("request completed ({:?})", now.elapsed());
+    ///         Ok(res)
+    ///     }
+    /// }
+    ///
+    /// let transport: Transport = TransportBuilder::default()
+    ///     .with_handler(Logger)
+    ///     .build()?;
+    /// # Ok::<(), opensearch::Error>(())
+    /// ```
+    pub fn with_handler(mut self, handler: impl RequestHandler + Clone) -> Self {
+        self.request_handlers.push(Box::new(handler));
+        self
+    }
+
+    /// Adds a [RequestHandler] to the stack of handlers that will be called when an underlying [reqwest::Request] is being sent.
+    ///
+    /// Handlers are called in the order they are added.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use opensearch::http::{
+    ///     middleware::{RequestHandler, RequestHandlerChain, RequestHandlerError},
+    ///     reqwest::{Request, Response},
+    ///     transport::{Transport, TransportBuilder},
+    /// };
+    /// use std::{future::Future, pin::Pin};
+    ///
+    /// fn logger(req: Request, next: RequestHandlerChain<'_>) -> Pin<Box<dyn Future<Output = Result<Response, RequestHandlerError>> + Send + '_>> {
+    ///     Box::pin(async move {
+    ///         println!("sending request to {}", req.url());
+    ///         let now = std::time::Instant::now();
+    ///         let res = next.run(req).await?;
+    ///         println!("request completed ({:?})", now.elapsed());
+    ///         Ok(res)
+    ///     })
+    /// }
+    ///
+    /// let transport: Transport = TransportBuilder::default()
+    ///     .with_handler_fn(logger)
+    ///     .build()?;
+    /// # Ok::<(), opensearch::Error>(())
+    /// ```
+    pub fn with_handler_fn<F>(self, handler: F) -> Self
+    where
+        F: for<'a> Fn(
+                reqwest::Request,
+                RequestHandlerChain<'a>,
+            ) -> BoxFuture<'a, Result<reqwest::Response, RequestHandlerError>>
+            + Clone
+            + Send
+            + Sync
+            + 'static,
+    {
+        self.with_handler(request_handler_fn(handler))
+    }
+
     /// Builds a [Transport] to use to send API calls to OpenSearch.
     pub fn build(self) -> Result<Transport, Error> {
-        let mut client_builder = self.client_builder;
+        let mut client_builder = ClientBuilder::new();
 
         if let Some(t) = self.timeout {
             client_builder = client_builder.timeout(t);
@@ -290,6 +475,14 @@ impl TransportBuilder {
             client_builder = client_builder.proxy(proxy);
         }
 
+        client_builder = self
+            .client_initializers
+            .into_iter()
+            .try_fold(client_builder, |client_builder, init| {
+                init.init(client_builder)
+            })
+            .map_err(BuildError::ClientInitializer)?;
+
         let client = client_builder.build().map_err(BuildError::ClientBuilder)?;
         Ok(Transport {
             client,
@@ -300,6 +493,8 @@ impl TransportBuilder {
             sigv4_service_name: self.sigv4_service_name,
             #[cfg(feature = "aws-auth")]
             sigv4_time_source: self.sigv4_time_source.unwrap_or_default(),
+            request_initializers: self.request_initializers.into_boxed_slice(),
+            request_handlers: self.request_handlers.into_boxed_slice(),
         })
     }
 }
@@ -344,6 +539,8 @@ pub struct Transport {
     sigv4_service_name: String,
     #[cfg(feature = "aws-auth")]
     sigv4_time_source: SharedTimeSource,
+    request_initializers: Box<[Box<dyn BoxedRequestInitializer>]>,
+    request_handlers: Box<[Box<dyn BoxedRequestHandler>]>,
 }
 
 impl Transport {
@@ -451,6 +648,14 @@ impl Transport {
             request_builder = request_builder.query(q);
         }
 
+        request_builder = self
+            .request_initializers
+            .iter()
+            .try_fold(request_builder, |request_builder, init| {
+                init.init(request_builder)
+            })
+            .map_err(Error::request_initializer)?;
+
         #[cfg_attr(not(feature = "aws-auth"), allow(unused_mut))]
         let mut request = request_builder.build()?;
 
@@ -466,7 +671,9 @@ impl Transport {
             .await?;
         }
 
-        let response = self.client.execute(request).await?;
+        let response = RequestHandlerChain::new(&self.client, &self.request_handlers)
+            .run(request)
+            .await?;
 
         Ok(Response::new(response, method))
     }

@@ -39,7 +39,7 @@ runs:
 
         if [[ -d "$OPENSEARCH_HOME/plugins/opensearch-security" ]]; then
           if [[ "$SECURED" == "true" ]]; then
-            if [ "$COMPARE_VERSION" != "$OPENSEARCH_REQUIRED_VERSION" ]; then
+            if [ "$COMPARE_VERSION" == "$OPENSEARCH_REQUIRED_VERSION" ]; then
               bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s -t
             else
               bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s

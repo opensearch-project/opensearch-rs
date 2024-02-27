@@ -26,7 +26,6 @@ runs:
         fi
         OPENSEARCH_HOME=$(realpath ./opensearch-*)
         OPENSEARCH_JAVA_OPTS="-Djava.net.preferIPv4Stack=true"
-        OPENSEARCH_VERSION=$(cat $OPENSEARCH_HOME/plugins/opensearch-security/plugin-descriptor.properties | grep '^version=' | cut -d'=' -f 2)
         export OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin
 
         url="http://localhost:9200"
@@ -36,6 +35,7 @@ runs:
 
         if [[ -d "$OPENSEARCH_HOME/plugins/opensearch-security" ]]; then
           if [[ "$SECURED" == "true" ]]; then
+            OPENSEARCH_VERSION=$(cat $OPENSEARCH_HOME/plugins/opensearch-security/plugin-descriptor.properties | grep '^version=' | cut -d'=' -f 2)
             OPENSEARCH_REQUIRED_VERSION="2.12.0"
             # Starting in 2.12.0, security demo configuration script requires an initial admin password
             COMPARE_VERSION=`echo $OPENSEARCH_REQUIRED_VERSION $OPENSEARCH_VERSION | tr ' ' '\n' | sort -V | uniq | head -n 1`

@@ -26,6 +26,7 @@ runs:
         fi
         OPENSEARCH_HOME=$(realpath ./opensearch-*)
         OPENSEARCH_JAVA_OPTS="-Djava.net.preferIPv4Stack=true"
+        export OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin
 
         url="http://localhost:9200"
         cp ./client/.ci/opensearch/opensearch.yml $OPENSEARCH_HOME/config/
@@ -34,7 +35,15 @@ runs:
 
         if [[ -d "$OPENSEARCH_HOME/plugins/opensearch-security" ]]; then
           if [[ "$SECURED" == "true" ]]; then
-            bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s
+            OPENSEARCH_VERSION=$(cat $OPENSEARCH_HOME/plugins/opensearch-security/plugin-descriptor.properties | grep '^version=' | cut -d'=' -f 2)
+            OPENSEARCH_REQUIRED_VERSION="2.12.0"
+            # Starting in 2.12.0, security demo configuration script requires an initial admin password
+            COMPARE_VERSION=`echo $OPENSEARCH_REQUIRED_VERSION $OPENSEARCH_VERSION | tr ' ' '\n' | sort -V | uniq | head -n 1`
+            if [ "$COMPARE_VERSION" == "$OPENSEARCH_REQUIRED_VERSION" ]; then
+              bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s -t
+            else
+              bash $OPENSEARCH_HOME/plugins/opensearch-security/tools/install_demo_configuration.sh -y -i -s
+            fi
             sed -i.bak -e 's/plugins.security.audit.type:.*/plugins.security.audit.type: log4j/' $OPENSEARCH_HOME/config/opensearch.yml
             cp ./client/.ci/opensearch/*.pem $OPENSEARCH_HOME/config/
             url="https://localhost:9200"

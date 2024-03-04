@@ -13,7 +13,7 @@ opensearch = { path = "../opensearch", features = ["experimental-apis"]}
 api_generator = { path = "./../api_generator" }
 
 anyhow = "1.0"
-base64 = "0.21"
+base64 = "0.22"
 clap = "2"
 itertools = "0.12.0"
 Inflector = "0.11.4"

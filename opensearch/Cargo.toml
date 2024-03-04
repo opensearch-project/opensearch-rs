@@ -30,7 +30,7 @@ aws-auth = ["aws-credential-types", "aws-sigv4", "aws-smithy-runtime-api", "aws-
 
 [dependencies]
 async-trait = "0.1"
-base64 = "0.21"
+base64 = "0.22"
 bytes = "1.0"
 dyn-clone = "1"
 lazy_static = "1.4"

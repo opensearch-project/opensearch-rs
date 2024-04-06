@@ -172,7 +172,7 @@ where
     B: Serialize,
 {
     /// Creates a new instance of a [bulk create operation](BulkCreateOperation)
-    pub fn create<S>(id: Option<S>, source: B) -> BulkCreateOperation<B>
+    pub fn create<S>(id: S, source: B) -> BulkCreateOperation<B>
     where
         S: Into<String>,
     {
@@ -180,11 +180,8 @@ where
     }
 
     /// Creates a new instance of a [bulk index operation](BulkIndexOperation)
-    pub fn index<S>(id: Option<S>, source: B) -> BulkIndexOperation<B>
-    where
-        S: Into<String>,
-    {
-        BulkIndexOperation::new(id, source)
+    pub fn index(source: B) -> BulkIndexOperation<B> {
+        BulkIndexOperation::new(source)
     }
 
     /// Creates a new instance of a [bulk delete operation](BulkDeleteOperation)
@@ -230,7 +227,7 @@ pub struct BulkCreateOperation<B> {
 
 impl<B> BulkCreateOperation<B> {
     /// Creates a new instance of [BulkCreateOperation]
-    pub fn new<S>(id: Option<S>, source: B) -> Self
+    pub fn new<S>(id: S, source: B) -> Self
     where
         S: Into<String>,
     {
@@ -239,7 +236,7 @@ impl<B> BulkCreateOperation<B> {
                 header: BulkHeader {
                     action: BulkAction::Create,
                     metadata: BulkMetadata {
-                        _id: id.map(|_id| _id.into()),
+                        _id: Some(id.into()),
                         ..Default::default()
                     },
                 },
@@ -294,16 +291,12 @@ pub struct BulkIndexOperation<B> {
 
 impl<B> BulkIndexOperation<B> {
     /// Creates a new instance of [BulkIndexOperation]
-    pub fn new<S>(id: Option<S>, source: B) -> Self
-    where
-        S: Into<String>,
-    {
+    pub fn new(source: B) -> Self {
         Self {
             operation: BulkOperation {
                 header: BulkHeader {
                     action: BulkAction::Index,
                     metadata: BulkMetadata {
-                        _id: id.map(|_id| _id.into()),
                         ..Default::default()
                     },
                 },
@@ -703,7 +696,8 @@ mod tests {
         let mut ops: Vec<BulkOperation<Value>> = Vec::with_capacity(4);
 
         ops.push(
-            BulkOperation::index(Some("1"), json!({ "foo": "index" }))
+            BulkOperation::index(json!({ "foo": "index" }))
+                .id("1")
                 .pipeline("pipeline")
                 .routing("routing")
                 .if_seq_no(1)
@@ -713,7 +707,7 @@ mod tests {
                 .into(),
         );
         ops.push(
-            BulkOperation::create(Some("2"), json!({ "bar": "create" }))
+            BulkOperation::create("2", json!({ "bar": "create" }))
                 .pipeline("pipeline")
                 .routing("routing")
                 .index("create_index")
@@ -788,19 +782,13 @@ mod tests {
         let mut ops = BulkOperations::new();
 
         ops.push(
-            BulkOperation::index(Some("1"), IndexDoc { foo: "index" })
+            BulkOperation::index(IndexDoc { foo: "index" })
+                .id("1")
                 .pipeline("pipeline")
                 .index("index_doc")
                 .routing("routing"),
         )?;
-        ops.push(BulkOperation::create(
-            Some("2"),
-            CreateDoc { bar: "create" },
-        ))?;
-        ops.push(BulkOperation::create(
-            None::<String>,
-            CreateDoc { bar: "create" },
-        ))?;
+        ops.push(BulkOperation::create("2", CreateDoc { bar: "create" }))?;
         ops.push(BulkOperation::update("3", UpdateDoc { baz: "update" }))?;
         ops.push(BulkOperation::<()>::delete("4"))?;
 
@@ -811,8 +799,6 @@ mod tests {
         expected.put_slice(b"{\"index\":{\"_index\":\"index_doc\",\"_id\":\"1\",\"pipeline\":\"pipeline\",\"routing\":\"routing\"}}\n");
         expected.put_slice(b"{\"foo\":\"index\"}\n");
         expected.put_slice(b"{\"create\":{\"_id\":\"2\"}}\n");
-        expected.put_slice(b"{\"bar\":\"create\"}\n");
-        expected.put_slice(b"{\"create\":{}}\n");
         expected.put_slice(b"{\"bar\":\"create\"}\n");
         expected.put_slice(b"{\"update\":{\"_id\":\"3\"}}\n");
         expected.put_slice(b"{\"baz\":\"update\"}\n");

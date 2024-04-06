@@ -151,8 +151,9 @@ pub async fn index_documents(client: &OpenSearch) -> Result<Response, Error> {
     if exists_response.status_code() == StatusCode::NOT_FOUND {
         let mut body: Vec<BulkOperation<_>> = vec![];
         for i in 1..=10 {
-            let op =
-                BulkOperation::index(Some(i.to_string()), json!({"title":"OpenSearch"})).into();
+            let op = BulkOperation::index(json!({"title":"OpenSearch"}))
+                .id(i.to_string())
+                .into();
             body.push(op);
         }
 

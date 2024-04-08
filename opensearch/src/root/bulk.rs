@@ -179,9 +179,9 @@ where
         BulkCreateOperation::new(id, source)
     }
 
-    /// Creates a new instance of [bulk create operation](BulkCreateOperation) without explicit id
-    pub fn create_no_id(source: B) -> BulkCreateOperation<B> {
-        BulkCreateOperation::new_no_id(source)
+    /// Creates a new instance of [bulk create operation](BulkCreateOperation) without an explicit id
+    pub fn create_without_id(source: B) -> BulkCreateOperation<B> {
+        BulkCreateOperation::new_without_id(source)
     }
 
     /// Creates a new instance of a [bulk index operation](BulkIndexOperation)
@@ -250,8 +250,8 @@ impl<B> BulkCreateOperation<B> {
         }
     }
 
-    /// Creates a new instance of [BulkCreateOperation] without explicit id
-    pub fn new_no_id(source: B) -> Self {
+    /// Creates a new instance of [BulkCreateOperation] without an explicit id
+    pub fn new_without_id(source: B) -> Self {
         Self {
             operation: BulkOperation {
                 header: BulkHeader {
@@ -810,7 +810,7 @@ mod tests {
                 .routing("routing"),
         )?;
         ops.push(BulkOperation::create("2", CreateDoc { bar: "create" }))?;
-        ops.push(BulkOperation::create_no_id(CreateDoc { bar: "create" }))?;
+        ops.push(BulkOperation::create_without_id(CreateDoc { bar: "create" }))?;
         ops.push(BulkOperation::update("3", UpdateDoc { baz: "update" }))?;
         ops.push(BulkOperation::<()>::delete("4"))?;
 

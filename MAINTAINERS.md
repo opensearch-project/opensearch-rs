@@ -13,6 +13,6 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 
 ## Emeritus
 
-| Maintainer    | GitHub ID                               | Affiliation |
-| ------------- | --------------------------------------- | ----------- |
-| Aditya Jindal | [aditjind](https://github.com/aditjind) | Amazon      |
+| Maintainer    | GitHub ID                                     | Affiliation |
+| ------------- | --------------------------------------------- | ----------- |
+| Aditya Jindal | [adityaj1107](https://github.com/adityaj1107) | Amazon      |

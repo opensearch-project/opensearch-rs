@@ -179,6 +179,11 @@ where
         BulkCreateOperation::new(id, source)
     }
 
+    /// Creates a new instance of [bulk create operation](BulkCreateOperation) without an explicit id
+    pub fn create_without_id(source: B) -> BulkCreateOperation<B> {
+        BulkCreateOperation::new_without_id(source)
+    }
+
     /// Creates a new instance of a [bulk index operation](BulkIndexOperation)
     pub fn index(source: B) -> BulkIndexOperation<B> {
         BulkIndexOperation::new(source)
@@ -237,6 +242,22 @@ impl<B> BulkCreateOperation<B> {
                     action: BulkAction::Create,
                     metadata: BulkMetadata {
                         _id: Some(id.into()),
+                        ..Default::default()
+                    },
+                },
+                source: Some(source),
+            },
+        }
+    }
+
+    /// Creates a new instance of [BulkCreateOperation] without an explicit id
+    pub fn new_without_id(source: B) -> Self {
+        Self {
+            operation: BulkOperation {
+                header: BulkHeader {
+                    action: BulkAction::Create,
+                    metadata: BulkMetadata {
+                        _id: None,
                         ..Default::default()
                     },
                 },
@@ -789,6 +810,7 @@ mod tests {
                 .routing("routing"),
         )?;
         ops.push(BulkOperation::create("2", CreateDoc { bar: "create" }))?;
+        ops.push(BulkOperation::create_without_id(CreateDoc { bar: "create" }))?;
         ops.push(BulkOperation::update("3", UpdateDoc { baz: "update" }))?;
         ops.push(BulkOperation::<()>::delete("4"))?;
 
@@ -799,6 +821,8 @@ mod tests {
         expected.put_slice(b"{\"index\":{\"_index\":\"index_doc\",\"_id\":\"1\",\"pipeline\":\"pipeline\",\"routing\":\"routing\"}}\n");
         expected.put_slice(b"{\"foo\":\"index\"}\n");
         expected.put_slice(b"{\"create\":{\"_id\":\"2\"}}\n");
+        expected.put_slice(b"{\"bar\":\"create\"}\n");
+        expected.put_slice(b"{\"create\":{}}\n");
         expected.put_slice(b"{\"bar\":\"create\"}\n");
         expected.put_slice(b"{\"update\":{\"_id\":\"3\"}}\n");
         expected.put_slice(b"{\"baz\":\"update\"}\n");

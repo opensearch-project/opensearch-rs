@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-script_path=$(dirname $(realpath -s $0))
+script_path=$(dirname $(realpath $0))
 certs_dir="$script_path/certs"
 opensearch_dir="$script_path/opensearch"
 

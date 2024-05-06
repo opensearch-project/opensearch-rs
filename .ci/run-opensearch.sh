@@ -8,7 +8,7 @@
 # - Deleting the volume should not dependent on the container still running
 # - Fixed `ES_JAVA_OPTS` config
 
-script_path=$(dirname $(realpath -s $0))
+script_path=$(dirname $(realpath $0))
 source $script_path/functions/imports.sh
 set -euo pipefail
 

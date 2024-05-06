@@ -13,6 +13,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bumps `sysinfo` from 0.29.0 to 0.30.5
 - Bumps `base64` from 0.21 to 0.22
 - Bumps `reqwest` from 0.11 to 0.12
+- Bumps `simple_logger` from 4.0.0 to 5.0.0
 
 ### Changed
 

@@ -31,7 +31,7 @@ if [[ -z $opensearch_node_name ]]; then
   echo -e "\033[34;1mINFO:\033[0m Running opensearch $STACK_VERSION\033[0m"
 fi
 
-export script_path=$(dirname $(realpath -s $0))
+export script_path=$(dirname $(realpath $0))
 source $script_path/functions/cleanup.sh
 source $script_path/functions/wait-for-container.sh
 trap "cleanup_trap ${network_name}" EXIT

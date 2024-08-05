@@ -810,7 +810,9 @@ mod tests {
                 .routing("routing"),
         )?;
         ops.push(BulkOperation::create("2", CreateDoc { bar: "create" }))?;
-        ops.push(BulkOperation::create_without_id(CreateDoc { bar: "create" }))?;
+        ops.push(BulkOperation::create_without_id(CreateDoc {
+            bar: "create",
+        }))?;
         ops.push(BulkOperation::update("3", UpdateDoc { baz: "update" }))?;
         ops.push(BulkOperation::<()>::delete("4"))?;
 

@@ -44,7 +44,7 @@ use opensearch::{
     Error, OpenSearch, DEFAULT_ADDRESS,
 };
 use serde_json::Value;
-use std::ops::Deref;
+use std::{ffi::OsStr, ops::Deref};
 use url::Url;
 
 use crate::assert_response_success;
@@ -61,8 +61,8 @@ fn cluster_addr() -> String {
 /// Determines if Fiddler.exe proxy process is running
 fn running_proxy() -> bool {
     let mut system = sysinfo::System::new();
-    system.refresh_processes();
-    let running = system.processes_by_name("Fiddler").next().is_some();
+    system.refresh_processes(sysinfo::ProcessesToUpdate::All);
+    let running = system.processes_by_name(OsStr::new("Fiddler")).next().is_some();
     running
 }
 

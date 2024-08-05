@@ -28,6 +28,8 @@
  * GitHub history for details.
  */
 
+use std::ffi::OsStr;
+
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 use opensearch::cert::CertificateValidation;
 use opensearch::{
@@ -68,7 +70,7 @@ fn create_client() -> Result<OpenSearch, Error> {
         let system = System::new_with_specifics(
             RefreshKind::new().with_processes(ProcessRefreshKind::default()),
         );
-        let has_fiddler = system.processes_by_name("Fiddler").next().is_some();
+        let has_fiddler = system.processes_by_name(OsStr::new("Fiddler")).next().is_some();
         has_fiddler
     }
 

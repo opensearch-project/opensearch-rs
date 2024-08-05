@@ -43,7 +43,7 @@ jobs:
           OPENSEARCH_URL: ${{ steps.opensearch.outputs.opensearch_url }}
 
       - name: Upload Coverage Data
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./test_results/opensearch.lcov
           flags: unit
@@ -87,7 +87,7 @@ jobs:
         env:
           OPENSEARCH_URL: ${{ steps.opensearch.outputs.opensearch_url }}
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           files: ./client/test_results/opensearch.lcov
           flags: integration
@@ -171,7 +171,7 @@ jobs:
         env:
           OPENSEARCH_URL: ${{ steps.opensearch.outputs.url }}
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           files: ./client/test_results/opensearch.lcov
           flags: integration

@@ -84,7 +84,10 @@ impl TestClientBuilder {
         // assume if we're running with HTTPS then authentication is also enabled and disable
         // certificate validation - we'll change this for tests that need to.
         if secure {
-            builder = builder.auth(Credentials::Basic("admin".into(), "admin".into()));
+            builder = builder.auth(Credentials::Basic(
+                "admin".into(),
+                std::env::var("OPENSEARCH_PASSWORD").unwrap_or("admin".into()),
+            ));
 
             #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
             {

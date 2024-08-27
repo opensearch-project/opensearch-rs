@@ -156,7 +156,13 @@ fn branch_suite_and_version_from_opensearch(
 
     let suite = TestSuite::Free;
 
-    let response = client.get(url).basic_auth("admin", Some("admin")).send()?;
+    let response = client
+        .get(url)
+        .basic_auth(
+            "admin",
+            Some(std::env::var("OPENSEARCH_PASSWORD").unwrap_or("admin".into())),
+        )
+        .send()?;
     let json: Value = response.json()?;
     let branch = match json["version"]["build_hash"].as_str() {
         Some(build_hash) if build_hash != "unknown" => build_hash.to_string(),

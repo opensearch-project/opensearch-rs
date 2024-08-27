@@ -7,16 +7,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 
-- Added new BulkCreate operation constructor without providing optional `id` field ([#245](https://github.com/opensearch-project/opensearch-rs/pull/245))
 
 ### Dependencies
-- Bumps `aws-*` dependencies to `1` ([#219](https://github.com/opensearch-project/opensearch-rs/pull/219))
-- Bumps `itertools` from 0.11.0 to 0.13.0
-- Bumps `hyper` from 0.14 to 1 in tests ([#221](https://github.com/opensearch-project/opensearch-rs/pull/221))
-- Bumps `sysinfo` from 0.29.0 to 0.31.2
-- Bumps `base64` from 0.21 to 0.22
-- Bumps `reqwest` from 0.11 to 0.12
-- Bumps `simple_logger` from 4.0.0 to 5.0.0
 
 ### Changed
 
@@ -27,6 +19,20 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 ### Security
+
+## [2.3.0]
+
+### Added
+- Added new BulkCreate operation constructor without providing optional `id` field ([#245](https://github.com/opensearch-project/opensearch-rs/pull/245))
+
+### Dependencies
+- Bumps `aws-*` dependencies to `1` ([#219](https://github.com/opensearch-project/opensearch-rs/pull/219))
+- Bumps `itertools` from 0.11.0 to 0.13.0
+- Bumps `hyper` from 0.14 to 1 in tests ([#221](https://github.com/opensearch-project/opensearch-rs/pull/221))
+- Bumps `sysinfo` from 0.29.0 to 0.31.2
+- Bumps `base64` from 0.21 to 0.22
+- Bumps `reqwest` from 0.11 to 0.12
+- Bumps `simple_logger` from 4.0.0 to 5.0.0
 
 ## [2.2.0]
 
@@ -79,7 +85,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixes `cargo make test` failing out of the box ([#117](https://github.com/opensearch-project/opensearch-rs/pull/117))
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
-- Fixes `DEVELOPER_GUIDE.md` to include complete information about setting up ([#194](https://github.com/opensearch-project/opensearch-rs/pull/194))
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...HEAD
+
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.0.0...v2.1.0

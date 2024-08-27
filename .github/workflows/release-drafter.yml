@@ -22,7 +22,7 @@ jobs:
         with:
           secret: ${{ github.TOKEN }}
           approvers: ${{ steps.get_data.outputs.approvers }}
-          minimum-approvals: 2
+          minimum-approvals: 1
           issue-title: 'Release opensearch-rs ${{ steps.get_data.outputs.version }}'
           issue-body: "Please approve or deny the release of opensearch-rs. <br> **${{ steps.get_data.outputs.version }}** <br> **TAG**: ${{ github.ref_name }} <br> **COMMIT**: ${{ github.sha }}"
           exclude-workflow-initiator-as-approver: true

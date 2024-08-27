@@ -62,7 +62,10 @@ fn cluster_addr() -> String {
 fn running_proxy() -> bool {
     let mut system = sysinfo::System::new();
     system.refresh_processes(sysinfo::ProcessesToUpdate::All);
-    let running = system.processes_by_name(OsStr::new("Fiddler")).next().is_some();
+    let running = system
+        .processes_by_name(OsStr::new("Fiddler"))
+        .next()
+        .is_some();
     running
 }
 

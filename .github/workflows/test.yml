@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '0 8 * * *'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   test:
     name: Test
@@ -55,6 +59,7 @@ jobs:
         with:
           files: ./test_results/opensearch.lcov
           flags: unit
+          use_oidc: true
 
       - name: Save OpenSearch logs
         if: failure()
@@ -112,6 +117,7 @@ jobs:
         with:
           files: ./client/test_results/opensearch.lcov
           flags: integration
+          use_oidc: true
 
       - name: Save OpenSearch logs
         if: failure()
@@ -203,9 +209,11 @@ jobs:
           OPENSEARCH_PASSWORD: ${{ steps.opensearch.outputs.admin_password }}
 
       - uses: codecov/codecov-action@v4
+        if: github.event_name != 'schedule'
         with:
           files: ./client/test_results/opensearch.lcov
           flags: integration
+          use_oidc: true
 
       - name: Save OpenSearch logs
         if: failure()

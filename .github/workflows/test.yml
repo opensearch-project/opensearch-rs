@@ -141,7 +141,7 @@ jobs:
       - name: GitHub App token
         id: github_app_token
         uses: tibdex/github-app-token@v1.5.0
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' && github.repository == 'opensearch-project/opensearch-rs'
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -224,7 +224,7 @@ jobs:
             opensearch-*/logs/*
 
       - name: Create issue about failure
-        if: failure() && github.event_name == 'schedule'
+        if: failure() && github.event_name == 'schedule' && github.repository == 'opensearch-project/opensearch-rs'
         uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ steps.github_app_token.outputs.token }}

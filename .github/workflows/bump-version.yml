@@ -1,0 +1,209 @@
+name: Bump Version
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to bump version on'
+        required: true
+      version:
+        description: 'Version to bump to'
+        required: true
+
+jobs:
+  bump-version-manual:
+    name: Bump Version (Manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: GitHub App Token
+        if: github.repository == 'opensearch-project/opensearch-rs'
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Install latest stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install cargo-make
+        uses: davidB/rust-cargo-make@v1
+
+      - name: Bump Version
+        run: cargo make update-version "$VERSION"
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          base: ${{ github.event.inputs.branch }}
+          branch: "feat/${{ github.event.inputs.branch }}/bump-version"
+          commit-message: Bump version to ${{ github.event.inputs.version }}
+          signoff: true
+          delete-branch: true
+          title: '[AUTO] Bump version on `${{ github.event.inputs.branch }}` to `${{ github.event.inputs.version }}`'
+          labels: autocut
+          body: |
+            Bumping version on `${{ github.event.inputs.branch }}` to `${{ github.event.inputs.version }}`.
+
+  bump-version-auto:
+    name: Bump Version (Auto)
+    runs-on: ubuntu-latest
+    if: github.repository == 'opensearch-project/opensearch-rs' && github.event_name == 'push'
+    steps:
+      - name: GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout ${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install latest stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install cargo-make
+        uses: davidB/rust-cargo-make@v1
+
+      - name: Fetch Version Information
+        run: |
+          echo "GITHUB_REF=${GITHUB_REF}"
+          VERSION=$(echo "${GITHUB_REF#refs/*/v}")
+          VERSION_COMPONENTS=(${VERSION//./ })
+          MAJOR="${VERSION_COMPONENTS[0]}"
+          MINOR="${VERSION_COMPONENTS[1]}"
+          PATCH="${VERSION_COMPONENTS[2]}"
+          BASE="${MAJOR}.${MINOR}"
+          BASE_X="${MAJOR}.x"
+          
+          IS_MAJOR_BUMP=false
+          IS_MINOR_BUMP=false
+          
+          if [ "${PATCH}" = "0" ]; then
+            IS_MINOR_BUMP=true
+            if [ "${MINOR}" = "0" ]; then
+              IS_MAJOR_BUMP=true
+            fi
+          fi
+          
+          NEXT_MAJOR="$((MAJOR + 1)).0.0"
+          NEXT_MINOR="${MAJOR}.$((MINOR + 1)).0"
+          NEXT_PATCH="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          
+          {
+            echo "VERSION=${VERSION}"
+            echo "MAJOR=${MAJOR}"
+            echo "MINOR=${MINOR}"
+            echo "PATCH=${PATCH}"
+            echo "BASE=${BASE}"
+            echo "BASE_X=${BASE_X}"
+            echo "IS_MAJOR_BUMP=${IS_MAJOR_BUMP}"
+            echo "IS_MINOR_BUMP=${IS_MINOR_BUMP}"
+            echo "NEXT_MAJOR=${NEXT_MAJOR}"
+            echo "NEXT_MINOR=${NEXT_MINOR}"
+            echo "NEXT_PATCH=${NEXT_PATCH}"
+          } | tee -a "${GITHUB_ENV}"
+
+      - name: Create ${{ env.BASE_X }} branch
+        if: env.IS_MAJOR_BUMP == 'true'
+        run: git branch ${BASE_X} && git push origin ${BASE_X}
+
+      - name: Create ${{ env.BASE }} branch
+        if: env.IS_MINOR_BUMP == 'true'
+        run: git branch ${BASE} && git push origin ${BASE}
+
+      - name: Checkout ${{ env.BASE }} branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Bump Patch Version
+        run: cargo make update-version "$NEXT_PATCH"
+
+      - name: Create Patch Version Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          base: ${{ env.BASE }}
+          branch: 'feat/${{ env.BASE }}/bump-version'
+          commit-message: Bump version to ${{ env.NEXT_PATCH }}
+          signoff: true
+          delete-branch: true
+          title: '[AUTO] Bump version on `${{ env.BASE }}` to `${{ env.NEXT_PATCH }}`'
+          labels: autocut
+          body: |
+            Bumping version on `${{ env.BASE }}` to `${{ env.NEXT_PATCH }}`.
+
+      - name: Checkout ${{ env.BASE_X }} branch
+        if: env.IS_MINOR_BUMP == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_X }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Bump Minor Version
+        if: env.IS_MINOR_BUMP == 'true'
+        run: cargo make update-version "$NEXT_MINOR"
+
+      - name: Create Minor Version Pull Request
+        if: env.IS_MINOR_BUMP == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          base: ${{ env.BASE_X }}
+          branch: 'feat/${{ env.BASE_X }}/bump-version'
+          commit-message: Bump version to ${{ env.NEXT_MINOR }}
+          signoff: true
+          delete-branch: true
+          title: '[AUTO] Bump version on `${{ env.BASE_X }}` to `${{ env.NEXT_MINOR }}`'
+          labels: autocut
+          body: |
+            Bumping version on `${{ env.BASE_X }}` to `${{ env.NEXT_MINOR }}`.
+
+      - name: Checkout main branch
+        if: env.IS_MAJOR_BUMP == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Bump Major Version
+        if: env.IS_MAJOR_BUMP == 'true'
+        run: cargo make update-version "$NEXT_MAJOR"
+
+      - name: Create Major Version Pull Request
+        if: env.IS_MAJOR_BUMP == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          base: main
+          branch: 'feat/main/bump-version'
+          commit-message: Bump version to ${{ env.NEXT_MAJOR }}
+          signoff: true
+          delete-branch: true
+          title: '[AUTO] Bump version on `main` to `${{ env.NEXT_MAJOR }}`'
+          labels: autocut
+          body: |
+            Bumping version on `main` to `${{ env.NEXT_MAJOR }}`.

@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Rust Client
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: client
 
@@ -92,7 +92,7 @@ jobs:
         secured: [true, false]
     steps:
       - name: Checkout Rust Client
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: client
 
@@ -148,7 +148,7 @@ jobs:
           installation_id: 22958780
 
       - name: Checkout Rust Client
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: client
 
@@ -156,7 +156,7 @@ jobs:
         uses: ./client/.github/actions/setup-rust-tools
 
       - name: Checkout OpenSearch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opensearch-project/opensearch
           ref: ${{ matrix.opensearch_ref }}

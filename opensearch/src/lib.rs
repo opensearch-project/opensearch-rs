@@ -74,7 +74,7 @@
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! opensearch = "1.0.0"
+//! opensearch = "2.3.0"
 //! ```
 //! The following _optional_ dependencies may also be useful to create requests and read responses
 //!
@@ -341,8 +341,8 @@
 //!
 //! ```toml,no_run
 //! [dependencies]
-//! opensearch = { version = "1", features = ["aws-auth"] }
-//! aws-config = "0.10"
+//! opensearch = { version = "2.3.0", features = ["aws-auth"] }
+//! aws-config = "1"
 //! ```
 //!
 //! ```rust,no_run

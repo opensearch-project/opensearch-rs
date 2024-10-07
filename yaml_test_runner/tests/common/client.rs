@@ -61,7 +61,7 @@ fn cluster_addr() -> String {
 /// Determines if Fiddler.exe proxy process is running
 fn running_proxy() -> bool {
     let mut system = sysinfo::System::new();
-    system.refresh_processes(sysinfo::ProcessesToUpdate::All);
+    system.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
     let running = system
         .processes_by_name(OsStr::new("Fiddler"))
         .next()

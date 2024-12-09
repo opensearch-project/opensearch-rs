@@ -9,7 +9,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 
 
 ### Dependencies
-- Bumps `sysinfo` from 0.31.2 to 0.32.0
+- Bumps `sysinfo` from 0.31.2 to 0.33.0
 - Bumps `thiserror` from 1 to 2
 
 ### Changed

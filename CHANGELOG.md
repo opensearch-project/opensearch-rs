@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.33.0
+- Bump `dangoslen/dependabot-changelog-helper` from 2 to 3 ([#298](https://github.com/opensearch-project/opensearch-rs/pull/298))
 
 ### Changed
 

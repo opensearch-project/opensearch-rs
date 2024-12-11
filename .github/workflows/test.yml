@@ -63,7 +63,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: opensearch-${{ matrix.os }}-${{ matrix.test-args }}
           path: |
@@ -121,7 +121,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: opensearch-logs-${{ matrix.version }}-${{ matrix.secured }}
           path: |
@@ -140,12 +140,11 @@ jobs:
     steps:
       - name: GitHub App token
         id: github_app_token
-        uses: tibdex/github-app-token@v1.5.0
+        uses: actions/create-github-app-token@v1
         if: github.event_name == 'schedule' && github.repository == 'opensearch-project/opensearch-rs'
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          installation_id: 22958780
 
       - name: Checkout Rust Client
         uses: actions/checkout@v4
@@ -217,7 +216,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: opensearch-logs-${{ matrix.opensearch_ref }}
           path: |

@@ -7,6 +7,9 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.33.0
+- Bump `dangoslen/dependabot-changelog-helper` from 2 to 3 ([#298](https://github.com/opensearch-project/opensearch-rs/pull/298))
+- Bump `VachaShah/backport` from 1.1.4 to 2.2.0 ([#299](https://github.com/opensearch-project/opensearch-rs/pull/299))
+- Bump `stefanzweifel/git-auto-commit-action` from 4 to 5 ([#300](https://github.com/opensearch-project/opensearch-rs/pull/300))
 
 ### Changed
 

@@ -11,6 +11,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `VachaShah/backport` from 1.1.4 to 2.2.0 ([#299](https://github.com/opensearch-project/opensearch-rs/pull/299))
 - Bump `stefanzweifel/git-auto-commit-action` from 4 to 5 ([#300](https://github.com/opensearch-project/opensearch-rs/pull/300))
 - Bump `softprops/action-gh-release` from 1 to 2 ([#303](https://github.com/opensearch-project/opensearch-rs/pull/303))
+- Bump `actions/cache` from 3 to 4 ([#304](https://github.com/opensearch-project/opensearch-rs/pull/304))
 
 ### Changed
 

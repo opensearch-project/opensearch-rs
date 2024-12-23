@@ -46,7 +46,7 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           base: ${{ github.event.inputs.branch }}
@@ -139,7 +139,7 @@ jobs:
         run: cargo make update-version "$NEXT_PATCH"
 
       - name: Create Patch Version Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: ${{ env.BASE }}
@@ -165,7 +165,7 @@ jobs:
 
       - name: Create Minor Version Pull Request
         if: env.IS_MINOR_BUMP == 'true'
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: ${{ env.BASE_X }}
@@ -191,7 +191,7 @@ jobs:
 
       - name: Create Major Version Pull Request
         if: env.IS_MAJOR_BUMP == 'true'
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: main

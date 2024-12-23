@@ -18,6 +18,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `actions/cache` from 3 to 4 ([#304](https://github.com/opensearch-project/opensearch-rs/pull/304))
 - Bump `actions/setup-java` from 3 to 4 ([#302](https://github.com/opensearch-project/opensearch-rs/pull/302))
 - Bump `lycheeverse/lychee-action` from 1.5.0 to 2.2.0 ([#310](https://github.com/opensearch-project/opensearch-rs/pull/310))
+- Bump `peter-evans/create-pull-request` from 5 to 7 ([#308](https://github.com/opensearch-project/opensearch-rs/pull/308))
 
 ### Changed
 

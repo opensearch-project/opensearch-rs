@@ -16,6 +16,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `lycheeverse/lychee-action` from 1.5.0 to 2.2.0 ([#310](https://github.com/opensearch-project/opensearch-rs/pull/310))
 - Bump `peter-evans/create-pull-request` from 5 to 7 ([#308](https://github.com/opensearch-project/opensearch-rs/pull/308))
 - Bump `actions/github-script` from 6 to 7 ([#309](https://github.com/opensearch-project/opensearch-rs/pull/309))
+- Bump `itertools` from 0.13.0 to 0.14.0 ([#319](https://github.com/opensearch-project/opensearch-rs/pull/319))
 
 ### Changed
 

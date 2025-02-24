@@ -7,7 +7,7 @@ description = "Official OpenSearch Rust client"
 repository = "https://github.com/opensearch-project/opensearch-rs"
 keywords = ["opensearch", "elasticsearch", "search", "lucene"]
 categories = ["api-bindings", "database"]
-documentation = "https://opensearch.org/docs/latest"
+homepage = "https://opensearch.org/docs/latest"
 license = "Apache-2.0"
 readme = "../README.md"
 

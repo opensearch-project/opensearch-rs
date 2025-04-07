@@ -149,8 +149,8 @@ jobs:
         uses: actions/create-github-app-token@v2
         if: github.event_name == 'schedule' && github.repository == 'opensearch-project/opensearch-rs'
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Checkout Rust Client
         uses: actions/checkout@v4

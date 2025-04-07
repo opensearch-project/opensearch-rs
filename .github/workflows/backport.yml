@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: GitHub App token
         id: github_app_token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Backport
         uses: VachaShah/backport@v2.2.0

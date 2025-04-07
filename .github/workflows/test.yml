@@ -146,7 +146,7 @@ jobs:
     steps:
       - name: GitHub App token
         id: github_app_token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         if: github.event_name == 'schedule' && github.repository == 'opensearch-project/opensearch-rs'
         with:
           app_id: ${{ secrets.APP_ID }}

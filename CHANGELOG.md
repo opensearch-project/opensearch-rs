@@ -17,6 +17,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `peter-evans/create-pull-request` from 5 to 7 ([#308](https://github.com/opensearch-project/opensearch-rs/pull/308))
 - Bump `actions/github-script` from 6 to 7 ([#309](https://github.com/opensearch-project/opensearch-rs/pull/309))
 - Bump `itertools` from 0.13.0 to 0.14.0 ([#319](https://github.com/opensearch-project/opensearch-rs/pull/319))
+- Bump `toml` from 0.8.0 to 0.9.2 ([#345](https://github.com/opensearch-project/opensearch-rs/pull/345))
 
 ### Changed
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))

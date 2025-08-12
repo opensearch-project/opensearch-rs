@@ -1,4 +1,4 @@
 Cluster APIs
 
-[Manage settings](https://opensearch.org/docs/opensearch/rest-api/cluster-settings/),
+[Manage settings](https://docs.opensearch.org/latest/api-reference/cluster-settings/),
 perform operations, and retrieve information about an OpenSearch cluster.

@@ -70,35 +70,53 @@ impl ToTokens for Contains {
                 if n.is_f64() {
                     let f = n.as_f64().unwrap();
                     tokens.append_all(quote! {
-                        crate::assert_contains!(json#expr, json!(#f));
+                        {
+                            let expr = &json#expr;
+                            crate::assert_contains!(expr, json!(#f));
+                        }
                     });
                 } else if n.is_u64() {
                     let u = n.as_u64().unwrap();
                     tokens.append_all(quote! {
-                        crate::assert_contains!(json#expr, json!(#u));
+                        {
+                            let expr = &json#expr;
+                            crate::assert_contains!(expr, json!(#u));
+                        }
                     });
                 } else {
                     let i = n.as_i64().unwrap();
                     tokens.append_all(quote! {
-                        crate::assert_contains!(json#expr, json!(#i));
+                        {
+                            let expr = &json#expr;
+                            crate::assert_contains!(expr, json!(#i));
+                        }
                     });
                 }
             }
             Value::String(s) => {
                 tokens.append_all(quote! {
-                    crate::assert_contains!(json#expr, json!(#s));
+                    {
+                        let expr = &json#expr;
+                        crate::assert_contains!(expr, json!(#s));
+                    }
                 });
             }
             Value::Bool(b) => {
                 tokens.append_all(quote! {
-                    crate::assert_contains!(json#expr, json!(#b));
+                    {
+                        let expr = &json#expr;
+                        crate::assert_contains!(expr, json!(#b));
+                    }
                 });
             }
             yaml if yaml.is_sequence() || yaml.is_mapping() => {
                 let json = rusty_json(yaml);
 
                 tokens.append_all(quote! {
-                    crate::assert_contains!(json#expr, json!(#json));
+                    {
+                        let expr = &json#expr;
+                        crate::assert_contains!(expr, json!(#json));
+                    }
                 });
             }
             yaml => {

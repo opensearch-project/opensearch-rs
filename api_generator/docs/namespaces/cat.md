@@ -1,6 +1,6 @@
 Cat APIs
 
-The [Cat APIs](https://opensearch.org/docs/opensearch/rest-api/cat/index/) aim to
+The [Cat APIs](https://docs.opensearch.org/latest/api-reference/cat/index/) aim to
 meet the needs of humans when looking at data returned from OpenSearch,
 formatting it as compact, column aligned text, making it easier on human eyes.
 

@@ -24,6 +24,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `toml` from 0.8.0 to 0.9.2 ([#345](https://github.com/opensearch-project/opensearch-rs/pull/345))
 - Bump `dialoguer` from 0.11.0 to 0.12.0 ([#354](https://github.com/opensearch-project/opensearch-rs/pull/354))
 - Bump `xml-rs` from 0.8 to 1.0 ([#356](https://github.com/opensearch-project/opensearch-rs/pull/356))
+- Bump `actions/checkout` from 4 to 5 ([#350](https://github.com/opensearch-project/opensearch-rs/pull/350))
 
 ### Changed
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))

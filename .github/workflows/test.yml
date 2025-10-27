@@ -63,7 +63,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: opensearch-${{ matrix.os }}-${{ matrix.test-args }}
           path: |
@@ -127,7 +127,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: opensearch-logs-${{ matrix.version }}-${{ matrix.secured }}
           path: |
@@ -222,7 +222,7 @@ jobs:
 
       - name: Save OpenSearch logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: opensearch-logs-${{ matrix.opensearch_ref }}
           path: |

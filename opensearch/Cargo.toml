@@ -61,7 +61,7 @@ textwrap = "0.16"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-xml-rs = "0.8"
+xml-rs = "1.0"
 
 [build-dependencies]
 rustc_version = "0.4"

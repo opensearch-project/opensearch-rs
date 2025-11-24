@@ -20,7 +20,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `toml` from 0.8.0 to 0.9.2 ([#345](https://github.com/opensearch-project/opensearch-rs/pull/345))
 - Bump `dialoguer` from 0.11.0 to 0.12.0 ([#354](https://github.com/opensearch-project/opensearch-rs/pull/354))
 - Bump `xml-rs` from 0.8 to 1.0 ([#356](https://github.com/opensearch-project/opensearch-rs/pull/356))
-- Bump `actions/checkout` from 4 to 5 ([#350](https://github.com/opensearch-project/opensearch-rs/pull/350))
+- Bump `actions/checkout` from 4 to 6 ([#350](https://github.com/opensearch-project/opensearch-rs/pull/350), [#372](https://github.com/opensearch-project/opensearch-rs/pull/372))
 - Bump `actions/upload-artifact` from 4 to 5 ([#365](https://github.com/opensearch-project/opensearch-rs/pull/365))
 
 ### Changed

@@ -7,7 +7,7 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Maintainer         | GitHub ID                                 | Affiliation |
 | ------------------ | ----------------------------------------- | ----------- |
 | Daniel Doubrovkine | [dblock](https://github.com/dblock)       | Independent |
-| Thomas Farr        | [Xtansia](https://github.com/Xtansia)     | Amazon      |
+| Thomas Farr        | [Xtansia](https://github.com/Xtansia)     | Independent |
 | Vacha Shah         | [VachaShah](https://github.com/VachaShah) | Amazon      |
 | Andriy Redko       | [reta](https://github.com/reta)           | Independent |
 

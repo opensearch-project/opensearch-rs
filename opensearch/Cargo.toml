@@ -23,7 +23,7 @@ experimental-apis = ["beta-apis"]
 
 # optional TLS
 native-tls = ["reqwest/native-tls"]
-rustls-tls = ["reqwest/rustls-tls"]
+rustls-tls = ["reqwest/rustls"]
 
 # AWS SigV4 Auth support
 aws-auth = ["aws-credential-types", "aws-sigv4", "aws-smithy-runtime-api", "aws-types"]
@@ -35,7 +35,7 @@ bytes = "1.0"
 dyn-clone = "1"
 lazy_static = "1.4"
 percent-encoding = "2.1.0"
-reqwest = { version = "0.12", default-features = false, features = ["gzip", "json"] }
+reqwest = { version = "0.13", default-features = false, features = ["gzip", "json", "query"] }
 url = "2.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

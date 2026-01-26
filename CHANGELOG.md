@@ -6,7 +6,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 ### Dependencies
-- Bumps `sysinfo` from 0.31.2 to 0.36.0 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346))
+- Bumps `sysinfo` from 0.31.2 to 0.38.0 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389))
+- Bumps `thiserror` from 1 to 2
 - Bump `dangoslen/dependabot-changelog-helper` from 2 to 4 ([#298](https://github.com/opensearch-project/opensearch-rs/pull/298), [#329](https://github.com/opensearch-project/opensearch-rs/pull/329))
 - Bump `VachaShah/backport` from 1.1.4 to 2.2.0 ([#299](https://github.com/opensearch-project/opensearch-rs/pull/299))
 - Bump `stefanzweifel/git-auto-commit-action` from 4 to 7 ([#300](https://github.com/opensearch-project/opensearch-rs/pull/300), [#343](https://github.com/opensearch-project/opensearch-rs/pull/343), [#363](https://github.com/opensearch-project/opensearch-rs/pull/363))

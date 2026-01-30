@@ -531,7 +531,7 @@ impl Default for Transport {
 /// dynamically at runtime, based upon the response to API calls.
 pub trait ConnectionPool: Debug + dyn_clone::DynClone + Sync + Send {
     /// Gets a reference to the next [Connection]
-    fn next(&self) -> &Connection;
+    fn next(&self) -> Connection;
 }
 
 clone_trait_object!(ConnectionPool);
@@ -560,8 +560,8 @@ impl Default for SingleNodeConnectionPool {
 
 impl ConnectionPool for SingleNodeConnectionPool {
     /// Gets a reference to the next [Connection]
-    fn next(&self) -> &Connection {
-        &self.connection
+    fn next(&self) -> Connection {
+        self.connection.clone()
     }
 }
 

@@ -2,7 +2,9 @@
 Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
-
+### ⚠️ Breaking Changes ⚠️
+- `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#392](https://github.com/opensearch-project/opensearch-rs/pull/392))
+ 
 ### Added
 
 ### Dependencies

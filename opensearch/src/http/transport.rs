@@ -60,6 +60,7 @@ use std::{
     io::{self, Write},
     time::Duration,
 };
+use std::sync::Arc;
 use url::Url;
 
 /// Error that can occur when building a [Transport]
@@ -356,7 +357,7 @@ impl Default for TransportBuilder {
 /// A connection to an OpenSearch node, used to send an API request
 #[derive(Debug, Clone)]
 pub struct Connection {
-    url: Url,
+    url: Arc<Url>,
 }
 
 impl Connection {
@@ -370,7 +371,7 @@ impl Connection {
             url.set_path(&format!("{}/", url.path()));
         }
 
-        Self { url }
+        Self { url: Arc::new(url) }
     }
 }
 
@@ -531,7 +532,7 @@ impl Default for Transport {
 /// dynamically at runtime, based upon the response to API calls.
 pub trait ConnectionPool: Debug + dyn_clone::DynClone + Sync + Send {
     /// Gets a reference to the next [Connection]
-    fn next(&self) -> &Connection;
+    fn next(&self) -> Connection;
 }
 
 clone_trait_object!(ConnectionPool);
@@ -560,8 +561,8 @@ impl Default for SingleNodeConnectionPool {
 
 impl ConnectionPool for SingleNodeConnectionPool {
     /// Gets a reference to the next [Connection]
-    fn next(&self) -> &Connection {
-        &self.connection
+    fn next(&self) -> Connection {
+        self.connection.clone()
     }
 }
 

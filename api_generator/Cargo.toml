@@ -1,6 +1,6 @@
 [package]
 name = "api_generator"
-version = "2.4.0"
+version = "2.5.0"
 publish = false
 description = "Generates source code for opensearch package, from the OpenSearch REST API specs"
 repository = "https://github.com/opensearch-project/opensearch-rs"

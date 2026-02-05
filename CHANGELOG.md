@@ -3,6 +3,22 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 ### ⚠️ Breaking Changes ⚠️
+
+### Dependencies
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [2.4.0]
+
+### ⚠️ Breaking Changes ⚠️
 - `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#392](https://github.com/opensearch-project/opensearch-rs/pull/392))
  
 ### Added
@@ -104,7 +120,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
 
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...v2.3.0
 [2.3.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.0.0...v2.1.0

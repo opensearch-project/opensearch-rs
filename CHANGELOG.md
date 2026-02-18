@@ -29,6 +29,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `actions/upload-artifact` from 4 to 6 ([#365](https://github.com/opensearch-project/opensearch-rs/pull/365), [#377](https://github.com/opensearch-project/opensearch-rs/pull/377))
 - Bump `reqwest` from 0.12 to 0.13 ([#387](https://github.com/opensearch-project/opensearch-rs/pull/387))
 - Lock native-tls to 0.2.15 version as it has issues with tlsv13 ([#398](https://github.com/opensearch-project/opensearch-rs/pull/398))
+- Bump native-tls to 0.2.18 ([#401](https://github.com/opensearch-project/opensearch-rs/pull/401))
 
 ### Changed
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))

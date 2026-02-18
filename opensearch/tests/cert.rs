@@ -45,7 +45,7 @@ fn assert_is_untrusted_cert_error(res: Result<Response, Error>) {
     let untrusted_cert_error = if cfg!(windows) {
         "terminated in a root certificate which is not trusted by the trust provider"
     } else if cfg!(target_os = "macos") {
-        "The certificate was not trusted"
+        "The validity period in the certificate exceeds the maximum allowed"
     } else {
         "unable to get local issuer certificate"
     };

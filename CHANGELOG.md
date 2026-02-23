@@ -30,6 +30,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `reqwest` from 0.12 to 0.13 ([#387](https://github.com/opensearch-project/opensearch-rs/pull/387))
 - Lock native-tls to 0.2.15 version as it has issues with tlsv13 ([#398](https://github.com/opensearch-project/opensearch-rs/pull/398))
 - Bump `actions/create-github-app-token` from 2 to 3 ([#407](https://github.com/opensearch-project/opensearch-rs/pull/407))
+- Bump `native-tls` from =0.2.15 to =0.2.18 ([#402](https://github.com/opensearch-project/opensearch-rs/pull/402))
 
 ### Changed
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))

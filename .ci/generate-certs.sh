@@ -24,6 +24,7 @@ kirk_csr="$certs_dir/kirk.csr"
 kirk_crt="$certs_dir/kirk.crt"
 kirk_p12="$certs_dir/kirk.p12"
 
+# MacOS changed the maximum validity period for the certificates
 common_crt_args="-extfile $openssl_conf -days 36500 -CA $root_ca_crt -CAkey $root_ca_key -CAcreateserial"
 common_csr_args="-config $openssl_conf -days 36500"
 

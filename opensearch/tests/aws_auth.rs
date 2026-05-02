@@ -12,17 +12,61 @@
 #![cfg(feature = "aws-auth")]
 
 pub mod common;
-use aws_credential_types::{provider::SharedCredentialsProvider, Credentials as AwsCredentials};
+use std::sync::{
+    atomic::{AtomicUsize, Ordering},
+    Arc,
+};
+
+use aws_credential_types::{
+    provider::{future, ProvideCredentials, SharedCredentialsProvider},
+    Credentials as AwsCredentials,
+};
 use aws_smithy_async::time::StaticTimeSource;
 use aws_types::region::Region;
 use common::{server::MockServer, tracing_init};
 use opensearch::{
+    auth::cache::CachedCredentialsProvider,
     http::{headers::HOST, transport::TransportBuilder},
     indices::IndicesCreateParts,
 };
 use reqwest::header::HeaderValue;
 use serde_json::json;
 use test_case::test_case;
+
+#[derive(Debug)]
+struct CountingCredentialsProvider {
+    calls: Arc<AtomicUsize>,
+}
+
+impl CountingCredentialsProvider {
+    fn new() -> (Self, Arc<AtomicUsize>) {
+        let calls = Arc::new(AtomicUsize::new(0));
+        (
+            Self {
+                calls: Arc::clone(&calls),
+            },
+            calls,
+        )
+    }
+}
+
+impl ProvideCredentials for CountingCredentialsProvider {
+    fn provide_credentials<'a>(&'a self) -> future::ProvideCredentials<'a>
+    where
+        Self: 'a,
+    {
+        future::ProvideCredentials::new(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(AwsCredentials::new(
+                "test-access-key",
+                "test-secret-key",
+                None,
+                None,
+                "test",
+            ))
+        })
+    }
+}
 
 fn sigv4_config(transport: TransportBuilder, service_name: &str) -> TransportBuilder {
     let aws_creds = AwsCredentials::new("test-access-key", "test-secret-key", None, None, "test");
@@ -32,6 +76,22 @@ fn sigv4_config(transport: TransportBuilder, service_name: &str) -> TransportBui
     transport
         .auth(opensearch::auth::Credentials::AwsSigV4(
             SharedCredentialsProvider::new(aws_creds),
+            region,
+        ))
+        .service_name(service_name)
+        .sigv4_time_source(time_source.into())
+}
+
+fn sigv4_config_cached(transport: TransportBuilder, service_name: &str) -> TransportBuilder {
+    let aws_creds = AwsCredentials::new("test-access-key", "test-secret-key", None, None, "test");
+    let region = Region::new("ap-southeast-2");
+    let time_source = StaticTimeSource::from_secs(1673626117); // 2023-01-13 16:08:37 +0000
+
+    let cached = CachedCredentialsProvider::new(aws_creds);
+
+    transport
+        .auth(opensearch::auth::Credentials::AwsSigV4(
+            SharedCredentialsProvider::new(cached),
             region,
         ))
         .service_name(service_name)
@@ -111,6 +171,59 @@ async fn aws_auth_get() -> anyhow::Result<()> {
         sent_req.header("x-amz-content-sha256"),
         Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
     ); // SHA of zero-length body
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn aws_auth_through_cached_provider_produces_identical_signature() -> anyhow::Result<()> {
+    // Same fixture as `aws_auth_get`; wrapping with CachedCredentialsProvider must not
+    // change the signature.
+    tracing_init();
+
+    let mut server = MockServer::start()?;
+
+    let client = server.client_with(|b| sigv4_config_cached(b, "custom").header(HOST, LOCALHOST));
+
+    let _ = client.ping().send().await?;
+
+    let sent_req = server.received_request().await?;
+
+    assert_eq!(sent_req.header("authorization"), Some("AWS4-HMAC-SHA256 Credential=test-access-key/20230113/ap-southeast-2/custom/aws4_request, SignedHeaders=accept;content-type;host;x-amz-content-sha256;x-amz-date, Signature=e5aa6e5d9e1b86b86ed31fbb10dd62b4e93423b77830f8189701421d3e9f65bd"));
+    assert_eq!(
+        sent_req.header("x-amz-content-sha256"),
+        Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    ); // SHA of zero-length body
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn cached_provider_reuses_credentials_across_requests() -> anyhow::Result<()> {
+    tracing_init();
+
+    let mut server = MockServer::start()?;
+    let region = Region::new("ap-southeast-2");
+    let time_source = StaticTimeSource::from_secs(1673626117); // 2023-01-13 16:08:37 +0000
+    let (provider, calls) = CountingCredentialsProvider::new();
+    let cached = CachedCredentialsProvider::new(provider);
+    let client = server.client_with(|b| {
+        b.auth(opensearch::auth::Credentials::AwsSigV4(
+            SharedCredentialsProvider::new(cached),
+            region,
+        ))
+        .service_name("custom")
+        .sigv4_time_source(time_source.into())
+        .header(HOST, LOCALHOST)
+    });
+
+    let _ = client.ping().send().await?;
+    let _ = client.ping().send().await?;
+
+    let _ = server.received_request().await?;
+    let _ = server.received_request().await?;
+
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
 
     Ok(())
 }

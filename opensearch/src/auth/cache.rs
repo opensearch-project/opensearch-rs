@@ -12,13 +12,20 @@
 //! documentation for the rationale.
 
 use std::fmt;
-use std::sync::RwLock;
+use std::sync::{
+    atomic::{AtomicUsize, Ordering},
+    RwLock,
+};
 use std::time::{Duration, SystemTime};
 
 use aws_credential_types::{
-    provider::{future, ProvideCredentials, Result as ProviderResult, SharedCredentialsProvider},
+    provider::{
+        error::CredentialsError, future, ProvideCredentials, Result as ProviderResult,
+        SharedCredentialsProvider,
+    },
     Credentials,
 };
+use aws_types::sdk_config::SharedTimeSource;
 
 /// Default safety margin subtracted from a credential's expiry.
 ///
@@ -65,7 +72,9 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 /// Cache hits take a [`std::sync::RwLock`] read guard, with no `.await`.
 /// Refreshes are serialised by a [`tokio::sync::Mutex`] and use a
 /// double-checked lookup so that concurrent callers crossing the expiry
-/// boundary trigger at most one inner provider call.
+/// boundary trigger at most one inner provider call. If that refresh fails,
+/// callers already waiting behind it receive a coalesced error instead of
+/// retrying the same failing provider serially.
 ///
 /// # Refresh stampede protection
 ///
@@ -79,9 +88,12 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 pub struct CachedCredentialsProvider {
     inner: SharedCredentialsProvider,
     cache: RwLock<Option<CachedEntry>>,
+    last_failure: RwLock<Option<RefreshFailure>>,
     refresh_lock: tokio::sync::Mutex<()>,
+    refresh_generation: AtomicUsize,
     buffer_time: Duration,
     buffer_time_jitter_fraction: f64,
+    time_source: SharedTimeSource,
 }
 
 #[derive(Clone)]
@@ -90,6 +102,11 @@ struct CachedEntry {
     /// `expiry - buffer_time`, or `None` if the inner credentials have no
     /// expiry, in which case the entry never goes stale.
     refresh_after: Option<SystemTime>,
+}
+
+struct RefreshFailure {
+    generation: usize,
+    message: String,
 }
 
 impl CachedEntry {
@@ -120,9 +137,12 @@ impl CachedCredentialsProvider {
         Self {
             inner,
             cache: RwLock::new(None),
+            last_failure: RwLock::new(None),
             refresh_lock: tokio::sync::Mutex::new(()),
+            refresh_generation: AtomicUsize::new(0),
             buffer_time: DEFAULT_BUFFER_TIME,
             buffer_time_jitter_fraction: DEFAULT_BUFFER_TIME_JITTER_FRACTION,
+            time_source: SharedTimeSource::default(),
         }
     }
 
@@ -136,15 +156,29 @@ impl CachedCredentialsProvider {
     /// [`Self::with_buffer_time`] (default:
     /// [`DEFAULT_BUFFER_TIME_JITTER_FRACTION`]).
     ///
-    /// `fraction` is clamped to `[0.0, 1.0]`; a value of `0.0` disables
-    /// jitter entirely.
+    /// `fraction` is clamped to `[0.0, 1.0]`; a value of `0.0`, `NaN`, or
+    /// infinity disables jitter entirely.
     pub fn with_buffer_time_jitter_fraction(mut self, fraction: f64) -> Self {
-        self.buffer_time_jitter_fraction = fraction.clamp(0.0, 1.0);
+        self.buffer_time_jitter_fraction = if fraction.is_finite() {
+            fraction.clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+        self
+    }
+
+    /// Override the time source used for cache freshness checks.
+    ///
+    /// The default uses system time. If the transport is configured with a
+    /// custom SigV4 time source, pass the same source here so credential
+    /// freshness is evaluated against the same clock used for signing.
+    pub fn with_time_source(mut self, time_source: SharedTimeSource) -> Self {
+        self.time_source = time_source;
         self
     }
 
     fn read_fresh(&self) -> Option<Credentials> {
-        let now = SystemTime::now();
+        let now = self.time_source.now();
         let guard = self.cache.read().unwrap_or_else(|p| p.into_inner());
         guard
             .as_ref()
@@ -175,11 +209,39 @@ impl CachedCredentialsProvider {
         *guard = Some(entry);
     }
 
+    fn store_failure(&self, generation: usize, err: &CredentialsError) {
+        let mut guard = self.last_failure.write().unwrap_or_else(|p| p.into_inner());
+        *guard = Some(RefreshFailure {
+            generation,
+            message: err.to_string(),
+        });
+    }
+
+    fn clear_failure(&self) {
+        let mut guard = self.last_failure.write().unwrap_or_else(|p| p.into_inner());
+        *guard = None;
+    }
+
+    fn failure_after(&self, observed_generation: usize) -> Option<CredentialsError> {
+        let guard = self.last_failure.read().unwrap_or_else(|p| p.into_inner());
+        guard
+            .as_ref()
+            .filter(|failure| failure.generation > observed_generation)
+            .map(|failure| {
+                CredentialsError::provider_error(format!(
+                    "coalesced credential refresh failure: {}",
+                    failure.message
+                ))
+            })
+    }
+
     async fn load_credentials(&self) -> ProviderResult {
         // Fast path: cache hit, no `.await`, shared lock only.
         if let Some(creds) = self.read_fresh() {
             return Ok(creds);
         }
+
+        let observed_generation = self.refresh_generation.load(Ordering::Acquire);
 
         // Serialise refreshes so concurrent callers fan in to a single
         // inner invocation.
@@ -190,7 +252,22 @@ impl CachedCredentialsProvider {
             return Ok(creds);
         }
 
-        let fresh = self.inner.provide_credentials().await?;
+        if let Some(err) = self.failure_after(observed_generation) {
+            return Err(err);
+        }
+
+        let fresh = match self.inner.provide_credentials().await {
+            Ok(fresh) => {
+                self.refresh_generation.fetch_add(1, Ordering::AcqRel);
+                self.clear_failure();
+                fresh
+            }
+            Err(err) => {
+                let generation = self.refresh_generation.fetch_add(1, Ordering::AcqRel) + 1;
+                self.store_failure(generation, &err);
+                return Err(err);
+            }
+        };
         self.store(fresh.clone());
         Ok(fresh)
     }
@@ -215,9 +292,11 @@ impl ProvideCredentials for CachedCredentialsProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aws_credential_types::provider::error::CredentialsError;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
+    use std::time::UNIX_EPOCH;
+
+    use aws_smithy_async::time::StaticTimeSource;
 
     #[derive(Debug)]
     struct CountingProvider {
@@ -270,6 +349,36 @@ mod tests {
         }
     }
 
+    #[derive(Debug)]
+    struct SlowFailingProvider {
+        calls: Arc<AtomicUsize>,
+    }
+
+    impl SlowFailingProvider {
+        fn new() -> (Self, Arc<AtomicUsize>) {
+            let calls = Arc::new(AtomicUsize::new(0));
+            (
+                Self {
+                    calls: Arc::clone(&calls),
+                },
+                calls,
+            )
+        }
+    }
+
+    impl ProvideCredentials for SlowFailingProvider {
+        fn provide_credentials<'a>(&'a self) -> future::ProvideCredentials<'a>
+        where
+            Self: 'a,
+        {
+            future::ProvideCredentials::new(async move {
+                self.calls.fetch_add(1, Ordering::SeqCst);
+                tokio::time::sleep(Duration::from_millis(20)).await;
+                Err(CredentialsError::provider_error("synthetic failure"))
+            })
+        }
+    }
+
     #[tokio::test]
     async fn first_call_invokes_inner_provider() {
         let (provider, calls) =
@@ -308,8 +417,7 @@ mod tests {
 
     #[tokio::test]
     async fn buffer_time_forces_immediate_refresh() {
-        // Expiry 30s away, buffer 60s -> always stale even after worst-case
-        // jitter (60s * 0.5 = 30s shorter buffer = 30s effective).
+        // Expiry 30s away, buffer 120s, jitter disabled -> always stale.
         let expiry = SystemTime::now() + Duration::from_secs(30);
         let (provider, calls) = CountingProvider::new(Some(expiry));
         let cached = CachedCredentialsProvider::new(provider)
@@ -339,16 +447,12 @@ mod tests {
     #[tokio::test]
     async fn jitter_shortens_effective_buffer_within_bounds() {
         // With buffer_time=100s and jitter_fraction=0.5, the effective buffer
-        // for any cached entry is in [50s, 100s]. Repeatedly populating the
-        // cache and checking when it becomes stale lets us verify the jitter
-        // is applied within the expected range.
+        // for any cached entry is in [50s, 100s], so refresh_after must fall
+        // between expiry-100s and expiry-50s.
         let buffer = Duration::from_secs(100);
         let fraction = 0.5;
 
         for _ in 0..20 {
-            // Expiry far enough in the future that the cache is fresh
-            // regardless of jitter (now + 200s, effective expiry in
-            // [now+100s, now+150s]).
             let expiry = SystemTime::now() + Duration::from_secs(200);
             let (provider, _calls) = CountingProvider::new(Some(expiry));
             let cached = CachedCredentialsProvider::new(provider)
@@ -356,11 +460,38 @@ mod tests {
                 .with_buffer_time_jitter_fraction(fraction);
 
             cached.provide_credentials().await.unwrap();
+            let refresh_after = cached
+                .cache
+                .read()
+                .unwrap_or_else(|p| p.into_inner())
+                .as_ref()
+                .and_then(|e| e.refresh_after)
+                .expect("cached entry has refresh_after");
+            let earliest = expiry.checked_sub(buffer).unwrap();
+            let latest = expiry.checked_sub(buffer.mul_f64(1.0 - fraction)).unwrap();
+
             assert!(
-                cached.read_fresh().is_some(),
-                "entry must be fresh: jitter should not push expiry below now"
+                refresh_after >= earliest && refresh_after <= latest,
+                "refresh_after must account for jitter: {:?} not in [{:?}, {:?}]",
+                refresh_after,
+                earliest,
+                latest
             );
         }
+    }
+
+    #[tokio::test]
+    async fn non_finite_jitter_fraction_disables_jitter() {
+        let expiry = SystemTime::now() + Duration::from_secs(10);
+        let (provider, calls) = CountingProvider::new(Some(expiry));
+        let cached = CachedCredentialsProvider::new(provider)
+            .with_buffer_time(Duration::from_secs(10))
+            .with_buffer_time_jitter_fraction(f64::NAN);
+
+        cached.provide_credentials().await.unwrap();
+        cached.provide_credentials().await.unwrap();
+
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]
@@ -405,6 +536,41 @@ mod tests {
 
         assert!(cached.provide_credentials().await.is_err());
         assert!(cached.provide_credentials().await.is_err());
+    }
+
+    #[tokio::test]
+    async fn concurrent_provider_errors_are_coalesced() {
+        let (provider, calls) = SlowFailingProvider::new();
+        let cached = Arc::new(CachedCredentialsProvider::new(provider));
+
+        let results = futures::future::join_all((0..10).map(|_| {
+            let cached = Arc::clone(&cached);
+            async move { cached.provide_credentials().await }
+        }))
+        .await;
+
+        assert!(results.iter().all(|result| result.is_err()));
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+
+        // Later callers still retry immediately; only callers queued behind
+        // the same failed refresh are coalesced.
+        assert!(cached.provide_credentials().await.is_err());
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
+    }
+
+    #[tokio::test]
+    async fn custom_time_source_controls_freshness() {
+        let expiry = UNIX_EPOCH + Duration::from_secs(20);
+        let (provider, calls) = CountingProvider::new(Some(expiry));
+        let cached = CachedCredentialsProvider::new(provider)
+            .with_buffer_time(Duration::from_secs(10))
+            .with_buffer_time_jitter_fraction(0.0)
+            .with_time_source(StaticTimeSource::from_secs(0).into());
+
+        cached.provide_credentials().await.unwrap();
+        cached.provide_credentials().await.unwrap();
+
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
     }
 
     #[tokio::test]

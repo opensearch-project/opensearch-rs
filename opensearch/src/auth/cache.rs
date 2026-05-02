@@ -12,17 +12,11 @@
 //! documentation for the rationale.
 
 use std::fmt;
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    RwLock,
-};
+use std::sync::RwLock;
 use std::time::{Duration, SystemTime};
 
 use aws_credential_types::{
-    provider::{
-        error::CredentialsError, future, ProvideCredentials, Result as ProviderResult,
-        SharedCredentialsProvider,
-    },
+    provider::{future, ProvideCredentials, Result as ProviderResult, SharedCredentialsProvider},
     Credentials,
 };
 use aws_types::sdk_config::SharedTimeSource;
@@ -72,9 +66,7 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 /// Cache hits take a [`std::sync::RwLock`] read guard, with no `.await`.
 /// Refreshes are serialised by a [`tokio::sync::Mutex`] and use a
 /// double-checked lookup so that concurrent callers crossing the expiry
-/// boundary trigger at most one inner provider call. If that refresh fails,
-/// callers already waiting behind it receive a coalesced error instead of
-/// retrying the same failing provider serially.
+/// boundary trigger at most one inner provider call.
 ///
 /// # Refresh stampede protection
 ///
@@ -88,9 +80,7 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 pub struct CachedCredentialsProvider {
     inner: SharedCredentialsProvider,
     cache: RwLock<Option<CachedEntry>>,
-    last_failure: RwLock<Option<RefreshFailure>>,
     refresh_lock: tokio::sync::Mutex<()>,
-    refresh_generation: AtomicUsize,
     buffer_time: Duration,
     buffer_time_jitter_fraction: f64,
     time_source: SharedTimeSource,
@@ -102,11 +92,6 @@ struct CachedEntry {
     /// `expiry - buffer_time`, or `None` if the inner credentials have no
     /// expiry, in which case the entry never goes stale.
     refresh_after: Option<SystemTime>,
-}
-
-struct RefreshFailure {
-    generation: usize,
-    message: String,
 }
 
 impl CachedEntry {
@@ -137,9 +122,7 @@ impl CachedCredentialsProvider {
         Self {
             inner,
             cache: RwLock::new(None),
-            last_failure: RwLock::new(None),
             refresh_lock: tokio::sync::Mutex::new(()),
-            refresh_generation: AtomicUsize::new(0),
             buffer_time: DEFAULT_BUFFER_TIME,
             buffer_time_jitter_fraction: DEFAULT_BUFFER_TIME_JITTER_FRACTION,
             time_source: SharedTimeSource::default(),
@@ -209,39 +192,11 @@ impl CachedCredentialsProvider {
         *guard = Some(entry);
     }
 
-    fn store_failure(&self, generation: usize, err: &CredentialsError) {
-        let mut guard = self.last_failure.write().unwrap_or_else(|p| p.into_inner());
-        *guard = Some(RefreshFailure {
-            generation,
-            message: err.to_string(),
-        });
-    }
-
-    fn clear_failure(&self) {
-        let mut guard = self.last_failure.write().unwrap_or_else(|p| p.into_inner());
-        *guard = None;
-    }
-
-    fn failure_after(&self, observed_generation: usize) -> Option<CredentialsError> {
-        let guard = self.last_failure.read().unwrap_or_else(|p| p.into_inner());
-        guard
-            .as_ref()
-            .filter(|failure| failure.generation > observed_generation)
-            .map(|failure| {
-                CredentialsError::provider_error(format!(
-                    "coalesced credential refresh failure: {}",
-                    failure.message
-                ))
-            })
-    }
-
     async fn load_credentials(&self) -> ProviderResult {
         // Fast path: cache hit, no `.await`, shared lock only.
         if let Some(creds) = self.read_fresh() {
             return Ok(creds);
         }
-
-        let observed_generation = self.refresh_generation.load(Ordering::Acquire);
 
         // Serialise refreshes so concurrent callers fan in to a single
         // inner invocation.
@@ -252,22 +207,7 @@ impl CachedCredentialsProvider {
             return Ok(creds);
         }
 
-        if let Some(err) = self.failure_after(observed_generation) {
-            return Err(err);
-        }
-
-        let fresh = match self.inner.provide_credentials().await {
-            Ok(fresh) => {
-                self.refresh_generation.fetch_add(1, Ordering::AcqRel);
-                self.clear_failure();
-                fresh
-            }
-            Err(err) => {
-                let generation = self.refresh_generation.fetch_add(1, Ordering::AcqRel) + 1;
-                self.store_failure(generation, &err);
-                return Err(err);
-            }
-        };
+        let fresh = self.inner.provide_credentials().await?;
         self.store(fresh.clone());
         Ok(fresh)
     }
@@ -292,6 +232,7 @@ impl ProvideCredentials for CachedCredentialsProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aws_credential_types::provider::error::CredentialsError;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
     use std::time::UNIX_EPOCH;
@@ -344,36 +285,6 @@ mod tests {
             Self: 'a,
         {
             future::ProvideCredentials::new(async {
-                Err(CredentialsError::provider_error("synthetic failure"))
-            })
-        }
-    }
-
-    #[derive(Debug)]
-    struct SlowFailingProvider {
-        calls: Arc<AtomicUsize>,
-    }
-
-    impl SlowFailingProvider {
-        fn new() -> (Self, Arc<AtomicUsize>) {
-            let calls = Arc::new(AtomicUsize::new(0));
-            (
-                Self {
-                    calls: Arc::clone(&calls),
-                },
-                calls,
-            )
-        }
-    }
-
-    impl ProvideCredentials for SlowFailingProvider {
-        fn provide_credentials<'a>(&'a self) -> future::ProvideCredentials<'a>
-        where
-            Self: 'a,
-        {
-            future::ProvideCredentials::new(async move {
-                self.calls.fetch_add(1, Ordering::SeqCst);
-                tokio::time::sleep(Duration::from_millis(20)).await;
                 Err(CredentialsError::provider_error("synthetic failure"))
             })
         }
@@ -536,26 +447,6 @@ mod tests {
 
         assert!(cached.provide_credentials().await.is_err());
         assert!(cached.provide_credentials().await.is_err());
-    }
-
-    #[tokio::test]
-    async fn concurrent_provider_errors_are_coalesced() {
-        let (provider, calls) = SlowFailingProvider::new();
-        let cached = Arc::new(CachedCredentialsProvider::new(provider));
-
-        let results = futures::future::join_all((0..10).map(|_| {
-            let cached = Arc::clone(&cached);
-            async move { cached.provide_credentials().await }
-        }))
-        .await;
-
-        assert!(results.iter().all(|result| result.is_err()));
-        assert_eq!(calls.load(Ordering::SeqCst), 1);
-
-        // Later callers still retry immediately; only callers queued behind
-        // the same failed refresh are coalesced.
-        assert!(cached.provide_credentials().await.is_err());
-        assert_eq!(calls.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]

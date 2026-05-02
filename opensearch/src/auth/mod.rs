@@ -115,3 +115,6 @@ impl std::convert::TryFrom<aws_types::SdkConfig> for Credentials {
         Credentials::try_from(&value)
     }
 }
+
+#[cfg(feature = "aws-auth")]
+pub mod cache;

@@ -370,6 +370,30 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ### Caching AWS credentials between requests
+//!
+//! The provider passed to [`Credentials::AwsSigV4`](crate::auth::Credentials::AwsSigV4) is
+//! invoked on every signed request. When credentials come from the IMDS or ECS metadata
+//! endpoint, this means an HTTP round-trip per request. Wrap the provider in
+//! [`auth::cache::CachedCredentialsProvider`](crate::auth::cache::CachedCredentialsProvider)
+//! to cache the resolved credentials until just before they expire:
+//!
+//! ```rust,no_run
+//! # #[cfg(feature = "aws-auth")] {
+//! # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+//! use aws_credential_types::provider::SharedCredentialsProvider;
+//! use opensearch::auth::{cache::CachedCredentialsProvider, Credentials};
+//!
+//! let aws_config = aws_config::load_from_env().await;
+//! let region = aws_config.region().expect("region").clone();
+//! let inner = aws_config.credentials_provider().expect("creds");
+//! let cached = CachedCredentialsProvider::from_shared(inner);
+//! let creds = Credentials::AwsSigV4(SharedCredentialsProvider::new(cached), region);
+//! # let _ = creds;
+//! # Ok(()) }
+//! # }
+//! ```
 
 #![doc(
     html_logo_url = "https://github.com/opensearch-project/opensearch-rs/raw/main/OpenSearch.svg"

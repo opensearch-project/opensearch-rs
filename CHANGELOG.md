@@ -8,7 +8,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 
-- Added `auth::cache::CachedCredentialsProvider`, an opt-in helper that caches AWS credentials between requests so that ECS / EC2 metadata endpoints are not queried on every signed request ([#XXX](https://github.com/opensearch-project/opensearch-rs/pull/XXX))
+- Added `auth::cache::CachedCredentialsProvider`, an opt-in helper that caches AWS credentials between requests so that ECS / EC2 metadata endpoints are not queried on every signed request ([#419](https://github.com/opensearch-project/opensearch-rs/pull/419))
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.38.0 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389))

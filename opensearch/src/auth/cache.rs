@@ -29,6 +29,14 @@ use aws_credential_types::{
 /// [`aws_smithy_runtime`'s `IdentityCache::lazy()`]: https://docs.rs/aws-smithy-runtime/latest/aws_smithy_runtime/client/identity/struct.IdentityCache.html
 pub const DEFAULT_BUFFER_TIME: Duration = Duration::from_secs(10);
 
+/// Default upper bound for the jitter applied to [`DEFAULT_BUFFER_TIME`].
+///
+/// A fresh random value in `[0, DEFAULT_BUFFER_TIME_JITTER_FRACTION)` is drawn
+/// each time a credential is cached and used to shorten the effective buffer,
+/// spreading refreshes across clients that share the same credential expiry
+/// to avoid stampedes against IMDS / ECS metadata.
+pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
+
 /// A [`ProvideCredentials`] adapter that caches the wrapped provider's
 /// output until shortly before it expires.
 ///
@@ -58,11 +66,22 @@ pub const DEFAULT_BUFFER_TIME: Duration = Duration::from_secs(10);
 /// Refreshes are serialised by a [`tokio::sync::Mutex`] and use a
 /// double-checked lookup so that concurrent callers crossing the expiry
 /// boundary trigger at most one inner provider call.
+///
+/// # Refresh stampede protection
+///
+/// When many clients share the same credential expiry (e.g. ECS tasks
+/// sharing a task role), they would otherwise refresh simultaneously and
+/// pile up on the IMDS / ECS metadata endpoint. A random jitter is
+/// subtracted from `buffer_time` for each cached entry to spread the
+/// refresh times. See [`with_buffer_time_jitter_fraction`].
+///
+/// [`with_buffer_time_jitter_fraction`]: Self::with_buffer_time_jitter_fraction
 pub struct CachedCredentialsProvider {
     inner: SharedCredentialsProvider,
     cache: RwLock<Option<CachedEntry>>,
     refresh_lock: tokio::sync::Mutex<()>,
     buffer_time: Duration,
+    buffer_time_jitter_fraction: f64,
 }
 
 #[derive(Clone)]
@@ -103,12 +122,24 @@ impl CachedCredentialsProvider {
             cache: RwLock::new(None),
             refresh_lock: tokio::sync::Mutex::new(()),
             buffer_time: DEFAULT_BUFFER_TIME,
+            buffer_time_jitter_fraction: DEFAULT_BUFFER_TIME_JITTER_FRACTION,
         }
     }
 
     /// Override the expiry buffer (default: [`DEFAULT_BUFFER_TIME`]).
     pub fn with_buffer_time(mut self, buffer_time: Duration) -> Self {
         self.buffer_time = buffer_time;
+        self
+    }
+
+    /// Override the upper bound for the random jitter applied to
+    /// [`Self::with_buffer_time`] (default:
+    /// [`DEFAULT_BUFFER_TIME_JITTER_FRACTION`]).
+    ///
+    /// `fraction` is clamped to `[0.0, 1.0]`; a value of `0.0` disables
+    /// jitter entirely.
+    pub fn with_buffer_time_jitter_fraction(mut self, fraction: f64) -> Self {
+        self.buffer_time_jitter_fraction = fraction.clamp(0.0, 1.0);
         self
     }
 
@@ -127,9 +158,15 @@ impl CachedCredentialsProvider {
     }
 
     fn store(&self, credentials: Credentials) {
-        let refresh_after = credentials
-            .expiry()
-            .map(|exp| exp.checked_sub(self.buffer_time).unwrap_or(exp));
+        let refresh_after = credentials.expiry().map(|exp| {
+            // Random jitter, drawn fresh per cached entry, shortens the
+            // effective buffer. Clients that share the same credential
+            // expiry then refresh at slightly different times.
+            let jitter_factor = fastrand::f64() * self.buffer_time_jitter_fraction;
+            let jitter = self.buffer_time.mul_f64(jitter_factor);
+            let effective_buffer = self.buffer_time.saturating_sub(jitter);
+            exp.checked_sub(effective_buffer).unwrap_or(exp)
+        });
         let entry = CachedEntry {
             credentials,
             refresh_after,
@@ -271,11 +308,13 @@ mod tests {
 
     #[tokio::test]
     async fn buffer_time_forces_immediate_refresh() {
-        // Expiry 30s away, buffer 60s -> always stale.
+        // Expiry 30s away, buffer 60s -> always stale even after worst-case
+        // jitter (60s * 0.5 = 30s shorter buffer = 30s effective).
         let expiry = SystemTime::now() + Duration::from_secs(30);
         let (provider, calls) = CountingProvider::new(Some(expiry));
-        let cached =
-            CachedCredentialsProvider::new(provider).with_buffer_time(Duration::from_secs(60));
+        let cached = CachedCredentialsProvider::new(provider)
+            .with_buffer_time(Duration::from_secs(120))
+            .with_buffer_time_jitter_fraction(0.0);
 
         cached.provide_credentials().await.unwrap();
         cached.provide_credentials().await.unwrap();
@@ -287,13 +326,57 @@ mod tests {
     async fn expired_entry_is_refreshed() {
         let expiry = SystemTime::now() - Duration::from_secs(60);
         let (provider, calls) = CountingProvider::new(Some(expiry));
-        let cached =
-            CachedCredentialsProvider::new(provider).with_buffer_time(Duration::from_secs(0));
+        let cached = CachedCredentialsProvider::new(provider)
+            .with_buffer_time(Duration::from_secs(0))
+            .with_buffer_time_jitter_fraction(0.0);
 
         cached.provide_credentials().await.unwrap();
         cached.provide_credentials().await.unwrap();
 
         assert!(calls.load(Ordering::SeqCst) >= 2);
+    }
+
+    #[tokio::test]
+    async fn jitter_shortens_effective_buffer_within_bounds() {
+        // With buffer_time=100s and jitter_fraction=0.5, the effective buffer
+        // for any cached entry is in [50s, 100s]. Repeatedly populating the
+        // cache and checking when it becomes stale lets us verify the jitter
+        // is applied within the expected range.
+        let buffer = Duration::from_secs(100);
+        let fraction = 0.5;
+
+        for _ in 0..20 {
+            // Expiry far enough in the future that the cache is fresh
+            // regardless of jitter (now + 200s, effective expiry in
+            // [now+100s, now+150s]).
+            let expiry = SystemTime::now() + Duration::from_secs(200);
+            let (provider, _calls) = CountingProvider::new(Some(expiry));
+            let cached = CachedCredentialsProvider::new(provider)
+                .with_buffer_time(buffer)
+                .with_buffer_time_jitter_fraction(fraction);
+
+            cached.provide_credentials().await.unwrap();
+            assert!(
+                cached.read_fresh().is_some(),
+                "entry must be fresh: jitter should not push expiry below now"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn zero_jitter_is_deterministic() {
+        // With jitter disabled, a credential expiring exactly at now+buffer
+        // is always considered stale.
+        let expiry = SystemTime::now() + Duration::from_secs(10);
+        let (provider, calls) = CountingProvider::new(Some(expiry));
+        let cached = CachedCredentialsProvider::new(provider)
+            .with_buffer_time(Duration::from_secs(10))
+            .with_buffer_time_jitter_fraction(0.0);
+
+        cached.provide_credentials().await.unwrap();
+        cached.provide_credentials().await.unwrap();
+
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]

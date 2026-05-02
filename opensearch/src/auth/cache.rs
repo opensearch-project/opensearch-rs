@@ -24,7 +24,10 @@ use aws_credential_types::{
 ///
 /// Refresh begins this far ahead of the inner credentials' expiry so that
 /// in-flight signed requests do not race with expiry on the server side.
-pub const DEFAULT_BUFFER_TIME: Duration = Duration::from_secs(5 * 60);
+/// Matches the default used by [`aws_smithy_runtime`'s `IdentityCache::lazy()`].
+///
+/// [`aws_smithy_runtime`'s `IdentityCache::lazy()`]: https://docs.rs/aws-smithy-runtime/latest/aws_smithy_runtime/client/identity/struct.IdentityCache.html
+pub const DEFAULT_BUFFER_TIME: Duration = Duration::from_secs(10);
 
 /// A [`ProvideCredentials`] adapter that caches the wrapped provider's
 /// output until shortly before it expires.

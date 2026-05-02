@@ -302,6 +302,19 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn from_shared_wraps_existing_provider() {
+        let expiry = SystemTime::now() + Duration::from_secs(3600);
+        let (provider, calls) = CountingProvider::new(Some(expiry));
+        let shared = SharedCredentialsProvider::new(provider);
+        let cached = CachedCredentialsProvider::from_shared(shared);
+
+        cached.provide_credentials().await.unwrap();
+        cached.provide_credentials().await.unwrap();
+
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
     async fn cache_hit_does_not_invoke_inner_provider() {
         let expiry = SystemTime::now() + Duration::from_secs(3600);
         let (provider, calls) = CountingProvider::new(Some(expiry));

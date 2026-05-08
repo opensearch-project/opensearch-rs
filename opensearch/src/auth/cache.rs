@@ -87,8 +87,9 @@ pub struct CachedCredentialsProvider {
 #[derive(Clone)]
 struct CachedEntry {
     credentials: Credentials,
-    /// `expiry - buffer_time`, or `None` if the inner credentials have no
-    /// expiry, in which case the entry never goes stale.
+    /// `expiry - effective_buffer` (where `effective_buffer = buffer_time - jitter`),
+    /// or `None` if the inner credentials have no expiry, in which case the
+    /// entry never goes stale.
     refresh_after: Option<SystemTime>,
 }
 
@@ -358,7 +359,7 @@ mod tests {
         cached.provide_credentials().await.unwrap();
         cached.provide_credentials().await.unwrap();
 
-        assert!(calls.load(Ordering::SeqCst) >= 2);
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]

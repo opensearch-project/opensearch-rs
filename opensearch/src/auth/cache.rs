@@ -12,7 +12,6 @@
 //! documentation for the rationale.
 
 use std::fmt;
-use std::sync::RwLock;
 use std::time::{Duration, SystemTime};
 
 use aws_credential_types::{
@@ -63,10 +62,10 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 ///
 /// # Concurrency
 ///
-/// Cache hits take a [`std::sync::RwLock`] read guard, with no `.await`.
-/// Refreshes are serialised by a [`tokio::sync::Mutex`] and use a
-/// double-checked lookup so that concurrent callers crossing the expiry
-/// boundary trigger at most one inner provider call.
+/// Cache hits take a [`tokio::sync::RwLock`] read guard. Refreshes acquire
+/// the write guard, which serialises concurrent refreshers; a double-checked
+/// lookup after the write guard is acquired ensures concurrent callers
+/// crossing the expiry boundary trigger at most one inner provider call.
 ///
 /// # Refresh stampede protection
 ///
@@ -79,8 +78,7 @@ pub const DEFAULT_BUFFER_TIME_JITTER_FRACTION: f64 = 0.5;
 /// [`with_buffer_time_jitter_fraction`]: Self::with_buffer_time_jitter_fraction
 pub struct CachedCredentialsProvider {
     inner: SharedCredentialsProvider,
-    cache: RwLock<Option<CachedEntry>>,
-    refresh_lock: tokio::sync::Mutex<()>,
+    cache: tokio::sync::RwLock<Option<CachedEntry>>,
     buffer_time: Duration,
     buffer_time_jitter_fraction: f64,
     time_source: SharedTimeSource,
@@ -121,8 +119,7 @@ impl CachedCredentialsProvider {
     pub fn from_shared(inner: SharedCredentialsProvider) -> Self {
         Self {
             inner,
-            cache: RwLock::new(None),
-            refresh_lock: tokio::sync::Mutex::new(()),
+            cache: tokio::sync::RwLock::new(None),
             buffer_time: DEFAULT_BUFFER_TIME,
             buffer_time_jitter_fraction: DEFAULT_BUFFER_TIME_JITTER_FRACTION,
             time_source: SharedTimeSource::default(),
@@ -160,21 +157,21 @@ impl CachedCredentialsProvider {
         self
     }
 
-    fn read_fresh(&self) -> Option<Credentials> {
+    async fn read_fresh(&self) -> Option<Credentials> {
+        let guard = self.cache.read().await;
+        // Sample `now` *after* acquiring the read lock. If acquiring the
+        // lock waited on a concurrent writer, the just-stored entry must
+        // be evaluated against the current clock — using a `now` sampled
+        // before the wait could classify an already-past `refresh_after`
+        // as still fresh.
         let now = self.time_source.now();
-        let guard = self.cache.read().unwrap_or_else(|p| p.into_inner());
         guard
             .as_ref()
             .filter(|e| e.is_fresh(now))
             .map(|e| e.credentials.clone())
     }
 
-    fn last_known(&self) -> Option<Credentials> {
-        let guard = self.cache.read().unwrap_or_else(|p| p.into_inner());
-        guard.as_ref().map(|e| e.credentials.clone())
-    }
-
-    fn store(&self, credentials: Credentials) {
+    fn make_entry(&self, credentials: Credentials) -> CachedEntry {
         let refresh_after = credentials.expiry().map(|exp| {
             // Random jitter, drawn fresh per cached entry, shortens the
             // effective buffer. Clients that share the same credential
@@ -184,31 +181,34 @@ impl CachedCredentialsProvider {
             let effective_buffer = self.buffer_time.saturating_sub(jitter);
             exp.checked_sub(effective_buffer).unwrap_or(exp)
         });
-        let entry = CachedEntry {
+        CachedEntry {
             credentials,
             refresh_after,
-        };
-        let mut guard = self.cache.write().unwrap_or_else(|p| p.into_inner());
-        *guard = Some(entry);
+        }
     }
 
     async fn load_credentials(&self) -> ProviderResult {
-        // Fast path: cache hit, no `.await`, shared lock only.
-        if let Some(creds) = self.read_fresh() {
+        // Fast path: shared read guard while the cached entry is fresh.
+        if let Some(creds) = self.read_fresh().await {
             return Ok(creds);
         }
 
-        // Serialise refreshes so concurrent callers fan in to a single
-        // inner invocation.
-        let _guard = self.refresh_lock.lock().await;
+        // Acquire the write guard. `tokio::sync::RwLock::write` is exclusive,
+        // which serialises concurrent refreshers, and (unlike `std::sync::RwLock`)
+        // we can hold it across the inner provider's `.await`.
+        let mut guard = self.cache.write().await;
 
-        // Double-check: another task may have refreshed while we waited.
-        if let Some(creds) = self.read_fresh() {
-            return Ok(creds);
+        // Double-check: another writer may have refreshed while we waited.
+        // Sample `now` after acquiring the lock so an entry just stored by a
+        // slow predecessor is judged against the current clock — not a `now`
+        // captured before we started waiting.
+        let now = self.time_source.now();
+        if let Some(entry) = guard.as_ref().filter(|e| e.is_fresh(now)) {
+            return Ok(entry.credentials.clone());
         }
 
         let fresh = self.inner.provide_credentials().await?;
-        self.store(fresh.clone());
+        *guard = Some(self.make_entry(fresh.clone()));
         Ok(fresh)
     }
 }
@@ -223,8 +223,13 @@ impl ProvideCredentials for CachedCredentialsProvider {
 
     fn fallback_on_interrupt(&self) -> Option<Credentials> {
         // Match the convention from `awslabs/smithy-rs#2720`: surface the
-        // last cached value when a refresh is interrupted.
-        self.last_known()
+        // last cached value when a refresh is interrupted. `try_read` skips
+        // waiting if a writer (i.e. another in-flight refresh) currently
+        // holds the lock, in which case we delegate to the inner provider.
+        self.cache
+            .try_read()
+            .ok()
+            .and_then(|g| g.as_ref().map(|e| e.credentials.clone()))
             .or_else(|| self.inner.fallback_on_interrupt())
     }
 }
@@ -387,7 +392,7 @@ mod tests {
             let refresh_after = cached
                 .cache
                 .read()
-                .unwrap_or_else(|p| p.into_inner())
+                .await
                 .as_ref()
                 .and_then(|e| e.refresh_after)
                 .expect("cached entry has refresh_after");

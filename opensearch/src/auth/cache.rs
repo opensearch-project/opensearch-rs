@@ -220,18 +220,6 @@ impl ProvideCredentials for CachedCredentialsProvider {
     {
         future::ProvideCredentials::new(self.load_credentials())
     }
-
-    fn fallback_on_interrupt(&self) -> Option<Credentials> {
-        // Match the convention from `awslabs/smithy-rs#2720`: surface the
-        // last cached value when a refresh is interrupted. `try_read` skips
-        // waiting if a writer (i.e. another in-flight refresh) currently
-        // holds the lock, in which case we delegate to the inner provider.
-        self.cache
-            .try_read()
-            .ok()
-            .and_then(|g| g.as_ref().map(|e| e.credentials.clone()))
-            .or_else(|| self.inner.fallback_on_interrupt())
-    }
 }
 
 #[cfg(test)]
@@ -480,17 +468,5 @@ mod tests {
         cached.provide_credentials().await.unwrap();
 
         assert_eq!(calls.load(Ordering::SeqCst), 1);
-    }
-
-    #[tokio::test]
-    async fn fallback_on_interrupt_returns_last_known_credentials() {
-        let expiry = SystemTime::now() + Duration::from_secs(3600);
-        let (provider, _calls) = CountingProvider::new(Some(expiry));
-        let cached = CachedCredentialsProvider::new(provider);
-
-        let primed = cached.provide_credentials().await.unwrap();
-
-        let fallback = cached.fallback_on_interrupt().expect("fallback present");
-        assert_eq!(fallback.access_key_id(), primed.access_key_id());
     }
 }

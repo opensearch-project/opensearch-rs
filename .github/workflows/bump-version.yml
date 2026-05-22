@@ -25,20 +25,20 @@ jobs:
       - name: GitHub App Token
         if: github.repository == 'opensearch-project/opensearch-rs'
         id: app-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ github.event.inputs.branch }}
 
       - name: Install latest stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
 
       - name: Install cargo-make
-        uses: davidB/rust-cargo-make@v1
+        uses: davidB/rust-cargo-make@184c522bf8152f601a20749ca36c742b57ba568b # v1
 
       - name: Bump Version
         run: cargo make update-version "$VERSION"
@@ -46,7 +46,7 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           base: ${{ github.event.inputs.branch }}
@@ -66,21 +66,21 @@ jobs:
     steps:
       - name: GitHub App Token
         id: app-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Install latest stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
 
       - name: Install cargo-make
-        uses: davidB/rust-cargo-make@v1
+        uses: davidB/rust-cargo-make@184c522bf8152f601a20749ca36c742b57ba568b # v1
 
       - name: Fetch Version Information
         run: |
@@ -130,7 +130,7 @@ jobs:
         run: git branch ${BASE} && git push origin ${BASE}
 
       - name: Checkout ${{ env.BASE }} branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ env.BASE }}
           token: ${{ steps.app-token.outputs.token }}
@@ -139,7 +139,7 @@ jobs:
         run: cargo make update-version "$NEXT_PATCH"
 
       - name: Create Patch Version Pull Request
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: ${{ env.BASE }}
@@ -154,7 +154,7 @@ jobs:
 
       - name: Checkout ${{ env.BASE_X }} branch
         if: env.IS_MINOR_BUMP == 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ env.BASE_X }}
           token: ${{ steps.app-token.outputs.token }}
@@ -165,7 +165,7 @@ jobs:
 
       - name: Create Minor Version Pull Request
         if: env.IS_MINOR_BUMP == 'true'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: ${{ env.BASE_X }}
@@ -180,7 +180,7 @@ jobs:
 
       - name: Checkout main branch
         if: env.IS_MAJOR_BUMP == 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: main
           token: ${{ steps.app-token.outputs.token }}
@@ -191,7 +191,7 @@ jobs:
 
       - name: Create Major Version Pull Request
         if: env.IS_MAJOR_BUMP == 'true'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           base: main

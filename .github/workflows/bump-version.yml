@@ -30,7 +30,7 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ github.event.inputs.branch }}
 
@@ -38,7 +38,7 @@ jobs:
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
 
       - name: Install cargo-make
-        uses: davidB/rust-cargo-make@184c522bf8152f601a20749ca36c742b57ba568b # v1
+        uses: davidB/rust-cargo-make@d8952235ddd22b65d7c6b9194d4dbd58c3ffc48a # v1
 
       - name: Bump Version
         run: cargo make update-version "$VERSION"
@@ -72,7 +72,7 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
 
@@ -80,7 +80,7 @@ jobs:
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
 
       - name: Install cargo-make
-        uses: davidB/rust-cargo-make@184c522bf8152f601a20749ca36c742b57ba568b # v1
+        uses: davidB/rust-cargo-make@d8952235ddd22b65d7c6b9194d4dbd58c3ffc48a # v1
 
       - name: Fetch Version Information
         run: |
@@ -92,21 +92,21 @@ jobs:
           PATCH="${VERSION_COMPONENTS[2]}"
           BASE="${MAJOR}.${MINOR}"
           BASE_X="${MAJOR}.x"
-          
+
           IS_MAJOR_BUMP=false
           IS_MINOR_BUMP=false
-          
+
           if [ "${PATCH}" = "0" ]; then
             IS_MINOR_BUMP=true
             if [ "${MINOR}" = "0" ]; then
               IS_MAJOR_BUMP=true
             fi
           fi
-          
+
           NEXT_MAJOR="$((MAJOR + 1)).0.0"
           NEXT_MINOR="${MAJOR}.$((MINOR + 1)).0"
           NEXT_PATCH="${MAJOR}.${MINOR}.$((PATCH + 1))"
-          
+
           {
             echo "VERSION=${VERSION}"
             echo "MAJOR=${MAJOR}"
@@ -130,7 +130,7 @@ jobs:
         run: git branch ${BASE} && git push origin ${BASE}
 
       - name: Checkout ${{ env.BASE }} branch
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ env.BASE }}
           token: ${{ steps.app-token.outputs.token }}
@@ -154,7 +154,7 @@ jobs:
 
       - name: Checkout ${{ env.BASE_X }} branch
         if: env.IS_MINOR_BUMP == 'true'
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ env.BASE_X }}
           token: ${{ steps.app-token.outputs.token }}
@@ -180,7 +180,7 @@ jobs:
 
       - name: Checkout main branch
         if: env.IS_MAJOR_BUMP == 'true'
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: main
           token: ${{ steps.app-token.outputs.token }}

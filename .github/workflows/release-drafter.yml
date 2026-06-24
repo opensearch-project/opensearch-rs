@@ -27,7 +27,8 @@ jobs:
           issue-body: "Please approve or deny the release of opensearch-rs. <br> **${{ steps.get_data.outputs.version }}** <br> **TAG**: ${{ github.ref_name }} <br> **COMMIT**: ${{ github.sha }}"
           exclude-workflow-initiator-as-approver: true
       - name: Release
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd
         with:
-          draft: true
-          generate_release_notes: true
+          immutableCreate: true
+          generateReleaseNotes: true
+          prerelease: true

@@ -35,6 +35,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `codecov/codecov-action` from 5 to 6 ([#412](https://github.com/opensearch-project/opensearch-rs/pull/412))
 
 ### Changed
+- Include a direct link to the failed job in scheduled integration-test failure issues ([#256](https://github.com/opensearch-project/opensearch-rs/issues/256))
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))
 
 ### Deprecated

@@ -233,6 +233,7 @@ jobs:
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2
         env:
           GITHUB_TOKEN: ${{ steps.github_app_token.outputs.token }}
+          FAILURE_JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
         with:
           filename: ./client/.github/test-failure-issue-template.md
           update_existing: true

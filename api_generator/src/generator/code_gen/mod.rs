@@ -328,6 +328,7 @@ pub fn generics(lifetimes: Vec<syn::Lifetime>, types: Vec<syn::TypeParam>) -> sy
 /// AST for a path type with lifetimes and type parameters.
 pub fn ty_path(ty: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Type>) -> syn::Type {
     syn::Type::Path(syn::TypePath {
+        attrs: vec![],
         qself: None,
         path: path(ty, lifetimes, types),
     })

@@ -7,6 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#391](https://github.com/opensearch-project/opensearch-rs/pull/391))
 
 ### Added
+- Added support for boolean-style `deprecated` fields on URL parts in the REST API spec to the API generator, as used by newer OpenSearch specs
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 
 - Added `auth::cache::CachedCredentialsProvider`, an opt-in helper that caches AWS credentials between requests so users can avoid querying ECS / EC2 metadata endpoints on every signed request ([#419](https://github.com/opensearch-project/opensearch-rs/pull/419))
 

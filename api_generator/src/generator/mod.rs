@@ -131,8 +131,32 @@ pub struct Type {
     pub options: Vec<Value>,
     #[serde(default)]
     pub default: Option<Value>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_deprecated")]
     pub deprecated: Option<Deprecated>,
+}
+
+/// Deserializes the `deprecated` field of a param or part, which may either be
+/// a boolean (e.g. `"deprecated": true`) or an object with `version` and
+/// `description` fields
+fn deserialize_deprecated<'de, D>(deserializer: D) -> Result<Option<Deprecated>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum BoolOrDeprecated {
+        Bool(bool),
+        Object(Deprecated),
+    }
+
+    match Option::<BoolOrDeprecated>::deserialize(deserializer)? {
+        Some(BoolOrDeprecated::Bool(true)) => Ok(Some(Deprecated {
+            version: String::new(),
+            description: String::from("Deprecated"),
+        })),
+        Some(BoolOrDeprecated::Bool(false)) | None => Ok(None),
+        Some(BoolOrDeprecated::Object(d)) => Ok(Some(d)),
+    }
 }
 
 /// The type of the param or part

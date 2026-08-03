@@ -42,6 +42,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 ### Fixed
+- Fixed `yaml_test_runner` generating an unexpected parts argument for APIs whose paths all have no URL parts (e.g. `cat.cluster_manager` with its deprecated `cat.master` alias path)
 
 ### Security
 

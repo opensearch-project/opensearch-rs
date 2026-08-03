@@ -630,9 +630,20 @@ impl ApiCall {
                 ));
             }
 
-            return match endpoint.url.paths.len() {
-                1 => Ok(None),
-                _ => Ok(Some(quote!(#enum_name::None))),
+            // The generated client method takes no parts argument when every
+            // path of the API has an empty set of parts (e.g. an API with a
+            // deprecated alias path such as cat.cluster_manager), as the parts
+            // enum then only contains a None variant.
+            let has_parts_variants = endpoint
+                .url
+                .paths
+                .iter()
+                .any(|p| !p.path.params().is_empty());
+
+            return if has_parts_variants {
+                Ok(Some(quote!(#enum_name::None)))
+            } else {
+                Ok(None)
             };
         }
 

@@ -196,37 +196,22 @@ async fn call_request_timeout_supersedes_global_timeout() -> anyhow::Result<()> 
 
 #[tokio::test]
 async fn deprecation_warning_headers() -> anyhow::Result<()> {
-    let client = client::create();
-    let _ = index_documents(&client).await?;
-    let response = client
+    // OpenSearch 3.x no longer emits Warning headers for the legacy `_term`
+    // aggregation order key, so a mock server is used to verify that the
+    // client correctly parses Warning headers from a response.
+    let mut server = MockServer::builder()
+        .response_header(
+            hyper::header::WARNING,
+            hyper::header::HeaderValue::from_static(
+                "299 OpenSearch \"Deprecated aggregation order key [_term] used, replaced by [_key]\"",
+            ),
+        )
+        .start()?;
+
+    let response = server
+        .client()
         .search(SearchParts::None)
-        .body(json! {
-            {
-              "aggs": {
-                "titles": {
-                  "terms": {
-                    "field": "title.keyword",
-                    "order": [{
-                      "_term": "asc"
-                    }]
-                  }
-                }
-              },
-              "query": {
-                "function_score": {
-                  "functions": [{
-                    "random_score": {
-                      "seed": 1337
-                    }
-                  }],
-                  "query": {
-                    "match_all": {}
-                  }
-                }
-              },
-              "size": 0
-            }
-        })
+        .body(json!({ "query": { "match_all": {} }, "size": 0 }))
         .send()
         .await?;
 

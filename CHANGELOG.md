@@ -42,6 +42,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 ### Fixed
+- Fixed the `deprecation_warning_headers` test relying on OpenSearch emitting a Warning header for the legacy `_term` aggregation order, which newer versions no longer do; the test now verifies Warning header parsing against a mock server with customizable response headers
 
 ### Security
 

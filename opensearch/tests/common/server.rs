@@ -56,17 +56,29 @@ use super::client::TestClientBuilder;
 struct RequestState {
     requests_tx: mpsc::UnboundedSender<ReceivedRequest>,
     response_delay: Option<Duration>,
+    response_headers: HeaderMap,
     shutdown_rx: watch::Receiver<bool>,
 }
 
 #[derive(Default)]
 pub struct MockServerBuilder {
     response_delay: Option<Duration>,
+    response_headers: HeaderMap,
 }
 
 impl MockServerBuilder {
     pub fn response_delay(mut self, delay: Duration) -> Self {
         self.response_delay = Some(delay);
+        self
+    }
+
+    /// Adds a header to every response returned by the mock server
+    pub fn response_header(
+        mut self,
+        name: hyper::header::HeaderName,
+        value: hyper::header::HeaderValue,
+    ) -> Self {
+        self.response_headers.append(name, value);
         self
     }
 
@@ -78,7 +90,9 @@ impl MockServerBuilder {
         if let Some(response_delay) = state.response_delay {
             sleep(response_delay).await;
         }
-        Ok(Default::default())
+        let mut response = Response::default();
+        response.headers_mut().extend(state.response_headers.clone());
+        Ok(response)
     }
 
     async fn serve_connection(io: TokioIo<TcpStream>, state: RequestState) {
@@ -124,6 +138,7 @@ impl MockServerBuilder {
             RequestState {
                 requests_tx,
                 response_delay: self.response_delay,
+                response_headers: self.response_headers,
                 shutdown_rx,
             },
         );

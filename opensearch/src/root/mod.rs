@@ -4180,6 +4180,13 @@ pub enum IndexParts<'b> {
     Index(&'b str),
 }
 impl<'b> IndexParts<'b> {
+    #[doc = "Returns the HTTP method for this Index operation (PUT for custom ID, POST for auto-generated ID)"]
+    pub fn method(&self) -> Method {
+        match self {
+            IndexParts::IndexId(_, _) => Method::Put,
+            IndexParts::Index(_) => Method::Post,
+        }
+    }
     #[doc = "Builds a relative URL path to the Index API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
@@ -4383,8 +4390,8 @@ where
     }
     #[doc = "Creates an asynchronous call to the Index API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
+        let method = self.parts.method();
         let path = self.parts.url();
-        let method = Method::Post;
         let headers = self.headers;
         let timeout = self.request_timeout;
         let query_string = {

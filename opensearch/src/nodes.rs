@@ -27,7 +27,7 @@
 //! Node APIs
 //!
 //! Manage settings, perform operations, and retrieve information about the
-//! [nodes in an OpenSearch cluster](https://opensearch.org/docs/opensearch/rest-api/index/).
+//! [nodes in an OpenSearch cluster](https://docs.opensearch.org/latest/api-reference/index/).
 
 #![allow(unused_imports)]
 use crate::{
@@ -57,13 +57,13 @@ impl<'b> NodesHotThreadsParts<'b> {
     #[doc = "Builds a relative URL path to the Nodes Hot Threads API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            NodesHotThreadsParts::None => "/_nodes/hot_threads".into(),
+            NodesHotThreadsParts::None => "/_cluster/nodes/hot_threads".into(),
             NodesHotThreadsParts::NodeId(node_id) => {
                 let node_id_str = node_id.join(",");
                 let encoded_node_id: Cow<str> =
                     percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(20usize + encoded_node_id.len());
-                p.push_str("/_nodes/");
+                let mut p = String::with_capacity(28usize + encoded_node_id.len());
+                p.push_str("/_cluster/nodes/");
                 p.push_str(encoded_node_id.as_ref());
                 p.push_str("/hot_threads");
                 p.into()
@@ -71,7 +71,7 @@ impl<'b> NodesHotThreadsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Hot Threads API](https://opensearch.org/docs/)\n\nReturns information about hot threads on each node in the cluster."]
+#[doc = "Builder for the [Nodes Hot Threads API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesHotThreads<'a, 'b> {
     transport: &'a Transport,
@@ -112,12 +112,12 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
             ty: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -127,22 +127,22 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Don't show threads that are in known-idle places, such as waiting on a socket select or pulling from an empty task queue (default: true)"]
+    #[doc = "Whether to show threads that are in known-idle places, such as waiting on a socket select or pulling from an empty task queue."]
     pub fn ignore_idle_threads(mut self, ignore_idle_threads: bool) -> Self {
         self.ignore_idle_threads = Some(ignore_idle_threads);
         self
     }
-    #[doc = "The interval for the second sampling of threads"]
+    #[doc = "The time interval between thread stack trace samples."]
     pub fn interval(mut self, interval: &'b str) -> Self {
         self.interval = Some(interval);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -152,7 +152,7 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Number of samples of thread stacktrace (default: 10)"]
+    #[doc = "The number of thread stack trace samples to collect."]
     pub fn snapshots(mut self, snapshots: i64) -> Self {
         self.snapshots = Some(snapshots);
         self
@@ -162,17 +162,17 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specify the number of threads to provide information for (default: 3)"]
+    #[doc = "The number of threads to provide information for."]
     pub fn threads(mut self, threads: i64) -> Self {
         self.threads = Some(threads);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response. If no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "The type to sample (default: cpu)"]
+    #[doc = "The type to sample."]
     pub fn ty(mut self, ty: Type) -> Self {
         self.ty = Some(ty);
         self
@@ -229,10 +229,8 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
 pub enum NodesInfoParts<'b> {
     #[doc = "No parts"]
     None,
-    #[doc = "NodeId"]
-    NodeId(&'b [&'b str]),
-    #[doc = "Metric"]
-    Metric(&'b [&'b str]),
+    #[doc = "NodeIdOrMetric"]
+    NodeIdOrMetric(&'b str),
     #[doc = "NodeId and Metric"]
     NodeIdMetric(&'b [&'b str], &'b [&'b str]),
 }
@@ -241,22 +239,12 @@ impl<'b> NodesInfoParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             NodesInfoParts::None => "/_nodes".into(),
-            NodesInfoParts::NodeId(node_id) => {
-                let node_id_str = node_id.join(",");
-                let encoded_node_id: Cow<str> =
-                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(8usize + encoded_node_id.len());
+            NodesInfoParts::NodeIdOrMetric(node_id_or_metric) => {
+                let encoded_node_id_or_metric: Cow<str> =
+                    percent_encode(node_id_or_metric.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(8usize + encoded_node_id_or_metric.len());
                 p.push_str("/_nodes/");
-                p.push_str(encoded_node_id.as_ref());
-                p.into()
-            }
-            NodesInfoParts::Metric(metric) => {
-                let metric_str = metric.join(",");
-                let encoded_metric: Cow<str> =
-                    percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(8usize + encoded_metric.len());
-                p.push_str("/_nodes/");
-                p.push_str(encoded_metric.as_ref());
+                p.push_str(encoded_node_id_or_metric.as_ref());
                 p.into()
             }
             NodesInfoParts::NodeIdMetric(node_id, metric) => {
@@ -277,7 +265,7 @@ impl<'b> NodesInfoParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Info API](https://opensearch.org/docs/)\n\nReturns information about nodes in the cluster."]
+#[doc = "Builder for the [Nodes Info API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesInfo<'a, 'b> {
     transport: &'a Transport,
@@ -310,17 +298,17 @@ impl<'a, 'b> NodesInfo<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "Return settings in flat format (default: false)"]
+    #[doc = "When `true`, returns settings in flat format."]
     pub fn flat_settings(mut self, flat_settings: bool) -> Self {
         self.flat_settings = Some(flat_settings);
         self
@@ -330,12 +318,12 @@ impl<'a, 'b> NodesInfo<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -350,7 +338,7 @@ impl<'a, 'b> NodesInfo<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response. If no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -419,7 +407,7 @@ impl<'b> NodesReloadSecureSettingsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Reload Secure Settings API](https://opensearch.org/docs/)\n\nReloads secure settings."]
+#[doc = "Builder for the [Nodes Reload Secure Settings API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
 #[derive(Clone, Debug)]
 pub struct NodesReloadSecureSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -474,12 +462,12 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -489,12 +477,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -509,7 +497,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response. If no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -555,14 +543,14 @@ where
 pub enum NodesStatsParts<'b> {
     #[doc = "No parts"]
     None,
-    #[doc = "NodeId"]
-    NodeId(&'b [&'b str]),
     #[doc = "Metric"]
     Metric(&'b [&'b str]),
-    #[doc = "NodeId and Metric"]
-    NodeIdMetric(&'b [&'b str], &'b [&'b str]),
     #[doc = "Metric and IndexMetric"]
     MetricIndexMetric(&'b [&'b str], &'b [&'b str]),
+    #[doc = "NodeId"]
+    NodeId(&'b [&'b str]),
+    #[doc = "NodeId and Metric"]
+    NodeIdMetric(&'b [&'b str], &'b [&'b str]),
     #[doc = "NodeId, Metric and IndexMetric"]
     NodeIdMetricIndexMetric(&'b [&'b str], &'b [&'b str], &'b [&'b str]),
 }
@@ -571,37 +559,12 @@ impl<'b> NodesStatsParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             NodesStatsParts::None => "/_nodes/stats".into(),
-            NodesStatsParts::NodeId(node_id) => {
-                let node_id_str = node_id.join(",");
-                let encoded_node_id: Cow<str> =
-                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(14usize + encoded_node_id.len());
-                p.push_str("/_nodes/");
-                p.push_str(encoded_node_id.as_ref());
-                p.push_str("/stats");
-                p.into()
-            }
             NodesStatsParts::Metric(metric) => {
                 let metric_str = metric.join(",");
                 let encoded_metric: Cow<str> =
                     percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(14usize + encoded_metric.len());
                 p.push_str("/_nodes/stats/");
-                p.push_str(encoded_metric.as_ref());
-                p.into()
-            }
-            NodesStatsParts::NodeIdMetric(node_id, metric) => {
-                let node_id_str = node_id.join(",");
-                let metric_str = metric.join(",");
-                let encoded_node_id: Cow<str> =
-                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_metric: Cow<str> =
-                    percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p =
-                    String::with_capacity(15usize + encoded_node_id.len() + encoded_metric.len());
-                p.push_str("/_nodes/");
-                p.push_str(encoded_node_id.as_ref());
-                p.push_str("/stats/");
                 p.push_str(encoded_metric.as_ref());
                 p.into()
             }
@@ -619,6 +582,31 @@ impl<'b> NodesStatsParts<'b> {
                 p.push_str(encoded_metric.as_ref());
                 p.push('/');
                 p.push_str(encoded_index_metric.as_ref());
+                p.into()
+            }
+            NodesStatsParts::NodeId(node_id) => {
+                let node_id_str = node_id.join(",");
+                let encoded_node_id: Cow<str> =
+                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(14usize + encoded_node_id.len());
+                p.push_str("/_nodes/");
+                p.push_str(encoded_node_id.as_ref());
+                p.push_str("/stats");
+                p.into()
+            }
+            NodesStatsParts::NodeIdMetric(node_id, metric) => {
+                let node_id_str = node_id.join(",");
+                let metric_str = metric.join(",");
+                let encoded_node_id: Cow<str> =
+                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
+                let encoded_metric: Cow<str> =
+                    percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p =
+                    String::with_capacity(15usize + encoded_node_id.len() + encoded_metric.len());
+                p.push_str("/_nodes/");
+                p.push_str(encoded_node_id.as_ref());
+                p.push_str("/stats/");
+                p.push_str(encoded_metric.as_ref());
                 p.into()
             }
             NodesStatsParts::NodeIdMetricIndexMetric(node_id, metric, index_metric) => {
@@ -648,7 +636,7 @@ impl<'b> NodesStatsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Stats API](https://opensearch.org/docs/)\n\nReturns statistical information about nodes in the cluster."]
+#[doc = "Builder for the [Nodes Stats API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesStats<'a, 'b> {
     transport: &'a Transport,
@@ -658,7 +646,7 @@ pub struct NodesStats<'a, 'b> {
     fielddata_fields: Option<&'b [&'b str]>,
     fields: Option<&'b [&'b str]>,
     filter_path: Option<&'b [&'b str]>,
-    groups: Option<bool>,
+    groups: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
     include_segment_file_sizes: Option<bool>,
@@ -693,33 +681,33 @@ impl<'a, 'b> NodesStats<'a, 'b> {
             types: None,
         }
     }
-    #[doc = "A comma-separated list of fields for `fielddata` and `suggest` index metric (supports wildcards)"]
+    #[doc = "A comma-separated list or wildcard expressions of fields to include in field data and suggest statistics."]
     pub fn completion_fields(mut self, completion_fields: &'b [&'b str]) -> Self {
         self.completion_fields = Some(completion_fields);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of fields for `fielddata` index metric (supports wildcards)"]
+    #[doc = "A comma-separated list or wildcard expressions of fields to include in field data statistics."]
     pub fn fielddata_fields(mut self, fielddata_fields: &'b [&'b str]) -> Self {
         self.fielddata_fields = Some(fielddata_fields);
         self
     }
-    #[doc = "A comma-separated list of fields for `fielddata` and `completion` index metric (supports wildcards)"]
+    #[doc = "A comma-separated list or wildcard expressions of fields to include in the statistics."]
     pub fn fields(mut self, fields: &'b [&'b str]) -> Self {
         self.fields = Some(fields);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "A comma-separated list of search groups for `search` index metric"]
-    pub fn groups(mut self, groups: bool) -> Self {
+    #[doc = "A comma-separated list of search groups to include in the search statistics."]
+    pub fn groups(mut self, groups: &'b [&'b str]) -> Self {
         self.groups = Some(groups);
         self
     }
@@ -728,22 +716,22 @@ impl<'a, 'b> NodesStats<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether to report the aggregated disk usage of each one of the Lucene index files (only applies if segment stats are requested)"]
+    #[doc = "When `true`,  reports the aggregated disk usage of each one of the Lucene index files (only applies if segment stats are requested)."]
     pub fn include_segment_file_sizes(mut self, include_segment_file_sizes: bool) -> Self {
         self.include_segment_file_sizes = Some(include_segment_file_sizes);
         self
     }
-    #[doc = "Return indices stats aggregated at index, node or shard level"]
+    #[doc = "Indicates whether statistics are aggregated at the cluster, index, or shard level."]
     pub fn level(mut self, level: Level) -> Self {
         self.level = Some(level);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -758,12 +746,12 @@ impl<'a, 'b> NodesStats<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response. If no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "A comma-separated list of document types for the `indexing` index metric"]
+    #[doc = "A comma-separated list of document types for the indexing index metric."]
     pub fn types(mut self, types: &'b [&'b str]) -> Self {
         self.types = Some(types);
         self
@@ -787,7 +775,8 @@ impl<'a, 'b> NodesStats<'a, 'b> {
                 fields: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                groups: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                groups: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 include_segment_file_sizes: Option<bool>,
                 level: Option<Level>,
@@ -827,10 +816,10 @@ impl<'a, 'b> NodesStats<'a, 'b> {
 pub enum NodesUsageParts<'b> {
     #[doc = "No parts"]
     None,
-    #[doc = "NodeId"]
-    NodeId(&'b [&'b str]),
     #[doc = "Metric"]
     Metric(&'b [&'b str]),
+    #[doc = "NodeId"]
+    NodeId(&'b [&'b str]),
     #[doc = "NodeId and Metric"]
     NodeIdMetric(&'b [&'b str], &'b [&'b str]),
 }
@@ -839,6 +828,15 @@ impl<'b> NodesUsageParts<'b> {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             NodesUsageParts::None => "/_nodes/usage".into(),
+            NodesUsageParts::Metric(metric) => {
+                let metric_str = metric.join(",");
+                let encoded_metric: Cow<str> =
+                    percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(14usize + encoded_metric.len());
+                p.push_str("/_nodes/usage/");
+                p.push_str(encoded_metric.as_ref());
+                p.into()
+            }
             NodesUsageParts::NodeId(node_id) => {
                 let node_id_str = node_id.join(",");
                 let encoded_node_id: Cow<str> =
@@ -847,15 +845,6 @@ impl<'b> NodesUsageParts<'b> {
                 p.push_str("/_nodes/");
                 p.push_str(encoded_node_id.as_ref());
                 p.push_str("/usage");
-                p.into()
-            }
-            NodesUsageParts::Metric(metric) => {
-                let metric_str = metric.join(",");
-                let encoded_metric: Cow<str> =
-                    percent_encode(metric_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(14usize + encoded_metric.len());
-                p.push_str("/_nodes/usage/");
-                p.push_str(encoded_metric.as_ref());
                 p.into()
             }
             NodesUsageParts::NodeIdMetric(node_id, metric) => {
@@ -876,7 +865,7 @@ impl<'b> NodesUsageParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Usage API](https://opensearch.org/docs/)\n\nReturns low-level information about REST actions usage on nodes."]
+#[doc = "Builder for the [Nodes Usage API](https://opensearch.org/docs/latest)\n\nReturns low-level information about REST actions usage on nodes."]
 #[derive(Clone, Debug)]
 pub struct NodesUsage<'a, 'b> {
     transport: &'a Transport,
@@ -907,12 +896,12 @@ impl<'a, 'b> NodesUsage<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -922,12 +911,12 @@ impl<'a, 'b> NodesUsage<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -942,7 +931,7 @@ impl<'a, 'b> NodesUsage<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period to wait for a response.\nIf no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -995,26 +984,26 @@ impl<'a> Nodes<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Nodes Hot Threads API](https://opensearch.org/docs/)\n\nReturns information about hot threads on each node in the cluster."]
+    #[doc = "[Nodes Hot Threads API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
     pub fn hot_threads<'b>(&'a self, parts: NodesHotThreadsParts<'b>) -> NodesHotThreads<'a, 'b> {
         NodesHotThreads::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Info API](https://opensearch.org/docs/)\n\nReturns information about nodes in the cluster."]
+    #[doc = "[Nodes Info API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
     pub fn info<'b>(&'a self, parts: NodesInfoParts<'b>) -> NodesInfo<'a, 'b> {
         NodesInfo::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Reload Secure Settings API](https://opensearch.org/docs/)\n\nReloads secure settings."]
+    #[doc = "[Nodes Reload Secure Settings API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
     pub fn reload_secure_settings<'b>(
         &'a self,
         parts: NodesReloadSecureSettingsParts<'b>,
     ) -> NodesReloadSecureSettings<'a, 'b, ()> {
         NodesReloadSecureSettings::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Stats API](https://opensearch.org/docs/)\n\nReturns statistical information about nodes in the cluster."]
+    #[doc = "[Nodes Stats API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
     pub fn stats<'b>(&'a self, parts: NodesStatsParts<'b>) -> NodesStats<'a, 'b> {
         NodesStats::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Usage API](https://opensearch.org/docs/)\n\nReturns low-level information about REST actions usage on nodes."]
+    #[doc = "[Nodes Usage API](https://opensearch.org/docs/latest)\n\nReturns low-level information about REST actions usage on nodes."]
     pub fn usage<'b>(&'a self, parts: NodesUsageParts<'b>) -> NodesUsage<'a, 'b> {
         NodesUsage::new(self.transport(), parts)
     }

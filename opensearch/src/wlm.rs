@@ -24,15 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Dangling Index APIs
-//!
-//! If OpenSearch encounters index data that is absent from the current cluster state,
-//! those indices are considered to be _dangling_. For example, this can happen if you delete
-//! more than `cluster.indices.tombstones.size` number of indices while an OpenSearch node
-//! is offline.
-//!
-//! The dangling indices APIs can list, import and delete dangling indices.
-
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -50,261 +41,70 @@ use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices Delete Dangling Index API"]
-pub enum DanglingIndicesDeleteDanglingIndexParts<'b> {
-    #[doc = "IndexUuid"]
-    IndexUuid(&'b str),
+#[doc = "API parts for the Wlm Create Query Group API"]
+pub enum WlmCreateQueryGroupParts {
+    #[doc = "No parts"]
+    None,
 }
-impl<'b> DanglingIndicesDeleteDanglingIndexParts<'b> {
-    #[doc = "Builds a relative URL path to the Dangling Indices Delete Dangling Index API"]
+impl WlmCreateQueryGroupParts {
+    #[doc = "Builds a relative URL path to the Wlm Create Query Group API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DanglingIndicesDeleteDanglingIndexParts::IndexUuid(index_uuid) => {
-                let encoded_index_uuid: Cow<str> =
-                    percent_encode(index_uuid.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(11usize + encoded_index_uuid.len());
-                p.push_str("/_dangling/");
-                p.push_str(encoded_index_uuid.as_ref());
-                p.into()
-            }
+            WlmCreateQueryGroupParts::None => "/_wlm/query_group".into(),
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
+#[doc = "Builder for the Wlm Create Query Group API\n\nCreates a new query group and sets the resource limits for the new query group."]
 #[derive(Clone, Debug)]
-pub struct DanglingIndicesDeleteDanglingIndex<'a, 'b> {
+pub struct WlmCreateQueryGroup<'a, 'b, B> {
     transport: &'a Transport,
-    parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    accept_data_loss: Option<bool>,
-    cluster_manager_timeout: Option<&'b str>,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    master_timeout: Option<&'b str>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-    timeout: Option<&'b str>,
-}
-impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
-    #[doc = "Creates a new instance of [DanglingIndicesDeleteDanglingIndex] with the specified API parts"]
-    pub fn new(
-        transport: &'a Transport,
-        parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    ) -> Self {
-        let headers = HeaderMap::new();
-        DanglingIndicesDeleteDanglingIndex {
-            transport,
-            parts,
-            headers,
-            accept_data_loss: None,
-            cluster_manager_timeout: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            master_timeout: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-            timeout: None,
-        }
-    }
-    #[doc = "Must be set to true in order to delete the dangling index."]
-    pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
-        self.accept_data_loss = Some(accept_data_loss);
-        self
-    }
-    #[doc = "Operation timeout for connection to cluster-manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "Explicit operation timeout."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Dangling Indices Delete Dangling Index API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Delete;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                accept_data_loss: Option<bool>,
-                cluster_manager_timeout: Option<&'b str>,
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                master_timeout: Option<&'b str>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-                timeout: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                accept_data_loss: self.accept_data_loss,
-                cluster_manager_timeout: self.cluster_manager_timeout,
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                master_timeout: self.master_timeout,
-                pretty: self.pretty,
-                source: self.source,
-                timeout: self.timeout,
-            };
-            Some(query_params)
-        };
-        let body = Option::<()>::None;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices Import Dangling Index API"]
-pub enum DanglingIndicesImportDanglingIndexParts<'b> {
-    #[doc = "IndexUuid"]
-    IndexUuid(&'b str),
-}
-impl<'b> DanglingIndicesImportDanglingIndexParts<'b> {
-    #[doc = "Builds a relative URL path to the Dangling Indices Import Dangling Index API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            DanglingIndicesImportDanglingIndexParts::IndexUuid(index_uuid) => {
-                let encoded_index_uuid: Cow<str> =
-                    percent_encode(index_uuid.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(11usize + encoded_index_uuid.len());
-                p.push_str("/_dangling/");
-                p.push_str(encoded_index_uuid.as_ref());
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
-#[derive(Clone, Debug)]
-pub struct DanglingIndicesImportDanglingIndex<'a, 'b, B> {
-    transport: &'a Transport,
-    parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    accept_data_loss: Option<bool>,
+    parts: WlmCreateQueryGroupParts,
     body: Option<B>,
-    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b, B> DanglingIndicesImportDanglingIndex<'a, 'b, B>
+impl<'a, 'b, B> WlmCreateQueryGroup<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [DanglingIndicesImportDanglingIndex] with the specified API parts"]
-    pub fn new(
-        transport: &'a Transport,
-        parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    ) -> Self {
+    #[doc = "Creates a new instance of [WlmCreateQueryGroup]"]
+    pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        DanglingIndicesImportDanglingIndex {
+        WlmCreateQueryGroup {
             transport,
-            parts,
+            parts: WlmCreateQueryGroupParts::None,
             headers,
-            accept_data_loss: None,
             body: None,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
     }
-    #[doc = "Must be set to true in order to import the dangling index."]
-    pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
-        self.accept_data_loss = Some(accept_data_loss);
-        self
-    }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> DanglingIndicesImportDanglingIndex<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> WlmCreateQueryGroup<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        DanglingIndicesImportDanglingIndex {
+        WlmCreateQueryGroup {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
-            accept_data_loss: self.accept_data_loss,
-            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
-            timeout: self.timeout,
         }
-    }
-    #[doc = "Operation timeout for connection to cluster-manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -326,12 +126,6 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -347,42 +141,29 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Dangling Indices Import Dangling Index API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Wlm Create Query Group API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
-        let method = Method::Post;
+        let method = Method::Put;
         let headers = self.headers;
         let timeout = self.request_timeout;
         let query_string = {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                accept_data_loss: Option<bool>,
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                accept_data_loss: self.accept_data_loss,
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -395,24 +176,30 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices List Dangling Indices API"]
-pub enum DanglingIndicesListDanglingIndicesParts {
-    #[doc = "No parts"]
-    None,
+#[doc = "API parts for the Wlm Delete Query Group API"]
+pub enum WlmDeleteQueryGroupParts<'b> {
+    #[doc = "Name"]
+    Name(&'b str),
 }
-impl DanglingIndicesListDanglingIndicesParts {
-    #[doc = "Builds a relative URL path to the Dangling Indices List Dangling Indices API"]
+impl<'b> WlmDeleteQueryGroupParts<'b> {
+    #[doc = "Builds a relative URL path to the Wlm Delete Query Group API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DanglingIndicesListDanglingIndicesParts::None => "/_dangling".into(),
+            WlmDeleteQueryGroupParts::Name(name) => {
+                let encoded_name: Cow<str> = percent_encode(name.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(18usize + encoded_name.len());
+                p.push_str("/_wlm/query_group/");
+                p.push_str(encoded_name.as_ref());
+                p.into()
+            }
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
+#[doc = "Builder for the Wlm Delete Query Group API\n\nDeletes the specified query group."]
 #[derive(Clone, Debug)]
-pub struct DanglingIndicesListDanglingIndices<'a, 'b> {
+pub struct WlmDeleteQueryGroup<'a, 'b> {
     transport: &'a Transport,
-    parts: DanglingIndicesListDanglingIndicesParts,
+    parts: WlmDeleteQueryGroupParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -421,13 +208,13 @@ pub struct DanglingIndicesListDanglingIndices<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
-    #[doc = "Creates a new instance of [DanglingIndicesListDanglingIndices]"]
-    pub fn new(transport: &'a Transport) -> Self {
+impl<'a, 'b> WlmDeleteQueryGroup<'a, 'b> {
+    #[doc = "Creates a new instance of [WlmDeleteQueryGroup] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: WlmDeleteQueryGroupParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        DanglingIndicesListDanglingIndices {
+        WlmDeleteQueryGroup {
             transport,
-            parts: DanglingIndicesListDanglingIndicesParts::None,
+            parts,
             headers,
             error_trace: None,
             filter_path: None,
@@ -472,7 +259,128 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Dangling Indices List Dangling Indices API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Wlm Delete Query Group API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Delete;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Wlm Get Query Group API"]
+pub enum WlmGetQueryGroupParts<'b> {
+    #[doc = "No parts"]
+    None,
+    #[doc = "Name"]
+    Name(&'b str),
+}
+impl<'b> WlmGetQueryGroupParts<'b> {
+    #[doc = "Builds a relative URL path to the Wlm Get Query Group API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            WlmGetQueryGroupParts::None => "/_wlm/query_group".into(),
+            WlmGetQueryGroupParts::Name(name) => {
+                let encoded_name: Cow<str> = percent_encode(name.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(18usize + encoded_name.len());
+                p.push_str("/_wlm/query_group/");
+                p.push_str(encoded_name.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Wlm Get Query Group API\n\nRetrieves the specified query group. If no query group is specified, all query groups in the cluster are retrieved."]
+#[derive(Clone, Debug)]
+pub struct WlmGetQueryGroup<'a, 'b> {
+    transport: &'a Transport,
+    parts: WlmGetQueryGroupParts<'b>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> WlmGetQueryGroup<'a, 'b> {
+    #[doc = "Creates a new instance of [WlmGetQueryGroup] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: WlmGetQueryGroupParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        WlmGetQueryGroup {
+            transport,
+            parts,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Wlm Get Query Group API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Get;
@@ -506,40 +414,188 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
         Ok(response)
     }
 }
-#[doc = "Namespace client for DanglingIndices APIs"]
-pub struct DanglingIndices<'a> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Wlm Update Query Group API"]
+pub enum WlmUpdateQueryGroupParts<'b> {
+    #[doc = "Name"]
+    Name(&'b str),
+}
+impl<'b> WlmUpdateQueryGroupParts<'b> {
+    #[doc = "Builds a relative URL path to the Wlm Update Query Group API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            WlmUpdateQueryGroupParts::Name(name) => {
+                let encoded_name: Cow<str> = percent_encode(name.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(18usize + encoded_name.len());
+                p.push_str("/_wlm/query_group/");
+                p.push_str(encoded_name.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Wlm Update Query Group API\n\nUpdates the specified query group."]
+#[derive(Clone, Debug)]
+pub struct WlmUpdateQueryGroup<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: WlmUpdateQueryGroupParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> WlmUpdateQueryGroup<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [WlmUpdateQueryGroup] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: WlmUpdateQueryGroupParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        WlmUpdateQueryGroup {
+            transport,
+            parts,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> WlmUpdateQueryGroup<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        WlmUpdateQueryGroup {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Wlm Update Query Group API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Put;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[doc = "Namespace client for Wlm APIs"]
+pub struct Wlm<'a> {
     transport: &'a Transport,
 }
-impl<'a> DanglingIndices<'a> {
-    #[doc = "Creates a new instance of [DanglingIndices]"]
+impl<'a> Wlm<'a> {
+    #[doc = "Creates a new instance of [Wlm]"]
     pub fn new(transport: &'a Transport) -> Self {
         Self { transport }
     }
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
-    pub fn delete_dangling_index<'b>(
-        &'a self,
-        parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    ) -> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
-        DanglingIndicesDeleteDanglingIndex::new(self.transport(), parts)
+    #[doc = "Wlm Create Query Group API\n\nCreates a new query group and sets the resource limits for the new query group."]
+    pub fn create_query_group<'b>(&'a self) -> WlmCreateQueryGroup<'a, 'b, ()> {
+        WlmCreateQueryGroup::new(self.transport())
     }
-    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
-    pub fn import_dangling_index<'b>(
+    #[doc = "Wlm Delete Query Group API\n\nDeletes the specified query group."]
+    pub fn delete_query_group<'b>(
         &'a self,
-        parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    ) -> DanglingIndicesImportDanglingIndex<'a, 'b, ()> {
-        DanglingIndicesImportDanglingIndex::new(self.transport(), parts)
+        parts: WlmDeleteQueryGroupParts<'b>,
+    ) -> WlmDeleteQueryGroup<'a, 'b> {
+        WlmDeleteQueryGroup::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
-    pub fn list_dangling_indices<'b>(&'a self) -> DanglingIndicesListDanglingIndices<'a, 'b> {
-        DanglingIndicesListDanglingIndices::new(self.transport())
+    #[doc = "Wlm Get Query Group API\n\nRetrieves the specified query group. If no query group is specified, all query groups in the cluster are retrieved."]
+    pub fn get_query_group<'b>(
+        &'a self,
+        parts: WlmGetQueryGroupParts<'b>,
+    ) -> WlmGetQueryGroup<'a, 'b> {
+        WlmGetQueryGroup::new(self.transport(), parts)
+    }
+    #[doc = "Wlm Update Query Group API\n\nUpdates the specified query group."]
+    pub fn update_query_group<'b>(
+        &'a self,
+        parts: WlmUpdateQueryGroupParts<'b>,
+    ) -> WlmUpdateQueryGroup<'a, 'b, ()> {
+        WlmUpdateQueryGroup::new(self.transport(), parts)
     }
 }
 impl OpenSearch {
-    #[doc = "Creates a namespace client for DanglingIndices APIs"]
-    pub fn dangling_indices(&self) -> DanglingIndices {
-        DanglingIndices::new(self.transport())
+    #[doc = "Creates a namespace client for Wlm APIs"]
+    pub fn wlm(&self) -> Wlm {
+        Wlm::new(self.transport())
     }
 }

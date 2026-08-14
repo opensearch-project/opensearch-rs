@@ -229,7 +229,7 @@ impl<'a> UrlBuilder<'a> {
                 PathPart::Param(p) => {
                     let name = valid_name(p);
                     let path_expr = match &parts[p].ty {
-                        TypeKind::String => path_none(name).into_expr(),
+                        TypeKind::String => path_none(&name).into_expr(),
                         _ => path_none(format!("{}_str", name).as_str()).into_expr(),
                     };
 
@@ -251,7 +251,7 @@ impl<'a> UrlBuilder<'a> {
             .filter_map(|p| match *p {
                 PathPart::Param(p) => {
                     let name = valid_name(p);
-                    let name_ident = ident(name);
+                    let name_ident = ident(&name);
                     // causes less-opaque error if user forgets to define part for URL
                     debug_assert!(
                         parts.contains_key(p),

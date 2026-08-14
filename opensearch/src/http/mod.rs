@@ -55,4 +55,6 @@ pub enum Method {
     Delete,
     /// head
     Head,
+    /// patch
+    Patch,
 }

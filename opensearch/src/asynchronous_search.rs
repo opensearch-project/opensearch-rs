@@ -24,15 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Dangling Index APIs
-//!
-//! If OpenSearch encounters index data that is absent from the current cluster state,
-//! those indices are considered to be _dangling_. For example, this can happen if you delete
-//! more than `cluster.indices.tombstones.size` number of indices while an OpenSearch node
-//! is offline.
-//!
-//! The dangling indices APIs can list, import and delete dangling indices.
-
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -50,75 +41,53 @@ use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices Delete Dangling Index API"]
-pub enum DanglingIndicesDeleteDanglingIndexParts<'b> {
-    #[doc = "IndexUuid"]
-    IndexUuid(&'b str),
+#[doc = "API parts for the Asynchronous Search Delete API"]
+pub enum AsynchronousSearchDeleteParts<'b> {
+    #[doc = "Id"]
+    Id(&'b str),
 }
-impl<'b> DanglingIndicesDeleteDanglingIndexParts<'b> {
-    #[doc = "Builds a relative URL path to the Dangling Indices Delete Dangling Index API"]
+impl<'b> AsynchronousSearchDeleteParts<'b> {
+    #[doc = "Builds a relative URL path to the Asynchronous Search Delete API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DanglingIndicesDeleteDanglingIndexParts::IndexUuid(index_uuid) => {
-                let encoded_index_uuid: Cow<str> =
-                    percent_encode(index_uuid.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(11usize + encoded_index_uuid.len());
-                p.push_str("/_dangling/");
-                p.push_str(encoded_index_uuid.as_ref());
+            AsynchronousSearchDeleteParts::Id(id) => {
+                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(34usize + encoded_id.len());
+                p.push_str("/_opendistro/_asynchronous_search/");
+                p.push_str(encoded_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
+#[doc = "Builder for the [Asynchronous Search Delete API](https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
 #[derive(Clone, Debug)]
-pub struct DanglingIndicesDeleteDanglingIndex<'a, 'b> {
+pub struct AsynchronousSearchDelete<'a, 'b> {
     transport: &'a Transport,
-    parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    accept_data_loss: Option<bool>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: AsynchronousSearchDeleteParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
-    #[doc = "Creates a new instance of [DanglingIndicesDeleteDanglingIndex] with the specified API parts"]
-    pub fn new(
-        transport: &'a Transport,
-        parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    ) -> Self {
+impl<'a, 'b> AsynchronousSearchDelete<'a, 'b> {
+    #[doc = "Creates a new instance of [AsynchronousSearchDelete] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: AsynchronousSearchDeleteParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        DanglingIndicesDeleteDanglingIndex {
+        AsynchronousSearchDelete {
             transport,
             parts,
             headers,
-            accept_data_loss: None,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
-    }
-    #[doc = "Must be set to true in order to delete the dangling index."]
-    pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
-        self.accept_data_loss = Some(accept_data_loss);
-        self
-    }
-    #[doc = "Operation timeout for connection to cluster-manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -140,12 +109,6 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -161,12 +124,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Dangling Indices Delete Dangling Index API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Asynchronous Search Delete API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Delete;
@@ -176,27 +134,19 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                accept_data_loss: Option<bool>,
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                accept_data_loss: self.accept_data_loss,
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -209,226 +159,46 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices Import Dangling Index API"]
-pub enum DanglingIndicesImportDanglingIndexParts<'b> {
-    #[doc = "IndexUuid"]
-    IndexUuid(&'b str),
+#[doc = "API parts for the Asynchronous Search Get API"]
+pub enum AsynchronousSearchGetParts<'b> {
+    #[doc = "Id"]
+    Id(&'b str),
 }
-impl<'b> DanglingIndicesImportDanglingIndexParts<'b> {
-    #[doc = "Builds a relative URL path to the Dangling Indices Import Dangling Index API"]
+impl<'b> AsynchronousSearchGetParts<'b> {
+    #[doc = "Builds a relative URL path to the Asynchronous Search Get API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            DanglingIndicesImportDanglingIndexParts::IndexUuid(index_uuid) => {
-                let encoded_index_uuid: Cow<str> =
-                    percent_encode(index_uuid.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(11usize + encoded_index_uuid.len());
-                p.push_str("/_dangling/");
-                p.push_str(encoded_index_uuid.as_ref());
+            AsynchronousSearchGetParts::Id(id) => {
+                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(34usize + encoded_id.len());
+                p.push_str("/_opendistro/_asynchronous_search/");
+                p.push_str(encoded_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
+#[doc = "Builder for the [Asynchronous Search Get API](https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
 #[derive(Clone, Debug)]
-pub struct DanglingIndicesImportDanglingIndex<'a, 'b, B> {
+pub struct AsynchronousSearchGet<'a, 'b> {
     transport: &'a Transport,
-    parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    accept_data_loss: Option<bool>,
-    body: Option<B>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: AsynchronousSearchGetParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b, B> DanglingIndicesImportDanglingIndex<'a, 'b, B>
-where
-    B: Body,
-{
-    #[doc = "Creates a new instance of [DanglingIndicesImportDanglingIndex] with the specified API parts"]
-    pub fn new(
-        transport: &'a Transport,
-        parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    ) -> Self {
+impl<'a, 'b> AsynchronousSearchGet<'a, 'b> {
+    #[doc = "Creates a new instance of [AsynchronousSearchGet] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: AsynchronousSearchGetParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        DanglingIndicesImportDanglingIndex {
+        AsynchronousSearchGet {
             transport,
             parts,
             headers,
-            accept_data_loss: None,
-            body: None,
-            cluster_manager_timeout: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            master_timeout: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-            timeout: None,
-        }
-    }
-    #[doc = "Must be set to true in order to import the dangling index."]
-    pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
-        self.accept_data_loss = Some(accept_data_loss);
-        self
-    }
-    #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> DanglingIndicesImportDanglingIndex<'a, 'b, JsonBody<T>>
-    where
-        T: Serialize,
-    {
-        DanglingIndicesImportDanglingIndex {
-            transport: self.transport,
-            parts: self.parts,
-            body: Some(body.into()),
-            accept_data_loss: self.accept_data_loss,
-            cluster_manager_timeout: self.cluster_manager_timeout,
-            error_trace: self.error_trace,
-            filter_path: self.filter_path,
-            headers: self.headers,
-            human: self.human,
-            master_timeout: self.master_timeout,
-            pretty: self.pretty,
-            request_timeout: self.request_timeout,
-            source: self.source,
-            timeout: self.timeout,
-        }
-    }
-    #[doc = "Operation timeout for connection to cluster-manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "Explicit operation timeout."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Dangling Indices Import Dangling Index API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Post;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                accept_data_loss: Option<bool>,
-                cluster_manager_timeout: Option<&'b str>,
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                master_timeout: Option<&'b str>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-                timeout: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                accept_data_loss: self.accept_data_loss,
-                cluster_manager_timeout: self.cluster_manager_timeout,
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                master_timeout: self.master_timeout,
-                pretty: self.pretty,
-                source: self.source,
-                timeout: self.timeout,
-            };
-            Some(query_params)
-        };
-        let body = self.body;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Dangling Indices List Dangling Indices API"]
-pub enum DanglingIndicesListDanglingIndicesParts {
-    #[doc = "No parts"]
-    None,
-}
-impl DanglingIndicesListDanglingIndicesParts {
-    #[doc = "Builds a relative URL path to the Dangling Indices List Dangling Indices API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            DanglingIndicesListDanglingIndicesParts::None => "/_dangling".into(),
-        }
-    }
-}
-#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
-#[derive(Clone, Debug)]
-pub struct DanglingIndicesListDanglingIndices<'a, 'b> {
-    transport: &'a Transport,
-    parts: DanglingIndicesListDanglingIndicesParts,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-}
-impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
-    #[doc = "Creates a new instance of [DanglingIndicesListDanglingIndices]"]
-    pub fn new(transport: &'a Transport) -> Self {
-        let headers = HeaderMap::new();
-        DanglingIndicesListDanglingIndices {
-            transport,
-            parts: DanglingIndicesListDanglingIndicesParts::None,
-            headers,
             error_trace: None,
             filter_path: None,
             human: None,
@@ -472,7 +242,7 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Dangling Indices List Dangling Indices API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Asynchronous Search Get API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Get;
@@ -506,40 +276,331 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
         Ok(response)
     }
 }
-#[doc = "Namespace client for DanglingIndices APIs"]
-pub struct DanglingIndices<'a> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Asynchronous Search Search API"]
+pub enum AsynchronousSearchSearchParts {
+    #[doc = "No parts"]
+    None,
+}
+impl AsynchronousSearchSearchParts {
+    #[doc = "Builds a relative URL path to the Asynchronous Search Search API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            AsynchronousSearchSearchParts::None => "/_opendistro/_asynchronous_search".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Asynchronous Search Search API](https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
+#[derive(Clone, Debug)]
+pub struct AsynchronousSearchSearch<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: AsynchronousSearchSearchParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    index: Option<&'b str>,
+    keep_alive: Option<&'b str>,
+    keep_on_completion: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+    wait_for_completion_timeout: Option<&'b str>,
+}
+impl<'a, 'b, B> AsynchronousSearchSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [AsynchronousSearchSearch]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        AsynchronousSearchSearch {
+            transport,
+            parts: AsynchronousSearchSearchParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            index: None,
+            keep_alive: None,
+            keep_on_completion: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+            wait_for_completion_timeout: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> AsynchronousSearchSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        AsynchronousSearchSearch {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            index: self.index,
+            keep_alive: self.keep_alive,
+            keep_on_completion: self.keep_on_completion,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+            wait_for_completion_timeout: self.wait_for_completion_timeout,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "The name of the index to be searched. Can be an individual name, a comma-separated list of indexes, or a wildcard expression of index names."]
+    pub fn index(mut self, index: &'b str) -> Self {
+        self.index = Some(index);
+        self
+    }
+    #[doc = "The amount of time that the result is saved in the cluster. For example, `2d` means that the results are stored in the cluster for 48 hours. \nThe saved search results are deleted after this period or if the search is canceled. Note that this includes the query execution time. \nIf the query exceeds this amount of time, the process cancels this query automatically."]
+    pub fn keep_alive(mut self, keep_alive: &'b str) -> Self {
+        self.keep_alive = Some(keep_alive);
+        self
+    }
+    #[doc = "Whether to save the results in the cluster after the search is complete. You can examine the stored results at a later time."]
+    pub fn keep_on_completion(mut self, keep_on_completion: bool) -> Self {
+        self.keep_on_completion = Some(keep_on_completion);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "The amount of time to wait for the results. You can poll the remaining results based on an ID. The maximum value is 300 seconds. Default is `1s`."]
+    pub fn wait_for_completion_timeout(mut self, wait_for_completion_timeout: &'b str) -> Self {
+        self.wait_for_completion_timeout = Some(wait_for_completion_timeout);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Asynchronous Search Search API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                index: Option<&'b str>,
+                keep_alive: Option<&'b str>,
+                keep_on_completion: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+                wait_for_completion_timeout: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                index: self.index,
+                keep_alive: self.keep_alive,
+                keep_on_completion: self.keep_on_completion,
+                pretty: self.pretty,
+                source: self.source,
+                wait_for_completion_timeout: self.wait_for_completion_timeout,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Asynchronous Search Stats API"]
+pub enum AsynchronousSearchStatsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl AsynchronousSearchStatsParts {
+    #[doc = "Builds a relative URL path to the Asynchronous Search Stats API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            AsynchronousSearchStatsParts::None => "/_opendistro/_asynchronous_search/stats".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Asynchronous Search Stats API](https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
+#[derive(Clone, Debug)]
+pub struct AsynchronousSearchStats<'a, 'b> {
+    transport: &'a Transport,
+    parts: AsynchronousSearchStatsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> AsynchronousSearchStats<'a, 'b> {
+    #[doc = "Creates a new instance of [AsynchronousSearchStats]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        AsynchronousSearchStats {
+            transport,
+            parts: AsynchronousSearchStatsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Asynchronous Search Stats API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[doc = "Namespace client for AsynchronousSearch APIs"]
+pub struct AsynchronousSearch<'a> {
     transport: &'a Transport,
 }
-impl<'a> DanglingIndices<'a> {
-    #[doc = "Creates a new instance of [DanglingIndices]"]
+impl<'a> AsynchronousSearch<'a> {
+    #[doc = "Creates a new instance of [AsynchronousSearch]"]
     pub fn new(transport: &'a Transport) -> Self {
         Self { transport }
     }
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
-    pub fn delete_dangling_index<'b>(
+    #[doc = "[Asynchronous Search Delete API](https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
+    pub fn delete<'b>(
         &'a self,
-        parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
-    ) -> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
-        DanglingIndicesDeleteDanglingIndex::new(self.transport(), parts)
+        parts: AsynchronousSearchDeleteParts<'b>,
+    ) -> AsynchronousSearchDelete<'a, 'b> {
+        AsynchronousSearchDelete::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
-    pub fn import_dangling_index<'b>(
+    #[doc = "[Asynchronous Search Get API](https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
+    pub fn get<'b>(
         &'a self,
-        parts: DanglingIndicesImportDanglingIndexParts<'b>,
-    ) -> DanglingIndicesImportDanglingIndex<'a, 'b, ()> {
-        DanglingIndicesImportDanglingIndex::new(self.transport(), parts)
+        parts: AsynchronousSearchGetParts<'b>,
+    ) -> AsynchronousSearchGet<'a, 'b> {
+        AsynchronousSearchGet::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
-    pub fn list_dangling_indices<'b>(&'a self) -> DanglingIndicesListDanglingIndices<'a, 'b> {
-        DanglingIndicesListDanglingIndices::new(self.transport())
+    #[doc = "[Asynchronous Search Search API](https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
+    pub fn search<'b>(&'a self) -> AsynchronousSearchSearch<'a, 'b, ()> {
+        AsynchronousSearchSearch::new(self.transport())
+    }
+    #[doc = "[Asynchronous Search Stats API](https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
+    pub fn stats<'b>(&'a self) -> AsynchronousSearchStats<'a, 'b> {
+        AsynchronousSearchStats::new(self.transport())
     }
 }
 impl OpenSearch {
-    #[doc = "Creates a namespace client for DanglingIndices APIs"]
-    pub fn dangling_indices(&self) -> DanglingIndices {
-        DanglingIndices::new(self.transport())
+    #[doc = "Creates a namespace client for AsynchronousSearch APIs"]
+    pub fn asynchronous_search(&self) -> AsynchronousSearch {
+        AsynchronousSearch::new(self.transport())
     }
 }

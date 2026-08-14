@@ -65,12 +65,12 @@ impl<'b> BulkParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Bulk API](https://opensearch.org/docs/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
+#[doc = "Builder for the [Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
 #[derive(Clone, Debug)]
 pub struct Bulk<'a, 'b, B> {
     transport: &'a Transport,
     parts: BulkParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     body: Option<B>,
@@ -78,6 +78,7 @@ pub struct Bulk<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
+    index: Option<&'b str>,
     pipeline: Option<&'b str>,
     pretty: Option<bool>,
     refresh: Option<Refresh>,
@@ -107,6 +108,7 @@ where
             error_trace: None,
             filter_path: None,
             human: None,
+            index: None,
             pipeline: None,
             pretty: None,
             refresh: None,
@@ -119,17 +121,17 @@ where
             wait_for_active_shards: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or default list of fields to return, can be overridden on each sub-request"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "`true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "Default list of fields to exclude from the returned _source field, can be overridden on each sub-request"]
+    #[doc = "A comma-separated list of source fields to exclude from the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "Default list of fields to extract and return from the _source field, can be overridden on each sub-request"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
@@ -150,6 +152,7 @@ where
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
+            index: self.index,
             pipeline: self.pipeline,
             pretty: self.pretty,
             refresh: self.refresh,
@@ -162,12 +165,12 @@ where
             wait_for_active_shards: self.wait_for_active_shards,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -177,22 +180,27 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "The pipeline id to preprocess incoming documents with"]
+    #[doc = "Name of the data stream, index, or index alias to perform bulk actions on."]
+    pub fn index(mut self, index: &'b str) -> Self {
+        self.index = Some(index);
+        self
+    }
+    #[doc = "ID of the pipeline to use to preprocess incoming documents.\nIf the index has a default ingest pipeline specified, then setting the value to `_none` disables the default ingest pipeline for this request.\nIf a final pipeline is configured it will always run, regardless of the value of this parameter."]
     pub fn pipeline(mut self, pipeline: &'b str) -> Self {
         self.pipeline = Some(pipeline);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "If `true` then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` (the default) then do nothing with refreshes."]
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
     pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
@@ -202,12 +210,12 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Sets require_alias for all incoming documents. Defaults to unset (false)"]
+    #[doc = "If `true`, the request's actions must target an index alias."]
     pub fn require_alias(mut self, require_alias: bool) -> Self {
         self.require_alias = Some(require_alias);
         self
     }
-    #[doc = "Specific routing value"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b str) -> Self {
         self.routing = Some(routing);
         self
@@ -217,17 +225,17 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period each action waits for the following operations: automatic index creation, dynamic mapping updates, waiting for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Default document type for items which don't provide one"]
+    #[doc = "Default document type for items which don't provide one."]
     pub fn ty(mut self, ty: &'b str) -> Self {
         self.ty = Some(ty);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the bulk operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -242,8 +250,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -252,6 +259,7 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
+                index: Option<&'b str>,
                 pipeline: Option<&'b str>,
                 pretty: Option<bool>,
                 refresh: Option<Refresh>,
@@ -267,6 +275,277 @@ where
                 _source: self._source,
                 _source_excludes: self._source_excludes,
                 _source_includes: self._source_includes,
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                index: self.index,
+                pipeline: self.pipeline,
+                pretty: self.pretty,
+                refresh: self.refresh,
+                require_alias: self.require_alias,
+                routing: self.routing,
+                source: self.source,
+                timeout: self.timeout,
+                ty: self.ty,
+                wait_for_active_shards: self.wait_for_active_shards,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Bulk Stream API"]
+pub enum BulkStreamParts<'b> {
+    #[doc = "No parts"]
+    None,
+    #[doc = "Index"]
+    Index(&'b str),
+}
+impl<'b> BulkStreamParts<'b> {
+    #[doc = "Builds a relative URL path to the Bulk Stream API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            BulkStreamParts::None => "/_bulk/stream".into(),
+            BulkStreamParts::Index(index) => {
+                let encoded_index: Cow<str> =
+                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(14usize + encoded_index.len());
+                p.push('/');
+                p.push_str(encoded_index.as_ref());
+                p.push_str("/_bulk/stream");
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the [Bulk Stream API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
+#[derive(Clone, Debug)]
+pub struct BulkStream<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: BulkStreamParts<'b>,
+    _source: Option<&'b str>,
+    _source_excludes: Option<&'b [&'b str]>,
+    _source_includes: Option<&'b [&'b str]>,
+    batch_interval: Option<&'b str>,
+    batch_size: Option<i64>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pipeline: Option<&'b str>,
+    pretty: Option<bool>,
+    refresh: Option<Refresh>,
+    request_timeout: Option<Duration>,
+    require_alias: Option<bool>,
+    routing: Option<&'b [&'b str]>,
+    source: Option<&'b str>,
+    timeout: Option<&'b str>,
+    ty: Option<&'b str>,
+    wait_for_active_shards: Option<&'b str>,
+}
+impl<'a, 'b, B> BulkStream<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [BulkStream] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: BulkStreamParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        BulkStream {
+            transport,
+            parts,
+            headers,
+            _source: None,
+            _source_excludes: None,
+            _source_includes: None,
+            batch_interval: None,
+            batch_size: None,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pipeline: None,
+            pretty: None,
+            refresh: None,
+            request_timeout: None,
+            require_alias: None,
+            routing: None,
+            source: None,
+            timeout: None,
+            ty: None,
+            wait_for_active_shards: None,
+        }
+    }
+    #[doc = "`true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
+        self._source = Some(_source);
+        self
+    }
+    #[doc = "A comma-separated list of source fields to exclude from the response."]
+    pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
+        self._source_excludes = Some(_source_excludes);
+        self
+    }
+    #[doc = "A comma-separated list of source fields to include in the response."]
+    pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
+        self._source_includes = Some(_source_includes);
+        self
+    }
+    #[doc = "Specifies for how long bulk operations should be accumulated into a batch before sending the batch to data nodes."]
+    pub fn batch_interval(mut self, batch_interval: &'b str) -> Self {
+        self.batch_interval = Some(batch_interval);
+        self
+    }
+    #[doc = "Specifies how many bulk operations should be accumulated into a batch before sending the batch to data nodes."]
+    pub fn batch_size(mut self, batch_size: i64) -> Self {
+        self.batch_size = Some(batch_size);
+        self
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: Vec<T>) -> BulkStream<'a, 'b, NdBody<T>>
+    where
+        T: Body,
+    {
+        BulkStream {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(NdBody(body)),
+            _source: self._source,
+            _source_excludes: self._source_excludes,
+            _source_includes: self._source_includes,
+            batch_interval: self.batch_interval,
+            batch_size: self.batch_size,
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pipeline: self.pipeline,
+            pretty: self.pretty,
+            refresh: self.refresh,
+            request_timeout: self.request_timeout,
+            require_alias: self.require_alias,
+            routing: self.routing,
+            source: self.source,
+            timeout: self.timeout,
+            ty: self.ty,
+            wait_for_active_shards: self.wait_for_active_shards,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "ID of the pipeline to use to preprocess incoming documents.\nIf the index has a default ingest pipeline specified, then setting the value to `_none` disables the default ingest pipeline for this request.\nIf a final pipeline is configured it will always run, regardless of the value of this parameter."]
+    pub fn pipeline(mut self, pipeline: &'b str) -> Self {
+        self.pipeline = Some(pipeline);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
+        self.refresh = Some(refresh);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "If `true`, the request's actions must target an index alias."]
+    pub fn require_alias(mut self, require_alias: bool) -> Self {
+        self.require_alias = Some(require_alias);
+        self
+    }
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
+        self.routing = Some(routing);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Period each action waits for the following operations: automatic index creation, dynamic mapping updates, waiting for active shards."]
+    pub fn timeout(mut self, timeout: &'b str) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
+    #[doc = "Default document type for items which don't provide one."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
+    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Bulk Stream API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                _source: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                _source_excludes: Option<&'b [&'b str]>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                _source_includes: Option<&'b [&'b str]>,
+                batch_interval: Option<&'b str>,
+                batch_size: Option<i64>,
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pipeline: Option<&'b str>,
+                pretty: Option<bool>,
+                refresh: Option<Refresh>,
+                require_alias: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
+                source: Option<&'b str>,
+                timeout: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
+                wait_for_active_shards: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                _source: self._source,
+                _source_excludes: self._source_excludes,
+                _source_includes: self._source_includes,
+                batch_interval: self.batch_interval,
+                batch_size: self.batch_size,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
@@ -315,7 +594,7 @@ impl<'b> ClearScrollParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Clear Scroll API](https://opensearch.org/docs/)\n\nExplicitly clears the search context for a scroll."]
+#[doc = "Builder for the [Clear Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
 #[derive(Clone, Debug)]
 pub struct ClearScroll<'a, 'b, B> {
     transport: &'a Transport,
@@ -367,12 +646,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -382,12 +661,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -462,7 +741,7 @@ impl<'b> CountParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Count API](https://opensearch.org/docs/)\n\nReturns number of documents matching a query."]
+#[doc = "Builder for the [Count API](https://opensearch.org/docs/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
 #[derive(Clone, Debug)]
 pub struct Count<'a, 'b, B> {
     transport: &'a Transport,
@@ -481,7 +760,7 @@ pub struct Count<'a, 'b, B> {
     ignore_throttled: Option<bool>,
     ignore_unavailable: Option<bool>,
     lenient: Option<bool>,
-    min_score: Option<i64>,
+    min_score: Option<f32>,
     preference: Option<&'b str>,
     pretty: Option<bool>,
     q: Option<&'b str>,
@@ -524,17 +803,17 @@ where
             terminate_after: None,
         }
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
     }
-    #[doc = "Specify whether wildcard and prefix queries should be analyzed (default: false)"]
+    #[doc = "If `true`, wildcard and prefix queries are analyzed.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn analyze_wildcard(mut self, analyze_wildcard: bool) -> Self {
         self.analyze_wildcard = Some(analyze_wildcard);
         self
     }
-    #[doc = "The analyzer to use for the query string"]
+    #[doc = "Analyzer to use for the query string.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn analyzer(mut self, analyzer: &'b str) -> Self {
         self.analyzer = Some(analyzer);
         self
@@ -571,27 +850,26 @@ where
             terminate_after: self.terminate_after,
         }
     }
-    #[doc = "The default operator for query string query (AND or OR)"]
+    #[doc = "The default operator for query string query: `AND` or `OR`.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn default_operator(mut self, default_operator: DefaultOperator) -> Self {
         self.default_operator = Some(default_operator);
         self
     }
-    #[doc = "The field to use as default where no field prefix is given in the query string"]
+    #[doc = "Field to use as default where no field prefix is given in the query string.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn df(mut self, df: &'b str) -> Self {
         self.df = Some(df);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -601,42 +879,42 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete, expanded or aliased indices should be ignored when throttled"]
+    #[doc = "If `true`, concrete, expanded or aliased indexes are ignored when frozen."]
     pub fn ignore_throttled(mut self, ignore_throttled: bool) -> Self {
         self.ignore_throttled = Some(ignore_throttled);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify whether format-based query failures (such as providing text to a numeric field) should be ignored"]
+    #[doc = "If `true`, format-based query failures (such as providing text to a numeric field) in the query string will be ignored."]
     pub fn lenient(mut self, lenient: bool) -> Self {
         self.lenient = Some(lenient);
         self
     }
-    #[doc = "Include only documents with a specific `_score` value in the result"]
-    pub fn min_score(mut self, min_score: i64) -> Self {
+    #[doc = "Sets the minimum `_score` value that documents must have to be included in the result."]
+    pub fn min_score(mut self, min_score: f32) -> Self {
         self.min_score = Some(min_score);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Query in the Lucene query string syntax"]
+    #[doc = "Query in the Lucene query string syntax."]
     pub fn q(mut self, q: &'b str) -> Self {
         self.q = Some(q);
         self
@@ -646,7 +924,7 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
@@ -656,7 +934,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "The maximum count for each shard, upon reaching which the query execution will terminate early"]
+    #[doc = "Maximum number of documents to collect for each shard.\nIf a query reaches this limit, OpenSearch terminates the query early.\nOpenSearch collects documents before sorting."]
     pub fn terminate_after(mut self, terminate_after: i64) -> Self {
         self.terminate_after = Some(terminate_after);
         self
@@ -688,7 +966,7 @@ where
                 ignore_throttled: Option<bool>,
                 ignore_unavailable: Option<bool>,
                 lenient: Option<bool>,
-                min_score: Option<i64>,
+                min_score: Option<f32>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 q: Option<&'b str>,
@@ -752,7 +1030,7 @@ impl<'b> CreateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Create API](https://opensearch.org/docs/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
+#[doc = "Builder for the [Create API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
 #[derive(Clone, Debug)]
 pub struct Create<'a, 'b, B> {
     transport: &'a Transport,
@@ -766,7 +1044,7 @@ pub struct Create<'a, 'b, B> {
     pretty: Option<bool>,
     refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     version: Option<i64>,
@@ -825,12 +1103,12 @@ where
             wait_for_active_shards: self.wait_for_active_shards,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -840,22 +1118,22 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "The pipeline id to preprocess incoming documents with"]
+    #[doc = "ID of the pipeline to use to preprocess incoming documents.\nIf the index has a default ingest pipeline specified, then setting the value to `_none` disables the default ingest pipeline for this request.\nIf a final pipeline is configured it will always run, regardless of the value of this parameter."]
     pub fn pipeline(mut self, pipeline: &'b str) -> Self {
         self.pipeline = Some(pipeline);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "If `true` then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` (the default) then do nothing with refreshes."]
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
     pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
@@ -865,8 +1143,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -875,22 +1153,22 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period the request waits for the following operations: automatic index creation, dynamic mapping updates, waiting for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control.\nThe specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the index operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -912,7 +1190,8 @@ where
                 pipeline: Option<&'b str>,
                 pretty: Option<bool>,
                 refresh: Option<Refresh>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 version: Option<i64>,
@@ -966,7 +1245,7 @@ impl<'b> CreatePitParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Create Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nCreates point in time context."]
+#[doc = "Builder for the [Create Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit)\n\nCreates point in time context."]
 #[derive(Clone, Debug)]
 pub struct CreatePit<'a, 'b, B> {
     transport: &'a Transport,
@@ -978,7 +1257,6 @@ pub struct CreatePit<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    ignore_unavailable: Option<bool>,
     keep_alive: Option<&'b str>,
     preference: Option<&'b str>,
     pretty: Option<bool>,
@@ -1003,7 +1281,6 @@ where
             expand_wildcards: None,
             filter_path: None,
             human: None,
-            ignore_unavailable: None,
             keep_alive: None,
             preference: None,
             pretty: None,
@@ -1012,7 +1289,7 @@ where
             source: None,
         }
     }
-    #[doc = "Allow if point in time can be created with partial failures"]
+    #[doc = "Allow if point in time can be created with partial failures."]
     pub fn allow_partial_pit_creation(mut self, allow_partial_pit_creation: bool) -> Self {
         self.allow_partial_pit_creation = Some(allow_partial_pit_creation);
         self
@@ -1032,7 +1309,6 @@ where
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            ignore_unavailable: self.ignore_unavailable,
             keep_alive: self.keep_alive,
             preference: self.preference,
             pretty: self.pretty,
@@ -1041,17 +1317,17 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "The type of index that can match the wildcard pattern. Supports comma-separated values. Optional. Default is `open`."]
+    #[doc = "Whether to expand wildcard expression to concrete indexes that are open, closed or both."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -1061,27 +1337,22 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
-    pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
-        self.ignore_unavailable = Some(ignore_unavailable);
-        self
-    }
-    #[doc = "Specify the keep alive for point in time"]
+    #[doc = "Specify the keep alive for point in time."]
     pub fn keep_alive(mut self, keep_alive: &'b str) -> Self {
         self.keep_alive = Some(keep_alive);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specify the node or shard the operation should be performed on."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1091,7 +1362,7 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A comma-separated list of specific routing values."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
@@ -1118,7 +1389,6 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                ignore_unavailable: Option<bool>,
                 keep_alive: Option<&'b str>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
@@ -1132,7 +1402,6 @@ where
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
                 human: self.human,
-                ignore_unavailable: self.ignore_unavailable,
                 keep_alive: self.keep_alive,
                 preference: self.preference,
                 pretty: self.pretty,
@@ -1173,7 +1442,7 @@ impl<'b> DeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete API](https://opensearch.org/docs/)\n\nRemoves a document from the index."]
+#[doc = "Builder for the [Delete API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
 #[derive(Clone, Debug)]
 pub struct Delete<'a, 'b> {
     transport: &'a Transport,
@@ -1187,7 +1456,7 @@ pub struct Delete<'a, 'b> {
     pretty: Option<bool>,
     refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     version: Option<i64>,
@@ -1218,12 +1487,12 @@ impl<'a, 'b> Delete<'a, 'b> {
             wait_for_active_shards: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -1233,27 +1502,27 @@ impl<'a, 'b> Delete<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "only perform the delete operation if the last operation that has changed the document has the specified primary term"]
+    #[doc = "Only perform the operation if the document has this primary term."]
     pub fn if_primary_term(mut self, if_primary_term: i64) -> Self {
         self.if_primary_term = Some(if_primary_term);
         self
     }
-    #[doc = "only perform the delete operation if the last operation that has changed the document has the specified sequence number"]
+    #[doc = "Only perform the operation if the document has this sequence number."]
     pub fn if_seq_no(mut self, if_seq_no: i64) -> Self {
         self.if_seq_no = Some(if_seq_no);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "If `true` then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` (the default) then do nothing with refreshes."]
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
     pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
@@ -1263,8 +1532,8 @@ impl<'a, 'b> Delete<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -1273,22 +1542,22 @@ impl<'a, 'b> Delete<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period to wait for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control.\nThe specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the delete operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -1311,7 +1580,8 @@ impl<'a, 'b> Delete<'a, 'b> {
                 if_seq_no: Option<i64>,
                 pretty: Option<bool>,
                 refresh: Option<Refresh>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 version: Option<i64>,
@@ -1357,7 +1627,7 @@ impl DeleteAllPitsParts {
         }
     }
 }
-#[doc = "Builder for the [Delete All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes all active point in time searches."]
+#[doc = "Builder for the [Delete All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches."]
 #[derive(Clone, Debug)]
 pub struct DeleteAllPits<'a, 'b> {
     transport: &'a Transport,
@@ -1386,12 +1656,12 @@ impl<'a, 'b> DeleteAllPits<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -1401,12 +1671,12 @@ impl<'a, 'b> DeleteAllPits<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1478,12 +1748,12 @@ impl<'b> DeleteByQueryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete By Query API](https://opensearch.org/docs/)\n\nDeletes documents matching the provided query."]
+#[doc = "Builder for the [Delete By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
 #[derive(Clone, Debug)]
 pub struct DeleteByQuery<'a, 'b, B> {
     transport: &'a Transport,
     parts: DeleteByQueryParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     allow_no_indices: Option<bool>,
@@ -1505,17 +1775,17 @@ pub struct DeleteByQuery<'a, 'b, B> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     q: Option<&'b str>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_cache: Option<bool>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
     routing: Option<&'b [&'b str]>,
     scroll: Option<&'b str>,
     scroll_size: Option<i64>,
     search_timeout: Option<&'b str>,
     search_type: Option<SearchType>,
     size: Option<i64>,
-    slices: Option<Slices>,
+    slices: Option<&'b str>,
     sort: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stats: Option<&'b [&'b str]>,
@@ -1578,32 +1848,32 @@ where
             wait_for_completion: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "List of fields to exclude from the returned `_source` field."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "List of fields to extract and return from the `_source` field."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes.\nFor example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
     }
-    #[doc = "Specify whether wildcard and prefix queries should be analyzed (default: false)"]
+    #[doc = "If `true`, wildcard and prefix queries are analyzed."]
     pub fn analyze_wildcard(mut self, analyze_wildcard: bool) -> Self {
         self.analyze_wildcard = Some(analyze_wildcard);
         self
     }
-    #[doc = "The analyzer to use for the query string"]
+    #[doc = "Analyzer to use for the query string."]
     pub fn analyzer(mut self, analyzer: &'b str) -> Self {
         self.analyzer = Some(analyzer);
         self
@@ -1659,37 +1929,37 @@ where
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "What to do when the delete by query hits version conflicts?"]
+    #[doc = "What to do if delete by query hits version conflicts: `abort` or `proceed`."]
     pub fn conflicts(mut self, conflicts: Conflicts) -> Self {
         self.conflicts = Some(conflicts);
         self
     }
-    #[doc = "The default operator for query string query (AND or OR)"]
+    #[doc = "The default operator for query string query: `AND` or `OR`."]
     pub fn default_operator(mut self, default_operator: DefaultOperator) -> Self {
         self.default_operator = Some(default_operator);
         self
     }
-    #[doc = "The field to use as default where no field prefix is given in the query string"]
+    #[doc = "Field to use as default where no field prefix is given in the query string."]
     pub fn df(mut self, df: &'b str) -> Self {
         self.df = Some(df);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Type of index that wildcard patterns can match.\nIf the request can target data streams, this argument determines whether wildcard expressions match hidden data streams.\nSupports comma-separated values, such as `open,hidden`. Valid values are: `all`, `open`, `closed`, `hidden`, `none`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "Starting offset (default: 0)"]
+    #[doc = "Starting offset."]
     pub fn from(mut self, from: i64) -> Self {
         self.from = Some(from);
         self
@@ -1699,47 +1969,47 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify whether format-based query failures (such as providing text to a numeric field) should be ignored"]
+    #[doc = "If `true`, format-based query failures (such as providing text to a numeric field) in the query string will be ignored."]
     pub fn lenient(mut self, lenient: bool) -> Self {
         self.lenient = Some(lenient);
         self
     }
-    #[doc = "Maximum number of documents to process (default: all documents)"]
+    #[doc = "Maximum number of documents to process.\nDefaults to all documents."]
     pub fn max_docs(mut self, max_docs: i64) -> Self {
         self.max_docs = Some(max_docs);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Query in the Lucene query string syntax"]
+    #[doc = "Query in the Lucene query string syntax."]
     pub fn q(mut self, q: &'b str) -> Self {
         self.q = Some(q);
         self
     }
-    #[doc = "Should the effected indexes be refreshed?"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes all shards involved in the delete by query after the request completes."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
-    #[doc = "Specify if request cache should be used for this request or not, defaults to index level setting"]
+    #[doc = "If `true`, the request cache is used for this request.\nDefaults to the index-level setting."]
     pub fn request_cache(mut self, request_cache: bool) -> Self {
         self.request_cache = Some(request_cache);
         self
@@ -1749,47 +2019,47 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle for this request in sub-requests per second. -1 means no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
-    #[doc = "Specify how long a consistent view of the index should be maintained for scrolled search"]
+    #[doc = "Period to retain the search context for scrolling."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
-    #[doc = "Size on the scroll request powering the delete by query"]
+    #[doc = "Size of the scroll request that powers the operation."]
     pub fn scroll_size(mut self, scroll_size: i64) -> Self {
         self.scroll_size = Some(scroll_size);
         self
     }
-    #[doc = "Explicit timeout for each search request. Defaults to no timeout."]
+    #[doc = "Explicit timeout for each search request.\nDefaults to no timeout."]
     pub fn search_timeout(mut self, search_timeout: &'b str) -> Self {
         self.search_timeout = Some(search_timeout);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "The type of the search operation.\nAvailable options: `query_then_fetch`, `dfs_query_then_fetch`."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
     }
-    #[doc = "Deprecated, please use `max_docs` instead"]
+    #[doc = "Deprecated, use `max_docs` instead."]
     pub fn size(mut self, size: i64) -> Self {
         self.size = Some(size);
         self
     }
-    #[doc = "The number of slices this task should be divided into. Defaults to 1, meaning the task isn't sliced into subtasks. Can be set to `auto`."]
-    pub fn slices(mut self, slices: Slices) -> Self {
+    #[doc = "The number of slices this task should be divided into."]
+    pub fn slices(mut self, slices: &'b str) -> Self {
         self.slices = Some(slices);
         self
     }
-    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs"]
+    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs."]
     pub fn sort(mut self, sort: &'b [&'b str]) -> Self {
         self.sort = Some(sort);
         self
@@ -1799,32 +2069,32 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specific 'tag' of the request for logging and statistical purposes"]
+    #[doc = "Specific `tag` of the request for logging and statistical purposes."]
     pub fn stats(mut self, stats: &'b [&'b str]) -> Self {
         self.stats = Some(stats);
         self
     }
-    #[doc = "The maximum number of documents to collect for each shard, upon reaching which the query execution will terminate early."]
+    #[doc = "Maximum number of documents to collect for each shard.\nIf a query reaches this limit, OpenSearch terminates the query early.\nOpenSearch collects documents before sorting.\nUse with caution.\nOpenSearch applies this parameter to each shard handling the request.\nWhen possible, let OpenSearch perform early termination automatically.\nAvoid specifying this parameter for requests that target data streams with backing indexes across multiple data tiers."]
     pub fn terminate_after(mut self, terminate_after: i64) -> Self {
         self.terminate_after = Some(terminate_after);
         self
     }
-    #[doc = "Time each individual bulk request should wait for shards that are unavailable."]
+    #[doc = "Period each deletion request waits for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Specify whether to return document version as part of a hit"]
+    #[doc = "If `true`, returns the document version as part of a hit."]
     pub fn version(mut self, version: bool) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the delete by query operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
     }
-    #[doc = "Should the request should block until the delete by query is complete."]
+    #[doc = "If `true`, the request blocks until the operation is complete."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -1839,8 +2109,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -1864,9 +2133,9 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 q: Option<&'b str>,
-                refresh: Option<bool>,
+                refresh: Option<Refresh>,
                 request_cache: Option<bool>,
-                requests_per_second: Option<i64>,
+                requests_per_second: Option<f32>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 routing: Option<&'b [&'b str]>,
                 scroll: Option<&'b str>,
@@ -1874,7 +2143,7 @@ where
                 search_timeout: Option<&'b str>,
                 search_type: Option<SearchType>,
                 size: Option<i64>,
-                slices: Option<Slices>,
+                slices: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 sort: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
@@ -1958,7 +2227,7 @@ impl<'b> DeleteByQueryRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete By Query Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
+#[doc = "Builder for the [Delete By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
 #[derive(Clone, Debug)]
 pub struct DeleteByQueryRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -1970,7 +2239,7 @@ pub struct DeleteByQueryRethrottle<'a, 'b, B> {
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
     source: Option<&'b str>,
 }
 impl<'a, 'b, B> DeleteByQueryRethrottle<'a, 'b, B>
@@ -2013,12 +2282,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2028,12 +2297,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2043,8 +2312,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle to set on this request in floating sub-requests per second. -1 means set no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
@@ -2068,7 +2337,7 @@ where
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                requests_per_second: Option<i64>,
+                requests_per_second: Option<f32>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -2103,7 +2372,7 @@ impl DeletePitParts {
         }
     }
 }
-#[doc = "Builder for the [Delete Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes one or more point in time searches based on the IDs passed."]
+#[doc = "Builder for the [Delete Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed."]
 #[derive(Clone, Debug)]
 pub struct DeletePit<'a, 'b, B> {
     transport: &'a Transport,
@@ -2155,12 +2424,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2170,12 +2439,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2244,7 +2513,7 @@ impl<'b> DeleteScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete Script API](https://opensearch.org/docs/)\n\nDeletes a script."]
+#[doc = "Builder for the [Delete Script API](https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
 #[derive(Clone, Debug)]
 pub struct DeleteScript<'a, 'b> {
     transport: &'a Transport,
@@ -2279,17 +2548,17 @@ impl<'a, 'b> DeleteScript<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[doc = "Operation timeout for connection to cluster-manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2299,18 +2568,18 @@ impl<'a, 'b> DeleteScript<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2325,7 +2594,7 @@ impl<'a, 'b> DeleteScript<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period to wait for a response.\nIf no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -2394,12 +2663,12 @@ impl<'b> ExistsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Exists API](https://opensearch.org/docs/)\n\nReturns information about whether a document exists in an index."]
+#[doc = "Builder for the [Exists API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
 #[derive(Clone, Debug)]
 pub struct Exists<'a, 'b> {
     transport: &'a Transport,
     parts: ExistsParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     error_trace: Option<bool>,
@@ -2409,9 +2678,9 @@ pub struct Exists<'a, 'b> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     realtime: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stored_fields: Option<&'b [&'b str]>,
     version: Option<i64>,
@@ -2443,27 +2712,27 @@ impl<'a, 'b> Exists<'a, 'b> {
             version_type: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "`true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude in the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2473,28 +2742,28 @@ impl<'a, 'b> Exists<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to perform the operation in realtime or search mode"]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
     }
-    #[doc = "Refresh the shard containing the document before performing the operation"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes all shards involved in the delete by query after the request completes."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -2503,8 +2772,8 @@ impl<'a, 'b> Exists<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "Target the specified primary shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -2513,17 +2782,17 @@ impl<'a, 'b> Exists<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "A comma-separated list of stored fields to return in the response"]
+    #[doc = "List of stored fields to return as part of a hit.\nIf no fields are specified, no stored fields are included in the response.\nIf this field is specified, the `_source` parameter defaults to false."]
     pub fn stored_fields(mut self, stored_fields: &'b [&'b str]) -> Self {
         self.stored_fields = Some(stored_fields);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control.\nThe specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -2538,8 +2807,7 @@ impl<'a, 'b> Exists<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -2551,8 +2819,9 @@ impl<'a, 'b> Exists<'a, 'b> {
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                refresh: Option<bool>,
-                routing: Option<&'b str>,
+                refresh: Option<Refresh>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 stored_fields: Option<&'b [&'b str]>,
@@ -2610,12 +2879,12 @@ impl<'b> ExistsSourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Exists Source API](https://opensearch.org/docs/)\n\nReturns information about whether a document source exists in an index."]
+#[doc = "Builder for the [Exists Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
 #[derive(Clone, Debug)]
 pub struct ExistsSource<'a, 'b> {
     transport: &'a Transport,
     parts: ExistsSourceParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     error_trace: Option<bool>,
@@ -2625,9 +2894,9 @@ pub struct ExistsSource<'a, 'b> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     realtime: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     version: Option<i64>,
     version_type: Option<VersionType>,
@@ -2657,27 +2926,27 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
             version_type: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "`true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude in the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2687,28 +2956,28 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to perform the operation in realtime or search mode"]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
     }
-    #[doc = "Refresh the shard containing the document before performing the operation"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes all shards involved in the delete by query after the request completes."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -2717,8 +2986,8 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "Target the specified primary shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -2727,12 +2996,12 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control.\nThe specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -2747,8 +3016,7 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -2760,8 +3028,9 @@ impl<'a, 'b> ExistsSource<'a, 'b> {
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                refresh: Option<bool>,
-                routing: Option<&'b str>,
+                refresh: Option<Refresh>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 version: Option<i64>,
                 version_type: Option<VersionType>,
@@ -2816,12 +3085,12 @@ impl<'b> ExplainParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Explain API](https://opensearch.org/docs/)\n\nReturns information about why a specific matches (or doesn't match) a query."]
+#[doc = "Builder for the [Explain API](https://opensearch.org/docs/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
 #[derive(Clone, Debug)]
 pub struct Explain<'a, 'b, B> {
     transport: &'a Transport,
     parts: ExplainParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     analyze_wildcard: Option<bool>,
@@ -2838,7 +3107,7 @@ pub struct Explain<'a, 'b, B> {
     pretty: Option<bool>,
     q: Option<&'b str>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stored_fields: Option<&'b [&'b str]>,
 }
@@ -2874,27 +3143,27 @@ where
             stored_fields: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude from the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Specify whether wildcards and prefix queries in the query string query should be analyzed (default: false)"]
+    #[doc = "If `true`, wildcard and prefix queries are analyzed."]
     pub fn analyze_wildcard(mut self, analyze_wildcard: bool) -> Self {
         self.analyze_wildcard = Some(analyze_wildcard);
         self
     }
-    #[doc = "The analyzer for the query string query"]
+    #[doc = "Analyzer to use for the query string.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn analyzer(mut self, analyzer: &'b str) -> Self {
         self.analyzer = Some(analyzer);
         self
@@ -2929,22 +3198,22 @@ where
             stored_fields: self.stored_fields,
         }
     }
-    #[doc = "The default operator for query string query (AND or OR)"]
+    #[doc = "The default operator for query string query: `AND` or `OR`."]
     pub fn default_operator(mut self, default_operator: DefaultOperator) -> Self {
         self.default_operator = Some(default_operator);
         self
     }
-    #[doc = "The default field for query string query (default: _all)"]
+    #[doc = "Field to use as default where no field prefix is given in the query string."]
     pub fn df(mut self, df: &'b str) -> Self {
         self.df = Some(df);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -2954,27 +3223,27 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify whether format-based query failures (such as providing text to a numeric field) should be ignored"]
+    #[doc = "If `true`, format-based query failures (such as providing text to a numeric field) in the query string will be ignored."]
     pub fn lenient(mut self, lenient: bool) -> Self {
         self.lenient = Some(lenient);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Query in the Lucene query string syntax"]
+    #[doc = "Query in the Lucene query string syntax."]
     pub fn q(mut self, q: &'b str) -> Self {
         self.q = Some(q);
         self
@@ -2984,8 +3253,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -2994,7 +3263,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "A comma-separated list of stored fields to return in the response"]
+    #[doc = "A comma-separated list of stored fields to return in the response."]
     pub fn stored_fields(mut self, stored_fields: &'b [&'b str]) -> Self {
         self.stored_fields = Some(stored_fields);
         self
@@ -3012,8 +3281,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -3030,7 +3298,8 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 q: Option<&'b str>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 stored_fields: Option<&'b [&'b str]>,
@@ -3090,7 +3359,7 @@ impl<'b> FieldCapsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Field Caps API](https://opensearch.org/docs/)\n\nReturns the information about the capabilities of fields among multiple indices."]
+#[doc = "Builder for the [Field Caps API](https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
 #[derive(Clone, Debug)]
 pub struct FieldCaps<'a, 'b, B> {
     transport: &'a Transport,
@@ -3134,7 +3403,7 @@ where
             source: None,
         }
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias,\nor `_all` value targets only missing or closed indexes. This behavior applies even if the request targets other open indexes. For example, a request\ntargeting `foo*,bar*` returns an error if an index starts with foo but no index starts with bar."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
@@ -3162,22 +3431,22 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "The type of index that wildcard patterns can match. If the request can target data streams, this argument determines whether wildcard expressions match hidden data streams. Supports comma-separated values, such as `open,hidden`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of field names"]
+    #[doc = "A comma-separated list of fields to retrieve capabilities for. Wildcard (`*`) expressions are supported."]
     pub fn fields(mut self, fields: &'b [&'b str]) -> Self {
         self.fields = Some(fields);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3187,22 +3456,22 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `true`, missing or closed indexes are not included in the response."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Indicates whether unmapped fields should be included in the response."]
+    #[doc = "If `true`, unmapped fields are included in the response."]
     pub fn include_unmapped(mut self, include_unmapped: bool) -> Self {
         self.include_unmapped = Some(include_unmapped);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3290,12 +3559,12 @@ impl<'b> GetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get API](https://opensearch.org/docs/)\n\nReturns a document."]
+#[doc = "Builder for the [Get API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
 #[derive(Clone, Debug)]
 pub struct Get<'a, 'b> {
     transport: &'a Transport,
     parts: GetParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     error_trace: Option<bool>,
@@ -3305,9 +3574,9 @@ pub struct Get<'a, 'b> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     realtime: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stored_fields: Option<&'b [&'b str]>,
     version: Option<i64>,
@@ -3339,27 +3608,27 @@ impl<'a, 'b> Get<'a, 'b> {
             version_type: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude in the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3369,28 +3638,28 @@ impl<'a, 'b> Get<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on. Random by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to perform the operation in realtime or search mode"]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
     }
-    #[doc = "Refresh the shard containing the document before performing the operation"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search. If `false`, do nothing with refreshes."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -3399,8 +3668,8 @@ impl<'a, 'b> Get<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "Target the specified primary shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -3409,17 +3678,17 @@ impl<'a, 'b> Get<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "A comma-separated list of stored fields to return in the response"]
+    #[doc = "List of stored fields to return as part of a hit.\nIf no fields are specified, no stored fields are included in the response.\nIf this field is specified, the `_source` parameter defaults to false."]
     pub fn stored_fields(mut self, stored_fields: &'b [&'b str]) -> Self {
         self.stored_fields = Some(stored_fields);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control. The specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `internal`, `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -3434,8 +3703,7 @@ impl<'a, 'b> Get<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -3447,8 +3715,9 @@ impl<'a, 'b> Get<'a, 'b> {
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                refresh: Option<bool>,
-                routing: Option<&'b str>,
+                refresh: Option<Refresh>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 stored_fields: Option<&'b [&'b str]>,
@@ -3496,7 +3765,7 @@ impl GetAllPitsParts {
         }
     }
 }
-#[doc = "Builder for the [Get All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nLists all active point in time searches."]
+#[doc = "Builder for the [Get All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
 #[derive(Clone, Debug)]
 pub struct GetAllPits<'a, 'b> {
     transport: &'a Transport,
@@ -3525,12 +3794,12 @@ impl<'a, 'b> GetAllPits<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3540,12 +3809,12 @@ impl<'a, 'b> GetAllPits<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3614,7 +3883,7 @@ impl<'b> GetScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get Script API](https://opensearch.org/docs/)\n\nReturns a script."]
+#[doc = "Builder for the [Get Script API](https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
 #[derive(Clone, Debug)]
 pub struct GetScript<'a, 'b> {
     transport: &'a Transport,
@@ -3647,17 +3916,17 @@ impl<'a, 'b> GetScript<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[doc = "Operation timeout for connection to cluster-manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3667,18 +3936,18 @@ impl<'a, 'b> GetScript<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Specify timeout for connection to master"]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3731,14 +4000,12 @@ impl<'a, 'b> GetScript<'a, 'b> {
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Script Context API"]
 pub enum GetScriptContextParts {
     #[doc = "No parts"]
     None,
 }
-#[cfg(feature = "experimental-apis")]
 impl GetScriptContextParts {
     #[doc = "Builds a relative URL path to the Get Script Context API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -3747,9 +4014,7 @@ impl GetScriptContextParts {
         }
     }
 }
-#[doc = "Builder for the [Get Script Context API](https://opensearch.org/docs/)\n\nReturns all script contexts."]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Get Script Context API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
 #[derive(Clone, Debug)]
 pub struct GetScriptContext<'a, 'b> {
     transport: &'a Transport,
@@ -3762,7 +4027,6 @@ pub struct GetScriptContext<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b> GetScriptContext<'a, 'b> {
     #[doc = "Creates a new instance of [GetScriptContext]"]
     pub fn new(transport: &'a Transport) -> Self {
@@ -3779,12 +4043,12 @@ impl<'a, 'b> GetScriptContext<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3794,12 +4058,12 @@ impl<'a, 'b> GetScriptContext<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3848,14 +4112,12 @@ impl<'a, 'b> GetScriptContext<'a, 'b> {
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Get Script Languages API"]
 pub enum GetScriptLanguagesParts {
     #[doc = "No parts"]
     None,
 }
-#[cfg(feature = "experimental-apis")]
 impl GetScriptLanguagesParts {
     #[doc = "Builds a relative URL path to the Get Script Languages API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -3864,9 +4126,7 @@ impl GetScriptLanguagesParts {
         }
     }
 }
-#[doc = "Builder for the [Get Script Languages API](https://opensearch.org/docs/)\n\nReturns available script types, languages and contexts"]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Get Script Languages API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
 #[derive(Clone, Debug)]
 pub struct GetScriptLanguages<'a, 'b> {
     transport: &'a Transport,
@@ -3879,7 +4139,6 @@ pub struct GetScriptLanguages<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b> GetScriptLanguages<'a, 'b> {
     #[doc = "Creates a new instance of [GetScriptLanguages]"]
     pub fn new(transport: &'a Transport) -> Self {
@@ -3896,12 +4155,12 @@ impl<'a, 'b> GetScriptLanguages<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -3911,12 +4170,12 @@ impl<'a, 'b> GetScriptLanguages<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3989,12 +4248,12 @@ impl<'b> GetSourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get Source API](https://opensearch.org/docs/)\n\nReturns the source of a document."]
+#[doc = "Builder for the [Get Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
 #[derive(Clone, Debug)]
 pub struct GetSource<'a, 'b> {
     transport: &'a Transport,
     parts: GetSourceParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     error_trace: Option<bool>,
@@ -4004,9 +4263,9 @@ pub struct GetSource<'a, 'b> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     realtime: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     version: Option<i64>,
     version_type: Option<VersionType>,
@@ -4036,27 +4295,27 @@ impl<'a, 'b> GetSource<'a, 'b> {
             version_type: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude in the response."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -4066,28 +4325,28 @@ impl<'a, 'b> GetSource<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on. Random by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to perform the operation in realtime or search mode"]
+    #[doc = "Boolean) If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
     }
-    #[doc = "Refresh the shard containing the document before performing the operation"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search. If `false`, do nothing with refreshes."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -4096,8 +4355,8 @@ impl<'a, 'b> GetSource<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "Target the specified primary shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -4106,12 +4365,12 @@ impl<'a, 'b> GetSource<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control. The specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type. One of `internal`, `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -4126,8 +4385,7 @@ impl<'a, 'b> GetSource<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -4139,8 +4397,9 @@ impl<'a, 'b> GetSource<'a, 'b> {
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                refresh: Option<bool>,
-                routing: Option<&'b str>,
+                refresh: Option<Refresh>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 version: Option<i64>,
                 version_type: Option<VersionType>,
@@ -4174,15 +4433,24 @@ impl<'a, 'b> GetSource<'a, 'b> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Index API"]
 pub enum IndexParts<'b> {
-    #[doc = "Index and Id"]
-    IndexId(&'b str, &'b str),
     #[doc = "Index"]
     Index(&'b str),
+    #[doc = "Index and Id"]
+    IndexId(&'b str, &'b str),
 }
 impl<'b> IndexParts<'b> {
     #[doc = "Builds a relative URL path to the Index API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
+            IndexParts::Index(index) => {
+                let encoded_index: Cow<str> =
+                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(6usize + encoded_index.len());
+                p.push('/');
+                p.push_str(encoded_index.as_ref());
+                p.push_str("/_doc");
+                p.into()
+            }
             IndexParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
@@ -4194,19 +4462,10 @@ impl<'b> IndexParts<'b> {
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
-            IndexParts::Index(index) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(6usize + encoded_index.len());
-                p.push('/');
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/_doc");
-                p.into()
-            }
         }
     }
 }
-#[doc = "Builder for the [Index API](https://opensearch.org/docs/)\n\nCreates or updates a document in an index."]
+#[doc = "Builder for the [Index API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
 #[derive(Clone, Debug)]
 pub struct Index<'a, 'b, B> {
     transport: &'a Transport,
@@ -4224,7 +4483,7 @@ pub struct Index<'a, 'b, B> {
     refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
     require_alias: Option<bool>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     version: Option<i64>,
@@ -4291,12 +4550,12 @@ where
             wait_for_active_shards: self.wait_for_active_shards,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -4306,37 +4565,37 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "only perform the index operation if the last operation that has changed the document has the specified primary term"]
+    #[doc = "Only perform the operation if the document has this primary term."]
     pub fn if_primary_term(mut self, if_primary_term: i64) -> Self {
         self.if_primary_term = Some(if_primary_term);
         self
     }
-    #[doc = "only perform the index operation if the last operation that has changed the document has the specified sequence number"]
+    #[doc = "Only perform the operation if the document has this sequence number."]
     pub fn if_seq_no(mut self, if_seq_no: i64) -> Self {
         self.if_seq_no = Some(if_seq_no);
         self
     }
-    #[doc = "Explicit operation type. Defaults to `index` for requests with an explicit document ID, and to `create`for requests without an explicit document ID"]
+    #[doc = "Set to create to only index the document if it does not already exist (put if absent).\nIf a document with the specified `_id` already exists, the indexing operation will fail.\nSame as using the `&lt;index&gt;/_create` endpoint.\nValid values: `index`, `create`.\nIf document id is specified, it defaults to `index`.\nOtherwise, it defaults to `create`."]
     pub fn op_type(mut self, op_type: OpType) -> Self {
         self.op_type = Some(op_type);
         self
     }
-    #[doc = "The pipeline id to preprocess incoming documents with"]
+    #[doc = "ID of the pipeline to use to preprocess incoming documents.\nIf the index has a default ingest pipeline specified, then setting the value to `_none` disables the default ingest pipeline for this request.\nIf a final pipeline is configured it will always run, regardless of the value of this parameter."]
     pub fn pipeline(mut self, pipeline: &'b str) -> Self {
         self.pipeline = Some(pipeline);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "If `true` then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` (the default) then do nothing with refreshes."]
+    #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
     pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
@@ -4346,13 +4605,13 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "When true, requires destination to be an alias. Default is false"]
+    #[doc = "If `true`, the destination must be an index alias."]
     pub fn require_alias(mut self, require_alias: bool) -> Self {
         self.require_alias = Some(require_alias);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -4361,22 +4620,22 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period the request waits for the following operations: automatic index creation, dynamic mapping updates, waiting for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "Explicit version number for concurrency control.\nThe specified version must match the current version of the document for the request to succeed."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type: `external`, `external_gte`."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the index operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -4402,7 +4661,8 @@ where
                 pretty: Option<bool>,
                 refresh: Option<Refresh>,
                 require_alias: Option<bool>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 version: Option<i64>,
@@ -4451,7 +4711,7 @@ impl InfoParts {
         }
     }
 }
-#[doc = "Builder for the [Info API](https://opensearch.org/docs/)\n\nReturns basic information about the cluster."]
+#[doc = "Builder for the [Info API](https://opensearch.org/docs/latest)\n\nReturns basic information about the cluster."]
 #[derive(Clone, Debug)]
 pub struct Info<'a, 'b> {
     transport: &'a Transport,
@@ -4480,12 +4740,12 @@ impl<'a, 'b> Info<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -4495,12 +4755,12 @@ impl<'a, 'b> Info<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -4574,12 +4834,12 @@ impl<'b> MgetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Mget API](https://opensearch.org/docs/)\n\nAllows to get multiple documents in one request."]
+#[doc = "Builder for the [Mget API](https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
 #[derive(Clone, Debug)]
 pub struct Mget<'a, 'b, B> {
     transport: &'a Transport,
     parts: MgetParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     body: Option<B>,
@@ -4590,9 +4850,9 @@ pub struct Mget<'a, 'b, B> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     realtime: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stored_fields: Option<&'b [&'b str]>,
 }
@@ -4624,17 +4884,17 @@ where
             stored_fields: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude from the response.\nYou can also use this parameter to exclude fields from the subset specified in `_source_includes` query parameter."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response.\nIf this parameter is specified, only these source fields are returned. You can exclude fields from this subset using the `_source_excludes` query parameter.\nIf the `_source` parameter is `false`, this parameter is ignored."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
@@ -4665,12 +4925,12 @@ where
             stored_fields: self.stored_fields,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -4680,28 +4940,28 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on. Random by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to perform the operation in realtime or search mode"]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
     }
-    #[doc = "Refresh the shard containing the document before performing the operation"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, the request refreshes relevant shards before retrieving documents."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -4710,8 +4970,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -4720,7 +4980,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "A comma-separated list of stored fields to return in the response"]
+    #[doc = "If `true`, retrieves the document fields stored in the index rather than the document `_source`."]
     pub fn stored_fields(mut self, stored_fields: &'b [&'b str]) -> Self {
         self.stored_fields = Some(stored_fields);
         self
@@ -4738,8 +4998,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -4751,8 +5010,9 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                refresh: Option<bool>,
-                routing: Option<&'b str>,
+                refresh: Option<Refresh>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 stored_fields: Option<&'b [&'b str]>,
@@ -4808,11 +5068,12 @@ impl<'b> MsearchParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Msearch API](https://opensearch.org/docs/)\n\nAllows to execute several search operations in one request."]
+#[doc = "Builder for the [Msearch API](https://opensearch.org/docs/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
 #[derive(Clone, Debug)]
 pub struct Msearch<'a, 'b, B> {
     transport: &'a Transport,
     parts: MsearchParts<'b>,
+    allow_partial_results: Option<bool>,
     body: Option<B>,
     ccs_minimize_roundtrips: Option<bool>,
     error_trace: Option<bool>,
@@ -4840,6 +5101,7 @@ where
             transport,
             parts,
             headers,
+            allow_partial_results: None,
             body: None,
             ccs_minimize_roundtrips: None,
             error_trace: None,
@@ -4856,6 +5118,11 @@ where
             typed_keys: None,
         }
     }
+    #[doc = "Specifies whether to return partial results if there are shard request timeouts or shard failures"]
+    pub fn allow_partial_results(mut self, allow_partial_results: bool) -> Self {
+        self.allow_partial_results = Some(allow_partial_results);
+        self
+    }
     #[doc = "The body for the API call"]
     pub fn body<T>(self, body: Vec<T>) -> Msearch<'a, 'b, NdBody<T>>
     where
@@ -4865,6 +5132,7 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(NdBody(body)),
+            allow_partial_results: self.allow_partial_results,
             ccs_minimize_roundtrips: self.ccs_minimize_roundtrips,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
@@ -4881,17 +5149,17 @@ where
             typed_keys: self.typed_keys,
         }
     }
-    #[doc = "Indicates whether network round-trips should be minimized as part of cross-cluster search requests execution"]
+    #[doc = "If `true`, network round-trips between the coordinating node and remote clusters are minimized for cross-cluster search requests."]
     pub fn ccs_minimize_roundtrips(mut self, ccs_minimize_roundtrips: bool) -> Self {
         self.ccs_minimize_roundtrips = Some(ccs_minimize_roundtrips);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -4901,27 +5169,27 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Controls the maximum number of concurrent searches the multi search api will execute"]
+    #[doc = "Maximum number of concurrent searches the multi search API can execute."]
     pub fn max_concurrent_searches(mut self, max_concurrent_searches: i64) -> Self {
         self.max_concurrent_searches = Some(max_concurrent_searches);
         self
     }
-    #[doc = "The number of concurrent shard requests each sub search executes concurrently per node. This value should be used to limit the impact of the search on the cluster in order to limit the number of concurrent shard requests"]
+    #[doc = "Maximum number of concurrent shard requests that each sub-search request executes per node."]
     pub fn max_concurrent_shard_requests(mut self, max_concurrent_shard_requests: i64) -> Self {
         self.max_concurrent_shard_requests = Some(max_concurrent_shard_requests);
         self
     }
-    #[doc = "A threshold that enforces a pre-filter roundtrip to prefilter search shards based on query rewriting if the\u{a0}number of shards the search request expands to exceeds the threshold. This filter roundtrip can limit the number of shards significantly if for instance a shard can not match any documents based on its rewrite method ie. if date filters are mandatory to match but the shard bounds and the query are disjoint."]
+    #[doc = "Defines a threshold that enforces a pre-filter roundtrip to prefilter search shards based on query rewriting if the number of shards the search request expands to exceeds the threshold. This filter roundtrip can limit the number of shards significantly if for instance a shard can not match any documents based on its rewrite method i.e., if date filters are mandatory to match but the shard bounds and the query are disjoint."]
     pub fn pre_filter_shard_size(mut self, pre_filter_shard_size: i64) -> Self {
         self.pre_filter_shard_size = Some(pre_filter_shard_size);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -4931,12 +5199,12 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Indicates whether hits.total should be rendered as an integer or an object in the rest search response"]
+    #[doc = "If `true`, `hits.total` are returned as an integer in the response. Defaults to false, which returns an object."]
     pub fn rest_total_hits_as_int(mut self, rest_total_hits_as_int: bool) -> Self {
         self.rest_total_hits_as_int = Some(rest_total_hits_as_int);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "Indicates whether global term and document frequencies should be used when scoring returned documents."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
@@ -4946,7 +5214,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specify whether aggregation and suggester names should be prefixed by their respective types in the response"]
+    #[doc = "Specifies whether aggregation and suggester names should be prefixed by their respective types in the response."]
     pub fn typed_keys(mut self, typed_keys: bool) -> Self {
         self.typed_keys = Some(typed_keys);
         self
@@ -4964,6 +5232,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                allow_partial_results: Option<bool>,
                 ccs_minimize_roundtrips: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -4979,6 +5248,7 @@ where
                 typed_keys: Option<bool>,
             }
             let query_params = QueryParams {
+                allow_partial_results: self.allow_partial_results,
                 ccs_minimize_roundtrips: self.ccs_minimize_roundtrips,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
@@ -5028,7 +5298,7 @@ impl<'b> MsearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Msearch Template API](https://opensearch.org/docs/)\n\nAllows to execute several search template operations in one request."]
+#[doc = "Builder for the [Msearch Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
 #[derive(Clone, Debug)]
 pub struct MsearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -5095,17 +5365,17 @@ where
             typed_keys: self.typed_keys,
         }
     }
-    #[doc = "Indicates whether network round-trips should be minimized as part of cross-cluster search requests execution"]
+    #[doc = "If `true`, network round-trips are minimized for cross-cluster search requests."]
     pub fn ccs_minimize_roundtrips(mut self, ccs_minimize_roundtrips: bool) -> Self {
         self.ccs_minimize_roundtrips = Some(ccs_minimize_roundtrips);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -5115,17 +5385,17 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Controls the maximum number of concurrent searches the multi search api will execute"]
+    #[doc = "Maximum number of concurrent searches the API can run."]
     pub fn max_concurrent_searches(mut self, max_concurrent_searches: i64) -> Self {
         self.max_concurrent_searches = Some(max_concurrent_searches);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -5135,12 +5405,12 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Indicates whether hits.total should be rendered as an integer or an object in the rest search response"]
+    #[doc = "If `true`, the response returns `hits.total` as an integer.\nIf `false`, it returns `hits.total` as an object."]
     pub fn rest_total_hits_as_int(mut self, rest_total_hits_as_int: bool) -> Self {
         self.rest_total_hits_as_int = Some(rest_total_hits_as_int);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "The type of the search operation.\nAvailable options: `query_then_fetch`, `dfs_query_then_fetch`."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
@@ -5150,7 +5420,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specify whether aggregation and suggester names should be prefixed by their respective types in the response"]
+    #[doc = "If `true`, the response prefixes aggregation and suggester names with their respective types."]
     pub fn typed_keys(mut self, typed_keys: bool) -> Self {
         self.typed_keys = Some(typed_keys);
         self
@@ -5227,7 +5497,7 @@ impl<'b> MtermvectorsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Mtermvectors API](https://opensearch.org/docs/)\n\nReturns multiple termvectors in one request."]
+#[doc = "Builder for the [Mtermvectors API](https://opensearch.org/docs/latest)\n\nReturns multiple termvectors in one request."]
 #[derive(Clone, Debug)]
 pub struct Mtermvectors<'a, 'b, B> {
     transport: &'a Transport,
@@ -5247,7 +5517,7 @@ pub struct Mtermvectors<'a, 'b, B> {
     pretty: Option<bool>,
     realtime: Option<bool>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     term_statistics: Option<bool>,
     version: Option<i64>,
@@ -5315,22 +5585,21 @@ where
             version_type: self.version_type,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Specifies if document count, sum of document frequencies and sum of total term frequencies should be returned. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "If `true`, the response includes the document count, sum of document frequencies, and sum of total term frequencies."]
     pub fn field_statistics(mut self, field_statistics: bool) -> Self {
         self.field_statistics = Some(field_statistics);
         self
     }
-    #[doc = "A comma-separated list of fields to return. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
     pub fn fields(mut self, fields: &'b [&'b str]) -> Self {
         self.fields = Some(fields);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -5340,42 +5609,42 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "A comma-separated list of documents ids. You must define ids as parameter or set \"ids\" or \"docs\" in the request body"]
+    #[doc = "A comma-separated list of documents IDs. You must provide either the `docs` field in the request body or specify `ids` as a query parameter or in the request body."]
     pub fn ids(mut self, ids: &'b [&'b str]) -> Self {
         self.ids = Some(ids);
         self
     }
-    #[doc = "Specifies if term offsets should be returned. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "If `true`, the response includes term offsets."]
     pub fn offsets(mut self, offsets: bool) -> Self {
         self.offsets = Some(offsets);
         self
     }
-    #[doc = "Specifies if term payloads should be returned. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "If `true`, the response includes term payloads."]
     pub fn payloads(mut self, payloads: bool) -> Self {
         self.payloads = Some(payloads);
         self
     }
-    #[doc = "Specifies if term positions should be returned. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "If `true`, the response includes term positions."]
     pub fn positions(mut self, positions: bool) -> Self {
         self.positions = Some(positions);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random) .Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "Specifies the node or shard on which the operation should be performed.\nSee [preference query parameter]({{site.url}}{{site.baseurl}}/api-reference/search-apis/search/#the-preference-query-parameter) for a list of available options.\nBy default the requests are routed randomly to available shard copies (primary or replica), with no guarantee of consistency across repeated queries."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specifies if requests are real-time as opposed to near-real-time (default: true)."]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
@@ -5385,8 +5654,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -5395,17 +5664,17 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies if total term frequency and document frequency should be returned. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\"."]
+    #[doc = "If `true`, the response includes term frequency and document frequency."]
     pub fn term_statistics(mut self, term_statistics: bool) -> Self {
         self.term_statistics = Some(term_statistics);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "If `true`, returns the document version as part of a hit."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -5438,7 +5707,8 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 term_statistics: Option<bool>,
                 version: Option<i64>,
@@ -5487,7 +5757,7 @@ impl PingParts {
         }
     }
 }
-#[doc = "Builder for the [Ping API](https://opensearch.org/docs/)\n\nReturns whether the cluster is running."]
+#[doc = "Builder for the [Ping API](https://opensearch.org/docs/latest)\n\nReturns whether the cluster is running."]
 #[derive(Clone, Debug)]
 pub struct Ping<'a, 'b> {
     transport: &'a Transport,
@@ -5516,12 +5786,12 @@ impl<'a, 'b> Ping<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -5531,12 +5801,12 @@ impl<'a, 'b> Ping<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -5619,7 +5889,7 @@ impl<'b> PutScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Put Script API](https://opensearch.org/docs/)\n\nCreates or updates a script."]
+#[doc = "Builder for the [Put Script API](https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
 #[derive(Clone, Debug)]
 pub struct PutScript<'a, 'b, B> {
     transport: &'a Transport,
@@ -5683,22 +5953,22 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[doc = "Operation timeout for connection to cluster-manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Context name to compile script against"]
+    #[doc = "Context in which the script or search template should run.\nTo prevent errors, the API immediately compiles the script or template in this context."]
     pub fn context(mut self, context: &'b str) -> Self {
         self.context = Some(context);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -5708,18 +5978,18 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -5734,7 +6004,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period to wait for a response.\nIf no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -5781,7 +6051,6 @@ where
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Rank Eval API"]
 pub enum RankEvalParts<'b> {
@@ -5790,7 +6059,6 @@ pub enum RankEvalParts<'b> {
     #[doc = "Index"]
     Index(&'b [&'b str]),
 }
-#[cfg(feature = "experimental-apis")]
 impl<'b> RankEvalParts<'b> {
     #[doc = "Builds a relative URL path to the Rank Eval API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -5809,9 +6077,7 @@ impl<'b> RankEvalParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rank Eval API](https://opensearch.org/docs/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries"]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Rank Eval API](https://opensearch.org/docs/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
 #[derive(Clone, Debug)]
 pub struct RankEval<'a, 'b, B> {
     transport: &'a Transport,
@@ -5829,7 +6095,6 @@ pub struct RankEval<'a, 'b, B> {
     search_type: Option<SearchType>,
     source: Option<&'b str>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b, B> RankEval<'a, 'b, B>
 where
     B: Body,
@@ -5854,7 +6119,7 @@ where
             source: None,
         }
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes. This behavior applies even if the request targets other open indexes. For example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
@@ -5881,17 +6146,17 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Whether to expand wildcard expression to concrete indexes that are open, closed or both."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -5901,17 +6166,17 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `true`, missing or closed indexes are not included in the response."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -5991,7 +6256,7 @@ impl ReindexParts {
         }
     }
 }
-#[doc = "Builder for the [Reindex API](https://opensearch.org/docs/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
+#[doc = "Builder for the [Reindex API](https://opensearch.org/docs/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
 #[derive(Clone, Debug)]
 pub struct Reindex<'a, 'b, B> {
     transport: &'a Transport,
@@ -6003,11 +6268,12 @@ pub struct Reindex<'a, 'b, B> {
     human: Option<bool>,
     max_docs: Option<i64>,
     pretty: Option<bool>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
+    require_alias: Option<bool>,
     scroll: Option<&'b str>,
-    slices: Option<Slices>,
+    slices: Option<&'b str>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     wait_for_active_shards: Option<&'b str>,
@@ -6033,6 +6299,7 @@ where
             refresh: None,
             request_timeout: None,
             requests_per_second: None,
+            require_alias: None,
             scroll: None,
             slices: None,
             source: None,
@@ -6059,6 +6326,7 @@ where
             refresh: self.refresh,
             request_timeout: self.request_timeout,
             requests_per_second: self.requests_per_second,
+            require_alias: self.require_alias,
             scroll: self.scroll,
             slices: self.slices,
             source: self.source,
@@ -6067,12 +6335,12 @@ where
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -6082,23 +6350,23 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Maximum number of documents to process (default: all documents)"]
+    #[doc = "Maximum number of documents to process. By default, all documents."]
     pub fn max_docs(mut self, max_docs: i64) -> Self {
         self.max_docs = Some(max_docs);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Should the affected indexes be refreshed?"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, the request refreshes affected shards to make this operation visible to search."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
@@ -6107,18 +6375,22 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle to set on this request in sub-requests per second. -1 means no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second.\nDefaults to no throttle."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
-    #[doc = "Control how long to keep the search context alive"]
+    pub fn require_alias(mut self, require_alias: bool) -> Self {
+        self.require_alias = Some(require_alias);
+        self
+    }
+    #[doc = "Specifies how long a consistent view of the index should be maintained for scrolled search."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
-    #[doc = "The number of slices this task should be divided into. Defaults to 1, meaning the task isn't sliced into subtasks. Can be set to `auto`."]
-    pub fn slices(mut self, slices: Slices) -> Self {
+    #[doc = "The number of slices this task should be divided into.\nDefaults to 1 slice, meaning the task isn't sliced into subtasks."]
+    pub fn slices(mut self, slices: &'b str) -> Self {
         self.slices = Some(slices);
         self
     }
@@ -6127,17 +6399,17 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Time each individual bulk request should wait for shards that are unavailable."]
+    #[doc = "Period each indexing waits for automatic index creation, dynamic mapping updates, and waiting for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the reindex operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
     }
-    #[doc = "Should the request should block until the reindex is complete."]
+    #[doc = "If `true`, the request blocks until the operation is complete."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -6158,10 +6430,11 @@ where
                 human: Option<bool>,
                 max_docs: Option<i64>,
                 pretty: Option<bool>,
-                refresh: Option<bool>,
-                requests_per_second: Option<i64>,
+                refresh: Option<Refresh>,
+                requests_per_second: Option<f32>,
+                require_alias: Option<bool>,
                 scroll: Option<&'b str>,
-                slices: Option<Slices>,
+                slices: Option<&'b str>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 wait_for_active_shards: Option<&'b str>,
@@ -6175,6 +6448,7 @@ where
                 pretty: self.pretty,
                 refresh: self.refresh,
                 requests_per_second: self.requests_per_second,
+                require_alias: self.require_alias,
                 scroll: self.scroll,
                 slices: self.slices,
                 source: self.source,
@@ -6214,7 +6488,7 @@ impl<'b> ReindexRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Reindex Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Reindex operation."]
+#[doc = "Builder for the [Reindex Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular reindex operation."]
 #[derive(Clone, Debug)]
 pub struct ReindexRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -6226,7 +6500,7 @@ pub struct ReindexRethrottle<'a, 'b, B> {
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
     source: Option<&'b str>,
 }
 impl<'a, 'b, B> ReindexRethrottle<'a, 'b, B>
@@ -6269,12 +6543,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -6284,12 +6558,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -6299,8 +6573,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle to set on this request in floating sub-requests per second. -1 means set no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
@@ -6324,7 +6598,7 @@ where
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                requests_per_second: Option<i64>,
+                requests_per_second: Option<f32>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -6368,7 +6642,7 @@ impl<'b> RenderSearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Render Search Template API](https://opensearch.org/docs/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+#[doc = "Builder for the [Render Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
 #[derive(Clone, Debug)]
 pub struct RenderSearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -6420,12 +6694,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -6435,12 +6709,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -6492,14 +6766,12 @@ where
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Scripts Painless Execute API"]
 pub enum ScriptsPainlessExecuteParts {
     #[doc = "No parts"]
     None,
 }
-#[cfg(feature = "experimental-apis")]
 impl ScriptsPainlessExecuteParts {
     #[doc = "Builds a relative URL path to the Scripts Painless Execute API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -6508,9 +6780,7 @@ impl ScriptsPainlessExecuteParts {
         }
     }
 }
-#[doc = "Builder for the [Scripts Painless Execute API](https://opensearch.org/docs/)\n\nAllows an arbitrary script to be executed and a result to be returned"]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Scripts Painless Execute API](https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
 #[derive(Clone, Debug)]
 pub struct ScriptsPainlessExecute<'a, 'b, B> {
     transport: &'a Transport,
@@ -6524,7 +6794,6 @@ pub struct ScriptsPainlessExecute<'a, 'b, B> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b, B> ScriptsPainlessExecute<'a, 'b, B>
 where
     B: Body,
@@ -6563,12 +6832,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -6578,12 +6847,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -6659,7 +6928,7 @@ impl<'b> ScrollParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Scroll API](https://opensearch.org/docs/)\n\nAllows to retrieve a large numbers of results from a single search request."]
+#[doc = "Builder for the [Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods)\n\nAllows to retrieve a large numbers of results from a single search request."]
 #[derive(Clone, Debug)]
 pub struct Scroll<'a, 'b, B> {
     transport: &'a Transport,
@@ -6720,12 +6989,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -6735,12 +7004,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -6750,17 +7019,18 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Indicates whether hits.total should be rendered as an integer or an object in the rest search response"]
+    #[doc = "If `true`, the API response's `hit.total` property is returned as an integer. If `false`, the API response's `hit.total` property is returned as an object."]
     pub fn rest_total_hits_as_int(mut self, rest_total_hits_as_int: bool) -> Self {
         self.rest_total_hits_as_int = Some(rest_total_hits_as_int);
         self
     }
-    #[doc = "Specify how long a consistent view of the index should be maintained for scrolled search"]
+    #[doc = "Period to retain the search context for scrolling."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
     #[doc = "The scroll ID for scrolled search"]
+    #[deprecated = "Deprecated"]
     pub fn scroll_id(mut self, scroll_id: &'b str) -> Self {
         self.scroll_id = Some(scroll_id);
         self
@@ -6839,12 +7109,12 @@ impl<'b> SearchParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search API](https://opensearch.org/docs/)\n\nReturns results matching a query."]
+#[doc = "Builder for the [Search API](https://opensearch.org/docs/latest/api-reference/search/)\n\nReturns results matching a query."]
 #[derive(Clone, Debug)]
 pub struct Search<'a, 'b, B> {
     transport: &'a Transport,
     parts: SearchParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     allow_no_indices: Option<bool>,
@@ -6853,6 +7123,7 @@ pub struct Search<'a, 'b, B> {
     analyzer: Option<&'b str>,
     batched_reduce_size: Option<i64>,
     body: Option<B>,
+    cancel_after_time_interval: Option<&'b str>,
     ccs_minimize_roundtrips: Option<bool>,
     default_operator: Option<DefaultOperator>,
     df: Option<&'b str>,
@@ -6866,9 +7137,11 @@ pub struct Search<'a, 'b, B> {
     human: Option<bool>,
     ignore_throttled: Option<bool>,
     ignore_unavailable: Option<bool>,
+    include_named_queries_score: Option<bool>,
+    index: Option<&'b [&'b str]>,
     lenient: Option<bool>,
     max_concurrent_shard_requests: Option<i64>,
-    min_compatible_shard_node: Option<&'b str>,
+    phase_took: Option<bool>,
     pre_filter_shard_size: Option<i64>,
     preference: Option<&'b str>,
     pretty: Option<bool>,
@@ -6878,6 +7151,7 @@ pub struct Search<'a, 'b, B> {
     rest_total_hits_as_int: Option<bool>,
     routing: Option<&'b [&'b str]>,
     scroll: Option<&'b str>,
+    search_pipeline: Option<&'b str>,
     search_type: Option<SearchType>,
     seq_no_primary_term: Option<bool>,
     size: Option<i64>,
@@ -6894,6 +7168,7 @@ pub struct Search<'a, 'b, B> {
     track_scores: Option<bool>,
     track_total_hits: Option<TrackTotalHits>,
     typed_keys: Option<bool>,
+    verbose_pipeline: Option<bool>,
     version: Option<bool>,
 }
 impl<'a, 'b, B> Search<'a, 'b, B>
@@ -6916,6 +7191,7 @@ where
             analyzer: None,
             batched_reduce_size: None,
             body: None,
+            cancel_after_time_interval: None,
             ccs_minimize_roundtrips: None,
             default_operator: None,
             df: None,
@@ -6928,9 +7204,11 @@ where
             human: None,
             ignore_throttled: None,
             ignore_unavailable: None,
+            include_named_queries_score: None,
+            index: None,
             lenient: None,
             max_concurrent_shard_requests: None,
-            min_compatible_shard_node: None,
+            phase_took: None,
             pre_filter_shard_size: None,
             preference: None,
             pretty: None,
@@ -6940,6 +7218,7 @@ where
             rest_total_hits_as_int: None,
             routing: None,
             scroll: None,
+            search_pipeline: None,
             search_type: None,
             seq_no_primary_term: None,
             size: None,
@@ -6956,45 +7235,46 @@ where
             track_scores: None,
             track_total_hits: None,
             typed_keys: None,
+            verbose_pipeline: None,
             version: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Indicates which source fields are returned for matching documents.\nThese fields are returned in the `hits._source` property of the search response.\nValid values are:\n`true` to return the entire document source;\n`false` to not return the document source;\n`&lt;string&gt;` to return the source fields that are specified as a comma-separated list (supports wildcard (`*`) patterns)."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "A comma-separated list of source fields to exclude from the response.\nYou can also use this parameter to exclude fields from the subset specified in `_source_includes` query parameter.\nIf the `_source` parameter is `false`, this parameter is ignored."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "A comma-separated list of source fields to include in the response.\nIf this parameter is specified, only these source fields are returned.\nYou can exclude fields from this subset using the `_source_excludes` query parameter.\nIf the `_source` parameter is `false`, this parameter is ignored."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes.\nFor example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
     }
-    #[doc = "Indicate if an error should be returned if there is a partial search failure or timeout"]
+    #[doc = "If `true`, returns partial results if there are shard request timeouts or shard failures. If `false`, returns an error with no partial results."]
     pub fn allow_partial_search_results(mut self, allow_partial_search_results: bool) -> Self {
         self.allow_partial_search_results = Some(allow_partial_search_results);
         self
     }
-    #[doc = "Specify whether wildcard and prefix queries should be analyzed (default: false)"]
+    #[doc = "If `true`, wildcard and prefix queries are analyzed.\nThis parameter can only be used when the q query string parameter is specified."]
     pub fn analyze_wildcard(mut self, analyze_wildcard: bool) -> Self {
         self.analyze_wildcard = Some(analyze_wildcard);
         self
     }
-    #[doc = "The analyzer to use for the query string"]
+    #[doc = "Analyzer to use for the query string.\nThis parameter can only be used when the q query string parameter is specified."]
     pub fn analyzer(mut self, analyzer: &'b str) -> Self {
         self.analyzer = Some(analyzer);
         self
     }
-    #[doc = "The number of shard results that should be reduced at once on the coordinating node. This value should be used as a protection mechanism to reduce the memory overhead per search request if the potential number of shards in the request can be large."]
+    #[doc = "The number of shard results that should be reduced at once on the coordinating node.\nThis value should be used as a protection mechanism to reduce the memory overhead per search request if the potential number of shards in the request can be large."]
     pub fn batched_reduce_size(mut self, batched_reduce_size: i64) -> Self {
         self.batched_reduce_size = Some(batched_reduce_size);
         self
@@ -7016,6 +7296,7 @@ where
             analyze_wildcard: self.analyze_wildcard,
             analyzer: self.analyzer,
             batched_reduce_size: self.batched_reduce_size,
+            cancel_after_time_interval: self.cancel_after_time_interval,
             ccs_minimize_roundtrips: self.ccs_minimize_roundtrips,
             default_operator: self.default_operator,
             df: self.df,
@@ -7029,9 +7310,11 @@ where
             human: self.human,
             ignore_throttled: self.ignore_throttled,
             ignore_unavailable: self.ignore_unavailable,
+            include_named_queries_score: self.include_named_queries_score,
+            index: self.index,
             lenient: self.lenient,
             max_concurrent_shard_requests: self.max_concurrent_shard_requests,
-            min_compatible_shard_node: self.min_compatible_shard_node,
+            phase_took: self.phase_took,
             pre_filter_shard_size: self.pre_filter_shard_size,
             preference: self.preference,
             pretty: self.pretty,
@@ -7041,6 +7324,7 @@ where
             rest_total_hits_as_int: self.rest_total_hits_as_int,
             routing: self.routing,
             scroll: self.scroll,
+            search_pipeline: self.search_pipeline,
             search_type: self.search_type,
             seq_no_primary_term: self.seq_no_primary_term,
             size: self.size,
@@ -7057,50 +7341,56 @@ where
             track_scores: self.track_scores,
             track_total_hits: self.track_total_hits,
             typed_keys: self.typed_keys,
+            verbose_pipeline: self.verbose_pipeline,
             version: self.version,
         }
     }
-    #[doc = "Indicates whether network round-trips should be minimized as part of cross-cluster search requests execution"]
+    #[doc = "The time after which the search request will be canceled.\nRequest-level parameter takes precedence over `cancel_after_time_interval` cluster setting."]
+    pub fn cancel_after_time_interval(mut self, cancel_after_time_interval: &'b str) -> Self {
+        self.cancel_after_time_interval = Some(cancel_after_time_interval);
+        self
+    }
+    #[doc = "If `true`, network round-trips between the coordinating node and the remote clusters are minimized when executing cross-cluster search (CCS) requests."]
     pub fn ccs_minimize_roundtrips(mut self, ccs_minimize_roundtrips: bool) -> Self {
         self.ccs_minimize_roundtrips = Some(ccs_minimize_roundtrips);
         self
     }
-    #[doc = "The default operator for query string query (AND or OR)"]
+    #[doc = "The default operator for query string query: AND or OR.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn default_operator(mut self, default_operator: DefaultOperator) -> Self {
         self.default_operator = Some(default_operator);
         self
     }
-    #[doc = "The field to use as default where no field prefix is given in the query string"]
+    #[doc = "Field to use as default where no field prefix is given in the query string.\nThis parameter can only be used when the q query string parameter is specified."]
     pub fn df(mut self, df: &'b str) -> Self {
         self.df = Some(df);
         self
     }
-    #[doc = "A comma-separated list of fields to return as the docvalue representation of a field for each hit"]
+    #[doc = "A comma-separated list of fields to return as the docvalue representation for each hit."]
     pub fn docvalue_fields(mut self, docvalue_fields: &'b [&'b str]) -> Self {
         self.docvalue_fields = Some(docvalue_fields);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Type of index that wildcard patterns can match.\nIf the request can target data streams, this argument determines whether wildcard expressions match hidden data streams.\nSupports comma-separated values, such as `open,hidden`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "Specify whether to return detailed information about score computation as part of a hit"]
+    #[doc = "If `true`, returns detailed information about score computation as part of a hit."]
     pub fn explain(mut self, explain: bool) -> Self {
         self.explain = Some(explain);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "Starting offset (default: 0)"]
+    #[doc = "Starting document offset.\nNeeds to be non-negative.\nBy default, you cannot page through more than 10,000 hits using the `from` and `size` parameters.\nTo page through more hits, use the `search_after` parameter."]
     pub fn from(mut self, from: i64) -> Self {
         self.from = Some(from);
         self
@@ -7110,57 +7400,67 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete, expanded or aliased indices should be ignored when throttled"]
+    #[doc = "If `true`, concrete, expanded or aliased indexes will be ignored when frozen."]
     pub fn ignore_throttled(mut self, ignore_throttled: bool) -> Self {
         self.ignore_throttled = Some(ignore_throttled);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify whether format-based query failures (such as providing text to a numeric field) should be ignored"]
+    #[doc = "Indicates whether `hit.matched_queries` should be rendered as a map that includes the name of the matched query associated with its score (true) or as an array containing the name of the matched queries (false)"]
+    pub fn include_named_queries_score(mut self, include_named_queries_score: bool) -> Self {
+        self.include_named_queries_score = Some(include_named_queries_score);
+        self
+    }
+    #[doc = "A comma-separated list of data streams, indexes, and aliases to search.\nSupports wildcards (`*`).\nTo search all data streams and indexes, omit this parameter or use `*` or `_all`."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
+        self.index = Some(index);
+        self
+    }
+    #[doc = "If `true`, format-based query failures (such as providing text to a numeric field) in the query string will be ignored.\nThis parameter can only be used when the `q` query string parameter is specified."]
     pub fn lenient(mut self, lenient: bool) -> Self {
         self.lenient = Some(lenient);
         self
     }
-    #[doc = "The number of concurrent shard requests per node this search executes concurrently. This value should be used to limit the impact of the search on the cluster in order to limit the number of concurrent shard requests"]
+    #[doc = "Defines the number of concurrent shard requests per node this search executes concurrently.\nThis value should be used to limit the impact of the search on the cluster in order to limit the number of concurrent shard requests."]
     pub fn max_concurrent_shard_requests(mut self, max_concurrent_shard_requests: i64) -> Self {
         self.max_concurrent_shard_requests = Some(max_concurrent_shard_requests);
         self
     }
-    #[doc = "The minimum compatible version that all shards involved in search should have for this request to be successful"]
-    pub fn min_compatible_shard_node(mut self, min_compatible_shard_node: &'b str) -> Self {
-        self.min_compatible_shard_node = Some(min_compatible_shard_node);
+    #[doc = "Indicates whether to return phase-level `took` time values in the response."]
+    pub fn phase_took(mut self, phase_took: bool) -> Self {
+        self.phase_took = Some(phase_took);
         self
     }
-    #[doc = "A threshold that enforces a pre-filter roundtrip to prefilter search shards based on query rewriting if the\u{a0}number of shards the search request expands to exceeds the threshold. This filter roundtrip can limit the number of shards significantly if for instance a shard can not match any documents based on its rewrite method ie. if date filters are mandatory to match but the shard bounds and the query are disjoint."]
+    #[doc = "Defines a threshold that enforces a pre-filter roundtrip to prefilter search shards based on query rewriting if the number of shards the search request expands to exceeds the threshold.\nThis filter roundtrip can limit the number of shards significantly if for instance a shard can not match any documents based on its rewrite method (if date filters are mandatory to match but the shard bounds and the query are disjoint).\nWhen unspecified, the pre-filter phase is executed if any of these conditions is met:\nthe request targets more than 128 shards;\nthe request targets one or more read-only index;\nthe primary sort of the query targets an indexed field."]
     pub fn pre_filter_shard_size(mut self, pre_filter_shard_size: i64) -> Self {
         self.pre_filter_shard_size = Some(pre_filter_shard_size);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Nodes and shards used for the search.\nBy default, OpenSearch selects from eligible nodes and shards using adaptive replica selection, accounting for allocation awareness. Valid values are:\n`_only_local` to run the search only on shards on the local node;\n`_local` to, if possible, run the search on shards on the local node, or if not, select shards using the default method;\n`_only_nodes:&lt;node-id&gt;,&lt;node-id&gt;` to run the search on only the specified nodes IDs, where, if suitable shards exist on more than one selected node, use shards on those nodes using the default method, or if none of the specified nodes are available, select shards from any available node using the default method;\n`_prefer_nodes:&lt;node-id&gt;,&lt;node-id&gt;` to if possible, run the search on the specified nodes IDs, or if not, select shards using the default method;\n`_shards:&lt;shard&gt;,&lt;shard&gt;` to run the search only on the specified shards;\n`&lt;custom-string&gt;` (any string that does not start with `_`) to route searches with the same `&lt;custom-string&gt;` to the same shards in the same order."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Query in the Lucene query string syntax"]
+    #[doc = "Query in the Lucene query string syntax using query parameter search.\nQuery parameter searches do not support the full OpenSearch Query DSL but are handy for testing."]
     pub fn q(mut self, q: &'b str) -> Self {
         self.q = Some(q);
         self
     }
-    #[doc = "Specify if request cache should be used for this request or not, defaults to index level setting"]
+    #[doc = "If `true`, the caching of search results is enabled for requests where `size` is `0`.\nDefaults to index level settings."]
     pub fn request_cache(mut self, request_cache: bool) -> Self {
         self.request_cache = Some(request_cache);
         self
@@ -7170,37 +7470,42 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Indicates whether hits.total should be rendered as an integer or an object in the rest search response"]
+    #[doc = "Indicates whether `hits.total` should be rendered as an integer or an object in the rest search response."]
     pub fn rest_total_hits_as_int(mut self, rest_total_hits_as_int: bool) -> Self {
         self.rest_total_hits_as_int = Some(rest_total_hits_as_int);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
-    #[doc = "Specify how long a consistent view of the index should be maintained for scrolled search"]
+    #[doc = "Period to retain the search context for scrolling. See Scroll search results.\nBy default, this value cannot exceed `1d` (24 hours).\nYou can change this limit using the `search.max_keep_alive` cluster-level setting."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "Customizable sequence of processing stages applied to search queries."]
+    pub fn search_pipeline(mut self, search_pipeline: &'b str) -> Self {
+        self.search_pipeline = Some(search_pipeline);
+        self
+    }
+    #[doc = "How distributed term frequencies are calculated for relevance scoring."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
     }
-    #[doc = "Specify whether to return sequence number and primary term of the last modification of each hit"]
+    #[doc = "If `true`, returns sequence number and primary term of the last modification of each hit."]
     pub fn seq_no_primary_term(mut self, seq_no_primary_term: bool) -> Self {
         self.seq_no_primary_term = Some(seq_no_primary_term);
         self
     }
-    #[doc = "Number of hits to return (default: 10)"]
+    #[doc = "Defines the number of hits to return.\nBy default, you cannot page through more than 10,000 hits using the `from` and `size` parameters.\nTo page through more hits, use the `search_after` parameter."]
     pub fn size(mut self, size: i64) -> Self {
         self.size = Some(size);
         self
     }
-    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs"]
+    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs."]
     pub fn sort(mut self, sort: &'b [&'b str]) -> Self {
         self.sort = Some(sort);
         self
@@ -7210,62 +7515,67 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specific 'tag' of the request for logging and statistical purposes"]
+    #[doc = "Specific `tag` of the request for logging and statistical purposes."]
     pub fn stats(mut self, stats: &'b [&'b str]) -> Self {
         self.stats = Some(stats);
         self
     }
-    #[doc = "A comma-separated list of stored fields to return as part of a hit"]
+    #[doc = "A comma-separated list of stored fields to return as part of a hit.\nIf no fields are specified, no stored fields are included in the response.\nIf this field is specified, the `_source` parameter defaults to `false`.\nYou can pass `_source: true` to return both source fields and stored fields in the search response."]
     pub fn stored_fields(mut self, stored_fields: &'b [&'b str]) -> Self {
         self.stored_fields = Some(stored_fields);
         self
     }
-    #[doc = "Specify which field to use for suggestions"]
+    #[doc = "Specifies which field to use for suggestions."]
     pub fn suggest_field(mut self, suggest_field: &'b str) -> Self {
         self.suggest_field = Some(suggest_field);
         self
     }
-    #[doc = "Specify suggest mode"]
+    #[doc = "Specifies the suggest mode.\nThis parameter can only be used when the `suggest_field` and `suggest_text` query string parameters are specified."]
     pub fn suggest_mode(mut self, suggest_mode: SuggestMode) -> Self {
         self.suggest_mode = Some(suggest_mode);
         self
     }
-    #[doc = "How many suggestions to return in response"]
+    #[doc = "Number of suggestions to return.\nThis parameter can only be used when the `suggest_field` and `suggest_text` query string parameters are specified."]
     pub fn suggest_size(mut self, suggest_size: i64) -> Self {
         self.suggest_size = Some(suggest_size);
         self
     }
-    #[doc = "The source text for which the suggestions should be returned"]
+    #[doc = "The source text for which the suggestions should be returned.\nThis parameter can only be used when the `suggest_field` and `suggest_text` query string parameters are specified."]
     pub fn suggest_text(mut self, suggest_text: &'b str) -> Self {
         self.suggest_text = Some(suggest_text);
         self
     }
-    #[doc = "The maximum number of documents to collect for each shard, upon reaching which the query execution will terminate early."]
+    #[doc = "Maximum number of documents to collect for each shard.\nIf a query reaches this limit, OpenSearch terminates the query early.\nOpenSearch collects documents before sorting.\nUse with caution.\nOpenSearch applies this parameter to each shard handling the request.\nWhen possible, let OpenSearch perform early termination automatically.\nAvoid specifying this parameter for requests that target data streams with backing indexes across multiple data tiers.\nIf set to `0` (default), the query does not terminate early."]
     pub fn terminate_after(mut self, terminate_after: i64) -> Self {
         self.terminate_after = Some(terminate_after);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Specifies the period of time to wait for a response from each shard.\nIf no response is received before the timeout expires, the request fails and returns an error."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Whether to calculate and return scores even if they are not used for sorting"]
+    #[doc = "If `true`, calculate and return document scores, even if the scores are not used for sorting."]
     pub fn track_scores(mut self, track_scores: bool) -> Self {
         self.track_scores = Some(track_scores);
         self
     }
-    #[doc = "Indicate if the number of documents that match the query should be tracked"]
+    #[doc = "Number of hits matching the query to count accurately.\nIf `true`, the exact number of hits is returned at the cost of some performance.\nIf `false`, the response does not include the total number of hits matching the query."]
     pub fn track_total_hits<T: Into<TrackTotalHits>>(mut self, track_total_hits: T) -> Self {
         self.track_total_hits = Some(track_total_hits.into());
         self
     }
-    #[doc = "Specify whether aggregation and suggester names should be prefixed by their respective types in the response"]
+    #[doc = "If `true`, aggregation and suggester names are be prefixed by their respective types in the response."]
     pub fn typed_keys(mut self, typed_keys: bool) -> Self {
         self.typed_keys = Some(typed_keys);
         self
     }
-    #[doc = "Specify whether to return document version as part of a hit"]
+    #[doc = "Enables or disables verbose mode for the search pipeline.\nWhen verbose mode is enabled, detailed information about each processor\nin the search pipeline is included in the search response. This includes\nthe processor name, execution status, input, output, and time taken for processing.\nThis parameter is primarily intended for debugging purposes, allowing users\nto track how data flows and transforms through the search pipeline."]
+    pub fn verbose_pipeline(mut self, verbose_pipeline: bool) -> Self {
+        self.verbose_pipeline = Some(verbose_pipeline);
+        self
+    }
+    #[doc = "If `true`, returns document version as part of a hit."]
     pub fn version(mut self, version: bool) -> Self {
         self.version = Some(version);
         self
@@ -7283,8 +7593,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -7294,6 +7603,7 @@ where
                 analyze_wildcard: Option<bool>,
                 analyzer: Option<&'b str>,
                 batched_reduce_size: Option<i64>,
+                cancel_after_time_interval: Option<&'b str>,
                 ccs_minimize_roundtrips: Option<bool>,
                 default_operator: Option<DefaultOperator>,
                 df: Option<&'b str>,
@@ -7309,9 +7619,12 @@ where
                 human: Option<bool>,
                 ignore_throttled: Option<bool>,
                 ignore_unavailable: Option<bool>,
+                include_named_queries_score: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
                 lenient: Option<bool>,
                 max_concurrent_shard_requests: Option<i64>,
-                min_compatible_shard_node: Option<&'b str>,
+                phase_took: Option<bool>,
                 pre_filter_shard_size: Option<i64>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
@@ -7321,6 +7634,7 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 routing: Option<&'b [&'b str]>,
                 scroll: Option<&'b str>,
+                search_pipeline: Option<&'b str>,
                 search_type: Option<SearchType>,
                 seq_no_primary_term: Option<bool>,
                 size: Option<i64>,
@@ -7340,6 +7654,7 @@ where
                 track_scores: Option<bool>,
                 track_total_hits: Option<TrackTotalHits>,
                 typed_keys: Option<bool>,
+                verbose_pipeline: Option<bool>,
                 version: Option<bool>,
             }
             let query_params = QueryParams {
@@ -7351,6 +7666,7 @@ where
                 analyze_wildcard: self.analyze_wildcard,
                 analyzer: self.analyzer,
                 batched_reduce_size: self.batched_reduce_size,
+                cancel_after_time_interval: self.cancel_after_time_interval,
                 ccs_minimize_roundtrips: self.ccs_minimize_roundtrips,
                 default_operator: self.default_operator,
                 df: self.df,
@@ -7363,9 +7679,11 @@ where
                 human: self.human,
                 ignore_throttled: self.ignore_throttled,
                 ignore_unavailable: self.ignore_unavailable,
+                include_named_queries_score: self.include_named_queries_score,
+                index: self.index,
                 lenient: self.lenient,
                 max_concurrent_shard_requests: self.max_concurrent_shard_requests,
-                min_compatible_shard_node: self.min_compatible_shard_node,
+                phase_took: self.phase_took,
                 pre_filter_shard_size: self.pre_filter_shard_size,
                 preference: self.preference,
                 pretty: self.pretty,
@@ -7374,6 +7692,7 @@ where
                 rest_total_hits_as_int: self.rest_total_hits_as_int,
                 routing: self.routing,
                 scroll: self.scroll,
+                search_pipeline: self.search_pipeline,
                 search_type: self.search_type,
                 seq_no_primary_term: self.seq_no_primary_term,
                 size: self.size,
@@ -7390,6 +7709,7 @@ where
                 track_scores: self.track_scores,
                 track_total_hits: self.track_total_hits,
                 typed_keys: self.typed_keys,
+                verbose_pipeline: self.verbose_pipeline,
                 version: self.version,
             };
             Some(query_params)
@@ -7428,7 +7748,7 @@ impl<'b> SearchShardsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search Shards API](https://opensearch.org/docs/)\n\nReturns information about the indices and shards that a search request would be executed against."]
+#[doc = "Builder for the [Search Shards API](https://opensearch.org/docs/latest)\n\nReturns information about the indexes and shards that a search request would be executed against."]
 #[derive(Clone, Debug)]
 pub struct SearchShards<'a, 'b, B> {
     transport: &'a Transport,
@@ -7445,7 +7765,7 @@ pub struct SearchShards<'a, 'b, B> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
 }
 impl<'a, 'b, B> SearchShards<'a, 'b, B>
@@ -7474,7 +7794,7 @@ where
             source: None,
         }
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes.\nFor example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
@@ -7503,17 +7823,17 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Type of index that wildcard patterns can match.\nIf the request can target data streams, this argument determines whether wildcard expressions match hidden data streams.\nSupports comma-separated values, such as `open,hidden`.\nValid values are: `all`, `open`, `closed`, `hidden`, `none`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -7523,27 +7843,27 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "If `true`, the request retrieves information from the local node only."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -7553,8 +7873,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -7587,7 +7907,8 @@ where
                 local: Option<bool>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -7639,7 +7960,7 @@ impl<'b> SearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search Template API](https://opensearch.org/docs/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+#[doc = "Builder for the [Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
 #[derive(Clone, Debug)]
 pub struct SearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -7655,6 +7976,7 @@ pub struct SearchTemplate<'a, 'b, B> {
     human: Option<bool>,
     ignore_throttled: Option<bool>,
     ignore_unavailable: Option<bool>,
+    phase_took: Option<bool>,
     preference: Option<&'b str>,
     pretty: Option<bool>,
     profile: Option<bool>,
@@ -7662,6 +7984,7 @@ pub struct SearchTemplate<'a, 'b, B> {
     rest_total_hits_as_int: Option<bool>,
     routing: Option<&'b [&'b str]>,
     scroll: Option<&'b str>,
+    search_pipeline: Option<&'b str>,
     search_type: Option<SearchType>,
     source: Option<&'b str>,
     typed_keys: Option<bool>,
@@ -7687,6 +8010,7 @@ where
             human: None,
             ignore_throttled: None,
             ignore_unavailable: None,
+            phase_took: None,
             preference: None,
             pretty: None,
             profile: None,
@@ -7694,12 +8018,13 @@ where
             rest_total_hits_as_int: None,
             routing: None,
             scroll: None,
+            search_pipeline: None,
             search_type: None,
             source: None,
             typed_keys: None,
         }
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes.\nFor example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
@@ -7723,6 +8048,7 @@ where
             human: self.human,
             ignore_throttled: self.ignore_throttled,
             ignore_unavailable: self.ignore_unavailable,
+            phase_took: self.phase_took,
             preference: self.preference,
             pretty: self.pretty,
             profile: self.profile,
@@ -7730,32 +8056,33 @@ where
             rest_total_hits_as_int: self.rest_total_hits_as_int,
             routing: self.routing,
             scroll: self.scroll,
+            search_pipeline: self.search_pipeline,
             search_type: self.search_type,
             source: self.source,
             typed_keys: self.typed_keys,
         }
     }
-    #[doc = "Indicates whether network round-trips should be minimized as part of cross-cluster search requests execution"]
+    #[doc = "If `true`, network round-trips are minimized for cross-cluster search requests."]
     pub fn ccs_minimize_roundtrips(mut self, ccs_minimize_roundtrips: bool) -> Self {
         self.ccs_minimize_roundtrips = Some(ccs_minimize_roundtrips);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Type of index that wildcard patterns can match.\nIf the request can target data streams, this argument determines whether wildcard expressions match hidden data streams.\nSupports comma-separated values, such as `open,hidden`.\nValid values are: `all`, `open`, `closed`, `hidden`, `none`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "Specify whether to return detailed information about score computation as part of a hit"]
+    #[doc = "If `true`, the response includes additional details about score computation as part of a hit."]
     pub fn explain(mut self, explain: bool) -> Self {
         self.explain = Some(explain);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -7765,32 +8092,37 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete, expanded or aliased indices should be ignored when throttled"]
+    #[doc = "If `true`, specified concrete, expanded, or aliased indexes are not included in the response when throttled."]
     pub fn ignore_throttled(mut self, ignore_throttled: bool) -> Self {
         self.ignore_throttled = Some(ignore_throttled);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Indicates whether to return phase-level `took` time values in the response."]
+    pub fn phase_took(mut self, phase_took: bool) -> Self {
+        self.phase_took = Some(phase_took);
+        self
+    }
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specify whether to profile the query execution"]
+    #[doc = "If `true`, the query execution is profiled."]
     pub fn profile(mut self, profile: bool) -> Self {
         self.profile = Some(profile);
         self
@@ -7800,22 +8132,27 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Indicates whether hits.total should be rendered as an integer or an object in the rest search response"]
+    #[doc = "If `true`, `hits.total` are rendered as an integer in the response."]
     pub fn rest_total_hits_as_int(mut self, rest_total_hits_as_int: bool) -> Self {
         self.rest_total_hits_as_int = Some(rest_total_hits_as_int);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
-    #[doc = "Specify how long a consistent view of the index should be maintained for scrolled search"]
+    #[doc = "Specifies how long a consistent view of the index\nshould be maintained for scrolled search."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "Customizable sequence of processing stages applied to search queries."]
+    pub fn search_pipeline(mut self, search_pipeline: &'b str) -> Self {
+        self.search_pipeline = Some(search_pipeline);
+        self
+    }
+    #[doc = "The type of the search operation."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
@@ -7825,7 +8162,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specify whether aggregation and suggester names should be prefixed by their respective types in the response"]
+    #[doc = "If `true`, the response prefixes aggregation and suggester names with their respective types."]
     pub fn typed_keys(mut self, typed_keys: bool) -> Self {
         self.typed_keys = Some(typed_keys);
         self
@@ -7854,6 +8191,7 @@ where
                 human: Option<bool>,
                 ignore_throttled: Option<bool>,
                 ignore_unavailable: Option<bool>,
+                phase_took: Option<bool>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 profile: Option<bool>,
@@ -7861,6 +8199,7 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 routing: Option<&'b [&'b str]>,
                 scroll: Option<&'b str>,
+                search_pipeline: Option<&'b str>,
                 search_type: Option<SearchType>,
                 source: Option<&'b str>,
                 typed_keys: Option<bool>,
@@ -7875,12 +8214,14 @@ where
                 human: self.human,
                 ignore_throttled: self.ignore_throttled,
                 ignore_unavailable: self.ignore_unavailable,
+                phase_took: self.phase_took,
                 preference: self.preference,
                 pretty: self.pretty,
                 profile: self.profile,
                 rest_total_hits_as_int: self.rest_total_hits_as_int,
                 routing: self.routing,
                 scroll: self.scroll,
+                search_pipeline: self.search_pipeline,
                 search_type: self.search_type,
                 source: self.source,
                 typed_keys: self.typed_keys,
@@ -7898,15 +8239,24 @@ where
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Termvectors API"]
 pub enum TermvectorsParts<'b> {
-    #[doc = "Index and Id"]
-    IndexId(&'b str, &'b str),
     #[doc = "Index"]
     Index(&'b str),
+    #[doc = "Index and Id"]
+    IndexId(&'b str, &'b str),
 }
 impl<'b> TermvectorsParts<'b> {
     #[doc = "Builds a relative URL path to the Termvectors API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
+            TermvectorsParts::Index(index) => {
+                let encoded_index: Cow<str> =
+                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(14usize + encoded_index.len());
+                p.push('/');
+                p.push_str(encoded_index.as_ref());
+                p.push_str("/_termvectors");
+                p.into()
+            }
             TermvectorsParts::IndexId(index, id) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
@@ -7918,19 +8268,10 @@ impl<'b> TermvectorsParts<'b> {
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
-            TermvectorsParts::Index(index) => {
-                let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(14usize + encoded_index.len());
-                p.push('/');
-                p.push_str(encoded_index.as_ref());
-                p.push_str("/_termvectors");
-                p.into()
-            }
         }
     }
 }
-#[doc = "Builder for the [Termvectors API](https://opensearch.org/docs/)\n\nReturns information and statistics about terms in the fields of a particular document."]
+#[doc = "Builder for the [Termvectors API](https://opensearch.org/docs/latest)\n\nReturns information and statistics about terms in the fields of a particular document."]
 #[derive(Clone, Debug)]
 pub struct Termvectors<'a, 'b, B> {
     transport: &'a Transport,
@@ -7949,7 +8290,7 @@ pub struct Termvectors<'a, 'b, B> {
     pretty: Option<bool>,
     realtime: Option<bool>,
     request_timeout: Option<Duration>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     term_statistics: Option<bool>,
     version: Option<i64>,
@@ -8015,22 +8356,21 @@ where
             version_type: self.version_type,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Specifies if document count, sum of document frequencies and sum of total term frequencies should be returned."]
+    #[doc = "If `true`, the response includes the document count, sum of document frequencies, and sum of total term frequencies."]
     pub fn field_statistics(mut self, field_statistics: bool) -> Self {
         self.field_statistics = Some(field_statistics);
         self
     }
-    #[doc = "A comma-separated list of fields to return."]
     pub fn fields(mut self, fields: &'b [&'b str]) -> Self {
         self.fields = Some(fields);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -8040,37 +8380,37 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specifies if term offsets should be returned."]
+    #[doc = "If `true`, the response includes term offsets."]
     pub fn offsets(mut self, offsets: bool) -> Self {
         self.offsets = Some(offsets);
         self
     }
-    #[doc = "Specifies if term payloads should be returned."]
+    #[doc = "If `true`, the response includes term payloads."]
     pub fn payloads(mut self, payloads: bool) -> Self {
         self.payloads = Some(payloads);
         self
     }
-    #[doc = "Specifies if term positions should be returned."]
+    #[doc = "If `true`, the response includes term positions."]
     pub fn positions(mut self, positions: bool) -> Self {
         self.positions = Some(positions);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)."]
+    #[doc = "Specifies the node or shard on which the operation should be performed.\nSee [preference query parameter]({{site.url}}{{site.baseurl}}/api-reference/search-apis/search/#the-preference-query-parameter) for a list of available options.\nBy default the requests are routed randomly to available shard copies (primary or replica), with no guarantee of consistency across repeated queries."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Specifies if request is real-time as opposed to near-real-time (default: true)."]
+    #[doc = "If `true`, the request is real time as opposed to near real time."]
     pub fn realtime(mut self, realtime: bool) -> Self {
         self.realtime = Some(realtime);
         self
@@ -8080,8 +8420,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Specific routing value."]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -8090,17 +8430,17 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies if total term frequency and document frequency should be returned."]
+    #[doc = "If `true`, the response includes term frequency and document frequency."]
     pub fn term_statistics(mut self, term_statistics: bool) -> Self {
         self.term_statistics = Some(term_statistics);
         self
     }
-    #[doc = "Explicit version number for concurrency control"]
+    #[doc = "If `true`, returns the document version as part of a hit."]
     pub fn version(mut self, version: i64) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Specific version type"]
+    #[doc = "The specific version type."]
     pub fn version_type(mut self, version_type: VersionType) -> Self {
         self.version_type = Some(version_type);
         self
@@ -8131,7 +8471,8 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 realtime: Option<bool>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 term_statistics: Option<bool>,
                 version: Option<i64>,
@@ -8189,12 +8530,12 @@ impl<'b> UpdateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update API](https://opensearch.org/docs/)\n\nUpdates a document with a script or partial document."]
+#[doc = "Builder for the [Update API](https://opensearch.org/docs/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
 #[derive(Clone, Debug)]
 pub struct Update<'a, 'b, B> {
     transport: &'a Transport,
     parts: UpdateParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     body: Option<B>,
@@ -8210,7 +8551,7 @@ pub struct Update<'a, 'b, B> {
     request_timeout: Option<Duration>,
     require_alias: Option<bool>,
     retry_on_conflict: Option<i64>,
-    routing: Option<&'b str>,
+    routing: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     wait_for_active_shards: Option<&'b str>,
@@ -8247,17 +8588,17 @@ where
             wait_for_active_shards: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `false` to disable source retrieval. You can also specify a comma-separated\nlist of the fields you want to retrieve."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "Specify the source fields you want to exclude."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "Specify the source fields you want to retrieve."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
@@ -8292,12 +8633,12 @@ where
             wait_for_active_shards: self.wait_for_active_shards,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -8307,32 +8648,32 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "only perform the update operation if the last operation that has changed the document has the specified primary term"]
+    #[doc = "Only perform the operation if the document has this primary term."]
     pub fn if_primary_term(mut self, if_primary_term: i64) -> Self {
         self.if_primary_term = Some(if_primary_term);
         self
     }
-    #[doc = "only perform the update operation if the last operation that has changed the document has the specified sequence number"]
+    #[doc = "Only perform the operation if the document has this sequence number."]
     pub fn if_seq_no(mut self, if_seq_no: i64) -> Self {
         self.if_seq_no = Some(if_seq_no);
         self
     }
-    #[doc = "The script language (default: painless)"]
+    #[doc = "The script language."]
     pub fn lang(mut self, lang: &'b str) -> Self {
         self.lang = Some(lang);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "If `true` then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` (the default) then do nothing with refreshes."]
+    #[doc = "If 'true', OpenSearch refreshes the affected shards to make this operation\nvisible to search, if `wait_for` then wait for a refresh to make this operation\nvisible to search, if `false` do nothing with refreshes."]
     pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
@@ -8342,18 +8683,18 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "When true, requires destination is an alias. Default is false"]
+    #[doc = "If `true`, the destination must be an index alias."]
     pub fn require_alias(mut self, require_alias: bool) -> Self {
         self.require_alias = Some(require_alias);
         self
     }
-    #[doc = "Specify how many times should the operation be retried when a conflict occurs (default: 0)"]
+    #[doc = "Specify how many times should the operation be retried when a conflict occurs."]
     pub fn retry_on_conflict(mut self, retry_on_conflict: i64) -> Self {
         self.retry_on_conflict = Some(retry_on_conflict);
         self
     }
-    #[doc = "Specific routing value"]
-    pub fn routing(mut self, routing: &'b str) -> Self {
+    #[doc = "A custom value used to route operations to a specific shard."]
+    pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
@@ -8362,12 +8703,12 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Period to wait for dynamic mapping updates and active shards.\nThis guarantees OpenSearch waits for at least the timeout before failing.\nThe actual wait time could be longer, particularly when multiple waits occur."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the update operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operations.\nSet to 'all' or any positive integer up to the total number of shards in the index\n(number_of_replicas+1). Defaults to 1 meaning the primary shard."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
@@ -8382,8 +8723,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -8399,7 +8739,8 @@ where
                 refresh: Option<Refresh>,
                 require_alias: Option<bool>,
                 retry_on_conflict: Option<i64>,
-                routing: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                routing: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 wait_for_active_shards: Option<&'b str>,
@@ -8456,12 +8797,12 @@ impl<'b> UpdateByQueryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update By Query API](https://opensearch.org/docs/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
+#[doc = "Builder for the [Update By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
 #[derive(Clone, Debug)]
 pub struct UpdateByQuery<'a, 'b, B> {
     transport: &'a Transport,
     parts: UpdateByQueryParts<'b>,
-    _source: Option<&'b [&'b str]>,
+    _source: Option<&'b str>,
     _source_excludes: Option<&'b [&'b str]>,
     _source_includes: Option<&'b [&'b str]>,
     allow_no_indices: Option<bool>,
@@ -8484,24 +8825,23 @@ pub struct UpdateByQuery<'a, 'b, B> {
     preference: Option<&'b str>,
     pretty: Option<bool>,
     q: Option<&'b str>,
-    refresh: Option<bool>,
+    refresh: Option<Refresh>,
     request_cache: Option<bool>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
     routing: Option<&'b [&'b str]>,
     scroll: Option<&'b str>,
     scroll_size: Option<i64>,
     search_timeout: Option<&'b str>,
     search_type: Option<SearchType>,
     size: Option<i64>,
-    slices: Option<Slices>,
+    slices: Option<&'b str>,
     sort: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stats: Option<&'b [&'b str]>,
     terminate_after: Option<i64>,
     timeout: Option<&'b str>,
     version: Option<bool>,
-    version_type: Option<bool>,
     wait_for_active_shards: Option<&'b str>,
     wait_for_completion: Option<bool>,
 }
@@ -8555,37 +8895,36 @@ where
             terminate_after: None,
             timeout: None,
             version: None,
-            version_type: None,
             wait_for_active_shards: None,
             wait_for_completion: None,
         }
     }
-    #[doc = "True or false to return the _source field or not, or a list of fields to return"]
-    pub fn _source(mut self, _source: &'b [&'b str]) -> Self {
+    #[doc = "Set to `true` or `false` to return the `_source` field or not, or a list of fields to return."]
+    pub fn _source(mut self, _source: &'b str) -> Self {
         self._source = Some(_source);
         self
     }
-    #[doc = "A list of fields to exclude from the returned _source field"]
+    #[doc = "List of fields to exclude from the returned `_source` field."]
     pub fn _source_excludes(mut self, _source_excludes: &'b [&'b str]) -> Self {
         self._source_excludes = Some(_source_excludes);
         self
     }
-    #[doc = "A list of fields to extract and return from the _source field"]
+    #[doc = "List of fields to extract and return from the `_source` field."]
     pub fn _source_includes(mut self, _source_includes: &'b [&'b str]) -> Self {
         self._source_includes = Some(_source_includes);
         self
     }
-    #[doc = "Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)"]
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes.\nFor example, a request targeting `foo*,bar*` returns an error if an index starts with `foo` but no index starts with `bar`."]
     pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
         self.allow_no_indices = Some(allow_no_indices);
         self
     }
-    #[doc = "Specify whether wildcard and prefix queries should be analyzed (default: false)"]
+    #[doc = "If `true`, wildcard and prefix queries are analyzed."]
     pub fn analyze_wildcard(mut self, analyze_wildcard: bool) -> Self {
         self.analyze_wildcard = Some(analyze_wildcard);
         self
     }
-    #[doc = "The analyzer to use for the query string"]
+    #[doc = "Analyzer to use for the query string."]
     pub fn analyzer(mut self, analyzer: &'b str) -> Self {
         self.analyzer = Some(analyzer);
         self
@@ -8638,42 +8977,41 @@ where
             terminate_after: self.terminate_after,
             timeout: self.timeout,
             version: self.version,
-            version_type: self.version_type,
             wait_for_active_shards: self.wait_for_active_shards,
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "What to do when the update by query hits version conflicts?"]
+    #[doc = "What to do if update by query hits version conflicts: `abort` or `proceed`."]
     pub fn conflicts(mut self, conflicts: Conflicts) -> Self {
         self.conflicts = Some(conflicts);
         self
     }
-    #[doc = "The default operator for query string query (AND or OR)"]
+    #[doc = "The default operator for query string query: `AND` or `OR`."]
     pub fn default_operator(mut self, default_operator: DefaultOperator) -> Self {
         self.default_operator = Some(default_operator);
         self
     }
-    #[doc = "The field to use as default where no field prefix is given in the query string"]
+    #[doc = "Field to use as default where no field prefix is given in the query string."]
     pub fn df(mut self, df: &'b str) -> Self {
         self.df = Some(df);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
+    #[doc = "Type of index that wildcard patterns can match.\nIf the request can target data streams, this argument determines whether wildcard expressions match hidden data streams.\nSupports comma-separated values, such as `open,hidden`.\nValid values are: `all`, `open`, `closed`, `hidden`, `none`."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "Starting offset (default: 0)"]
+    #[doc = "Starting offset."]
     pub fn from(mut self, from: i64) -> Self {
         self.from = Some(from);
         self
@@ -8683,52 +9021,52 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Whether specified concrete indices should be ignored when unavailable (missing or closed)"]
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Specify whether format-based query failures (such as providing text to a numeric field) should be ignored"]
+    #[doc = "If `true`, format-based query failures (such as providing text to a numeric field) in the query string will be ignored."]
     pub fn lenient(mut self, lenient: bool) -> Self {
         self.lenient = Some(lenient);
         self
     }
-    #[doc = "Maximum number of documents to process (default: all documents)"]
+    #[doc = "Maximum number of documents to process.\nDefaults to all documents."]
     pub fn max_docs(mut self, max_docs: i64) -> Self {
         self.max_docs = Some(max_docs);
         self
     }
-    #[doc = "Ingest pipeline to set on index requests made by this action. (default: none)"]
+    #[doc = "ID of the pipeline to use to preprocess incoming documents.\nIf the index has a default ingest pipeline specified, then setting the value to `_none` disables the default ingest pipeline for this request.\nIf a final pipeline is configured it will always run, regardless of the value of this parameter."]
     pub fn pipeline(mut self, pipeline: &'b str) -> Self {
         self.pipeline = Some(pipeline);
         self
     }
-    #[doc = "Specify the node or shard the operation should be performed on (default: random)"]
+    #[doc = "Specifies the node or shard the operation should be performed on.\nRandom by default."]
     pub fn preference(mut self, preference: &'b str) -> Self {
         self.preference = Some(preference);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Query in the Lucene query string syntax"]
+    #[doc = "Query in the Lucene query string syntax."]
     pub fn q(mut self, q: &'b str) -> Self {
         self.q = Some(q);
         self
     }
-    #[doc = "Should the affected indexes be refreshed?"]
-    pub fn refresh(mut self, refresh: bool) -> Self {
+    #[doc = "If `true`, OpenSearch refreshes affected shards to make the operation visible to search."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
         self.refresh = Some(refresh);
         self
     }
-    #[doc = "Specify if request cache should be used for this request or not, defaults to index level setting"]
+    #[doc = "If `true`, the request cache is used for this request."]
     pub fn request_cache(mut self, request_cache: bool) -> Self {
         self.request_cache = Some(request_cache);
         self
@@ -8738,47 +9076,47 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle to set on this request in sub-requests per second. -1 means no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
-    #[doc = "A comma-separated list of specific routing values"]
+    #[doc = "A custom value used to route operations to a specific shard."]
     pub fn routing(mut self, routing: &'b [&'b str]) -> Self {
         self.routing = Some(routing);
         self
     }
-    #[doc = "Specify how long a consistent view of the index should be maintained for scrolled search"]
+    #[doc = "Period to retain the search context for scrolling."]
     pub fn scroll(mut self, scroll: &'b str) -> Self {
         self.scroll = Some(scroll);
         self
     }
-    #[doc = "Size on the scroll request powering the update by query"]
+    #[doc = "Size of the scroll request that powers the operation."]
     pub fn scroll_size(mut self, scroll_size: i64) -> Self {
         self.scroll_size = Some(scroll_size);
         self
     }
-    #[doc = "Explicit timeout for each search request. Defaults to no timeout."]
+    #[doc = "Explicit timeout for each search request."]
     pub fn search_timeout(mut self, search_timeout: &'b str) -> Self {
         self.search_timeout = Some(search_timeout);
         self
     }
-    #[doc = "Search operation type"]
+    #[doc = "The type of the search operation. Available options: `query_then_fetch`, `dfs_query_then_fetch`."]
     pub fn search_type(mut self, search_type: SearchType) -> Self {
         self.search_type = Some(search_type);
         self
     }
-    #[doc = "Deprecated, please use `max_docs` instead"]
+    #[doc = "Deprecated, use `max_docs` instead."]
     pub fn size(mut self, size: i64) -> Self {
         self.size = Some(size);
         self
     }
-    #[doc = "The number of slices this task should be divided into. Defaults to 1, meaning the task isn't sliced into subtasks. Can be set to `auto`."]
-    pub fn slices(mut self, slices: Slices) -> Self {
+    #[doc = "The number of slices this task should be divided into."]
+    pub fn slices(mut self, slices: &'b str) -> Self {
         self.slices = Some(slices);
         self
     }
-    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs"]
+    #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs."]
     pub fn sort(mut self, sort: &'b [&'b str]) -> Self {
         self.sort = Some(sort);
         self
@@ -8788,37 +9126,32 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Specific 'tag' of the request for logging and statistical purposes"]
+    #[doc = "Specific `tag` of the request for logging and statistical purposes."]
     pub fn stats(mut self, stats: &'b [&'b str]) -> Self {
         self.stats = Some(stats);
         self
     }
-    #[doc = "The maximum number of documents to collect for each shard, upon reaching which the query execution will terminate early."]
+    #[doc = "Maximum number of documents to collect for each shard.\nIf a query reaches this limit, OpenSearch terminates the query early.\nOpenSearch collects documents before sorting.\nUse with caution.\nOpenSearch applies this parameter to each shard handling the request.\nWhen possible, let OpenSearch perform early termination automatically.\nAvoid specifying this parameter for requests that target data streams with backing indexes across multiple data tiers."]
     pub fn terminate_after(mut self, terminate_after: i64) -> Self {
         self.terminate_after = Some(terminate_after);
         self
     }
-    #[doc = "Time each individual bulk request should wait for shards that are unavailable."]
+    #[doc = "Period each update request waits for the following operations: dynamic mapping updates, waiting for active shards."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Specify whether to return document version as part of a hit"]
+    #[doc = "If `true`, returns the document version as part of a hit."]
     pub fn version(mut self, version: bool) -> Self {
         self.version = Some(version);
         self
     }
-    #[doc = "Should the document increment the version number (internal) on hit or not (reindex)"]
-    pub fn version_type(mut self, version_type: bool) -> Self {
-        self.version_type = Some(version_type);
-        self
-    }
-    #[doc = "Sets the number of shard copies that must be active before proceeding with the update by query operation. Defaults to 1, meaning the primary shard only. Set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1)"]
+    #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
     pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
         self.wait_for_active_shards = Some(wait_for_active_shards);
         self
     }
-    #[doc = "Should the request should block until the update by query operation is complete."]
+    #[doc = "If `true`, the request blocks until the operation is complete."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -8833,8 +9166,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                _source: Option<&'b [&'b str]>,
+                _source: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 _source_excludes: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -8859,9 +9191,9 @@ where
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
                 q: Option<&'b str>,
-                refresh: Option<bool>,
+                refresh: Option<Refresh>,
                 request_cache: Option<bool>,
-                requests_per_second: Option<i64>,
+                requests_per_second: Option<f32>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 routing: Option<&'b [&'b str]>,
                 scroll: Option<&'b str>,
@@ -8869,7 +9201,7 @@ where
                 search_timeout: Option<&'b str>,
                 search_type: Option<SearchType>,
                 size: Option<i64>,
-                slices: Option<Slices>,
+                slices: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 sort: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
@@ -8878,7 +9210,6 @@ where
                 terminate_after: Option<i64>,
                 timeout: Option<&'b str>,
                 version: Option<bool>,
-                version_type: Option<bool>,
                 wait_for_active_shards: Option<&'b str>,
                 wait_for_completion: Option<bool>,
             }
@@ -8920,7 +9251,6 @@ where
                 terminate_after: self.terminate_after,
                 timeout: self.timeout,
                 version: self.version,
-                version_type: self.version_type,
                 wait_for_active_shards: self.wait_for_active_shards,
                 wait_for_completion: self.wait_for_completion,
             };
@@ -8956,7 +9286,7 @@ impl<'b> UpdateByQueryRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update By Query Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Update By Query operation."]
+#[doc = "Builder for the [Update By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Update By Query operation."]
 #[derive(Clone, Debug)]
 pub struct UpdateByQueryRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -8968,7 +9298,7 @@ pub struct UpdateByQueryRethrottle<'a, 'b, B> {
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    requests_per_second: Option<i64>,
+    requests_per_second: Option<f32>,
     source: Option<&'b str>,
 }
 impl<'a, 'b, B> UpdateByQueryRethrottle<'a, 'b, B>
@@ -9011,12 +9341,12 @@ where
             source: self.source,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -9026,12 +9356,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -9041,8 +9371,8 @@ where
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "The throttle to set on this request in floating sub-requests per second. -1 means set no throttle."]
-    pub fn requests_per_second(mut self, requests_per_second: i64) -> Self {
+    #[doc = "The throttle for this request in sub-requests per second."]
+    pub fn requests_per_second(mut self, requests_per_second: f32) -> Self {
         self.requests_per_second = Some(requests_per_second);
         self
     }
@@ -9066,7 +9396,7 @@ where
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                requests_per_second: Option<i64>,
+                requests_per_second: Option<f32>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -9088,206 +9418,202 @@ where
     }
 }
 impl OpenSearch {
-    #[doc = "[Bulk API](https://opensearch.org/docs/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
+    #[doc = "[Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
     pub fn bulk<'a, 'b>(&'a self, parts: BulkParts<'b>) -> Bulk<'a, 'b, ()> {
         Bulk::new(self.transport(), parts)
     }
-    #[doc = "[Clear Scroll API](https://opensearch.org/docs/)\n\nExplicitly clears the search context for a scroll."]
+    #[doc = "[Bulk Stream API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
+    pub fn bulk_stream<'a, 'b>(&'a self, parts: BulkStreamParts<'b>) -> BulkStream<'a, 'b, ()> {
+        BulkStream::new(self.transport(), parts)
+    }
+    #[doc = "[Clear Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
     pub fn clear_scroll<'a, 'b>(&'a self, parts: ClearScrollParts<'b>) -> ClearScroll<'a, 'b, ()> {
         ClearScroll::new(self.transport(), parts)
     }
-    #[doc = "[Count API](https://opensearch.org/docs/)\n\nReturns number of documents matching a query."]
+    #[doc = "[Count API](https://opensearch.org/docs/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
     pub fn count<'a, 'b>(&'a self, parts: CountParts<'b>) -> Count<'a, 'b, ()> {
         Count::new(self.transport(), parts)
     }
-    #[doc = "[Create API](https://opensearch.org/docs/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
+    #[doc = "[Create API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
     pub fn create<'a, 'b>(&'a self, parts: CreateParts<'b>) -> Create<'a, 'b, ()> {
         Create::new(self.transport(), parts)
     }
-    #[doc = "[Create Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nCreates point in time context."]
+    #[doc = "[Create Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit)\n\nCreates point in time context."]
     pub fn create_pit<'a, 'b>(&'a self, parts: CreatePitParts<'b>) -> CreatePit<'a, 'b, ()> {
         CreatePit::new(self.transport(), parts)
     }
-    #[doc = "[Delete API](https://opensearch.org/docs/)\n\nRemoves a document from the index."]
+    #[doc = "[Delete API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
     pub fn delete<'a, 'b>(&'a self, parts: DeleteParts<'b>) -> Delete<'a, 'b> {
         Delete::new(self.transport(), parts)
     }
-    #[doc = "[Delete All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes all active point in time searches."]
+    #[doc = "[Delete All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches."]
     pub fn delete_all_pits<'a, 'b>(&'a self) -> DeleteAllPits<'a, 'b> {
         DeleteAllPits::new(self.transport())
     }
-    #[doc = "[Delete By Query API](https://opensearch.org/docs/)\n\nDeletes documents matching the provided query."]
+    #[doc = "[Delete By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
     pub fn delete_by_query<'a, 'b>(
         &'a self,
         parts: DeleteByQueryParts<'b>,
     ) -> DeleteByQuery<'a, 'b, ()> {
         DeleteByQuery::new(self.transport(), parts)
     }
-    #[doc = "[Delete By Query Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
+    #[doc = "[Delete By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
     pub fn delete_by_query_rethrottle<'a, 'b>(
         &'a self,
         parts: DeleteByQueryRethrottleParts<'b>,
     ) -> DeleteByQueryRethrottle<'a, 'b, ()> {
         DeleteByQueryRethrottle::new(self.transport(), parts)
     }
-    #[doc = "[Delete Pit API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nDeletes one or more point in time searches based on the IDs passed."]
+    #[doc = "[Delete Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed."]
     pub fn delete_pit<'a, 'b>(&'a self) -> DeletePit<'a, 'b, ()> {
         DeletePit::new(self.transport())
     }
-    #[doc = "[Delete Script API](https://opensearch.org/docs/)\n\nDeletes a script."]
+    #[doc = "[Delete Script API](https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
     pub fn delete_script<'a, 'b>(&'a self, parts: DeleteScriptParts<'b>) -> DeleteScript<'a, 'b> {
         DeleteScript::new(self.transport(), parts)
     }
-    #[doc = "[Exists API](https://opensearch.org/docs/)\n\nReturns information about whether a document exists in an index."]
+    #[doc = "[Exists API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
     pub fn exists<'a, 'b>(&'a self, parts: ExistsParts<'b>) -> Exists<'a, 'b> {
         Exists::new(self.transport(), parts)
     }
-    #[doc = "[Exists Source API](https://opensearch.org/docs/)\n\nReturns information about whether a document source exists in an index."]
+    #[doc = "[Exists Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
     pub fn exists_source<'a, 'b>(&'a self, parts: ExistsSourceParts<'b>) -> ExistsSource<'a, 'b> {
         ExistsSource::new(self.transport(), parts)
     }
-    #[doc = "[Explain API](https://opensearch.org/docs/)\n\nReturns information about why a specific matches (or doesn't match) a query."]
+    #[doc = "[Explain API](https://opensearch.org/docs/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
     pub fn explain<'a, 'b>(&'a self, parts: ExplainParts<'b>) -> Explain<'a, 'b, ()> {
         Explain::new(self.transport(), parts)
     }
-    #[doc = "[Field Caps API](https://opensearch.org/docs/)\n\nReturns the information about the capabilities of fields among multiple indices."]
+    #[doc = "[Field Caps API](https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
     pub fn field_caps<'a, 'b>(&'a self, parts: FieldCapsParts<'b>) -> FieldCaps<'a, 'b, ()> {
         FieldCaps::new(self.transport(), parts)
     }
-    #[doc = "[Get API](https://opensearch.org/docs/)\n\nReturns a document."]
+    #[doc = "[Get API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
     pub fn get<'a, 'b>(&'a self, parts: GetParts<'b>) -> Get<'a, 'b> {
         Get::new(self.transport(), parts)
     }
-    #[doc = "[Get All Pits API](https://opensearch.org/docs/latest/opensearch/rest-api/point_in_time/)\n\nLists all active point in time searches."]
+    #[doc = "[Get All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
     pub fn get_all_pits<'a, 'b>(&'a self) -> GetAllPits<'a, 'b> {
         GetAllPits::new(self.transport())
     }
-    #[doc = "[Get Script API](https://opensearch.org/docs/)\n\nReturns a script."]
+    #[doc = "[Get Script API](https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
     pub fn get_script<'a, 'b>(&'a self, parts: GetScriptParts<'b>) -> GetScript<'a, 'b> {
         GetScript::new(self.transport(), parts)
     }
-    #[doc = "[Get Script Context API](https://opensearch.org/docs/)\n\nReturns all script contexts."]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Get Script Context API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
     pub fn get_script_context<'a, 'b>(&'a self) -> GetScriptContext<'a, 'b> {
         GetScriptContext::new(self.transport())
     }
-    #[doc = "[Get Script Languages API](https://opensearch.org/docs/)\n\nReturns available script types, languages and contexts"]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Get Script Languages API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
     pub fn get_script_languages<'a, 'b>(&'a self) -> GetScriptLanguages<'a, 'b> {
         GetScriptLanguages::new(self.transport())
     }
-    #[doc = "[Get Source API](https://opensearch.org/docs/)\n\nReturns the source of a document."]
+    #[doc = "[Get Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
     pub fn get_source<'a, 'b>(&'a self, parts: GetSourceParts<'b>) -> GetSource<'a, 'b> {
         GetSource::new(self.transport(), parts)
     }
-    #[doc = "[Index API](https://opensearch.org/docs/)\n\nCreates or updates a document in an index."]
+    #[doc = "[Index API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
     pub fn index<'a, 'b>(&'a self, parts: IndexParts<'b>) -> Index<'a, 'b, ()> {
         Index::new(self.transport(), parts)
     }
-    #[doc = "[Info API](https://opensearch.org/docs/)\n\nReturns basic information about the cluster."]
+    #[doc = "[Info API](https://opensearch.org/docs/latest)\n\nReturns basic information about the cluster."]
     pub fn info<'a, 'b>(&'a self) -> Info<'a, 'b> {
         Info::new(self.transport())
     }
-    #[doc = "[Mget API](https://opensearch.org/docs/)\n\nAllows to get multiple documents in one request."]
+    #[doc = "[Mget API](https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
     pub fn mget<'a, 'b>(&'a self, parts: MgetParts<'b>) -> Mget<'a, 'b, ()> {
         Mget::new(self.transport(), parts)
     }
-    #[doc = "[Msearch API](https://opensearch.org/docs/)\n\nAllows to execute several search operations in one request."]
+    #[doc = "[Msearch API](https://opensearch.org/docs/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
     pub fn msearch<'a, 'b>(&'a self, parts: MsearchParts<'b>) -> Msearch<'a, 'b, ()> {
         Msearch::new(self.transport(), parts)
     }
-    #[doc = "[Msearch Template API](https://opensearch.org/docs/)\n\nAllows to execute several search template operations in one request."]
+    #[doc = "[Msearch Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
     pub fn msearch_template<'a, 'b>(
         &'a self,
         parts: MsearchTemplateParts<'b>,
     ) -> MsearchTemplate<'a, 'b, ()> {
         MsearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Mtermvectors API](https://opensearch.org/docs/)\n\nReturns multiple termvectors in one request."]
+    #[doc = "[Mtermvectors API](https://opensearch.org/docs/latest)\n\nReturns multiple termvectors in one request."]
     pub fn mtermvectors<'a, 'b>(
         &'a self,
         parts: MtermvectorsParts<'b>,
     ) -> Mtermvectors<'a, 'b, ()> {
         Mtermvectors::new(self.transport(), parts)
     }
-    #[doc = "[Ping API](https://opensearch.org/docs/)\n\nReturns whether the cluster is running."]
+    #[doc = "[Ping API](https://opensearch.org/docs/latest)\n\nReturns whether the cluster is running."]
     pub fn ping<'a, 'b>(&'a self) -> Ping<'a, 'b> {
         Ping::new(self.transport())
     }
-    #[doc = "[Put Script API](https://opensearch.org/docs/)\n\nCreates or updates a script."]
+    #[doc = "[Put Script API](https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
     pub fn put_script<'a, 'b>(&'a self, parts: PutScriptParts<'b>) -> PutScript<'a, 'b, ()> {
         PutScript::new(self.transport(), parts)
     }
-    #[doc = "[Rank Eval API](https://opensearch.org/docs/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries"]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Rank Eval API](https://opensearch.org/docs/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
     pub fn rank_eval<'a, 'b>(&'a self, parts: RankEvalParts<'b>) -> RankEval<'a, 'b, ()> {
         RankEval::new(self.transport(), parts)
     }
-    #[doc = "[Reindex API](https://opensearch.org/docs/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
+    #[doc = "[Reindex API](https://opensearch.org/docs/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
     pub fn reindex<'a, 'b>(&'a self) -> Reindex<'a, 'b, ()> {
         Reindex::new(self.transport())
     }
-    #[doc = "[Reindex Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Reindex operation."]
+    #[doc = "[Reindex Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular reindex operation."]
     pub fn reindex_rethrottle<'a, 'b>(
         &'a self,
         parts: ReindexRethrottleParts<'b>,
     ) -> ReindexRethrottle<'a, 'b, ()> {
         ReindexRethrottle::new(self.transport(), parts)
     }
-    #[doc = "[Render Search Template API](https://opensearch.org/docs/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Render Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     pub fn render_search_template<'a, 'b>(
         &'a self,
         parts: RenderSearchTemplateParts<'b>,
     ) -> RenderSearchTemplate<'a, 'b, ()> {
         RenderSearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Scripts Painless Execute API](https://opensearch.org/docs/)\n\nAllows an arbitrary script to be executed and a result to be returned"]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Scripts Painless Execute API](https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
     pub fn scripts_painless_execute<'a, 'b>(&'a self) -> ScriptsPainlessExecute<'a, 'b, ()> {
         ScriptsPainlessExecute::new(self.transport())
     }
-    #[doc = "[Scroll API](https://opensearch.org/docs/)\n\nAllows to retrieve a large numbers of results from a single search request.\n\n# Examples\n\nTo initiate a scroll, make search API call with a specified `scroll` timeout,\nthen fetch the next set of hits using the `_scroll_id` returned in\nthe response. Once no more hits are returned, clear the scroll.\n\n```rust,no_run\n# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};\n# use serde_json::{json, Value};\n# async fn doc() -> Result<(), Box<dyn std::error::Error>> {\nlet client = OpenSearch::default();\n\nfn print_hits(hits: &[Value]) {\n    for hit in hits {\n        println!(\n            \"id: '{}', source: '{}', score: '{}'\",\n            hit[\"_id\"].as_str().unwrap(),\n            hit[\"_source\"],\n            hit[\"_score\"].as_f64().unwrap()\n        );\n    }\n}\n\nlet scroll = \"1m\";\nlet mut response = client\n    .search(SearchParts::Index(&[\"tweets\"]))\n    .scroll(scroll)\n    .body(json!({\n        \"query\": {\n            \"match\": {\n                \"body\": {\n                    \"query\": \"OpenSearch rust\",\n                    \"operator\": \"AND\"\n                }\n            }\n        }\n    }))\n    .send()\n    .await?;\n\nlet mut response_body = response.json::<Value>().await?;\nlet mut scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\nlet mut hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n\nprint_hits(hits);\n\nwhile hits.len() > 0 {\n    response = client\n        .scroll(ScrollParts::None)\n        .body(json!({\n            \"scroll\": scroll,\n            \"scroll_id\": scroll_id\n        }))\n        .send()\n        .await?;\n\n    response_body = response.json::<Value>().await?;\n    scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\n    hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n    print_hits(hits);\n}\n\nresponse = client\n    .clear_scroll(ClearScrollParts::None)\n    .body(json!({\n        \"scroll_id\": scroll_id\n    }))\n    .send()\n    .await?;\n    \n# Ok(())\n# }\n```"]
+    #[doc = "[Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods)\n\nAllows to retrieve a large numbers of results from a single search request.\n\n# Examples\n\nTo initiate a scroll, make search API call with a specified `scroll` timeout,\nthen fetch the next set of hits using the `_scroll_id` returned in\nthe response. Once no more hits are returned, clear the scroll.\n\n```rust,no_run\n# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};\n# use serde_json::{json, Value};\n# async fn doc() -> Result<(), Box<dyn std::error::Error>> {\nlet client = OpenSearch::default();\n\nfn print_hits(hits: &[Value]) {\n    for hit in hits {\n        println!(\n            \"id: '{}', source: '{}', score: '{}'\",\n            hit[\"_id\"].as_str().unwrap(),\n            hit[\"_source\"],\n            hit[\"_score\"].as_f64().unwrap()\n        );\n    }\n}\n\nlet scroll = \"1m\";\nlet mut response = client\n    .search(SearchParts::Index(&[\"tweets\"]))\n    .scroll(scroll)\n    .body(json!({\n        \"query\": {\n            \"match\": {\n                \"body\": {\n                    \"query\": \"OpenSearch rust\",\n                    \"operator\": \"AND\"\n                }\n            }\n        }\n    }))\n    .send()\n    .await?;\n\nlet mut response_body = response.json::<Value>().await?;\nlet mut scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\nlet mut hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n\nprint_hits(hits);\n\nwhile hits.len() > 0 {\n    response = client\n        .scroll(ScrollParts::None)\n        .body(json!({\n            \"scroll\": scroll,\n            \"scroll_id\": scroll_id\n        }))\n        .send()\n        .await?;\n\n    response_body = response.json::<Value>().await?;\n    scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\n    hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n    print_hits(hits);\n}\n\nresponse = client\n    .clear_scroll(ClearScrollParts::None)\n    .body(json!({\n        \"scroll_id\": scroll_id\n    }))\n    .send()\n    .await?;\n    \n# Ok(())\n# }\n```"]
     pub fn scroll<'a, 'b>(&'a self, parts: ScrollParts<'b>) -> Scroll<'a, 'b, ()> {
         Scroll::new(self.transport(), parts)
     }
-    #[doc = "[Search API](https://opensearch.org/docs/)\n\nReturns results matching a query."]
+    #[doc = "[Search API](https://opensearch.org/docs/latest/api-reference/search/)\n\nReturns results matching a query."]
     pub fn search<'a, 'b>(&'a self, parts: SearchParts<'b>) -> Search<'a, 'b, ()> {
         Search::new(self.transport(), parts)
     }
-    #[doc = "[Search Shards API](https://opensearch.org/docs/)\n\nReturns information about the indices and shards that a search request would be executed against."]
+    #[doc = "[Search Shards API](https://opensearch.org/docs/latest)\n\nReturns information about the indexes and shards that a search request would be executed against."]
     pub fn search_shards<'a, 'b>(
         &'a self,
         parts: SearchShardsParts<'b>,
     ) -> SearchShards<'a, 'b, ()> {
         SearchShards::new(self.transport(), parts)
     }
-    #[doc = "[Search Template API](https://opensearch.org/docs/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     pub fn search_template<'a, 'b>(
         &'a self,
         parts: SearchTemplateParts<'b>,
     ) -> SearchTemplate<'a, 'b, ()> {
         SearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Termvectors API](https://opensearch.org/docs/)\n\nReturns information and statistics about terms in the fields of a particular document."]
+    #[doc = "[Termvectors API](https://opensearch.org/docs/latest)\n\nReturns information and statistics about terms in the fields of a particular document."]
     pub fn termvectors<'a, 'b>(&'a self, parts: TermvectorsParts<'b>) -> Termvectors<'a, 'b, ()> {
         Termvectors::new(self.transport(), parts)
     }
-    #[doc = "[Update API](https://opensearch.org/docs/)\n\nUpdates a document with a script or partial document."]
+    #[doc = "[Update API](https://opensearch.org/docs/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
     pub fn update<'a, 'b>(&'a self, parts: UpdateParts<'b>) -> Update<'a, 'b, ()> {
         Update::new(self.transport(), parts)
     }
-    #[doc = "[Update By Query API](https://opensearch.org/docs/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
+    #[doc = "[Update By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
     pub fn update_by_query<'a, 'b>(
         &'a self,
         parts: UpdateByQueryParts<'b>,
     ) -> UpdateByQuery<'a, 'b, ()> {
         UpdateByQuery::new(self.transport(), parts)
     }
-    #[doc = "[Update By Query Rethrottle API](https://opensearch.org/docs/)\n\nChanges the number of requests per second for a particular Update By Query operation."]
+    #[doc = "[Update By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Update By Query operation."]
     pub fn update_by_query_rethrottle<'a, 'b>(
         &'a self,
         parts: UpdateByQueryRethrottleParts<'b>,

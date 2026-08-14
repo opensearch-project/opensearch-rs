@@ -169,7 +169,7 @@ impl<'a> EnumBuilder<'a> {
                     attrs: vec![],
                     by_ref: None,
                     mutability: None,
-                    ident: ident(valid_name(p)),
+                    ident: ident(&valid_name(p)),
                     subpat: None,
                 })
             })

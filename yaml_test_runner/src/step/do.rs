@@ -375,7 +375,7 @@ impl ApiCall {
                 let mut tokens = TokenStream::new();
                 for (n, v) in params {
                     let param_ident = syn::Ident::new(
-                        api_generator::generator::code_gen::valid_name(n),
+                        &api_generator::generator::code_gen::valid_name(n),
                         Span::call_site(),
                     );
 

@@ -5,10 +5,16 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### ⚠️ Breaking Changes ⚠️
 - Internalized the `BuildError` type, consolidating on the `Error` type ([#228](https://github.com/opensearch-project/opensearch-rs/pull/228))
 - `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#391](https://github.com/opensearch-project/opensearch-rs/pull/391))
+- Regenerated the client from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document, removing APIs that no longer exist in OpenSearch: `cat.master`, `indices.unfreeze`, `indices.reload_search_analyzers`, `indices.migrate_to_data_stream`, `indices.promote_data_stream`, `snapshot.get_features` and the `text_structure` namespace
+- Some URL part and query parameter types changed to match the OpenAPI specification (e.g. `IndicesGetIndexTemplateParts::Name` now takes a single `&str`)
 
 ### Added
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 
 - Added `auth::cache::CachedCredentialsProvider`, an opt-in helper that caches AWS credentials between requests so users can avoid querying ECS / EC2 metadata endpoints on every signed request ([#419](https://github.com/opensearch-project/opensearch-rs/pull/419))
+- Added an OpenAPI specification reader to the API generator (`cargo run -p api_generator -- --openapi [FILE]`), generating the client from the published `opensearch-openapi.yaml`
+- Added plugin API namespaces generated from the OpenAPI specification: `asynchronous_search`, `flow_framework`, `geospatial`, `ingestion`, `insights`, `ism`, `knn`, `list`, `ltr`, `ml`, `neural`, `notifications`, `observability`, `ppl`, `query`, `replication`, `rollups`, `search_relevance`, `security`, `security_analytics`, `sm`, `sql`, `transforms`, `ubi` and `wlm`
+- Added core APIs present in the OpenAPI specification: data streams, search pipelines, point-in-time, cluster weighted routing and decommission awareness, remote store, `tasks.delete` and more
+- Added `Method::Patch` support to the HTTP transport for security plugin PATCH APIs
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.39.1 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389), [#420](https://github.com/opensearch-project/opensearch-rs/pull/420))

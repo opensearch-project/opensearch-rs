@@ -24,22 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Ingest APIs
-//!
-//! Manage ingest pipelines : Ingest pipelines can be used on a node with the `ingest` role to
-//! pre-process documents before indexing, to apply transformations and enrich data. Transformations are performed
-//! by processors in the pipeline, and can include such operations as
-//!
-//! - add, remove and append fields within the document
-//! - point documents to the right time-based index based on a timestamp within the document
-//! - extract details from fields with known formats and add new fields with extracted data
-//!
-//! and many more.
-//!
-//! All nodes enable ingest by default, so any node can handle ingest tasks. Ingest pipelines can
-//! be conditionally executed, and failures within pipelines can be explicitly handled by defining
-//! processors to execute in the event of failure.
-
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -57,64 +41,70 @@ use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Delete Pipeline API"]
-pub enum IngestDeletePipelineParts<'b> {
-    #[doc = "Id"]
-    Id(&'b str),
+#[doc = "API parts for the Observability Create Object API"]
+pub enum ObservabilityCreateObjectParts {
+    #[doc = "No parts"]
+    None,
 }
-impl<'b> IngestDeletePipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Delete Pipeline API"]
+impl ObservabilityCreateObjectParts {
+    #[doc = "Builds a relative URL path to the Observability Create Object API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestDeletePipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
+            ObservabilityCreateObjectParts::None => "/_plugins/_observability/object".into(),
         }
     }
 }
-#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
+#[doc = "Builder for the Observability Create Object API\n\nCreates a new observability object."]
 #[derive(Clone, Debug)]
-pub struct IngestDeletePipeline<'a, 'b> {
+pub struct ObservabilityCreateObject<'a, 'b, B> {
     transport: &'a Transport,
-    parts: IngestDeletePipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: ObservabilityCreateObjectParts,
+    body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestDeletePipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestDeletePipelineParts<'b>) -> Self {
+impl<'a, 'b, B> ObservabilityCreateObject<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [ObservabilityCreateObject]"]
+    pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        IngestDeletePipeline {
+        ObservabilityCreateObject {
             transport,
-            parts,
+            parts: ObservabilityCreateObjectParts::None,
             headers,
-            cluster_manager_timeout: None,
+            body: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
     }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> ObservabilityCreateObject<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        ObservabilityCreateObject {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -136,10 +126,123 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Observability Create Object API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Observability Delete Object API"]
+pub enum ObservabilityDeleteObjectParts<'b> {
+    #[doc = "ObjectId"]
+    ObjectId(&'b str),
+}
+impl<'b> ObservabilityDeleteObjectParts<'b> {
+    #[doc = "Builds a relative URL path to the Observability Delete Object API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            ObservabilityDeleteObjectParts::ObjectId(object_id) => {
+                let encoded_object_id: Cow<str> =
+                    percent_encode(object_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(32usize + encoded_object_id.len());
+                p.push_str("/_plugins/_observability/object/");
+                p.push_str(encoded_object_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Observability Delete Object API\n\nDeletes specific observability object specified by ID."]
+#[derive(Clone, Debug)]
+pub struct ObservabilityDeleteObject<'a, 'b> {
+    transport: &'a Transport,
+    parts: ObservabilityDeleteObjectParts<'b>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> ObservabilityDeleteObject<'a, 'b> {
+    #[doc = "Creates a new instance of [ObservabilityDeleteObject] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: ObservabilityDeleteObjectParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        ObservabilityDeleteObject {
+            transport,
+            parts,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -157,12 +260,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Delete Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Observability Delete Object API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Delete;
@@ -172,25 +270,19 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -203,65 +295,298 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Get Pipeline API"]
-pub enum IngestGetPipelineParts<'b> {
+#[doc = "API parts for the Observability Delete Objects API"]
+pub enum ObservabilityDeleteObjectsParts {
     #[doc = "No parts"]
     None,
-    #[doc = "Id"]
-    Id(&'b str),
 }
-impl<'b> IngestGetPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Get Pipeline API"]
+impl ObservabilityDeleteObjectsParts {
+    #[doc = "Builds a relative URL path to the Observability Delete Objects API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestGetPipelineParts::None => "/_ingest/pipeline".into(),
-            IngestGetPipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
+            ObservabilityDeleteObjectsParts::None => "/_plugins/_observability/object".into(),
+        }
+    }
+}
+#[doc = "Builder for the Observability Delete Objects API\n\nDeletes specific observability objects specified by ID or a list of IDs."]
+#[derive(Clone, Debug)]
+pub struct ObservabilityDeleteObjects<'a, 'b> {
+    transport: &'a Transport,
+    parts: ObservabilityDeleteObjectsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    objectid: Option<&'b str>,
+    objectidlist: Option<&'b str>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> ObservabilityDeleteObjects<'a, 'b> {
+    #[doc = "Creates a new instance of [ObservabilityDeleteObjects]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        ObservabilityDeleteObjects {
+            transport,
+            parts: ObservabilityDeleteObjectsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            objectid: None,
+            objectidlist: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "The ID of a single observability object to delete."]
+    pub fn objectid(mut self, objectid: &'b str) -> Self {
+        self.objectid = Some(objectid);
+        self
+    }
+    #[doc = "A comma-separated list of observability object IDs to delete."]
+    pub fn objectidlist(mut self, objectidlist: &'b str) -> Self {
+        self.objectidlist = Some(objectidlist);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Observability Delete Objects API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Delete;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                #[serde(rename = "objectId")]
+                objectid: Option<&'b str>,
+                #[serde(rename = "objectIdList")]
+                objectidlist: Option<&'b str>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                objectid: self.objectid,
+                objectidlist: self.objectidlist,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Observability Get Localstats API"]
+pub enum ObservabilityGetLocalstatsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl ObservabilityGetLocalstatsParts {
+    #[doc = "Builds a relative URL path to the Observability Get Localstats API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            ObservabilityGetLocalstatsParts::None => "/_plugins/_observability/_local/stats".into(),
+        }
+    }
+}
+#[doc = "Builder for the Observability Get Localstats API\n\nRetrieves local stats of all observability objects."]
+#[derive(Clone, Debug)]
+pub struct ObservabilityGetLocalstats<'a, 'b> {
+    transport: &'a Transport,
+    parts: ObservabilityGetLocalstatsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> ObservabilityGetLocalstats<'a, 'b> {
+    #[doc = "Creates a new instance of [ObservabilityGetLocalstats]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        ObservabilityGetLocalstats {
+            transport,
+            parts: ObservabilityGetLocalstatsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Observability Get Localstats API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Observability Get Object API"]
+pub enum ObservabilityGetObjectParts<'b> {
+    #[doc = "ObjectId"]
+    ObjectId(&'b str),
+}
+impl<'b> ObservabilityGetObjectParts<'b> {
+    #[doc = "Builds a relative URL path to the Observability Get Object API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            ObservabilityGetObjectParts::ObjectId(object_id) => {
+                let encoded_object_id: Cow<str> =
+                    percent_encode(object_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(32usize + encoded_object_id.len());
+                p.push_str("/_plugins/_observability/object/");
+                p.push_str(encoded_object_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
+#[doc = "Builder for the Observability Get Object API\n\nRetrieves specific observability object specified by ID."]
 #[derive(Clone, Debug)]
-pub struct IngestGetPipeline<'a, 'b> {
+pub struct ObservabilityGetObject<'a, 'b> {
     transport: &'a Transport,
-    parts: IngestGetPipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: ObservabilityGetObjectParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-impl<'a, 'b> IngestGetPipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestGetPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestGetPipelineParts<'b>) -> Self {
+impl<'a, 'b> ObservabilityGetObject<'a, 'b> {
+    #[doc = "Creates a new instance of [ObservabilityGetObject] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: ObservabilityGetObjectParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestGetPipeline {
+        ObservabilityGetObject {
             transport,
             parts,
             headers,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
         }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -283,12 +608,6 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -304,7 +623,7 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Ingest Get Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Observability Get Object API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Get;
@@ -314,21 +633,17 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
             };
@@ -343,47 +658,45 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Processor Grok API"]
-pub enum IngestProcessorGrokParts {
+#[doc = "API parts for the Observability List Objects API"]
+pub enum ObservabilityListObjectsParts {
     #[doc = "No parts"]
     None,
 }
-impl IngestProcessorGrokParts {
-    #[doc = "Builds a relative URL path to the Ingest Processor Grok API"]
+impl ObservabilityListObjectsParts {
+    #[doc = "Builds a relative URL path to the Observability List Objects API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestProcessorGrokParts::None => "/_ingest/processor/grok".into(),
+            ObservabilityListObjectsParts::None => "/_plugins/_observability/object".into(),
         }
     }
 }
-#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
+#[doc = "Builder for the Observability List Objects API\n\nRetrieves list of all observability objects."]
 #[derive(Clone, Debug)]
-pub struct IngestProcessorGrok<'a, 'b> {
+pub struct ObservabilityListObjects<'a, 'b> {
     transport: &'a Transport,
-    parts: IngestProcessorGrokParts,
+    parts: ObservabilityListObjectsParts,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    s: Option<bool>,
     source: Option<&'b str>,
 }
-impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestProcessorGrok]"]
+impl<'a, 'b> ObservabilityListObjects<'a, 'b> {
+    #[doc = "Creates a new instance of [ObservabilityListObjects]"]
     pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        IngestProcessorGrok {
+        ObservabilityListObjects {
             transport,
-            parts: IngestProcessorGrokParts::None,
+            parts: ObservabilityListObjectsParts::None,
             headers,
             error_trace: None,
             filter_path: None,
             human: None,
             pretty: None,
             request_timeout: None,
-            s: None,
             source: None,
         }
     }
@@ -417,17 +730,12 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Determines how to sort returned grok patterns by key name."]
-    pub fn s(mut self, s: bool) -> Self {
-        self.s = Some(s);
-        self
-    }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
     pub fn source(mut self, source: &'b str) -> Self {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Ingest Processor Grok API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Observability List Objects API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Get;
@@ -442,7 +750,6 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                s: Option<bool>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -450,7 +757,6 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 pretty: self.pretty,
-                s: self.s,
                 source: self.source,
             };
             Some(query_params)
@@ -464,90 +770,77 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Put Pipeline API"]
-pub enum IngestPutPipelineParts<'b> {
-    #[doc = "Id"]
-    Id(&'b str),
+#[doc = "API parts for the Observability Update Object API"]
+pub enum ObservabilityUpdateObjectParts<'b> {
+    #[doc = "ObjectId"]
+    ObjectId(&'b str),
 }
-impl<'b> IngestPutPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Put Pipeline API"]
+impl<'b> ObservabilityUpdateObjectParts<'b> {
+    #[doc = "Builds a relative URL path to the Observability Update Object API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestPutPipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
+            ObservabilityUpdateObjectParts::ObjectId(object_id) => {
+                let encoded_object_id: Cow<str> =
+                    percent_encode(object_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(32usize + encoded_object_id.len());
+                p.push_str("/_plugins/_observability/object/");
+                p.push_str(encoded_object_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
+#[doc = "Builder for the Observability Update Object API\n\nUpdates an existing observability object."]
 #[derive(Clone, Debug)]
-pub struct IngestPutPipeline<'a, 'b, B> {
+pub struct ObservabilityUpdateObject<'a, 'b, B> {
     transport: &'a Transport,
-    parts: IngestPutPipelineParts<'b>,
+    parts: ObservabilityUpdateObjectParts<'b>,
     body: Option<B>,
-    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b, B> IngestPutPipeline<'a, 'b, B>
+impl<'a, 'b, B> ObservabilityUpdateObject<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [IngestPutPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestPutPipelineParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [ObservabilityUpdateObject] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: ObservabilityUpdateObjectParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestPutPipeline {
+        ObservabilityUpdateObject {
             transport,
             parts,
             headers,
             body: None,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
     }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestPutPipeline<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> ObservabilityUpdateObject<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        IngestPutPipeline {
+        ObservabilityUpdateObject {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
-            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
-            timeout: self.timeout,
         }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -569,12 +862,6 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -590,12 +877,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Put Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Observability Update Object API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Put;
@@ -605,25 +887,19 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -635,209 +911,59 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Simulate API"]
-pub enum IngestSimulateParts<'b> {
-    #[doc = "No parts"]
-    None,
-    #[doc = "Id"]
-    Id(&'b str),
-}
-impl<'b> IngestSimulateParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Simulate API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestSimulateParts::None => "/_ingest/pipeline/_simulate".into(),
-            IngestSimulateParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(28usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_simulate");
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
-#[derive(Clone, Debug)]
-pub struct IngestSimulate<'a, 'b, B> {
-    transport: &'a Transport,
-    parts: IngestSimulateParts<'b>,
-    body: Option<B>,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-    verbose: Option<bool>,
-}
-impl<'a, 'b, B> IngestSimulate<'a, 'b, B>
-where
-    B: Body,
-{
-    #[doc = "Creates a new instance of [IngestSimulate] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestSimulateParts<'b>) -> Self {
-        let headers = HeaderMap::new();
-        IngestSimulate {
-            transport,
-            parts,
-            headers,
-            body: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-            verbose: None,
-        }
-    }
-    #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestSimulate<'a, 'b, JsonBody<T>>
-    where
-        T: Serialize,
-    {
-        IngestSimulate {
-            transport: self.transport,
-            parts: self.parts,
-            body: Some(body.into()),
-            error_trace: self.error_trace,
-            filter_path: self.filter_path,
-            headers: self.headers,
-            human: self.human,
-            pretty: self.pretty,
-            request_timeout: self.request_timeout,
-            source: self.source,
-            verbose: self.verbose,
-        }
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "When `true`, the response includes output data for each processor in the pipeline"]
-    pub fn verbose(mut self, verbose: bool) -> Self {
-        self.verbose = Some(verbose);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Simulate API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = match self.body {
-            Some(_) => Method::Post,
-            None => Method::Get,
-        };
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-                verbose: Option<bool>,
-            }
-            let query_params = QueryParams {
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                pretty: self.pretty,
-                source: self.source,
-                verbose: self.verbose,
-            };
-            Some(query_params)
-        };
-        let body = self.body;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[doc = "Namespace client for Ingest APIs"]
-pub struct Ingest<'a> {
+#[doc = "Namespace client for Observability APIs"]
+pub struct Observability<'a> {
     transport: &'a Transport,
 }
-impl<'a> Ingest<'a> {
-    #[doc = "Creates a new instance of [Ingest]"]
+impl<'a> Observability<'a> {
+    #[doc = "Creates a new instance of [Observability]"]
     pub fn new(transport: &'a Transport) -> Self {
         Self { transport }
     }
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
-    pub fn delete_pipeline<'b>(
+    #[doc = "Observability Create Object API\n\nCreates a new observability object."]
+    pub fn create_object<'b>(&'a self) -> ObservabilityCreateObject<'a, 'b, ()> {
+        ObservabilityCreateObject::new(self.transport())
+    }
+    #[doc = "Observability Delete Object API\n\nDeletes specific observability object specified by ID."]
+    pub fn delete_object<'b>(
         &'a self,
-        parts: IngestDeletePipelineParts<'b>,
-    ) -> IngestDeletePipeline<'a, 'b> {
-        IngestDeletePipeline::new(self.transport(), parts)
+        parts: ObservabilityDeleteObjectParts<'b>,
+    ) -> ObservabilityDeleteObject<'a, 'b> {
+        ObservabilityDeleteObject::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
-    pub fn get_pipeline<'b>(
+    #[doc = "Observability Delete Objects API\n\nDeletes specific observability objects specified by ID or a list of IDs."]
+    pub fn delete_objects<'b>(&'a self) -> ObservabilityDeleteObjects<'a, 'b> {
+        ObservabilityDeleteObjects::new(self.transport())
+    }
+    #[doc = "Observability Get Localstats API\n\nRetrieves local stats of all observability objects."]
+    pub fn get_localstats<'b>(&'a self) -> ObservabilityGetLocalstats<'a, 'b> {
+        ObservabilityGetLocalstats::new(self.transport())
+    }
+    #[doc = "Observability Get Object API\n\nRetrieves specific observability object specified by ID."]
+    pub fn get_object<'b>(
         &'a self,
-        parts: IngestGetPipelineParts<'b>,
-    ) -> IngestGetPipeline<'a, 'b> {
-        IngestGetPipeline::new(self.transport(), parts)
+        parts: ObservabilityGetObjectParts<'b>,
+    ) -> ObservabilityGetObject<'a, 'b> {
+        ObservabilityGetObject::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
-    pub fn processor_grok<'b>(&'a self) -> IngestProcessorGrok<'a, 'b> {
-        IngestProcessorGrok::new(self.transport())
+    #[doc = "Observability List Objects API\n\nRetrieves list of all observability objects."]
+    pub fn list_objects<'b>(&'a self) -> ObservabilityListObjects<'a, 'b> {
+        ObservabilityListObjects::new(self.transport())
     }
-    #[doc = "[Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
-    pub fn put_pipeline<'b>(
+    #[doc = "Observability Update Object API\n\nUpdates an existing observability object."]
+    pub fn update_object<'b>(
         &'a self,
-        parts: IngestPutPipelineParts<'b>,
-    ) -> IngestPutPipeline<'a, 'b, ()> {
-        IngestPutPipeline::new(self.transport(), parts)
-    }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
-    pub fn simulate<'b>(&'a self, parts: IngestSimulateParts<'b>) -> IngestSimulate<'a, 'b, ()> {
-        IngestSimulate::new(self.transport(), parts)
+        parts: ObservabilityUpdateObjectParts<'b>,
+    ) -> ObservabilityUpdateObject<'a, 'b, ()> {
+        ObservabilityUpdateObject::new(self.transport(), parts)
     }
 }
 impl OpenSearch {
-    #[doc = "Creates a namespace client for Ingest APIs"]
-    pub fn ingest(&self) -> Ingest {
-        Ingest::new(self.transport())
+    #[doc = "Creates a namespace client for Observability APIs"]
+    pub fn observability(&self) -> Observability {
+        Observability::new(self.transport())
     }
 }

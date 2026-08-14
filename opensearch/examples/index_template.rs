@@ -204,7 +204,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     client
         .indices()
-        .get_index_template(IndicesGetIndexTemplateParts::Name(&["books"]))
+        .get_index_template(IndicesGetIndexTemplateParts::Name("books"))
         .send()
         .await?;
 

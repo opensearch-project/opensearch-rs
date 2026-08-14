@@ -102,10 +102,12 @@ pub fn parse_expr(input: TokenStream) -> syn::Expr {
 }
 
 /// Ensures that the name generated is one that is valid for Rust
-pub fn valid_name(s: &str) -> &str {
+pub fn valid_name(s: &str) -> String {
     match s {
-        "type" => "ty",
-        s => s,
+        "type" => "ty".to_string(),
+        // dotted query parameter names (e.g. "chime.url") are not valid
+        // identifiers; serde rename preserves the original wire name
+        s => s.replace('.', "_"),
     }
 }
 
@@ -126,7 +128,7 @@ fn path_segments(paths: Vec<(&str, Vec<syn::Lifetime>, Vec<syn::Type>)>) -> syn:
         segments: paths
             .into_iter()
             .map::<PathSegment, _>(|(path, lifetimes, types)| {
-                let ident = ident(valid_name(path));
+                let ident = ident(&valid_name(path));
                 PathSegment {
                     ident,
                     arguments: if !lifetimes.is_empty() || !types.is_empty() {

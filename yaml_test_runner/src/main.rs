@@ -66,6 +66,14 @@ fn main() -> anyhow::Result<()> {
             .help("The url of a running OpenSearch cluster. Used to determine the version, test suite and branch to use to compile tests")
             .required(true)
             .takes_value(true))
+        .arg(Arg::with_name("openapi")
+            .short("o")
+            .long("openapi")
+            .value_name("OPENAPI_FILE")
+            .help("Read the API model from the opensearch-api-specification OpenAPI document instead of the legacy REST API specs. When no file is given, the latest published specification is downloaded")
+            .takes_value(true)
+            .min_values(0)
+            .max_values(1))
         .get_matches();
 
     let url = matches.value_of("url").expect("missing 'url' argument");
@@ -81,39 +89,60 @@ fn main() -> anyhow::Result<()> {
     info!("Using branch {}", &branch);
     info!("Using test_suite {:?}", &suite);
 
-    let rest_specs_dir = Path::new("./api_generator/rest_specs");
+    let api = if matches.is_present("openapi") {
+        let default_path = Path::new("./api_generator/opensearch-openapi.yaml");
+        let spec_file = match matches.value_of("openapi") {
+            Some(f) => PathBuf::from(f),
+            None => {
+                if !default_path.exists() {
+                    api_generator::openapi::download_spec(default_path)?;
+                }
+                default_path.to_path_buf()
+            }
+        };
 
-    if !rest_specs_dir.exists()
-        || rest_specs_dir
-            .read_dir()
-            .map(|mut e| e.next().is_none())
-            .unwrap_or_else(|_| true)
-    {
-        error!(
-            "No rest specs found at {}. Run api_generator project to download rest specs",
-            rest_specs_dir.to_str().unwrap()
-        );
-        exit(1);
-    }
+        if !spec_file.exists() {
+            error!("No OpenAPI specification found at {}", spec_file.display());
+            exit(1);
+        }
 
-    let last_downloaded_rest_spec_branch = rest_specs_dir.join("last_downloaded_version");
+        info!("Using OpenAPI specification from {}", spec_file.display());
+        api_generator::openapi::read_api("opensearch-api-specification/main", &spec_file)?
+    } else {
+        let rest_specs_dir = Path::new("./api_generator/rest_specs");
 
-    if !last_downloaded_rest_spec_branch.exists() {
-        error!(
-            "No last downloaded rest version found at {}.",
-            last_downloaded_rest_spec_branch.to_str().unwrap()
-        );
-        exit(1);
-    }
-    let rest_spec_version = fs::read_to_string(last_downloaded_rest_spec_branch)?;
-    info!("Using rest specs from {}", &rest_spec_version);
+        if !rest_specs_dir.exists()
+            || rest_specs_dir
+                .read_dir()
+                .map(|mut e| e.next().is_none())
+                .unwrap_or_else(|_| true)
+        {
+            error!(
+                "No rest specs found at {}. Run api_generator project to download rest specs",
+                rest_specs_dir.to_str().unwrap()
+            );
+            exit(1);
+        }
+
+        let last_downloaded_rest_spec_branch = rest_specs_dir.join("last_downloaded_version");
+
+        if !last_downloaded_rest_spec_branch.exists() {
+            error!(
+                "No last downloaded rest version found at {}.",
+                last_downloaded_rest_spec_branch.to_str().unwrap()
+            );
+            exit(1);
+        }
+        let rest_spec_version = fs::read_to_string(last_downloaded_rest_spec_branch)?;
+        info!("Using rest specs from {}", &rest_spec_version);
+
+        api_generator::generator::read_api(&branch, rest_specs_dir)?
+    };
 
     let download_dir = PathBuf::from(format!("./{}/yaml", env!("CARGO_PKG_NAME")));
     let generated_dir = PathBuf::from(format!("./{}/tests", env!("CARGO_PKG_NAME")));
 
     github::download_test_suites(&branch, &download_dir)?;
-
-    let api = api_generator::generator::read_api(&branch, rest_specs_dir)?;
 
     // delete everything under the generated_dir except common dir
     if generated_dir.exists() {

@@ -337,8 +337,17 @@ impl ApiCall {
         variant: &str,
         options: &[serde_json::Value],
     ) -> anyhow::Result<TokenStream> {
-        if !variant.is_empty() && !options.contains(&serde_json::Value::String(variant.to_owned()))
-        {
+        // Match the variant against the options case-insensitively: the
+        // OpenAPI specification models enum values in lowercase (e.g.
+        // default_operator "and"/"or") while YAML tests may use uppercase
+        // (e.g. "AND"). Use the option's casing to derive the variant name
+        // so it matches the generated client.
+        let matched_option = options
+            .iter()
+            .filter_map(serde_json::Value::as_str)
+            .find(|o| o.eq_ignore_ascii_case(variant));
+
+        if !variant.is_empty() && matched_option.is_none() {
             return Err(anyhow!(
                 "options {:?} does not contain value {}",
                 &options,
@@ -358,7 +367,10 @@ impl ApiCall {
                 return Err(anyhow!("unhandled empty value for {}", &e));
             }
         } else {
-            syn::Ident::new(&variant.to_pascal_case(), Span::call_site())
+            syn::Ident::new(
+                &matched_option.unwrap_or(variant).to_pascal_case(),
+                Span::call_site(),
+            )
         };
 
         Ok(quote!(#enum_name::#variant))
@@ -453,6 +465,12 @@ impl ApiCall {
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap() as i32)
                                         });
+                                    } else if s.is_empty() {
+                                        // yaml tests may pass an empty string to mean
+                                        // "unspecified" for params that the OpenAPI
+                                        // specification models as an integer, e.g. the
+                                        // deprecated cat.thread_pool size param. Omit
+                                        // the param in this case.
                                     } else {
                                         match s.parse::<i32>() {
                                             Ok(i) => tokens.append_all(quote! {
@@ -475,6 +493,12 @@ impl ApiCall {
                                         tokens.append_all(quote! {
                                            .#param_ident(#set_value.as_i64().unwrap())
                                         });
+                                    } else if s.is_empty() {
+                                        // yaml tests may pass an empty string to mean
+                                        // "unspecified" for params that the OpenAPI
+                                        // specification models as numeric, e.g. the
+                                        // deprecated cat.thread_pool size param. Omit
+                                        // the param in this case.
                                     } else {
                                         let i = s.parse::<i64>()?;
                                         tokens.append_all(quote! {
@@ -516,6 +540,14 @@ impl ApiCall {
                                     .#param_ident(&[#s])
                                 })
                             }
+                            TypeKind::String => {
+                                // the OpenAPI specification models some boolean|string
+                                // union params e.g. _source as strings
+                                let s = b.to_string();
+                                tokens.append_all(quote! {
+                                    .#param_ident(#s)
+                                })
+                            }
                             _ => {
                                 tokens.append_all(quote! {
                                     .#param_ident(#b)
@@ -527,6 +559,14 @@ impl ApiCall {
                                 let s = i.to_string();
                                 tokens.append_all(quote! {
                                     .#param_ident(#s)
+                                })
+                            }
+                            TypeKind::List => {
+                                // the OpenAPI specification models some params that
+                                // accept scalar values e.g. routing as lists
+                                let s = i.to_string();
+                                tokens.append_all(quote! {
+                                    .#param_ident(&[#s])
                                 })
                             }
                             TypeKind::Integer => {
@@ -589,9 +629,30 @@ impl ApiCall {
                                     .#param_ident(&[#(#result),*])
                                 });
                             } else {
-                                tokens.append_all(quote! {
-                                    .#param_ident(&[#(#result),*])
-                                });
+                                match kind {
+                                    // the OpenAPI specification models some params that
+                                    // accept comma-separated values as strings
+                                    TypeKind::String => {
+                                        let s = result.iter().join(",");
+                                        tokens.append_all(quote! {
+                                            .#param_ident(#s)
+                                        });
+                                    }
+                                    // a single-valued enum param may be passed as a
+                                    // one element array in yaml tests
+                                    TypeKind::Enum if result.len() == 1 => {
+                                        let e =
+                                            Self::generate_enum(n, result[0].as_str(), &ty.options)?;
+                                        tokens.append_all(quote! {
+                                            .#param_ident(#e)
+                                        });
+                                    }
+                                    _ => {
+                                        tokens.append_all(quote! {
+                                            .#param_ident(&[#(#result),*])
+                                        });
+                                    }
+                                }
                             }
                         }
                         _ => println!("unsupported value {:?} for param {}", v, n),
@@ -601,6 +662,15 @@ impl ApiCall {
                 Ok(Some(tokens))
             }
         }
+    }
+
+    /// Whether a URL path part matches the name used in a yaml test.
+    ///
+    /// The OpenAPI specification models some alternative path parts as a
+    /// single composite part e.g. `{node_id_or_metric}`, while yaml tests
+    /// use the legacy part names e.g. `metric`.
+    fn part_matches(path_part: &str, name: &str) -> bool {
+        path_part == name || path_part.split("_or_").any(|p| p == name)
     }
 
     fn generate_parts(
@@ -646,24 +716,34 @@ impl ApiCall {
                 }
             }
             _ => {
-                // get the matching path parts
-                let matching_path_parts = endpoint
-                    .url
-                    .paths
-                    .iter()
-                    .filter(|path| {
-                        let p = path.path.params();
-                        if p.len() != parts.len() {
-                            return false;
-                        }
+                // get the matching path parts, preferring exact part name
+                // matches over composite (`a_or_b`) part matches
+                let find_matching_paths = |exact: bool| {
+                    endpoint
+                        .url
+                        .paths
+                        .iter()
+                        .filter(|path| {
+                            let p = path.path.params();
+                            if p.len() != parts.len() {
+                                return false;
+                            }
 
-                        let contains =
-                            parts
-                                .iter()
-                                .filter_map(|i| if p.contains(&i.0) { Some(()) } else { None });
-                        contains.count() == parts.len()
-                    })
-                    .collect::<Vec<_>>();
+                            parts.iter().all(|i| {
+                                if exact {
+                                    p.contains(&i.0)
+                                } else {
+                                    p.iter().any(|pp| Self::part_matches(pp, i.0))
+                                }
+                            })
+                        })
+                        .collect::<Vec<_>>()
+                };
+
+                let mut matching_path_parts = find_matching_paths(true);
+                if matching_path_parts.is_empty() {
+                    matching_path_parts = find_matching_paths(false);
+                }
 
                 match matching_path_parts.len() {
                     0 => None,
@@ -680,6 +760,19 @@ impl ApiCall {
         })?;
 
         let path_parts = path.path.params();
+
+        // remap the yaml part names onto the path's part names, to support
+        // composite parts e.g. metric -> node_id_or_metric
+        let parts: Vec<(&str, &Value)> = parts
+            .iter()
+            .map(|(name, v)| {
+                match path_parts.iter().find(|pp| Self::part_matches(pp, name)) {
+                    Some(pp) => (*pp, *v),
+                    None => (*name, *v),
+                }
+            })
+            .collect();
+        let parts = parts.as_slice();
         let variant_name = {
             let v = path_parts
                 .iter()

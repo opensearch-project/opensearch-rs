@@ -63,6 +63,18 @@ description = "Generates OpenSearch client tests from YAML tests"
 dependencies = ["start-opensearch", "generate-yaml-tests-inner", "format"]
 run_task = "stop-opensearch"
 
+[tasks.generate-yaml-tests-openapi-inner]
+category = "OpenSearch"
+private = true
+command = "cargo"
+args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}", "--openapi"]
+
+[tasks.generate-yaml-tests-openapi]
+category = "OpenSearch"
+description = "Generates OpenSearch client tests from YAML tests, using the OpenAPI specification for the API model"
+dependencies = ["start-opensearch", "generate-yaml-tests-openapi-inner", "format"]
+run_task = "stop-opensearch"
+
 [tasks.generate-api-inner]
 category = "OpenSearch"
 private = true

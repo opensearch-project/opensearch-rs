@@ -74,6 +74,11 @@ fn main() -> anyhow::Result<()> {
             .takes_value(true)
             .min_values(0)
             .max_values(1))
+        .arg(Arg::with_name("download-tests")
+            .short("d")
+            .long("download-tests")
+            .help("Download the yaml test suites matching the cluster from GitHub, replacing any existing ones. By default existing test suites are reused")
+            .takes_value(false))
         .get_matches();
 
     let url = matches.value_of("url").expect("missing 'url' argument");
@@ -142,7 +147,11 @@ fn main() -> anyhow::Result<()> {
     let download_dir = PathBuf::from(format!("./{}/yaml", env!("CARGO_PKG_NAME")));
     let generated_dir = PathBuf::from(format!("./{}/tests", env!("CARGO_PKG_NAME")));
 
-    github::download_test_suites(&branch, &download_dir)?;
+    github::ensure_test_suites(
+        &branch,
+        &download_dir,
+        matches.is_present("download-tests"),
+    )?;
 
     // delete everything under the generated_dir except common dir
     if generated_dir.exists() {

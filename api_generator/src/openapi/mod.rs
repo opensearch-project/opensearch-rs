@@ -38,7 +38,7 @@ use std::{
 };
 
 /// The release artifact of the OpenSearch API specification
-pub const SPEC_URL: &str = "https://github.com/opensearch-project/opensearch-api-specification/releases/download/main-latest/opensearch-openapi.yaml";
+pub const SPEC_URL: &str = "https://api-spec.opensearch.org/opensearch-openapi.yaml";
 
 /// HTTP methods that may appear as keys of an OpenAPI path item
 const METHODS: &[&str] = &["get", "put", "post", "delete", "head", "patch"];

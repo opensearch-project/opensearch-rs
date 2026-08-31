@@ -902,7 +902,7 @@ components:
         let err = read_fixture_err(&spec);
         assert!(
             err.contains("unresolved schema $ref: #/components/schemas/Missing"),
-            "unexpected error: {err}"
+            "unexpected error: {}", err
         );
     }
 
@@ -917,7 +917,7 @@ components:
         let err = read_fixture_err(&spec);
         assert!(
             err.contains("unsupported schema $ref"),
-            "unexpected error: {err}"
+            "unexpected error: {}", err
         );
     }
 
@@ -934,7 +934,7 @@ components:
         let err = read_fixture_err(&spec);
         assert!(
             err.contains("too deep or cyclic"),
-            "unexpected error: {err}"
+            "unexpected error: {}", err
         );
     }
 
@@ -954,7 +954,7 @@ components:
         let err = read_fixture_err(&spec);
         assert!(
             err.contains("unresolved schema $ref: #/components/schemas/Missing"),
-            "unexpected error: {err}"
+            "unexpected error: {}", err
         );
     }
 

@@ -95,6 +95,8 @@ impl<'a> RequestBuilder<'a> {
                     }
                 }
             }
+            // normalize: the combination must not depend on path order
+            m.sort();
             m
         };
 

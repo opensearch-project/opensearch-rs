@@ -55,7 +55,7 @@ env = { CLEANUP = true, DETACH = false }
 category = "OpenSearch"
 private = true
 command = "cargo"
-args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}", "--download-tests"]
+args = ["run", "-p", "yaml_test_runner", "--", "-u", "${OPENSEARCH_URL}", "--openapi", "--download-tests"]
 
 [tasks.generate-yaml-tests]
 category = "OpenSearch"

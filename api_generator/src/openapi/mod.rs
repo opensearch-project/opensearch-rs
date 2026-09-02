@@ -38,7 +38,7 @@ use std::{
 };
 
 /// The release artifact of the OpenSearch API specification
-pub const SPEC_URL: &str = "https://github.com/opensearch-project/opensearch-api-specification/releases/download/main-latest/opensearch-openapi.yaml";
+pub const SPEC_URL: &str = "https://api-spec.opensearch.org/opensearch-openapi.yaml";
 
 /// HTTP methods that may appear as keys of an OpenAPI path item
 const METHODS: &[&str] = &["get", "put", "post", "delete", "head", "patch"];
@@ -180,27 +180,35 @@ impl Resolver {
     }
 
     /// Resolves a schema `$ref` chain, returning the schema and the name of
-    /// the last `$ref` followed (used for heuristics such as Duration -> time)
-    fn schema<'a>(&'a self, schema: &'a Value) -> (&'a Value, Option<&'a str>) {
+    /// the last `$ref` followed (used for heuristics such as Duration -> time).
+    ///
+    /// Returns an error if a `$ref` does not point into
+    /// `#/components/schemas/`, if a referenced schema does not exist, or
+    /// if the chain does not resolve within the depth limit (a cycle or a
+    /// pathologically deep chain)
+    fn schema<'a>(&'a self, schema: &'a Value) -> anyhow::Result<(&'a Value, Option<&'a str>)> {
         let mut current = schema;
         let mut last_name = None;
         // depth-limit to guard against reference cycles
         for _ in 0..8 {
-            match current["$ref"].as_str() {
-                Some(r) => match r.strip_prefix("#/components/schemas/") {
-                    Some(name) => match self.schemas.get(name) {
-                        Some(s) => {
-                            last_name = Some(name);
-                            current = s;
-                        }
-                        None => break,
-                    },
-                    None => break,
-                },
-                None => break,
-            }
+            let r = match current["$ref"].as_str() {
+                Some(r) => r,
+                None => return Ok((current, last_name)),
+            };
+            let name = r
+                .strip_prefix("#/components/schemas/")
+                .ok_or_else(|| anyhow!("unsupported schema $ref: {}", r))?;
+            let schema = self
+                .schemas
+                .get(name)
+                .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?;
+            last_name = Some(name);
+            current = schema;
         }
-        (current, last_name)
+        match current["$ref"].as_str() {
+            Some(r) => bail!("schema $ref chain too deep or cyclic at: {}", r),
+            None => Ok((current, last_name)),
+        }
     }
 }
 
@@ -257,7 +265,7 @@ fn to_legacy_endpoint(
                     Some(n) => n,
                     None => continue,
                 };
-                let legacy_type = to_legacy_type(param, resolver);
+                let legacy_type = to_legacy_type(param, resolver)?;
                 match param["in"].as_str() {
                     Some("path") => {
                         // legacy REST specs never type URL parts as enums,
@@ -370,9 +378,9 @@ fn to_legacy_body(request_body: &Value) -> Value {
 }
 
 /// Converts an OpenAPI parameter into a legacy [Type] JSON object
-fn to_legacy_type(param: &Value, resolver: &Resolver) -> Value {
-    let (schema, ref_name) = resolver.schema(&param["schema"]);
-    let (kind, options) = to_legacy_type_kind(schema, ref_name, resolver);
+fn to_legacy_type(param: &Value, resolver: &Resolver) -> anyhow::Result<Value> {
+    let (schema, ref_name) = resolver.schema(&param["schema"])?;
+    let (kind, options) = to_legacy_type_kind(schema, ref_name, resolver)?;
 
     let mut ty = json!({
         "type": kind,
@@ -390,7 +398,7 @@ fn to_legacy_type(param: &Value, resolver: &Resolver) -> Value {
             "description": param["x-deprecation-message"].as_str().unwrap_or("Deprecated"),
         });
     }
-    ty
+    Ok(ty)
 }
 
 /// Maps a resolved OpenAPI schema to a legacy type kind string and
@@ -399,7 +407,7 @@ fn to_legacy_type_kind(
     schema: &Value,
     ref_name: Option<&str>,
     resolver: &Resolver,
-) -> (&'static str, Option<Vec<Value>>) {
+) -> anyhow::Result<(&'static str, Option<Vec<Value>>)> {
     // enum-like schemas: a flat `enum`, a `const`, or a `oneOf` whose
     // variants each contribute fixed string values. This covers mixed
     // forms such as _common___ByteUnit (const and multi-value enum
@@ -407,41 +415,39 @@ fn to_legacy_type_kind(
     // _common___ExpandWildcards (scalar and array-of-scalar variants for
     // the comma-separated form) and _common___Refresh (a boolean variant,
     // ignored because the "true"/"false" consts cover it)
-    if let Some(values) = collect_enum_values(schema, resolver) {
-        return match valid_enum_values(values) {
+    if let Some(values) = collect_enum_values(schema, resolver)? {
+        return Ok(match valid_enum_values(values) {
             Some(values) => ("enum", Some(values)),
             // values that cannot become Rust identifiers, e.g. "1".."5"
             None => ("string", None),
-        };
+        });
     }
 
     if let Some(one_of) = schema["oneOf"].as_array() {
+        let mut variant_types = Vec::with_capacity(one_of.len());
+        for variant in one_of {
+            variant_types.push(resolver.schema(variant)?.0["type"].as_str());
+        }
         // oneOf [scalar, array of scalar] used for comma-separated values
         // of arbitrary strings, e.g. _common___Indices
-        if one_of
-            .iter()
-            .any(|v| resolver.schema(v).0["type"].as_str() == Some("array"))
-        {
-            return ("list", None);
+        if variant_types.contains(&Some("array")) {
+            return Ok(("list", None));
         }
         // boolean alongside numeric variants (e.g. _core.search___TrackHits)
         // maps to the legacy boolean type; the code generator special-cases
         // parameters like track_total_hits by name
-        let types: Vec<&str> = one_of
-            .iter()
-            .filter_map(|v| resolver.schema(v).0["type"].as_str())
-            .collect();
+        let types: Vec<&str> = variant_types.iter().flatten().copied().collect();
         if types.len() == one_of.len()
             && types.contains(&"boolean")
             && types
                 .iter()
                 .all(|t| matches!(*t, "boolean" | "integer" | "number"))
         {
-            return ("boolean", None);
+            return Ok(("boolean", None));
         }
     }
 
-    match schema["type"].as_str() {
+    Ok(match schema["type"].as_str() {
         Some("array") => ("list", None),
         Some("boolean") => ("boolean", None),
         Some("integer") => match schema["format"].as_str() {
@@ -464,7 +470,7 @@ fn to_legacy_type_kind(
         }
         // union types and unspecified schemas: default to string
         _ => ("string", None),
-    }
+    })
 }
 
 /// Whether an operation declares at least one 2xx (or default) response.
@@ -481,9 +487,10 @@ fn has_success_response(op: &Value) -> bool {
 }
 
 /// Recursively collects the fixed string values a schema can take,
-/// aggregating across all `oneOf` variants. Returns `None` if the schema
-/// (or any variant that must contribute) allows values that are not fixed
-/// strings, so that the caller falls back to a non-enum type.
+/// aggregating across all `oneOf` variants. Returns `Ok(None)` if the
+/// schema (or any variant that must contribute) allows values that are not
+/// fixed strings, so that the caller falls back to a non-enum type.
+/// Broken `$ref`s encountered while collecting are hard errors.
 ///
 /// - `enum` lists and `const` values contribute their strings
 /// - `oneOf` unions the values of all its variants
@@ -491,56 +498,61 @@ fn has_success_response(op: &Value) -> bool {
 ///   comma-separated form of an enum, e.g. _common___ExpandWildcards)
 /// - boolean variants are skipped (e.g. _common___Refresh, where the
 ///   "true"/"false" consts cover the boolean form)
-fn collect_enum_values(schema: &Value, resolver: &Resolver) -> Option<Vec<Value>> {
+fn collect_enum_values(schema: &Value, resolver: &Resolver) -> anyhow::Result<Option<Vec<Value>>> {
+    /// `Ok(true)`: collected, `Ok(false)`: not enum-like (soft failure),
+    /// `Err`: broken specification (hard error)
     fn collect(
         schema: &Value,
         resolver: &Resolver,
         depth: usize,
         out: &mut Vec<Value>,
-    ) -> Result<(), ()> {
+    ) -> anyhow::Result<bool> {
         // guard against pathological nesting
         if depth > 4 {
-            return Err(());
+            return Ok(false);
         }
-        let (schema, _) = resolver.schema(schema);
+        let (schema, _) = resolver.schema(schema)?;
 
         if let Some(values) = schema["enum"].as_array() {
             if values.is_empty() || !values.iter().all(|v| v.is_string()) {
-                return Err(());
+                return Ok(false);
             }
             out.extend(values.iter().cloned());
-            return Ok(());
+            return Ok(true);
         }
         match &schema["const"] {
             c @ Value::String(_) => {
                 out.push(c.clone());
-                return Ok(());
+                return Ok(true);
             }
             Value::Null => {}
             // non-string const, e.g. a number
-            _ => return Err(()),
+            _ => return Ok(false),
         }
         if let Some(one_of) = schema["oneOf"].as_array() {
             for variant in one_of {
-                let (resolved, _) = resolver.schema(variant);
-                match resolved["type"].as_str() {
+                let (resolved, _) = resolver.schema(variant)?;
+                let collected = match resolved["type"].as_str() {
                     // covered by explicit "true"/"false" consts where relevant
                     Some("boolean") => continue,
                     // comma-separated form: collect from the item schema
                     Some("array") => collect(&resolved["items"], resolver, depth + 1, out)?,
                     _ => collect(resolved, resolver, depth + 1, out)?,
+                };
+                if !collected {
+                    return Ok(false);
                 }
             }
-            return Ok(());
+            return Ok(true);
         }
-        Err(())
+        Ok(false)
     }
 
     let mut values = Vec::new();
-    match collect(schema, resolver, 0, &mut values) {
-        Ok(()) if !values.is_empty() => Some(values),
+    Ok(match collect(schema, resolver, 0, &mut values)? {
+        true if !values.is_empty() => Some(values),
         _ => None,
-    }
+    })
 }
 
 /// Validates candidate enum values, dropping duplicates that differ only in
@@ -577,9 +589,9 @@ fn common_params(resolver: &Resolver) -> anyhow::Result<BTreeMap<String, Type>> 
             && param["in"].as_str() == Some("query")
         {
             if let Some(name) = param["name"].as_str() {
-                common
-                    .entry(name.to_string())
-                    .or_insert_with(|| to_legacy_type(param, resolver));
+                if !common.contains_key(name) {
+                    common.insert(name.to_string(), to_legacy_type(param, resolver)?);
+                }
             }
         }
     }
@@ -746,10 +758,22 @@ components:
           enum: [red, RED]
 "#;
 
-    fn fixture_api() -> Api {
+    fn read_fixture(spec: &str) -> anyhow::Result<Api> {
         let mut file = tempfile::NamedTempFile::new().unwrap();
-        file.write_all(FIXTURE.as_bytes()).unwrap();
-        read_api("test", file.path()).unwrap()
+        file.write_all(spec.as_bytes()).unwrap();
+        read_api("test", file.path())
+    }
+
+    /// Reads a spec expected to fail, returning the error message
+    fn read_fixture_err(spec: &str) -> String {
+        match read_fixture(spec) {
+            Ok(_) => panic!("expected reading the spec to fail"),
+            Err(e) => e.to_string(),
+        }
+    }
+
+    fn fixture_api() -> Api {
+        read_fixture(FIXTURE).unwrap()
     }
 
     #[test]
@@ -836,5 +860,119 @@ components:
         let search = &api.root.endpoints()["search"];
         assert!(search.supports_body());
         assert!(!search.supports_nd_body());
+    }
+
+    /// A minimal spec with a single query parameter referencing `Root`,
+    /// alongside the given `components.schemas` entries (indented by 4)
+    fn broken_ref_fixture(schemas: &str) -> String {
+        format!(
+            r#"
+openapi: 3.1.0
+info:
+  title: Test
+  version: 0.0.0
+paths:
+  /_broken:
+    get:
+      operationId: broken.0
+      x-operation-group: broken
+      description: An endpoint with a broken schema reference.
+      parameters:
+        - name: p
+          in: query
+          description: A parameter.
+          schema:
+            $ref: '#/components/schemas/Root'
+      responses: {{}}
+components:
+  schemas:
+{schemas}
+"#
+        )
+    }
+
+    #[test]
+    fn errors_on_unresolved_schema_ref() {
+        let spec = broken_ref_fixture(
+            r#"
+    Root:
+      $ref: '#/components/schemas/Missing'
+"#,
+        );
+        let err = read_fixture_err(&spec);
+        assert!(
+            err.contains("unresolved schema $ref: #/components/schemas/Missing"),
+            "unexpected error: {}", err
+        );
+    }
+
+    #[test]
+    fn errors_on_unsupported_schema_ref() {
+        let spec = broken_ref_fixture(
+            r#"
+    Root:
+      $ref: 'other.yaml#/components/schemas/External'
+"#,
+        );
+        let err = read_fixture_err(&spec);
+        assert!(
+            err.contains("unsupported schema $ref"),
+            "unexpected error: {}", err
+        );
+    }
+
+    #[test]
+    fn errors_on_cyclic_schema_ref() {
+        let spec = broken_ref_fixture(
+            r#"
+    Root:
+      $ref: '#/components/schemas/Other'
+    Other:
+      $ref: '#/components/schemas/Root'
+"#,
+        );
+        let err = read_fixture_err(&spec);
+        assert!(
+            err.contains("too deep or cyclic"),
+            "unexpected error: {}", err
+        );
+    }
+
+    #[test]
+    fn errors_on_broken_ref_inside_one_of() {
+        // a broken $ref reached during enum collection is a hard error,
+        // not a silent fallback to the string type
+        let spec = broken_ref_fixture(
+            r#"
+    Root:
+      oneOf:
+        - $ref: '#/components/schemas/Missing'
+        - type: string
+          const: a
+"#,
+        );
+        let err = read_fixture_err(&spec);
+        assert!(
+            err.contains("unresolved schema $ref: #/components/schemas/Missing"),
+            "unexpected error: {}", err
+        );
+    }
+
+    #[test]
+    fn resolves_schema_ref_chains_within_depth_limit() {
+        // a valid (acyclic) chain still resolves
+        let spec = broken_ref_fixture(
+            r#"
+    Root:
+      $ref: '#/components/schemas/Middle'
+    Middle:
+      $ref: '#/components/schemas/Leaf'
+    Leaf:
+      type: boolean
+"#,
+        );
+        let api = read_fixture(&spec).unwrap();
+        let broken = &api.root.endpoints()["broken"];
+        assert_eq!(broken.params["p"].ty, TypeKind::Boolean);
     }
 }

@@ -15,6 +15,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added plugin API namespaces generated from the OpenAPI specification: `asynchronous_search`, `flow_framework`, `geospatial`, `ingestion`, `insights`, `ism`, `knn`, `list`, `ltr`, `ml`, `neural`, `notifications`, `observability`, `ppl`, `query`, `replication`, `rollups`, `search_relevance`, `security`, `security_analytics`, `sm`, `sql`, `transforms`, `ubi` and `wlm`
 - Added core APIs present in the OpenAPI specification: data streams, search pipelines, point-in-time, cluster weighted routing and decommission awareness, remote store, `tasks.delete` and more
 - Added `Method::Patch` support to the HTTP transport for security plugin PATCH APIs
+- Added an `--openapi` option to `yaml_test_runner` to generate tests from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document instead of the legacy REST API specs, bridging representation differences with the yaml test suites ([#472](https://github.com/opensearch-project/opensearch-rs/issues/472))
+- `yaml_test_runner` now reuses existing yaml test suites by default for reproducible, offline test generation; pass `--download-tests` (used by the `cargo make` tasks) to download the suites matching the cluster instead
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.39.1 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389), [#420](https://github.com/opensearch-project/opensearch-rs/pull/420))
@@ -48,6 +50,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 ### Fixed
+- Skipped the `_source` empty-value deprecation warning yaml tests, which expect warnings that OpenSearch distributions do not emit (verified on released versions up to 3.7.0 and a 3.9.0 nightly build)
+- Fixed `yaml_test_runner` ignoring comma-separated multi-range version skips in YAML tests (e.g. `" - 2.6.99, 2.13.0 - "`)
 
 ### Security
 

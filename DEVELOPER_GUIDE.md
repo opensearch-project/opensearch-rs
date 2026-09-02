@@ -47,7 +47,7 @@ The following information will help in getting up and running.
   cargo install --force cargo-make
   ```
 
-- [**Packages**]()
+- [**Packages**](#)
 
   Use your preferred package manager to install the following packages:
   

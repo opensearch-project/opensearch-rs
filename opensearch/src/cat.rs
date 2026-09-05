@@ -26,7 +26,7 @@
 
 //! Cat APIs
 //!
-//! The [Cat APIs](https://opensearch.org/docs/opensearch/rest-api/cat/index/) aim to
+//! The [Cat APIs](https://docs.opensearch.org/latest/api-reference/cat/index/) aim to
 //! meet the needs of humans when looking at data returned from OpenSearch,
 //! formatting it as compact, column aligned text, making it easier on human eyes.
 //!
@@ -160,7 +160,7 @@ impl<'b> CatAliasesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Aliases API](https://opensearch.org/docs/)\n\nShows information about currently configured aliases to indices including filter and routing infos."]
+#[doc = "Builder for the [Cat Aliases API](https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
 #[derive(Clone, Debug)]
 pub struct CatAliases<'a, 'b> {
     transport: &'a Transport,
@@ -205,27 +205,26 @@ impl<'a, 'b> CatAliases<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -235,22 +234,22 @@ impl<'a, 'b> CatAliases<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Whether to return information from the local node only instead of from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -260,7 +259,7 @@ impl<'a, 'b> CatAliases<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -270,7 +269,7 @@ impl<'a, 'b> CatAliases<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -327,6 +326,176 @@ impl<'a, 'b> CatAliases<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Cat All Pit Segments API"]
+pub enum CatAllPitSegmentsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl CatAllPitSegmentsParts {
+    #[doc = "Builds a relative URL path to the Cat All Pit Segments API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            CatAllPitSegmentsParts::None => "/_cat/pit_segments/_all".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Cat All Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
+#[derive(Clone, Debug)]
+pub struct CatAllPitSegments<'a, 'b> {
+    transport: &'a Transport,
+    parts: CatAllPitSegmentsParts,
+    bytes: Option<Bytes>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    h: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    help: Option<bool>,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    s: Option<&'b [&'b str]>,
+    source: Option<&'b str>,
+    v: Option<bool>,
+}
+impl<'a, 'b> CatAllPitSegments<'a, 'b> {
+    #[doc = "Creates a new instance of [CatAllPitSegments]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let mut headers = HeaderMap::with_capacity(2);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("text/plain"));
+        headers.insert(ACCEPT, HeaderValue::from_static("text/plain"));
+        CatAllPitSegments {
+            transport,
+            parts: CatAllPitSegmentsParts::None,
+            headers,
+            bytes: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            h: None,
+            help: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            s: None,
+            source: None,
+            v: None,
+        }
+    }
+    #[doc = "The units used to display byte values."]
+    pub fn bytes(mut self, bytes: Bytes) -> Self {
+        self.bytes = Some(bytes);
+        self
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "A comma-separated list of column names to display."]
+    pub fn h(mut self, h: &'b [&'b str]) -> Self {
+        self.h = Some(h);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Returns help information."]
+    pub fn help(mut self, help: bool) -> Self {
+        self.help = Some(help);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
+    pub fn s(mut self, s: &'b [&'b str]) -> Self {
+        self.s = Some(s);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Enables verbose mode, which displays column headers."]
+    pub fn v(mut self, v: bool) -> Self {
+        self.v = Some(v);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Cat All Pit Segments API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                bytes: Option<Bytes>,
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                h: Option<&'b [&'b str]>,
+                help: Option<bool>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                s: Option<&'b [&'b str]>,
+                source: Option<&'b str>,
+                v: Option<bool>,
+            }
+            let query_params = QueryParams {
+                bytes: self.bytes,
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                h: self.h,
+                help: self.help,
+                human: self.human,
+                pretty: self.pretty,
+                s: self.s,
+                source: self.source,
+                v: self.v,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Allocation API"]
 pub enum CatAllocationParts<'b> {
     #[doc = "No parts"]
@@ -351,7 +520,7 @@ impl<'b> CatAllocationParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Allocation API](https://opensearch.org/docs/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
+#[doc = "Builder for the [Cat Allocation API](https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
 #[derive(Clone, Debug)]
 pub struct CatAllocation<'a, 'b> {
     transport: &'a Transport,
@@ -400,32 +569,32 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "A timeout for connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the HTTP `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -435,28 +604,28 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from cluster-manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "A timeout for connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -466,7 +635,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -476,7 +645,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -549,7 +718,7 @@ impl CatClusterManagerParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Cluster Manager API](https://opensearch.org/docs/latest/opensearch/rest-api/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+#[doc = "Builder for the [Cat Cluster Manager API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
 #[derive(Clone, Debug)]
 pub struct CatClusterManager<'a, 'b> {
     transport: &'a Transport,
@@ -596,27 +765,27 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "A timeout for connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the HTTP `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -626,28 +795,28 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "A timeout for connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -657,7 +826,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -667,7 +836,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -749,7 +918,7 @@ impl<'b> CatCountParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Count API](https://opensearch.org/docs/)\n\nProvides quick access to the document count of the entire cluster, or individual indices."]
+#[doc = "Builder for the [Cat Count API](https://opensearch.org/docs/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
 #[derive(Clone, Debug)]
 pub struct CatCount<'a, 'b> {
     transport: &'a Transport,
@@ -790,22 +959,22 @@ impl<'a, 'b> CatCount<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -815,17 +984,17 @@ impl<'a, 'b> CatCount<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -835,7 +1004,7 @@ impl<'a, 'b> CatCount<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -845,7 +1014,7 @@ impl<'a, 'b> CatCount<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -921,7 +1090,7 @@ impl<'b> CatFielddataParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Fielddata API](https://opensearch.org/docs/)\n\nShows how much heap memory is currently being used by fielddata on every data node in the cluster."]
+#[doc = "Builder for the [Cat Fielddata API](https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
 #[derive(Clone, Debug)]
 pub struct CatFielddata<'a, 'b> {
     transport: &'a Transport,
@@ -966,32 +1135,32 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of fields to return in the output"]
+    #[doc = "A comma-separated list of fields used to limit the amount of returned information."]
     pub fn fields(mut self, fields: &'b [&'b str]) -> Self {
         self.fields = Some(fields);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -1001,17 +1170,17 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1021,7 +1190,7 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -1031,7 +1200,7 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -1101,7 +1270,7 @@ impl CatHealthParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Health API](https://opensearch.org/docs/)\n\nReturns a concise representation of the cluster health."]
+#[doc = "Builder for the [Cat Health API](https://opensearch.org/docs/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
 #[derive(Clone, Debug)]
 pub struct CatHealth<'a, 'b> {
     transport: &'a Transport,
@@ -1146,22 +1315,22 @@ impl<'a, 'b> CatHealth<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -1171,17 +1340,17 @@ impl<'a, 'b> CatHealth<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1191,7 +1360,7 @@ impl<'a, 'b> CatHealth<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -1201,17 +1370,17 @@ impl<'a, 'b> CatHealth<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "The unit used to display time values."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Set to false to disable timestamping"]
+    #[doc = "When `true`, returns `HH:MM:SS` and Unix epoch timestamps."]
     pub fn ts(mut self, ts: bool) -> Self {
         self.ts = Some(ts);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -1280,7 +1449,7 @@ impl CatHelpParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Help API](https://opensearch.org/docs/)\n\nReturns help for the Cat APIs."]
+#[doc = "Builder for the [Cat Help API](https://opensearch.org/docs/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
 #[derive(Clone, Debug)]
 pub struct CatHelp<'a, 'b> {
     transport: &'a Transport,
@@ -1288,11 +1457,9 @@ pub struct CatHelp<'a, 'b> {
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
-    help: Option<bool>,
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    s: Option<&'b [&'b str]>,
     source: Option<&'b str>,
 }
 impl<'a, 'b> CatHelp<'a, 'b> {
@@ -1307,20 +1474,18 @@ impl<'a, 'b> CatHelp<'a, 'b> {
             headers,
             error_trace: None,
             filter_path: None,
-            help: None,
             human: None,
             pretty: None,
             request_timeout: None,
-            s: None,
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -1330,17 +1495,12 @@ impl<'a, 'b> CatHelp<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
-    pub fn help(mut self, help: bool) -> Self {
-        self.help = Some(help);
-        self
-    }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1348,11 +1508,6 @@ impl<'a, 'b> CatHelp<'a, 'b> {
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
-    pub fn s(mut self, s: &'b [&'b str]) -> Self {
-        self.s = Some(s);
         self
     }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
@@ -1373,20 +1528,15 @@ impl<'a, 'b> CatHelp<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                help: Option<bool>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                s: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
-                help: self.help,
                 human: self.human,
                 pretty: self.pretty,
-                s: self.s,
                 source: self.source,
             };
             Some(query_params)
@@ -1424,7 +1574,7 @@ impl<'b> CatIndicesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Indices API](https://opensearch.org/docs/)\n\nReturns information about indices: number of primaries and replicas, document counts, disk size, ..."]
+#[doc = "Builder for the [Cat Indices API](https://opensearch.org/docs/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
 #[derive(Clone, Debug)]
 pub struct CatIndices<'a, 'b> {
     transport: &'a Transport,
@@ -1483,37 +1633,36 @@ impl<'a, 'b> CatIndices<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "Whether to expand wildcard expression to concrete indices that are open, closed or both."]
     pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
         self.expand_wildcards = Some(expand_wildcards);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -1523,43 +1672,43 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "A health status (\"green\", \"yellow\", or \"red\" to filter only indices matching the specified health status"]
+    #[doc = "Limits indexes based on their health status. Supported values are `green`, `yellow`, and `red`."]
     pub fn health(mut self, health: Health) -> Self {
         self.health = Some(health);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "If set to true segment stats will include stats for segments that are not currently loaded into memory"]
+    #[doc = "Whether to include information from segments not loaded into memory."]
     pub fn include_unloaded_segments(mut self, include_unloaded_segments: bool) -> Self {
         self.include_unloaded_segments = Some(include_unloaded_segments);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
     }
-    #[doc = "Set to true to return stats only for primary shards"]
+    #[doc = "When `true`, returns information only from the primary shards."]
     pub fn pri(mut self, pri: bool) -> Self {
         self.pri = Some(pri);
         self
@@ -1569,7 +1718,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -1579,12 +1728,12 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -1654,7 +1803,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         Ok(response)
     }
 }
-#[deprecated = "To promote inclusive language, please use '/_cat/cluster_manager' instead."]
+#[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Master API"]
 pub enum CatMasterParts {
@@ -1670,8 +1819,8 @@ impl CatMasterParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Master API](https://opensearch.org/docs/latest/opensearch/rest-api/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
-#[deprecated = "To promote inclusive language, please use '/_cat/cluster_manager' instead."]
+#[doc = "Builder for the [Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+#[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct CatMaster<'a, 'b> {
@@ -1720,27 +1869,27 @@ impl<'a, 'b> CatMaster<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -1750,28 +1899,28 @@ impl<'a, 'b> CatMaster<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "This parameter is deprecated in favor of cluster_manager_timeout to support inclusive terminology."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1781,7 +1930,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -1791,7 +1940,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -1862,7 +2011,7 @@ impl CatNodeattrsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Nodeattrs API](https://opensearch.org/docs/)\n\nReturns information about custom node attributes."]
+#[doc = "Builder for the [Cat Nodeattrs API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
 #[derive(Clone, Debug)]
 pub struct CatNodeattrs<'a, 'b> {
     transport: &'a Transport,
@@ -1909,27 +2058,27 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -1939,28 +2088,28 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -1970,7 +2119,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -1980,7 +2129,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -2051,7 +2200,7 @@ impl CatNodesParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Nodes API](https://opensearch.org/docs/)\n\nReturns basic statistics about performance of cluster nodes."]
+#[doc = "Builder for the [Cat Nodes API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
 #[derive(Clone, Debug)]
 pub struct CatNodes<'a, 'b> {
     transport: &'a Transport,
@@ -2061,7 +2210,7 @@ pub struct CatNodes<'a, 'b> {
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     format: Option<&'b str>,
-    full_id: Option<bool>,
+    full_id: Option<&'b str>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
@@ -2104,37 +2253,37 @@ impl<'a, 'b> CatNodes<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Return the full node ID instead of the shortened version (default: false)"]
-    pub fn full_id(mut self, full_id: bool) -> Self {
+    #[doc = "When `true`, returns the full node ID. When `false`, returns the shortened node ID."]
+    pub fn full_id(mut self, full_id: &'b str) -> Self {
         self.full_id = Some(full_id);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -2144,29 +2293,29 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Calculate the selected nodes using the local cluster state rather than the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     #[deprecated = "This parameter does not cause this API to act locally."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2176,7 +2325,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -2186,12 +2335,12 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -2212,7 +2361,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 format: Option<&'b str>,
-                full_id: Option<bool>,
+                full_id: Option<&'b str>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
@@ -2268,7 +2417,7 @@ impl CatPendingTasksParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Pending Tasks API](https://opensearch.org/docs/)\n\nReturns a concise representation of the cluster pending tasks."]
+#[doc = "Builder for the [Cat Pending Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
 #[derive(Clone, Debug)]
 pub struct CatPendingTasks<'a, 'b> {
     transport: &'a Transport,
@@ -2317,27 +2466,27 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -2347,28 +2496,28 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2378,7 +2527,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -2388,12 +2537,12 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -2453,6 +2602,205 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Cat Pit Segments API"]
+pub enum CatPitSegmentsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl CatPitSegmentsParts {
+    #[doc = "Builds a relative URL path to the Cat Pit Segments API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            CatPitSegmentsParts::None => "/_cat/pit_segments".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Cat Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
+#[derive(Clone, Debug)]
+pub struct CatPitSegments<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: CatPitSegmentsParts,
+    body: Option<B>,
+    bytes: Option<Bytes>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    h: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    help: Option<bool>,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    s: Option<&'b [&'b str]>,
+    source: Option<&'b str>,
+    v: Option<bool>,
+}
+impl<'a, 'b, B> CatPitSegments<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [CatPitSegments]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let mut headers = HeaderMap::with_capacity(2);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("text/plain"));
+        headers.insert(ACCEPT, HeaderValue::from_static("text/plain"));
+        CatPitSegments {
+            transport,
+            parts: CatPitSegmentsParts::None,
+            headers,
+            body: None,
+            bytes: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            h: None,
+            help: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            s: None,
+            source: None,
+            v: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> CatPitSegments<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        CatPitSegments {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            bytes: self.bytes,
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            format: self.format,
+            h: self.h,
+            headers: self.headers,
+            help: self.help,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            s: self.s,
+            source: self.source,
+            v: self.v,
+        }
+    }
+    #[doc = "The units used to display byte values."]
+    pub fn bytes(mut self, bytes: Bytes) -> Self {
+        self.bytes = Some(bytes);
+        self
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "A comma-separated list of column names to display."]
+    pub fn h(mut self, h: &'b [&'b str]) -> Self {
+        self.h = Some(h);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Returns help information."]
+    pub fn help(mut self, help: bool) -> Self {
+        self.help = Some(help);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
+    pub fn s(mut self, s: &'b [&'b str]) -> Self {
+        self.s = Some(s);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Enables verbose mode, which displays column headers."]
+    pub fn v(mut self, v: bool) -> Self {
+        self.v = Some(v);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Cat Pit Segments API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                bytes: Option<Bytes>,
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                h: Option<&'b [&'b str]>,
+                help: Option<bool>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                s: Option<&'b [&'b str]>,
+                source: Option<&'b str>,
+                v: Option<bool>,
+            }
+            let query_params = QueryParams {
+                bytes: self.bytes,
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                h: self.h,
+                help: self.help,
+                human: self.human,
+                pretty: self.pretty,
+                s: self.s,
+                source: self.source,
+                v: self.v,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Plugins API"]
 pub enum CatPluginsParts {
     #[doc = "No parts"]
@@ -2466,7 +2814,7 @@ impl CatPluginsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Plugins API](https://opensearch.org/docs/)\n\nReturns information about installed plugins across nodes node."]
+#[doc = "Builder for the [Cat Plugins API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
 #[derive(Clone, Debug)]
 pub struct CatPlugins<'a, 'b> {
     transport: &'a Transport,
@@ -2513,27 +2861,27 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -2543,28 +2891,28 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2574,7 +2922,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -2584,7 +2932,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -2666,7 +3014,7 @@ impl<'b> CatRecoveryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Recovery API](https://opensearch.org/docs/)\n\nReturns information about index shard recoveries, both on-going completed."]
+#[doc = "Builder for the [Cat Recovery API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
 #[derive(Clone, Debug)]
 pub struct CatRecovery<'a, 'b> {
     transport: &'a Transport,
@@ -2717,37 +3065,37 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "If `true`, the response only includes ongoing shard recoveries"]
+    #[doc = "If `true`, the response only includes ongoing shard recoveries."]
     pub fn active_only(mut self, active_only: bool) -> Self {
         self.active_only = Some(active_only);
         self
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "If `true`, the response includes detailed information about shard recoveries"]
+    #[doc = "When `true`, includes detailed information about shard recoveries."]
     pub fn detailed(mut self, detailed: bool) -> Self {
         self.detailed = Some(detailed);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -2757,22 +3105,22 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Comma-separated list or wildcard expression of index names to limit the returned information"]
+    #[doc = "A comma-separated list of data streams, indexes, and aliases used to limit the request.\nSupports wildcards (`*`). To target all data streams and indexes, omit this parameter or use `*` or `_all`."]
     pub fn index(mut self, index: &'b [&'b str]) -> Self {
         self.index = Some(index);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2782,7 +3130,7 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -2792,12 +3140,12 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -2873,7 +3221,7 @@ impl CatRepositoriesParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Repositories API](https://opensearch.org/docs/)\n\nReturns information about snapshot repositories registered in the cluster."]
+#[doc = "Builder for the [Cat Repositories API](https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
 #[derive(Clone, Debug)]
 pub struct CatRepositories<'a, 'b> {
     transport: &'a Transport,
@@ -2920,27 +3268,27 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -2950,28 +3298,28 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Calculate the selected nodes using the local cluster state rather than the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -2981,7 +3329,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -2991,7 +3339,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -3049,6 +3397,288 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Cat Segment Replication API"]
+pub enum CatSegmentReplicationParts<'b> {
+    #[doc = "No parts"]
+    None,
+    #[doc = "Index"]
+    Index(&'b [&'b str]),
+}
+impl<'b> CatSegmentReplicationParts<'b> {
+    #[doc = "Builds a relative URL path to the Cat Segment Replication API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            CatSegmentReplicationParts::None => "/_cat/segment_replication".into(),
+            CatSegmentReplicationParts::Index(index) => {
+                let index_str = index.join(",");
+                let encoded_index: Cow<str> =
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(26usize + encoded_index.len());
+                p.push_str("/_cat/segment_replication/");
+                p.push_str(encoded_index.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the [Cat Segment Replication API](https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
+#[derive(Clone, Debug)]
+pub struct CatSegmentReplication<'a, 'b> {
+    transport: &'a Transport,
+    parts: CatSegmentReplicationParts<'b>,
+    active_only: Option<bool>,
+    allow_no_indices: Option<bool>,
+    bytes: Option<Bytes>,
+    completed_only: Option<bool>,
+    detailed: Option<bool>,
+    error_trace: Option<bool>,
+    expand_wildcards: Option<&'b [ExpandWildcards]>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    h: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    help: Option<bool>,
+    human: Option<bool>,
+    ignore_throttled: Option<bool>,
+    ignore_unavailable: Option<bool>,
+    index: Option<&'b [&'b str]>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    s: Option<&'b [&'b str]>,
+    shards: Option<&'b [&'b str]>,
+    source: Option<&'b str>,
+    time: Option<Time>,
+    timeout: Option<&'b str>,
+    v: Option<bool>,
+}
+impl<'a, 'b> CatSegmentReplication<'a, 'b> {
+    #[doc = "Creates a new instance of [CatSegmentReplication] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: CatSegmentReplicationParts<'b>) -> Self {
+        let mut headers = HeaderMap::with_capacity(2);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("text/plain"));
+        headers.insert(ACCEPT, HeaderValue::from_static("text/plain"));
+        CatSegmentReplication {
+            transport,
+            parts,
+            headers,
+            active_only: None,
+            allow_no_indices: None,
+            bytes: None,
+            completed_only: None,
+            detailed: None,
+            error_trace: None,
+            expand_wildcards: None,
+            filter_path: None,
+            format: None,
+            h: None,
+            help: None,
+            human: None,
+            ignore_throttled: None,
+            ignore_unavailable: None,
+            index: None,
+            pretty: None,
+            request_timeout: None,
+            s: None,
+            shards: None,
+            source: None,
+            time: None,
+            timeout: None,
+            v: None,
+        }
+    }
+    #[doc = "When `true`, the response only includes ongoing segment replication events."]
+    pub fn active_only(mut self, active_only: bool) -> Self {
+        self.active_only = Some(active_only);
+        self
+    }
+    #[doc = "Whether to ignore the index if a wildcard index expression resolves to no concrete indexes. This includes the `_all` string or when no indexes have been specified."]
+    pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
+        self.allow_no_indices = Some(allow_no_indices);
+        self
+    }
+    #[doc = "The units used to display byte values."]
+    pub fn bytes(mut self, bytes: Bytes) -> Self {
+        self.bytes = Some(bytes);
+        self
+    }
+    #[doc = "When `true`, the response only includes the last-completed segment replication events."]
+    pub fn completed_only(mut self, completed_only: bool) -> Self {
+        self.completed_only = Some(completed_only);
+        self
+    }
+    #[doc = "When `true`, the response includes additional metrics for each stage of a segment replication event."]
+    pub fn detailed(mut self, detailed: bool) -> Self {
+        self.detailed = Some(detailed);
+        self
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    pub fn expand_wildcards(mut self, expand_wildcards: &'b [ExpandWildcards]) -> Self {
+        self.expand_wildcards = Some(expand_wildcards);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "A comma-separated list of column names to display."]
+    pub fn h(mut self, h: &'b [&'b str]) -> Self {
+        self.h = Some(h);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Returns help information."]
+    pub fn help(mut self, help: bool) -> Self {
+        self.help = Some(help);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether specified concrete, expanded, or aliased indexes should be ignored when throttled."]
+    pub fn ignore_throttled(mut self, ignore_throttled: bool) -> Self {
+        self.ignore_throttled = Some(ignore_throttled);
+        self
+    }
+    #[doc = "Whether the specified concrete indexes should be ignored when missing or closed."]
+    pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
+        self.ignore_unavailable = Some(ignore_unavailable);
+        self
+    }
+    #[doc = "A comma-separated list of data streams, indexes, and aliases used to limit the request.\nSupports wildcards (`*`). To target all data streams and indexes, omit this parameter or use `*` or `_all`."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
+        self.index = Some(index);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
+    pub fn s(mut self, s: &'b [&'b str]) -> Self {
+        self.s = Some(s);
+        self
+    }
+    #[doc = "A comma-separated list of shards to display."]
+    pub fn shards(mut self, shards: &'b [&'b str]) -> Self {
+        self.shards = Some(shards);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    pub fn time(mut self, time: Time) -> Self {
+        self.time = Some(time);
+        self
+    }
+    #[doc = "The operation timeout."]
+    pub fn timeout(mut self, timeout: &'b str) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
+    #[doc = "Enables verbose mode, which displays column headers."]
+    pub fn v(mut self, v: bool) -> Self {
+        self.v = Some(v);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Cat Segment Replication API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                active_only: Option<bool>,
+                allow_no_indices: Option<bool>,
+                bytes: Option<Bytes>,
+                completed_only: Option<bool>,
+                detailed: Option<bool>,
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                expand_wildcards: Option<&'b [ExpandWildcards]>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                h: Option<&'b [&'b str]>,
+                help: Option<bool>,
+                human: Option<bool>,
+                ignore_throttled: Option<bool>,
+                ignore_unavailable: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
+                pretty: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                s: Option<&'b [&'b str]>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                shards: Option<&'b [&'b str]>,
+                source: Option<&'b str>,
+                time: Option<Time>,
+                timeout: Option<&'b str>,
+                v: Option<bool>,
+            }
+            let query_params = QueryParams {
+                active_only: self.active_only,
+                allow_no_indices: self.allow_no_indices,
+                bytes: self.bytes,
+                completed_only: self.completed_only,
+                detailed: self.detailed,
+                error_trace: self.error_trace,
+                expand_wildcards: self.expand_wildcards,
+                filter_path: self.filter_path,
+                format: self.format,
+                h: self.h,
+                help: self.help,
+                human: self.human,
+                ignore_throttled: self.ignore_throttled,
+                ignore_unavailable: self.ignore_unavailable,
+                index: self.index,
+                pretty: self.pretty,
+                s: self.s,
+                shards: self.shards,
+                source: self.source,
+                time: self.time,
+                timeout: self.timeout,
+                v: self.v,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Segments API"]
 pub enum CatSegmentsParts<'b> {
     #[doc = "No parts"]
@@ -3073,7 +3703,7 @@ impl<'b> CatSegmentsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Segments API](https://opensearch.org/docs/)\n\nProvides low-level information about the segments in the shards of an index."]
+#[doc = "Builder for the [Cat Segments API](https://opensearch.org/docs/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
 #[derive(Clone, Debug)]
 pub struct CatSegments<'a, 'b> {
     transport: &'a Transport,
@@ -3120,32 +3750,32 @@ impl<'a, 'b> CatSegments<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -3155,23 +3785,23 @@ impl<'a, 'b> CatSegments<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3181,7 +3811,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -3191,7 +3821,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -3273,7 +3903,7 @@ impl<'b> CatShardsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Shards API](https://opensearch.org/docs/)\n\nProvides a detailed view of shard allocation on nodes."]
+#[doc = "Builder for the [Cat Shards API](https://opensearch.org/docs/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
 #[derive(Clone, Debug)]
 pub struct CatShards<'a, 'b> {
     transport: &'a Transport,
@@ -3324,32 +3954,32 @@ impl<'a, 'b> CatShards<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "The unit in which to display byte values"]
+    #[doc = "The units used to display byte values."]
     pub fn bytes(mut self, bytes: Bytes) -> Self {
         self.bytes = Some(bytes);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -3359,28 +3989,28 @@ impl<'a, 'b> CatShards<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3390,7 +4020,7 @@ impl<'a, 'b> CatShards<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -3400,12 +4030,11 @@ impl<'a, 'b> CatShards<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -3491,7 +4120,7 @@ impl<'b> CatSnapshotsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Snapshots API](https://opensearch.org/docs/)\n\nReturns all snapshots in a specific repository."]
+#[doc = "Builder for the [Cat Snapshots API](https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
 #[derive(Clone, Debug)]
 pub struct CatSnapshots<'a, 'b> {
     transport: &'a Transport,
@@ -3507,6 +4136,7 @@ pub struct CatSnapshots<'a, 'b> {
     ignore_unavailable: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
+    repository: Option<&'b [&'b str]>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
     source: Option<&'b str>,
@@ -3533,6 +4163,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
             ignore_unavailable: None,
             master_timeout: None,
             pretty: None,
+            repository: None,
             request_timeout: None,
             s: None,
             source: None,
@@ -3540,27 +4171,27 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -3570,30 +4201,35 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Set to true to ignore unavailable snapshots"]
+    #[doc = "When `true`, the response does not include information from unavailable snapshots."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "A comma-separated list of snapshot repositories used to limit the request.\nAccepts wildcard expressions.\n`_all` returns all repositories.\nIf any repository fails during the request, OpenSearch returns an error."]
+    pub fn repository(mut self, repository: &'b [&'b str]) -> Self {
+        self.repository = Some(repository);
         self
     }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
@@ -3601,7 +4237,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -3611,12 +4247,12 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -3644,6 +4280,8 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                repository: Option<&'b [&'b str]>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
                 time: Option<Time>,
@@ -3660,6 +4298,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
                 ignore_unavailable: self.ignore_unavailable,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
+                repository: self.repository,
                 s: self.s,
                 source: self.source,
                 time: self.time,
@@ -3689,7 +4328,7 @@ impl CatTasksParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Tasks API](https://opensearch.org/docs/)\n\nReturns information about the tasks currently executing on one or more nodes in the cluster."]
+#[doc = "Builder for the [Cat Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
 #[derive(Clone, Debug)]
 pub struct CatTasks<'a, 'b> {
     transport: &'a Transport,
@@ -3740,32 +4379,32 @@ impl<'a, 'b> CatTasks<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "A comma-separated list of actions that should be returned. Leave empty to return all."]
+    #[doc = "The task action names used to limit the response."]
     pub fn actions(mut self, actions: &'b [&'b str]) -> Self {
         self.actions = Some(actions);
         self
     }
-    #[doc = "Return detailed task information (default: false)"]
+    #[doc = "If `true`, the response includes detailed information about shard recoveries."]
     pub fn detailed(mut self, detailed: bool) -> Self {
         self.detailed = Some(detailed);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -3775,27 +4414,27 @@ impl<'a, 'b> CatTasks<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes"]
+    #[doc = "A comma-separated list of node IDs or names used to limit the returned information. \nUse `_local` to return information from the node to which you're connecting, specify a specific node from which to get information, or keep the parameter empty to get information from all nodes."]
     pub fn nodes(mut self, nodes: &'b [&'b str]) -> Self {
         self.nodes = Some(nodes);
         self
     }
-    #[doc = "Return tasks with specified parent task id (node_id:task_number). Set to -1 to return all."]
+    #[doc = "The parent task identifier, which is used to limit the response."]
     pub fn parent_task_id(mut self, parent_task_id: &'b str) -> Self {
         self.parent_task_id = Some(parent_task_id);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -3805,7 +4444,7 @@ impl<'a, 'b> CatTasks<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -3815,12 +4454,12 @@ impl<'a, 'b> CatTasks<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The unit in which to display time values"]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -3906,7 +4545,7 @@ impl<'b> CatTemplatesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Templates API](https://opensearch.org/docs/)\n\nReturns information about existing templates."]
+#[doc = "Builder for the [Cat Templates API](https://opensearch.org/docs/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
 #[derive(Clone, Debug)]
 pub struct CatTemplates<'a, 'b> {
     transport: &'a Transport,
@@ -3953,27 +4592,27 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -3983,28 +4622,28 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -4014,7 +4653,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
@@ -4024,7 +4663,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -4106,7 +4745,7 @@ impl<'b> CatThreadPoolParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Thread Pool API](https://opensearch.org/docs/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queue and rejected statistics are returned for all thread pools."]
+#[doc = "Builder for the [Cat Thread Pool API](https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
 #[derive(Clone, Debug)]
 pub struct CatThreadPool<'a, 'b> {
     transport: &'a Transport,
@@ -4124,7 +4763,7 @@ pub struct CatThreadPool<'a, 'b> {
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
-    size: Option<Size>,
+    size: Option<i64>,
     source: Option<&'b str>,
     v: Option<bool>,
 }
@@ -4155,27 +4794,27 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
             v: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "A timeout for connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "a short version of the Accept header, e.g. json, yaml"]
+    #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
     pub fn format(mut self, format: &'b str) -> Self {
         self.format = Some(format);
         self
     }
-    #[doc = "Comma-separated list of column names to display"]
+    #[doc = "A comma-separated list of column names to display."]
     pub fn h(mut self, h: &'b [&'b str]) -> Self {
         self.h = Some(h);
         self
@@ -4185,28 +4824,28 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return help information"]
+    #[doc = "Returns help information."]
     pub fn help(mut self, help: bool) -> Self {
         self.help = Some(help);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Return local information, do not retrieve the state from cluster-manager node (default: false)"]
+    #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
+    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -4216,14 +4855,13 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Comma-separated list of column names or column aliases to sort by"]
+    #[doc = "A comma-separated list of column names or column aliases to sort by."]
     pub fn s(mut self, s: &'b [&'b str]) -> Self {
         self.s = Some(s);
         self
     }
-    #[doc = "The multiplier in which to display values"]
-    #[deprecated = "Setting this value has no effect and will be removed from the specification."]
-    pub fn size(mut self, size: Size) -> Self {
+    #[doc = "The multiplier in which to display values."]
+    pub fn size(mut self, size: i64) -> Self {
         self.size = Some(size);
         self
     }
@@ -4232,7 +4870,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display column headers"]
+    #[doc = "Enables verbose mode, which displays column headers."]
     pub fn v(mut self, v: bool) -> Self {
         self.v = Some(v);
         self
@@ -4261,7 +4899,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
-                size: Option<Size>,
+                size: Option<i64>,
                 source: Option<&'b str>,
                 v: Option<bool>,
             }
@@ -4303,89 +4941,104 @@ impl<'a> Cat<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Cat Aliases API](https://opensearch.org/docs/)\n\nShows information about currently configured aliases to indices including filter and routing infos."]
+    #[doc = "[Cat Aliases API](https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
     pub fn aliases<'b>(&'a self, parts: CatAliasesParts<'b>) -> CatAliases<'a, 'b> {
         CatAliases::new(self.transport(), parts)
     }
-    #[doc = "[Cat Allocation API](https://opensearch.org/docs/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
+    #[doc = "[Cat All Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
+    pub fn all_pit_segments<'b>(&'a self) -> CatAllPitSegments<'a, 'b> {
+        CatAllPitSegments::new(self.transport())
+    }
+    #[doc = "[Cat Allocation API](https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
     pub fn allocation<'b>(&'a self, parts: CatAllocationParts<'b>) -> CatAllocation<'a, 'b> {
         CatAllocation::new(self.transport(), parts)
     }
-    #[doc = "[Cat Cluster Manager API](https://opensearch.org/docs/latest/opensearch/rest-api/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[doc = "[Cat Cluster Manager API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
     pub fn cluster_manager<'b>(&'a self) -> CatClusterManager<'a, 'b> {
         CatClusterManager::new(self.transport())
     }
-    #[doc = "[Cat Count API](https://opensearch.org/docs/)\n\nProvides quick access to the document count of the entire cluster, or individual indices."]
+    #[doc = "[Cat Count API](https://opensearch.org/docs/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
     pub fn count<'b>(&'a self, parts: CatCountParts<'b>) -> CatCount<'a, 'b> {
         CatCount::new(self.transport(), parts)
     }
-    #[doc = "[Cat Fielddata API](https://opensearch.org/docs/)\n\nShows how much heap memory is currently being used by fielddata on every data node in the cluster."]
+    #[doc = "[Cat Fielddata API](https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
     pub fn fielddata<'b>(&'a self, parts: CatFielddataParts<'b>) -> CatFielddata<'a, 'b> {
         CatFielddata::new(self.transport(), parts)
     }
-    #[doc = "[Cat Health API](https://opensearch.org/docs/)\n\nReturns a concise representation of the cluster health."]
+    #[doc = "[Cat Health API](https://opensearch.org/docs/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
     pub fn health<'b>(&'a self) -> CatHealth<'a, 'b> {
         CatHealth::new(self.transport())
     }
-    #[doc = "[Cat Help API](https://opensearch.org/docs/)\n\nReturns help for the Cat APIs."]
+    #[doc = "[Cat Help API](https://opensearch.org/docs/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
     pub fn help<'b>(&'a self) -> CatHelp<'a, 'b> {
         CatHelp::new(self.transport())
     }
-    #[doc = "[Cat Indices API](https://opensearch.org/docs/)\n\nReturns information about indices: number of primaries and replicas, document counts, disk size, ..."]
+    #[doc = "[Cat Indices API](https://opensearch.org/docs/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
     pub fn indices<'b>(&'a self, parts: CatIndicesParts<'b>) -> CatIndices<'a, 'b> {
         CatIndices::new(self.transport(), parts)
     }
-    #[doc = "[Cat Master API](https://opensearch.org/docs/latest/opensearch/rest-api/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
-    #[deprecated = "To promote inclusive language, please use '/_cat/cluster_manager' instead."]
+    #[doc = "[Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
     #[allow(deprecated)]
     pub fn master<'b>(&'a self) -> CatMaster<'a, 'b> {
         CatMaster::new(self.transport())
     }
-    #[doc = "[Cat Nodeattrs API](https://opensearch.org/docs/)\n\nReturns information about custom node attributes."]
+    #[doc = "[Cat Nodeattrs API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
     pub fn nodeattrs<'b>(&'a self) -> CatNodeattrs<'a, 'b> {
         CatNodeattrs::new(self.transport())
     }
-    #[doc = "[Cat Nodes API](https://opensearch.org/docs/)\n\nReturns basic statistics about performance of cluster nodes."]
+    #[doc = "[Cat Nodes API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
     pub fn nodes<'b>(&'a self) -> CatNodes<'a, 'b> {
         CatNodes::new(self.transport())
     }
-    #[doc = "[Cat Pending Tasks API](https://opensearch.org/docs/)\n\nReturns a concise representation of the cluster pending tasks."]
+    #[doc = "[Cat Pending Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
     pub fn pending_tasks<'b>(&'a self) -> CatPendingTasks<'a, 'b> {
         CatPendingTasks::new(self.transport())
     }
-    #[doc = "[Cat Plugins API](https://opensearch.org/docs/)\n\nReturns information about installed plugins across nodes node."]
+    #[doc = "[Cat Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
+    pub fn pit_segments<'b>(&'a self) -> CatPitSegments<'a, 'b, ()> {
+        CatPitSegments::new(self.transport())
+    }
+    #[doc = "[Cat Plugins API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
     pub fn plugins<'b>(&'a self) -> CatPlugins<'a, 'b> {
         CatPlugins::new(self.transport())
     }
-    #[doc = "[Cat Recovery API](https://opensearch.org/docs/)\n\nReturns information about index shard recoveries, both on-going completed."]
+    #[doc = "[Cat Recovery API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
     pub fn recovery<'b>(&'a self, parts: CatRecoveryParts<'b>) -> CatRecovery<'a, 'b> {
         CatRecovery::new(self.transport(), parts)
     }
-    #[doc = "[Cat Repositories API](https://opensearch.org/docs/)\n\nReturns information about snapshot repositories registered in the cluster."]
+    #[doc = "[Cat Repositories API](https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
     pub fn repositories<'b>(&'a self) -> CatRepositories<'a, 'b> {
         CatRepositories::new(self.transport())
     }
-    #[doc = "[Cat Segments API](https://opensearch.org/docs/)\n\nProvides low-level information about the segments in the shards of an index."]
+    #[doc = "[Cat Segment Replication API](https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
+    pub fn segment_replication<'b>(
+        &'a self,
+        parts: CatSegmentReplicationParts<'b>,
+    ) -> CatSegmentReplication<'a, 'b> {
+        CatSegmentReplication::new(self.transport(), parts)
+    }
+    #[doc = "[Cat Segments API](https://opensearch.org/docs/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
     pub fn segments<'b>(&'a self, parts: CatSegmentsParts<'b>) -> CatSegments<'a, 'b> {
         CatSegments::new(self.transport(), parts)
     }
-    #[doc = "[Cat Shards API](https://opensearch.org/docs/)\n\nProvides a detailed view of shard allocation on nodes."]
+    #[doc = "[Cat Shards API](https://opensearch.org/docs/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
     pub fn shards<'b>(&'a self, parts: CatShardsParts<'b>) -> CatShards<'a, 'b> {
         CatShards::new(self.transport(), parts)
     }
-    #[doc = "[Cat Snapshots API](https://opensearch.org/docs/)\n\nReturns all snapshots in a specific repository."]
+    #[doc = "[Cat Snapshots API](https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
     pub fn snapshots<'b>(&'a self, parts: CatSnapshotsParts<'b>) -> CatSnapshots<'a, 'b> {
         CatSnapshots::new(self.transport(), parts)
     }
-    #[doc = "[Cat Tasks API](https://opensearch.org/docs/)\n\nReturns information about the tasks currently executing on one or more nodes in the cluster."]
+    #[doc = "[Cat Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
     pub fn tasks<'b>(&'a self) -> CatTasks<'a, 'b> {
         CatTasks::new(self.transport())
     }
-    #[doc = "[Cat Templates API](https://opensearch.org/docs/)\n\nReturns information about existing templates."]
+    #[doc = "[Cat Templates API](https://opensearch.org/docs/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
     pub fn templates<'b>(&'a self, parts: CatTemplatesParts<'b>) -> CatTemplates<'a, 'b> {
         CatTemplates::new(self.transport(), parts)
     }
-    #[doc = "[Cat Thread Pool API](https://opensearch.org/docs/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queue and rejected statistics are returned for all thread pools."]
+    #[doc = "[Cat Thread Pool API](https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
     pub fn thread_pool<'b>(&'a self, parts: CatThreadPoolParts<'b>) -> CatThreadPool<'a, 'b> {
         CatThreadPool::new(self.transport(), parts)
     }

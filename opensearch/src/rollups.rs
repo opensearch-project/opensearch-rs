@@ -24,22 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Ingest APIs
-//!
-//! Manage ingest pipelines : Ingest pipelines can be used on a node with the `ingest` role to
-//! pre-process documents before indexing, to apply transformations and enrich data. Transformations are performed
-//! by processors in the pipeline, and can include such operations as
-//!
-//! - add, remove and append fields within the document
-//! - point documents to the right time-based index based on a timestamp within the document
-//! - extract details from fields with known formats and add new fields with extracted data
-//!
-//! and many more.
-//!
-//! All nodes enable ingest by default, so any node can handle ingest tasks. Ingest pipelines can
-//! be conditionally executed, and failures within pipelines can be explicitly handled by defining
-//! processors to execute in the event of failure.
-
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -57,64 +41,53 @@ use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Delete Pipeline API"]
-pub enum IngestDeletePipelineParts<'b> {
+#[doc = "API parts for the Rollups Delete API"]
+pub enum RollupsDeleteParts<'b> {
     #[doc = "Id"]
     Id(&'b str),
 }
-impl<'b> IngestDeletePipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Delete Pipeline API"]
+impl<'b> RollupsDeleteParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Delete API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestDeletePipelineParts::Id(id) => {
+            RollupsDeleteParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
+                let mut p = String::with_capacity(26usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
+#[doc = "Builder for the [Rollups Delete API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
 #[derive(Clone, Debug)]
-pub struct IngestDeletePipeline<'a, 'b> {
+pub struct RollupsDelete<'a, 'b> {
     transport: &'a Transport,
-    parts: IngestDeletePipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: RollupsDeleteParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestDeletePipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestDeletePipelineParts<'b>) -> Self {
+impl<'a, 'b> RollupsDelete<'a, 'b> {
+    #[doc = "Creates a new instance of [RollupsDelete] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsDeleteParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestDeletePipeline {
+        RollupsDelete {
             transport,
             parts,
             headers,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -136,12 +109,6 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -157,12 +124,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Delete Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Rollups Delete API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Delete;
@@ -172,25 +134,19 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -203,187 +159,52 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Get Pipeline API"]
-pub enum IngestGetPipelineParts<'b> {
-    #[doc = "No parts"]
-    None,
+#[doc = "API parts for the Rollups Explain API"]
+pub enum RollupsExplainParts<'b> {
     #[doc = "Id"]
     Id(&'b str),
 }
-impl<'b> IngestGetPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Get Pipeline API"]
+impl<'b> RollupsExplainParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Explain API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestGetPipelineParts::None => "/_ingest/pipeline".into(),
-            IngestGetPipelineParts::Id(id) => {
+            RollupsExplainParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
+                let mut p = String::with_capacity(35usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
+                p.push_str("/_explain");
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
+#[doc = "Builder for the [Rollups Explain API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
 #[derive(Clone, Debug)]
-pub struct IngestGetPipeline<'a, 'b> {
+pub struct RollupsExplain<'a, 'b> {
     transport: &'a Transport,
-    parts: IngestGetPipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: RollupsExplainParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-impl<'a, 'b> IngestGetPipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestGetPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestGetPipelineParts<'b>) -> Self {
+impl<'a, 'b> RollupsExplain<'a, 'b> {
+    #[doc = "Creates a new instance of [RollupsExplain] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsExplainParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestGetPipeline {
+        RollupsExplain {
             transport,
             parts,
             headers,
-            cluster_manager_timeout: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            master_timeout: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-        }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Get Pipeline API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Get;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                master_timeout: Option<&'b str>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                master_timeout: self.master_timeout,
-                pretty: self.pretty,
-                source: self.source,
-            };
-            Some(query_params)
-        };
-        let body = Option::<()>::None;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Processor Grok API"]
-pub enum IngestProcessorGrokParts {
-    #[doc = "No parts"]
-    None,
-}
-impl IngestProcessorGrokParts {
-    #[doc = "Builds a relative URL path to the Ingest Processor Grok API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestProcessorGrokParts::None => "/_ingest/processor/grok".into(),
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
-#[derive(Clone, Debug)]
-pub struct IngestProcessorGrok<'a, 'b> {
-    transport: &'a Transport,
-    parts: IngestProcessorGrokParts,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    s: Option<bool>,
-    source: Option<&'b str>,
-}
-impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestProcessorGrok]"]
-    pub fn new(transport: &'a Transport) -> Self {
-        let headers = HeaderMap::new();
-        IngestProcessorGrok {
-            transport,
-            parts: IngestProcessorGrokParts::None,
-            headers,
             error_trace: None,
             filter_path: None,
             human: None,
             pretty: None,
             request_timeout: None,
-            s: None,
             source: None,
         }
     }
@@ -417,17 +238,12 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
         self.request_timeout = Some(timeout);
         self
     }
-    #[doc = "Determines how to sort returned grok patterns by key name."]
-    pub fn s(mut self, s: bool) -> Self {
-        self.s = Some(s);
-        self
-    }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
     pub fn source(mut self, source: &'b str) -> Self {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Ingest Processor Grok API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Rollups Explain API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Get;
@@ -442,7 +258,6 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                s: Option<bool>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -450,7 +265,6 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 pretty: self.pretty,
-                s: self.s,
                 source: self.source,
             };
             Some(query_params)
@@ -464,90 +278,200 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Put Pipeline API"]
-pub enum IngestPutPipelineParts<'b> {
+#[doc = "API parts for the Rollups Get API"]
+pub enum RollupsGetParts<'b> {
     #[doc = "Id"]
     Id(&'b str),
 }
-impl<'b> IngestPutPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Put Pipeline API"]
+impl<'b> RollupsGetParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Get API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestPutPipelineParts::Id(id) => {
+            RollupsGetParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
+                let mut p = String::with_capacity(26usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
+#[doc = "Builder for the [Rollups Get API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
 #[derive(Clone, Debug)]
-pub struct IngestPutPipeline<'a, 'b, B> {
+pub struct RollupsGet<'a, 'b> {
     transport: &'a Transport,
-    parts: IngestPutPipelineParts<'b>,
-    body: Option<B>,
-    cluster_manager_timeout: Option<&'b str>,
+    parts: RollupsGetParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b, B> IngestPutPipeline<'a, 'b, B>
+impl<'a, 'b> RollupsGet<'a, 'b> {
+    #[doc = "Creates a new instance of [RollupsGet] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsGetParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        RollupsGet {
+            transport,
+            parts,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Rollups Get API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Rollups Put API"]
+pub enum RollupsPutParts<'b> {
+    #[doc = "Id"]
+    Id(&'b str),
+}
+impl<'b> RollupsPutParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Put API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            RollupsPutParts::Id(id) => {
+                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(26usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
+                p.push_str(encoded_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the [Rollups Put API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
+#[derive(Clone, Debug)]
+pub struct RollupsPut<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: RollupsPutParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    if_primary_term: Option<i64>,
+    if_seq_no: Option<i64>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> RollupsPut<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [IngestPutPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestPutPipelineParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [RollupsPut] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsPutParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestPutPipeline {
+        RollupsPut {
             transport,
             parts,
             headers,
             body: None,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
-            master_timeout: None,
+            if_primary_term: None,
+            if_seq_no: None,
             pretty: None,
             request_timeout: None,
             source: None,
-            timeout: None,
         }
     }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestPutPipeline<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> RollupsPut<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        IngestPutPipeline {
+        RollupsPut {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
-            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
-            master_timeout: self.master_timeout,
+            if_primary_term: self.if_primary_term,
+            if_seq_no: self.if_seq_no,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
-            timeout: self.timeout,
         }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -569,10 +493,14 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
+    #[doc = "Only performs the operation if the document has the specified primary term."]
+    pub fn if_primary_term(mut self, if_primary_term: i64) -> Self {
+        self.if_primary_term = Some(if_primary_term);
+        self
+    }
+    #[doc = "Only performs the operation if the document has the specified sequence number."]
+    pub fn if_seq_no(mut self, if_seq_no: i64) -> Self {
+        self.if_seq_no = Some(if_seq_no);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -590,12 +518,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Put Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Rollups Put API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Put;
@@ -605,25 +528,23 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
+                if_primary_term: Option<i64>,
+                if_seq_no: Option<i64>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
-                master_timeout: self.master_timeout,
+                if_primary_term: self.if_primary_term,
+                if_seq_no: self.if_seq_no,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -636,34 +557,31 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Simulate API"]
-pub enum IngestSimulateParts<'b> {
-    #[doc = "No parts"]
-    None,
+#[doc = "API parts for the Rollups Start API"]
+pub enum RollupsStartParts<'b> {
     #[doc = "Id"]
     Id(&'b str),
 }
-impl<'b> IngestSimulateParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Simulate API"]
+impl<'b> RollupsStartParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Start API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestSimulateParts::None => "/_ingest/pipeline/_simulate".into(),
-            IngestSimulateParts::Id(id) => {
+            RollupsStartParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(28usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
+                let mut p = String::with_capacity(33usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
-                p.push_str("/_simulate");
+                p.push_str("/_start");
                 p.into()
             }
         }
     }
 }
-#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
+#[doc = "Builder for the [Rollups Start API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
 #[derive(Clone, Debug)]
-pub struct IngestSimulate<'a, 'b, B> {
+pub struct RollupsStart<'a, 'b, B> {
     transport: &'a Transport,
-    parts: IngestSimulateParts<'b>,
+    parts: RollupsStartParts<'b>,
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
@@ -672,16 +590,15 @@ pub struct IngestSimulate<'a, 'b, B> {
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    verbose: Option<bool>,
 }
-impl<'a, 'b, B> IngestSimulate<'a, 'b, B>
+impl<'a, 'b, B> RollupsStart<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [IngestSimulate] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestSimulateParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [RollupsStart] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsStartParts<'b>) -> Self {
         let headers = HeaderMap::new();
-        IngestSimulate {
+        RollupsStart {
             transport,
             parts,
             headers,
@@ -692,15 +609,14 @@ where
             pretty: None,
             request_timeout: None,
             source: None,
-            verbose: None,
         }
     }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestSimulate<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> RollupsStart<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        IngestSimulate {
+        RollupsStart {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
@@ -711,7 +627,6 @@ where
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
-            verbose: self.verbose,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -749,18 +664,10 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "When `true`, the response includes output data for each processor in the pipeline"]
-    pub fn verbose(mut self, verbose: bool) -> Self {
-        self.verbose = Some(verbose);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Simulate API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Rollups Start API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
-        let method = match self.body {
-            Some(_) => Method::Post,
-            None => Method::Get,
-        };
+        let method = Method::Post;
         let headers = self.headers;
         let timeout = self.request_timeout;
         let query_string = {
@@ -773,7 +680,6 @@ where
                 human: Option<bool>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                verbose: Option<bool>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -781,7 +687,6 @@ where
                 human: self.human,
                 pretty: self.pretty,
                 source: self.source,
-                verbose: self.verbose,
             };
             Some(query_params)
         };
@@ -793,51 +698,188 @@ where
         Ok(response)
     }
 }
-#[doc = "Namespace client for Ingest APIs"]
-pub struct Ingest<'a> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Rollups Stop API"]
+pub enum RollupsStopParts<'b> {
+    #[doc = "Id"]
+    Id(&'b str),
+}
+impl<'b> RollupsStopParts<'b> {
+    #[doc = "Builds a relative URL path to the Rollups Stop API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            RollupsStopParts::Id(id) => {
+                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(32usize + encoded_id.len());
+                p.push_str("/_opendistro/_rollup/jobs/");
+                p.push_str(encoded_id.as_ref());
+                p.push_str("/_stop");
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the [Rollups Stop API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
+#[derive(Clone, Debug)]
+pub struct RollupsStop<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: RollupsStopParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> RollupsStop<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [RollupsStop] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: RollupsStopParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        RollupsStop {
+            transport,
+            parts,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> RollupsStop<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        RollupsStop {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Rollups Stop API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[doc = "Namespace client for Rollups APIs"]
+pub struct Rollups<'a> {
     transport: &'a Transport,
 }
-impl<'a> Ingest<'a> {
-    #[doc = "Creates a new instance of [Ingest]"]
+impl<'a> Rollups<'a> {
+    #[doc = "Creates a new instance of [Rollups]"]
     pub fn new(transport: &'a Transport) -> Self {
         Self { transport }
     }
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
-    pub fn delete_pipeline<'b>(
-        &'a self,
-        parts: IngestDeletePipelineParts<'b>,
-    ) -> IngestDeletePipeline<'a, 'b> {
-        IngestDeletePipeline::new(self.transport(), parts)
+    #[doc = "[Rollups Delete API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
+    pub fn delete<'b>(&'a self, parts: RollupsDeleteParts<'b>) -> RollupsDelete<'a, 'b> {
+        RollupsDelete::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
-    pub fn get_pipeline<'b>(
-        &'a self,
-        parts: IngestGetPipelineParts<'b>,
-    ) -> IngestGetPipeline<'a, 'b> {
-        IngestGetPipeline::new(self.transport(), parts)
+    #[doc = "[Rollups Explain API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
+    pub fn explain<'b>(&'a self, parts: RollupsExplainParts<'b>) -> RollupsExplain<'a, 'b> {
+        RollupsExplain::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
-    pub fn processor_grok<'b>(&'a self) -> IngestProcessorGrok<'a, 'b> {
-        IngestProcessorGrok::new(self.transport())
+    #[doc = "[Rollups Get API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
+    pub fn get<'b>(&'a self, parts: RollupsGetParts<'b>) -> RollupsGet<'a, 'b> {
+        RollupsGet::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
-    pub fn put_pipeline<'b>(
-        &'a self,
-        parts: IngestPutPipelineParts<'b>,
-    ) -> IngestPutPipeline<'a, 'b, ()> {
-        IngestPutPipeline::new(self.transport(), parts)
+    #[doc = "[Rollups Put API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
+    pub fn put<'b>(&'a self, parts: RollupsPutParts<'b>) -> RollupsPut<'a, 'b, ()> {
+        RollupsPut::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
-    pub fn simulate<'b>(&'a self, parts: IngestSimulateParts<'b>) -> IngestSimulate<'a, 'b, ()> {
-        IngestSimulate::new(self.transport(), parts)
+    #[doc = "[Rollups Start API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
+    pub fn start<'b>(&'a self, parts: RollupsStartParts<'b>) -> RollupsStart<'a, 'b, ()> {
+        RollupsStart::new(self.transport(), parts)
+    }
+    #[doc = "[Rollups Stop API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
+    pub fn stop<'b>(&'a self, parts: RollupsStopParts<'b>) -> RollupsStop<'a, 'b, ()> {
+        RollupsStop::new(self.transport(), parts)
     }
 }
 impl OpenSearch {
-    #[doc = "Creates a namespace client for Ingest APIs"]
-    pub fn ingest(&self) -> Ingest {
-        Ingest::new(self.transport())
+    #[doc = "Creates a namespace client for Rollups APIs"]
+    pub fn rollups(&self) -> Rollups {
+        Rollups::new(self.transport())
     }
 }

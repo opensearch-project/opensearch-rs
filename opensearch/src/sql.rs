@@ -24,22 +24,6 @@
 // cargo make generate-api
 // -----------------------------------------------
 
-//! Ingest APIs
-//!
-//! Manage ingest pipelines : Ingest pipelines can be used on a node with the `ingest` role to
-//! pre-process documents before indexing, to apply transformations and enrich data. Transformations are performed
-//! by processors in the pipeline, and can include such operations as
-//!
-//! - add, remove and append fields within the document
-//! - point documents to the right time-based index based on a timestamp within the document
-//! - extract details from fields with known formats and add new fields with extracted data
-//!
-//! and many more.
-//!
-//! All nodes enable ingest by default, so any node can handle ingest tasks. Ingest pipelines can
-//! be conditionally executed, and failures within pipelines can be explicitly handled by defining
-//! processors to execute in the event of failure.
-
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -57,497 +41,76 @@ use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Delete Pipeline API"]
-pub enum IngestDeletePipelineParts<'b> {
-    #[doc = "Id"]
-    Id(&'b str),
-}
-impl<'b> IngestDeletePipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Delete Pipeline API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestDeletePipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
-#[derive(Clone, Debug)]
-pub struct IngestDeletePipeline<'a, 'b> {
-    transport: &'a Transport,
-    parts: IngestDeletePipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    master_timeout: Option<&'b str>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-    timeout: Option<&'b str>,
-}
-impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestDeletePipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestDeletePipelineParts<'b>) -> Self {
-        let headers = HeaderMap::new();
-        IngestDeletePipeline {
-            transport,
-            parts,
-            headers,
-            cluster_manager_timeout: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            master_timeout: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-            timeout: None,
-        }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Delete Pipeline API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Delete;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                master_timeout: Option<&'b str>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-                timeout: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                master_timeout: self.master_timeout,
-                pretty: self.pretty,
-                source: self.source,
-                timeout: self.timeout,
-            };
-            Some(query_params)
-        };
-        let body = Option::<()>::None;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Get Pipeline API"]
-pub enum IngestGetPipelineParts<'b> {
-    #[doc = "No parts"]
-    None,
-    #[doc = "Id"]
-    Id(&'b str),
-}
-impl<'b> IngestGetPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Get Pipeline API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestGetPipelineParts::None => "/_ingest/pipeline".into(),
-            IngestGetPipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
-#[derive(Clone, Debug)]
-pub struct IngestGetPipeline<'a, 'b> {
-    transport: &'a Transport,
-    parts: IngestGetPipelineParts<'b>,
-    cluster_manager_timeout: Option<&'b str>,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    master_timeout: Option<&'b str>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-}
-impl<'a, 'b> IngestGetPipeline<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestGetPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestGetPipelineParts<'b>) -> Self {
-        let headers = HeaderMap::new();
-        IngestGetPipeline {
-            transport,
-            parts,
-            headers,
-            cluster_manager_timeout: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            master_timeout: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-        }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Get Pipeline API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Get;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                master_timeout: Option<&'b str>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                master_timeout: self.master_timeout,
-                pretty: self.pretty,
-                source: self.source,
-            };
-            Some(query_params)
-        };
-        let body = Option::<()>::None;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Processor Grok API"]
-pub enum IngestProcessorGrokParts {
+#[doc = "API parts for the Sql Close API"]
+pub enum SqlCloseParts {
     #[doc = "No parts"]
     None,
 }
-impl IngestProcessorGrokParts {
-    #[doc = "Builds a relative URL path to the Ingest Processor Grok API"]
+impl SqlCloseParts {
+    #[doc = "Builds a relative URL path to the Sql Close API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IngestProcessorGrokParts::None => "/_ingest/processor/grok".into(),
+            SqlCloseParts::None => "/_opendistro/_sql/close".into(),
         }
     }
 }
-#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
+#[doc = "Builder for the [Sql Close API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
 #[derive(Clone, Debug)]
-pub struct IngestProcessorGrok<'a, 'b> {
+pub struct SqlClose<'a, 'b, B> {
     transport: &'a Transport,
-    parts: IngestProcessorGrokParts,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    s: Option<bool>,
-    source: Option<&'b str>,
-}
-impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
-    #[doc = "Creates a new instance of [IngestProcessorGrok]"]
-    pub fn new(transport: &'a Transport) -> Self {
-        let headers = HeaderMap::new();
-        IngestProcessorGrok {
-            transport,
-            parts: IngestProcessorGrokParts::None,
-            headers,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            pretty: None,
-            request_timeout: None,
-            s: None,
-            source: None,
-        }
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "Determines how to sort returned grok patterns by key name."]
-    pub fn s(mut self, s: bool) -> Self {
-        self.s = Some(s);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Processor Grok API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = Method::Get;
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                pretty: Option<bool>,
-                s: Option<bool>,
-                source: Option<&'b str>,
-            }
-            let query_params = QueryParams {
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                pretty: self.pretty,
-                s: self.s,
-                source: self.source,
-            };
-            Some(query_params)
-        };
-        let body = Option::<()>::None;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Put Pipeline API"]
-pub enum IngestPutPipelineParts<'b> {
-    #[doc = "Id"]
-    Id(&'b str),
-}
-impl<'b> IngestPutPipelineParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Put Pipeline API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestPutPipelineParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(18usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
-#[derive(Clone, Debug)]
-pub struct IngestPutPipeline<'a, 'b, B> {
-    transport: &'a Transport,
-    parts: IngestPutPipelineParts<'b>,
+    parts: SqlCloseParts,
     body: Option<B>,
-    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
     headers: HeaderMap,
     human: Option<bool>,
-    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
+    sanitize: Option<bool>,
     source: Option<&'b str>,
-    timeout: Option<&'b str>,
 }
-impl<'a, 'b, B> IngestPutPipeline<'a, 'b, B>
+impl<'a, 'b, B> SqlClose<'a, 'b, B>
 where
     B: Body,
 {
-    #[doc = "Creates a new instance of [IngestPutPipeline] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestPutPipelineParts<'b>) -> Self {
+    #[doc = "Creates a new instance of [SqlClose]"]
+    pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        IngestPutPipeline {
+        SqlClose {
             transport,
-            parts,
+            parts: SqlCloseParts::None,
             headers,
             body: None,
-            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
+            format: None,
             human: None,
-            master_timeout: None,
             pretty: None,
             request_timeout: None,
+            sanitize: None,
             source: None,
-            timeout: None,
         }
     }
     #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestPutPipeline<'a, 'b, JsonBody<T>>
+    pub fn body<T>(self, body: T) -> SqlClose<'a, 'b, JsonBody<T>>
     where
         T: Serialize,
     {
-        IngestPutPipeline {
+        SqlClose {
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
-            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
+            format: self.format,
             headers: self.headers,
             human: self.human,
-            master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
+            sanitize: self.sanitize,
             source: self.source,
-            timeout: self.timeout,
         }
-    }
-    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
-        self.cluster_manager_timeout = Some(cluster_manager_timeout);
-        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -557,6 +120,11 @@ where
     #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
         self
     }
     #[doc = "Adds a HTTP header"]
@@ -569,10 +137,751 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
-    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
-        self.master_timeout = Some(master_timeout);
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Whether to escape special characters in the results."]
+    pub fn sanitize(mut self, sanitize: bool) -> Self {
+        self.sanitize = Some(sanitize);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Sql Close API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                sanitize: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                pretty: self.pretty,
+                sanitize: self.sanitize,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Sql Explain API"]
+pub enum SqlExplainParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SqlExplainParts {
+    #[doc = "Builds a relative URL path to the Sql Explain API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SqlExplainParts::None => "/_opendistro/_sql/_explain".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Sql Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
+#[derive(Clone, Debug)]
+pub struct SqlExplain<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SqlExplainParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    sanitize: Option<bool>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SqlExplain<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SqlExplain]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SqlExplain {
+            transport,
+            parts: SqlExplainParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            sanitize: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SqlExplain<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SqlExplain {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            format: self.format,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            sanitize: self.sanitize,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Whether to escape special characters in the results."]
+    pub fn sanitize(mut self, sanitize: bool) -> Self {
+        self.sanitize = Some(sanitize);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Sql Explain API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                sanitize: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                pretty: self.pretty,
+                sanitize: self.sanitize,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Sql Get Stats API"]
+pub enum SqlGetStatsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SqlGetStatsParts {
+    #[doc = "Builds a relative URL path to the Sql Get Stats API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SqlGetStatsParts::None => "/_opendistro/_sql/stats".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Sql Get Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
+#[derive(Clone, Debug)]
+pub struct SqlGetStats<'a, 'b> {
+    transport: &'a Transport,
+    parts: SqlGetStatsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    sanitize: Option<bool>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> SqlGetStats<'a, 'b> {
+    #[doc = "Creates a new instance of [SqlGetStats]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SqlGetStats {
+            transport,
+            parts: SqlGetStatsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            sanitize: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Whether to escape special characters in the results."]
+    pub fn sanitize(mut self, sanitize: bool) -> Self {
+        self.sanitize = Some(sanitize);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Sql Get Stats API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                sanitize: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                pretty: self.pretty,
+                sanitize: self.sanitize,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Sql Post Stats API"]
+pub enum SqlPostStatsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SqlPostStatsParts {
+    #[doc = "Builds a relative URL path to the Sql Post Stats API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SqlPostStatsParts::None => "/_opendistro/_sql/stats".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Sql Post Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
+#[derive(Clone, Debug)]
+pub struct SqlPostStats<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SqlPostStatsParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    sanitize: Option<bool>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SqlPostStats<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SqlPostStats]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SqlPostStats {
+            transport,
+            parts: SqlPostStatsParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            sanitize: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SqlPostStats<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SqlPostStats {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            format: self.format,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            sanitize: self.sanitize,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Whether to escape special characters in the results."]
+    pub fn sanitize(mut self, sanitize: bool) -> Self {
+        self.sanitize = Some(sanitize);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Sql Post Stats API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                sanitize: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                pretty: self.pretty,
+                sanitize: self.sanitize,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Sql Query API"]
+pub enum SqlQueryParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SqlQueryParts {
+    #[doc = "Builds a relative URL path to the Sql Query API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SqlQueryParts::None => "/_opendistro/_sql".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Sql Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
+#[derive(Clone, Debug)]
+pub struct SqlQuery<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SqlQueryParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    sanitize: Option<bool>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SqlQuery<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SqlQuery]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SqlQuery {
+            transport,
+            parts: SqlQueryParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            sanitize: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SqlQuery<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SqlQuery {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            format: self.format,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            sanitize: self.sanitize,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Whether to escape special characters in the results."]
+    pub fn sanitize(mut self, sanitize: bool) -> Self {
+        self.sanitize = Some(sanitize);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Sql Query API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                sanitize: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                pretty: self.pretty,
+                sanitize: self.sanitize,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Sql Settings API"]
+pub enum SqlSettingsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SqlSettingsParts {
+    #[doc = "Builds a relative URL path to the Sql Settings API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SqlSettingsParts::None => "/_opendistro/_sql/settings".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Sql Settings API](https://opensearch.org/docs/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
+#[derive(Clone, Debug)]
+pub struct SqlSettings<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SqlSettingsParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<&'b str>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SqlSettings<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SqlSettings]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SqlSettings {
+            transport,
+            parts: SqlSettingsParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SqlSettings<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SqlSettings {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            format: self.format,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Specifies the response format (JSON or YAML)."]
+    pub fn format(mut self, format: &'b str) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -590,12 +899,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response."]
-    pub fn timeout(mut self, timeout: &'b str) -> Self {
-        self.timeout = Some(timeout);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Put Pipeline API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Sql Settings API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
         let method = Method::Put;
@@ -605,25 +909,21 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
-                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
+                format: Option<&'b str>,
                 human: Option<bool>,
-                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
-                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
-                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
+                format: self.format,
                 human: self.human,
-                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
-                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -635,209 +935,46 @@ where
         Ok(response)
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Ingest Simulate API"]
-pub enum IngestSimulateParts<'b> {
-    #[doc = "No parts"]
-    None,
-    #[doc = "Id"]
-    Id(&'b str),
-}
-impl<'b> IngestSimulateParts<'b> {
-    #[doc = "Builds a relative URL path to the Ingest Simulate API"]
-    pub fn url(self) -> Cow<'static, str> {
-        match self {
-            IngestSimulateParts::None => "/_ingest/pipeline/_simulate".into(),
-            IngestSimulateParts::Id(id) => {
-                let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(28usize + encoded_id.len());
-                p.push_str("/_ingest/pipeline/");
-                p.push_str(encoded_id.as_ref());
-                p.push_str("/_simulate");
-                p.into()
-            }
-        }
-    }
-}
-#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
-#[derive(Clone, Debug)]
-pub struct IngestSimulate<'a, 'b, B> {
-    transport: &'a Transport,
-    parts: IngestSimulateParts<'b>,
-    body: Option<B>,
-    error_trace: Option<bool>,
-    filter_path: Option<&'b [&'b str]>,
-    headers: HeaderMap,
-    human: Option<bool>,
-    pretty: Option<bool>,
-    request_timeout: Option<Duration>,
-    source: Option<&'b str>,
-    verbose: Option<bool>,
-}
-impl<'a, 'b, B> IngestSimulate<'a, 'b, B>
-where
-    B: Body,
-{
-    #[doc = "Creates a new instance of [IngestSimulate] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: IngestSimulateParts<'b>) -> Self {
-        let headers = HeaderMap::new();
-        IngestSimulate {
-            transport,
-            parts,
-            headers,
-            body: None,
-            error_trace: None,
-            filter_path: None,
-            human: None,
-            pretty: None,
-            request_timeout: None,
-            source: None,
-            verbose: None,
-        }
-    }
-    #[doc = "The body for the API call"]
-    pub fn body<T>(self, body: T) -> IngestSimulate<'a, 'b, JsonBody<T>>
-    where
-        T: Serialize,
-    {
-        IngestSimulate {
-            transport: self.transport,
-            parts: self.parts,
-            body: Some(body.into()),
-            error_trace: self.error_trace,
-            filter_path: self.filter_path,
-            headers: self.headers,
-            human: self.human,
-            pretty: self.pretty,
-            request_timeout: self.request_timeout,
-            source: self.source,
-            verbose: self.verbose,
-        }
-    }
-    #[doc = "Whether to include the stack trace of returned errors."]
-    pub fn error_trace(mut self, error_trace: bool) -> Self {
-        self.error_trace = Some(error_trace);
-        self
-    }
-    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
-    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
-        self.filter_path = Some(filter_path);
-        self
-    }
-    #[doc = "Adds a HTTP header"]
-    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
-        self.headers.insert(key, value);
-        self
-    }
-    #[doc = "Whether to return human-readable values for statistics."]
-    pub fn human(mut self, human: bool) -> Self {
-        self.human = Some(human);
-        self
-    }
-    #[doc = "Whether to pretty-format the returned JSON response."]
-    pub fn pretty(mut self, pretty: bool) -> Self {
-        self.pretty = Some(pretty);
-        self
-    }
-    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
-    pub fn request_timeout(mut self, timeout: Duration) -> Self {
-        self.request_timeout = Some(timeout);
-        self
-    }
-    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
-    pub fn source(mut self, source: &'b str) -> Self {
-        self.source = Some(source);
-        self
-    }
-    #[doc = "When `true`, the response includes output data for each processor in the pipeline"]
-    pub fn verbose(mut self, verbose: bool) -> Self {
-        self.verbose = Some(verbose);
-        self
-    }
-    #[doc = "Creates an asynchronous call to the Ingest Simulate API that can be awaited"]
-    pub async fn send(self) -> Result<Response, Error> {
-        let path = self.parts.url();
-        let method = match self.body {
-            Some(_) => Method::Post,
-            None => Method::Get,
-        };
-        let headers = self.headers;
-        let timeout = self.request_timeout;
-        let query_string = {
-            #[serde_with::skip_serializing_none]
-            #[derive(Serialize)]
-            struct QueryParams<'b> {
-                error_trace: Option<bool>,
-                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
-                filter_path: Option<&'b [&'b str]>,
-                human: Option<bool>,
-                pretty: Option<bool>,
-                source: Option<&'b str>,
-                verbose: Option<bool>,
-            }
-            let query_params = QueryParams {
-                error_trace: self.error_trace,
-                filter_path: self.filter_path,
-                human: self.human,
-                pretty: self.pretty,
-                source: self.source,
-                verbose: self.verbose,
-            };
-            Some(query_params)
-        };
-        let body = self.body;
-        let response = self
-            .transport
-            .send(method, &path, headers, query_string.as_ref(), body, timeout)
-            .await?;
-        Ok(response)
-    }
-}
-#[doc = "Namespace client for Ingest APIs"]
-pub struct Ingest<'a> {
+#[doc = "Namespace client for Sql APIs"]
+pub struct Sql<'a> {
     transport: &'a Transport,
 }
-impl<'a> Ingest<'a> {
-    #[doc = "Creates a new instance of [Ingest]"]
+impl<'a> Sql<'a> {
+    #[doc = "Creates a new instance of [Sql]"]
     pub fn new(transport: &'a Transport) -> Self {
         Self { transport }
     }
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
-    pub fn delete_pipeline<'b>(
-        &'a self,
-        parts: IngestDeletePipelineParts<'b>,
-    ) -> IngestDeletePipeline<'a, 'b> {
-        IngestDeletePipeline::new(self.transport(), parts)
+    #[doc = "[Sql Close API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
+    pub fn close<'b>(&'a self) -> SqlClose<'a, 'b, ()> {
+        SqlClose::new(self.transport())
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
-    pub fn get_pipeline<'b>(
-        &'a self,
-        parts: IngestGetPipelineParts<'b>,
-    ) -> IngestGetPipeline<'a, 'b> {
-        IngestGetPipeline::new(self.transport(), parts)
+    #[doc = "[Sql Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
+    pub fn explain<'b>(&'a self) -> SqlExplain<'a, 'b, ()> {
+        SqlExplain::new(self.transport())
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
-    pub fn processor_grok<'b>(&'a self) -> IngestProcessorGrok<'a, 'b> {
-        IngestProcessorGrok::new(self.transport())
+    #[doc = "[Sql Get Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
+    pub fn get_stats<'b>(&'a self) -> SqlGetStats<'a, 'b> {
+        SqlGetStats::new(self.transport())
     }
-    #[doc = "[Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
-    pub fn put_pipeline<'b>(
-        &'a self,
-        parts: IngestPutPipelineParts<'b>,
-    ) -> IngestPutPipeline<'a, 'b, ()> {
-        IngestPutPipeline::new(self.transport(), parts)
+    #[doc = "[Sql Post Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
+    pub fn post_stats<'b>(&'a self) -> SqlPostStats<'a, 'b, ()> {
+        SqlPostStats::new(self.transport())
     }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
-    pub fn simulate<'b>(&'a self, parts: IngestSimulateParts<'b>) -> IngestSimulate<'a, 'b, ()> {
-        IngestSimulate::new(self.transport(), parts)
+    #[doc = "[Sql Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
+    pub fn query<'b>(&'a self) -> SqlQuery<'a, 'b, ()> {
+        SqlQuery::new(self.transport())
+    }
+    #[doc = "[Sql Settings API](https://opensearch.org/docs/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
+    pub fn settings<'b>(&'a self) -> SqlSettings<'a, 'b, ()> {
+        SqlSettings::new(self.transport())
     }
 }
 impl OpenSearch {
-    #[doc = "Creates a namespace client for Ingest APIs"]
-    pub fn ingest(&self) -> Ingest {
-        Ingest::new(self.transport())
+    #[doc = "Creates a namespace client for Sql APIs"]
+    pub fn sql(&self) -> Sql {
+        Sql::new(self.transport())
     }
 }

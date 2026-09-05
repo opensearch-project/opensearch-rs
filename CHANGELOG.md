@@ -44,6 +44,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))
+- Changed the supported (CI-tested) OpenSearch versions to 2.19.x and 3.x: every release of the current major plus the latest release of the previous major, re-evaluated at each release. The 2.x client remains the documented fallback for older OpenSearch lines
 
 ### Deprecated
 

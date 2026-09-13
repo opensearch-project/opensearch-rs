@@ -238,7 +238,11 @@ impl Deprecated {
     pub fn attr(d: &Option<Self>) -> (Option<TokenStream>, Option<TokenStream>) {
         match d.as_ref() {
             Some(d) => {
-                let message = &d.description;
+                let message = if d.version.is_empty() {
+                    d.description.clone()
+                } else {
+                    format!("Deprecated since OpenSearch {}: {}", d.version, d.description)
+                };
                 (
                     Some(quote!(#[deprecated = #message])),
                     Some(quote!(#[allow(deprecated)])),

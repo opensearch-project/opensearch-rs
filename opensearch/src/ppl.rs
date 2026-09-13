@@ -50,7 +50,7 @@ impl PplExplainParts {
     #[doc = "Builds a relative URL path to the Ppl Explain API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            PplExplainParts::None => "/_opendistro/_ppl/_explain".into(),
+            PplExplainParts::None => "/_plugins/_ppl/_explain".into(),
         }
     }
 }
@@ -205,7 +205,7 @@ impl PplGetStatsParts {
     #[doc = "Builds a relative URL path to the Ppl Get Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            PplGetStatsParts::None => "/_opendistro/_ppl/stats".into(),
+            PplGetStatsParts::None => "/_plugins/_ppl/stats".into(),
         }
     }
 }
@@ -335,7 +335,7 @@ impl PplPostStatsParts {
     #[doc = "Builds a relative URL path to the Ppl Post Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            PplPostStatsParts::None => "/_opendistro/_ppl/stats".into(),
+            PplPostStatsParts::None => "/_plugins/_ppl/stats".into(),
         }
     }
 }
@@ -490,7 +490,7 @@ impl PplQueryParts {
     #[doc = "Builds a relative URL path to the Ppl Query API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            PplQueryParts::None => "/_opendistro/_ppl".into(),
+            PplQueryParts::None => "/_plugins/_ppl".into(),
         }
     }
 }

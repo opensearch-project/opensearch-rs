@@ -52,12 +52,12 @@ impl<'b> IsmAddPolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Add Policy API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmAddPolicyParts::None => "/_opendistro/_ism/add".into(),
+            IsmAddPolicyParts::None => "/_plugins/_ism/add".into(),
             IsmAddPolicyParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(22usize + encoded_index.len());
-                p.push_str("/_opendistro/_ism/add/");
+                let mut p = String::with_capacity(19usize + encoded_index.len());
+                p.push_str("/_plugins/_ism/add/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }
@@ -206,12 +206,12 @@ impl<'b> IsmChangePolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Change Policy API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmChangePolicyParts::None => "/_opendistro/_ism/change_policy".into(),
+            IsmChangePolicyParts::None => "/_plugins/_ism/change_policy".into(),
             IsmChangePolicyParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(32usize + encoded_index.len());
-                p.push_str("/_opendistro/_ism/change_policy/");
+                let mut p = String::with_capacity(29usize + encoded_index.len());
+                p.push_str("/_plugins/_ism/change_policy/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }
@@ -361,8 +361,8 @@ impl<'b> IsmDeletePolicyParts<'b> {
             IsmDeletePolicyParts::PolicyId(policy_id) => {
                 let encoded_policy_id: Cow<str> =
                     percent_encode(policy_id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(27usize + encoded_policy_id.len());
-                p.push_str("/_opendistro/_ism/policies/");
+                let mut p = String::with_capacity(24usize + encoded_policy_id.len());
+                p.push_str("/_plugins/_ism/policies/");
                 p.push_str(encoded_policy_id.as_ref());
                 p.into()
             }
@@ -480,8 +480,8 @@ impl<'b> IsmExistsPolicyParts<'b> {
             IsmExistsPolicyParts::PolicyId(policy_id) => {
                 let encoded_policy_id: Cow<str> =
                     percent_encode(policy_id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(27usize + encoded_policy_id.len());
-                p.push_str("/_opendistro/_ism/policies/");
+                let mut p = String::with_capacity(24usize + encoded_policy_id.len());
+                p.push_str("/_plugins/_ism/policies/");
                 p.push_str(encoded_policy_id.as_ref());
                 p.into()
             }
@@ -598,12 +598,12 @@ impl<'b> IsmExplainPolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Explain Policy API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmExplainPolicyParts::None => "/_opendistro/_ism/explain".into(),
+            IsmExplainPolicyParts::None => "/_plugins/_ism/explain".into(),
             IsmExplainPolicyParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(26usize + encoded_index.len());
-                p.push_str("/_opendistro/_ism/explain/");
+                let mut p = String::with_capacity(23usize + encoded_index.len());
+                p.push_str("/_plugins/_ism/explain/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }
@@ -744,7 +744,7 @@ impl IsmGetPoliciesParts {
     #[doc = "Builds a relative URL path to the Ism Get Policies API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmGetPoliciesParts::None => "/_opendistro/_ism/policies".into(),
+            IsmGetPoliciesParts::None => "/_plugins/_ism/policies".into(),
         }
     }
 }
@@ -859,8 +859,8 @@ impl<'b> IsmGetPolicyParts<'b> {
             IsmGetPolicyParts::PolicyId(policy_id) => {
                 let encoded_policy_id: Cow<str> =
                     percent_encode(policy_id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(27usize + encoded_policy_id.len());
-                p.push_str("/_opendistro/_ism/policies/");
+                let mut p = String::with_capacity(24usize + encoded_policy_id.len());
+                p.push_str("/_plugins/_ism/policies/");
                 p.push_str(encoded_policy_id.as_ref());
                 p.into()
             }
@@ -975,7 +975,7 @@ impl IsmPutPoliciesParts {
     #[doc = "Builds a relative URL path to the Ism Put Policies API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmPutPoliciesParts::None => "/_opendistro/_ism/policies".into(),
+            IsmPutPoliciesParts::None => "/_plugins/_ism/policies".into(),
         }
     }
 }
@@ -1143,8 +1143,8 @@ impl<'b> IsmPutPolicyParts<'b> {
             IsmPutPolicyParts::PolicyId(policy_id) => {
                 let encoded_policy_id: Cow<str> =
                     percent_encode(policy_id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(27usize + encoded_policy_id.len());
-                p.push_str("/_opendistro/_ism/policies/");
+                let mut p = String::with_capacity(24usize + encoded_policy_id.len());
+                p.push_str("/_plugins/_ism/policies/");
                 p.push_str(encoded_policy_id.as_ref());
                 p.into()
             }
@@ -1305,8 +1305,8 @@ impl<'b> IsmRefreshSearchAnalyzersParts<'b> {
             IsmRefreshSearchAnalyzersParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(39usize + encoded_index.len());
-                p.push_str("/_opendistro/_refresh_search_analyzers/");
+                let mut p = String::with_capacity(36usize + encoded_index.len());
+                p.push_str("/_plugins/_refresh_search_analyzers/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }
@@ -1446,12 +1446,12 @@ impl<'b> IsmRemovePolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Remove Policy API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmRemovePolicyParts::None => "/_opendistro/_ism/remove".into(),
+            IsmRemovePolicyParts::None => "/_plugins/_ism/remove".into(),
             IsmRemovePolicyParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(25usize + encoded_index.len());
-                p.push_str("/_opendistro/_ism/remove/");
+                let mut p = String::with_capacity(22usize + encoded_index.len());
+                p.push_str("/_plugins/_ism/remove/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }
@@ -1600,12 +1600,12 @@ impl<'b> IsmRetryIndexParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Retry Index API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            IsmRetryIndexParts::None => "/_opendistro/_ism/retry".into(),
+            IsmRetryIndexParts::None => "/_plugins/_ism/retry".into(),
             IsmRetryIndexParts::Index(index) => {
                 let encoded_index: Cow<str> =
                     percent_encode(index.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(24usize + encoded_index.len());
-                p.push_str("/_opendistro/_ism/retry/");
+                let mut p = String::with_capacity(21usize + encoded_index.len());
+                p.push_str("/_plugins/_ism/retry/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }

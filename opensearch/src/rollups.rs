@@ -52,8 +52,8 @@ impl<'b> RollupsDeleteParts<'b> {
         match self {
             RollupsDeleteParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(26usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(23usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -170,8 +170,8 @@ impl<'b> RollupsExplainParts<'b> {
         match self {
             RollupsExplainParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(32usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.push_str("/_explain");
                 p.into()
@@ -289,8 +289,8 @@ impl<'b> RollupsGetParts<'b> {
         match self {
             RollupsGetParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(26usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(23usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -407,8 +407,8 @@ impl<'b> RollupsPutParts<'b> {
         match self {
             RollupsPutParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(26usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(23usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -568,8 +568,8 @@ impl<'b> RollupsStartParts<'b> {
         match self {
             RollupsStartParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(33usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(30usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.push_str("/_start");
                 p.into()
@@ -710,8 +710,8 @@ impl<'b> RollupsStopParts<'b> {
         match self {
             RollupsStopParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(32usize + encoded_id.len());
-                p.push_str("/_opendistro/_rollup/jobs/");
+                let mut p = String::with_capacity(29usize + encoded_id.len());
+                p.push_str("/_plugins/_rollup/jobs/");
                 p.push_str(encoded_id.as_ref());
                 p.push_str("/_stop");
                 p.into()

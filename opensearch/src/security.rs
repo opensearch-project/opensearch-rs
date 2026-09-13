@@ -50,7 +50,7 @@ impl SecurityAuthinfoParts {
     #[doc = "Builds a relative URL path to the Security Authinfo API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityAuthinfoParts::None => "/_opendistro/_security/authinfo".into(),
+            SecurityAuthinfoParts::None => "/_plugins/_security/authinfo".into(),
         }
     }
 }
@@ -208,7 +208,7 @@ impl SecurityAuthtokenParts {
     #[doc = "Builds a relative URL path to the Security Authtoken API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityAuthtokenParts::None => "/_opendistro/_security/api/authtoken".into(),
+            SecurityAuthtokenParts::None => "/_plugins/_security/api/authtoken".into(),
         }
     }
 }
@@ -343,7 +343,7 @@ impl SecurityChangePasswordParts {
     #[doc = "Builds a relative URL path to the Security Change Password API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityChangePasswordParts::None => "/_opendistro/_security/api/account".into(),
+            SecurityChangePasswordParts::None => "/_plugins/_security/api/account".into(),
         }
     }
 }
@@ -732,8 +732,8 @@ impl<'b> SecurityCreateActionGroupParts<'b> {
             SecurityCreateActionGroupParts::ActionGroup(action_group) => {
                 let encoded_action_group: Cow<str> =
                     percent_encode(action_group.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_action_group.len());
-                p.push_str("/_opendistro/_security/api/actiongroups/");
+                let mut p = String::with_capacity(37usize + encoded_action_group.len());
+                p.push_str("/_plugins/_security/api/actiongroups/");
                 p.push_str(encoded_action_group.as_ref());
                 p.into()
             }
@@ -871,7 +871,7 @@ impl SecurityCreateAllowlistParts {
     #[doc = "Builds a relative URL path to the Security Create Allowlist API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityCreateAllowlistParts::None => "/_opendistro/_security/api/allowlist".into(),
+            SecurityCreateAllowlistParts::None => "/_plugins/_security/api/allowlist".into(),
         }
     }
 }
@@ -1008,8 +1008,8 @@ impl<'b> SecurityCreateRoleParts<'b> {
         match self {
             SecurityCreateRoleParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(33usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/roles/");
+                let mut p = String::with_capacity(30usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/roles/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -1149,8 +1149,8 @@ impl<'b> SecurityCreateRoleMappingParts<'b> {
         match self {
             SecurityCreateRoleMappingParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/rolesmapping/");
+                let mut p = String::with_capacity(37usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/rolesmapping/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -1291,8 +1291,8 @@ impl<'b> SecurityCreateTenantParts<'b> {
             SecurityCreateTenantParts::Tenant(tenant) => {
                 let encoded_tenant: Cow<str> =
                     percent_encode(tenant.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_tenant.len());
-                p.push_str("/_opendistro/_security/api/tenants/");
+                let mut p = String::with_capacity(32usize + encoded_tenant.len());
+                p.push_str("/_plugins/_security/api/tenants/");
                 p.push_str(encoded_tenant.as_ref());
                 p.into()
             }
@@ -1431,7 +1431,7 @@ impl SecurityCreateUpdateTenancyConfigParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityCreateUpdateTenancyConfigParts::None => {
-                "/_opendistro/_security/api/tenancy/config".into()
+                "/_plugins/_security/api/tenancy/config".into()
             }
         }
     }
@@ -1570,8 +1570,8 @@ impl<'b> SecurityCreateUserParts<'b> {
             SecurityCreateUserParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(41usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/internalusers/");
+                let mut p = String::with_capacity(38usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/internalusers/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -1712,8 +1712,8 @@ impl<'b> SecurityCreateUserLegacyParts<'b> {
             SecurityCreateUserLegacyParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(32usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/user/");
+                let mut p = String::with_capacity(29usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/user/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -1854,8 +1854,8 @@ impl<'b> SecurityDeleteActionGroupParts<'b> {
             SecurityDeleteActionGroupParts::ActionGroup(action_group) => {
                 let encoded_action_group: Cow<str> =
                     percent_encode(action_group.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_action_group.len());
-                p.push_str("/_opendistro/_security/api/actiongroups/");
+                let mut p = String::with_capacity(37usize + encoded_action_group.len());
+                p.push_str("/_plugins/_security/api/actiongroups/");
                 p.push_str(encoded_action_group.as_ref());
                 p.into()
             }
@@ -1973,8 +1973,8 @@ impl<'b> SecurityDeleteDistinguishedNameParts<'b> {
             SecurityDeleteDistinguishedNameParts::ClusterName(cluster_name) => {
                 let encoded_cluster_name: Cow<str> =
                     percent_encode(cluster_name.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_cluster_name.len());
-                p.push_str("/_opendistro/_security/api/nodesdn/");
+                let mut p = String::with_capacity(32usize + encoded_cluster_name.len());
+                p.push_str("/_plugins/_security/api/nodesdn/");
                 p.push_str(encoded_cluster_name.as_ref());
                 p.into()
             }
@@ -2091,8 +2091,8 @@ impl<'b> SecurityDeleteRoleParts<'b> {
         match self {
             SecurityDeleteRoleParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(33usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/roles/");
+                let mut p = String::with_capacity(30usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/roles/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -2209,8 +2209,8 @@ impl<'b> SecurityDeleteRoleMappingParts<'b> {
         match self {
             SecurityDeleteRoleMappingParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/rolesmapping/");
+                let mut p = String::with_capacity(37usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/rolesmapping/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -2328,8 +2328,8 @@ impl<'b> SecurityDeleteTenantParts<'b> {
             SecurityDeleteTenantParts::Tenant(tenant) => {
                 let encoded_tenant: Cow<str> =
                     percent_encode(tenant.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_tenant.len());
-                p.push_str("/_opendistro/_security/api/tenants/");
+                let mut p = String::with_capacity(32usize + encoded_tenant.len());
+                p.push_str("/_plugins/_security/api/tenants/");
                 p.push_str(encoded_tenant.as_ref());
                 p.into()
             }
@@ -2447,8 +2447,8 @@ impl<'b> SecurityDeleteUserParts<'b> {
             SecurityDeleteUserParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(41usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/internalusers/");
+                let mut p = String::with_capacity(38usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/internalusers/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -2566,8 +2566,8 @@ impl<'b> SecurityDeleteUserLegacyParts<'b> {
             SecurityDeleteUserLegacyParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(32usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/user/");
+                let mut p = String::with_capacity(29usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/user/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -2682,7 +2682,7 @@ impl SecurityFlushCacheParts {
     #[doc = "Builds a relative URL path to the Security Flush Cache API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityFlushCacheParts::None => "/_opendistro/_security/api/cache".into(),
+            SecurityFlushCacheParts::None => "/_plugins/_security/api/cache".into(),
         }
     }
 }
@@ -2934,8 +2934,8 @@ impl<'b> SecurityGenerateUserTokenParts<'b> {
             SecurityGenerateUserTokenParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(51usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/internalusers/");
+                let mut p = String::with_capacity(48usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/internalusers/");
                 p.push_str(encoded_username.as_ref());
                 p.push_str("/authtoken");
                 p.into()
@@ -3074,7 +3074,7 @@ impl SecurityGetAccountDetailsParts {
     #[doc = "Builds a relative URL path to the Security Get Account Details API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetAccountDetailsParts::None => "/_opendistro/_security/api/account".into(),
+            SecurityGetAccountDetailsParts::None => "/_plugins/_security/api/account".into(),
         }
     }
 }
@@ -3189,8 +3189,8 @@ impl<'b> SecurityGetActionGroupParts<'b> {
             SecurityGetActionGroupParts::ActionGroup(action_group) => {
                 let encoded_action_group: Cow<str> =
                     percent_encode(action_group.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_action_group.len());
-                p.push_str("/_opendistro/_security/api/actiongroups/");
+                let mut p = String::with_capacity(37usize + encoded_action_group.len());
+                p.push_str("/_plugins/_security/api/actiongroups/");
                 p.push_str(encoded_action_group.as_ref());
                 p.into()
             }
@@ -3547,7 +3547,7 @@ impl SecurityGetAllowlistParts {
     #[doc = "Builds a relative URL path to the Security Get Allowlist API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetAllowlistParts::None => "/_opendistro/_security/api/allowlist".into(),
+            SecurityGetAllowlistParts::None => "/_plugins/_security/api/allowlist".into(),
         }
     }
 }
@@ -3771,7 +3771,7 @@ impl SecurityGetCertificatesParts {
     #[doc = "Builds a relative URL path to the Security Get Certificates API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetCertificatesParts::None => "/_opendistro/_security/api/ssl/certs".into(),
+            SecurityGetCertificatesParts::None => "/_plugins/_security/api/ssl/certs".into(),
         }
     }
 }
@@ -3883,9 +3883,7 @@ impl SecurityGetConfigurationParts {
     #[doc = "Builds a relative URL path to the Security Get Configuration API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetConfigurationParts::None => {
-                "/_opendistro/_security/api/securityconfig".into()
-            }
+            SecurityGetConfigurationParts::None => "/_plugins/_security/api/securityconfig".into(),
         }
     }
 }
@@ -3997,7 +3995,7 @@ impl SecurityGetDashboardsInfoParts {
     #[doc = "Builds a relative URL path to the Security Get Dashboards Info API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetDashboardsInfoParts::None => "/_opendistro/_security/kibanainfo".into(),
+            SecurityGetDashboardsInfoParts::None => "/_plugins/_security/dashboardsinfo".into(),
         }
     }
 }
@@ -4112,8 +4110,8 @@ impl<'b> SecurityGetDistinguishedNameParts<'b> {
             SecurityGetDistinguishedNameParts::ClusterName(cluster_name) => {
                 let encoded_cluster_name: Cow<str> =
                     percent_encode(cluster_name.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_cluster_name.len());
-                p.push_str("/_opendistro/_security/api/nodesdn/");
+                let mut p = String::with_capacity(32usize + encoded_cluster_name.len());
+                p.push_str("/_plugins/_security/api/nodesdn/");
                 p.push_str(encoded_cluster_name.as_ref());
                 p.into()
             }
@@ -4496,7 +4494,7 @@ impl SecurityGetPermissionsInfoParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityGetPermissionsInfoParts::None => {
-                "/_opendistro/_security/api/permissionsinfo".into()
+                "/_plugins/_security/api/permissionsinfo".into()
             }
         }
     }
@@ -4611,8 +4609,8 @@ impl<'b> SecurityGetRoleParts<'b> {
         match self {
             SecurityGetRoleParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(33usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/roles/");
+                let mut p = String::with_capacity(30usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/roles/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -4729,8 +4727,8 @@ impl<'b> SecurityGetRoleMappingParts<'b> {
         match self {
             SecurityGetRoleMappingParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/rolesmapping/");
+                let mut p = String::with_capacity(37usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/rolesmapping/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -5190,9 +5188,7 @@ impl SecurityGetTenancyConfigParts {
     #[doc = "Builds a relative URL path to the Security Get Tenancy Config API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetTenancyConfigParts::None => {
-                "/_opendistro/_security/api/tenancy/config".into()
-            }
+            SecurityGetTenancyConfigParts::None => "/_plugins/_security/api/tenancy/config".into(),
         }
     }
 }
@@ -5307,8 +5303,8 @@ impl<'b> SecurityGetTenantParts<'b> {
             SecurityGetTenantParts::Tenant(tenant) => {
                 let encoded_tenant: Cow<str> =
                     percent_encode(tenant.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_tenant.len());
-                p.push_str("/_opendistro/_security/api/tenants/");
+                let mut p = String::with_capacity(32usize + encoded_tenant.len());
+                p.push_str("/_plugins/_security/api/tenants/");
                 p.push_str(encoded_tenant.as_ref());
                 p.into()
             }
@@ -5423,7 +5419,7 @@ impl SecurityGetTenantsParts {
     #[doc = "Builds a relative URL path to the Security Get Tenants API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetTenantsParts::None => "/_opendistro/_security/api/tenants".into(),
+            SecurityGetTenantsParts::None => "/_plugins/_security/api/tenants".into(),
         }
     }
 }
@@ -5538,8 +5534,8 @@ impl<'b> SecurityGetUserParts<'b> {
             SecurityGetUserParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(41usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/internalusers/");
+                let mut p = String::with_capacity(38usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/internalusers/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -5657,8 +5653,8 @@ impl<'b> SecurityGetUserLegacyParts<'b> {
             SecurityGetUserLegacyParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(32usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/user/");
+                let mut p = String::with_capacity(29usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/user/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -5885,7 +5881,7 @@ impl SecurityGetUsersLegacyParts {
     #[doc = "Builds a relative URL path to the Security Get Users Legacy API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityGetUsersLegacyParts::None => "/_opendistro/_security/api/user".into(),
+            SecurityGetUsersLegacyParts::None => "/_plugins/_security/api/user".into(),
         }
     }
 }
@@ -5997,7 +5993,7 @@ impl SecurityHealthParts {
     #[doc = "Builds a relative URL path to the Security Health API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityHealthParts::None => "/_opendistro/_security/health".into(),
+            SecurityHealthParts::None => "/_plugins/_security/health".into(),
         }
     }
 }
@@ -6145,7 +6141,7 @@ impl SecurityMigrateParts {
     #[doc = "Builds a relative URL path to the Security Migrate API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityMigrateParts::None => "/_opendistro/_security/api/migrate".into(),
+            SecurityMigrateParts::None => "/_plugins/_security/api/migrate".into(),
         }
     }
 }
@@ -6283,8 +6279,8 @@ impl<'b> SecurityPatchActionGroupParts<'b> {
             SecurityPatchActionGroupParts::ActionGroup(action_group) => {
                 let encoded_action_group: Cow<str> =
                     percent_encode(action_group.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_action_group.len());
-                p.push_str("/_opendistro/_security/api/actiongroups/");
+                let mut p = String::with_capacity(37usize + encoded_action_group.len());
+                p.push_str("/_plugins/_security/api/actiongroups/");
                 p.push_str(encoded_action_group.as_ref());
                 p.into()
             }
@@ -6557,7 +6553,7 @@ impl SecurityPatchAllowlistParts {
     #[doc = "Builds a relative URL path to the Security Patch Allowlist API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityPatchAllowlistParts::None => "/_opendistro/_security/api/allowlist".into(),
+            SecurityPatchAllowlistParts::None => "/_plugins/_security/api/allowlist".into(),
         }
     }
 }
@@ -6828,7 +6824,7 @@ impl SecurityPatchConfigurationParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityPatchConfigurationParts::None => {
-                "/_opendistro/_security/api/securityconfig".into()
+                "/_plugins/_security/api/securityconfig".into()
             }
         }
     }
@@ -6967,8 +6963,8 @@ impl<'b> SecurityPatchDistinguishedNameParts<'b> {
             SecurityPatchDistinguishedNameParts::ClusterName(cluster_name) => {
                 let encoded_cluster_name: Cow<str> =
                     percent_encode(cluster_name.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_cluster_name.len());
-                p.push_str("/_opendistro/_security/api/nodesdn/");
+                let mut p = String::with_capacity(32usize + encoded_cluster_name.len());
+                p.push_str("/_plugins/_security/api/nodesdn/");
                 p.push_str(encoded_cluster_name.as_ref());
                 p.into()
             }
@@ -7243,8 +7239,8 @@ impl<'b> SecurityPatchRoleParts<'b> {
         match self {
             SecurityPatchRoleParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(33usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/roles/");
+                let mut p = String::with_capacity(30usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/roles/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -7384,8 +7380,8 @@ impl<'b> SecurityPatchRoleMappingParts<'b> {
         match self {
             SecurityPatchRoleMappingParts::Role(role) => {
                 let encoded_role: Cow<str> = percent_encode(role.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_role.len());
-                p.push_str("/_opendistro/_security/api/rolesmapping/");
+                let mut p = String::with_capacity(37usize + encoded_role.len());
+                p.push_str("/_plugins/_security/api/rolesmapping/");
                 p.push_str(encoded_role.as_ref());
                 p.into()
             }
@@ -7796,8 +7792,8 @@ impl<'b> SecurityPatchTenantParts<'b> {
             SecurityPatchTenantParts::Tenant(tenant) => {
                 let encoded_tenant: Cow<str> =
                     percent_encode(tenant.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_tenant.len());
-                p.push_str("/_opendistro/_security/api/tenants/");
+                let mut p = String::with_capacity(32usize + encoded_tenant.len());
+                p.push_str("/_plugins/_security/api/tenants/");
                 p.push_str(encoded_tenant.as_ref());
                 p.into()
             }
@@ -7935,7 +7931,7 @@ impl SecurityPatchTenantsParts {
     #[doc = "Builds a relative URL path to the Security Patch Tenants API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityPatchTenantsParts::None => "/_opendistro/_security/api/tenants".into(),
+            SecurityPatchTenantsParts::None => "/_plugins/_security/api/tenants".into(),
         }
     }
 }
@@ -8073,8 +8069,8 @@ impl<'b> SecurityPatchUserParts<'b> {
             SecurityPatchUserParts::Username(username) => {
                 let encoded_username: Cow<str> =
                     percent_encode(username.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(41usize + encoded_username.len());
-                p.push_str("/_opendistro/_security/api/internalusers/");
+                let mut p = String::with_capacity(38usize + encoded_username.len());
+                p.push_str("/_plugins/_security/api/internalusers/");
                 p.push_str(encoded_username.as_ref());
                 p.into()
             }
@@ -8347,7 +8343,7 @@ impl SecurityPostDashboardsInfoParts {
     #[doc = "Builds a relative URL path to the Security Post Dashboards Info API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityPostDashboardsInfoParts::None => "/_opendistro/_security/kibanainfo".into(),
+            SecurityPostDashboardsInfoParts::None => "/_plugins/_security/dashboardsinfo".into(),
         }
     }
 }
@@ -8483,7 +8479,7 @@ impl SecurityReloadHttpCertificatesParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityReloadHttpCertificatesParts::None => {
-                "/_opendistro/_security/api/ssl/http/reloadcerts".into()
+                "/_plugins/_security/api/ssl/http/reloadcerts".into()
             }
         }
     }
@@ -8620,7 +8616,7 @@ impl SecurityReloadTransportCertificatesParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityReloadTransportCertificatesParts::None => {
-                "/_opendistro/_security/api/ssl/transport/reloadcerts".into()
+                "/_plugins/_security/api/ssl/transport/reloadcerts".into()
             }
         }
     }
@@ -8756,7 +8752,7 @@ impl SecurityTenantInfoParts {
     #[doc = "Builds a relative URL path to the Security Tenant Info API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityTenantInfoParts::None => "/_opendistro/_security/tenantinfo".into(),
+            SecurityTenantInfoParts::None => "/_plugins/_security/tenantinfo".into(),
         }
     }
 }
@@ -8895,7 +8891,7 @@ impl SecurityUpdateAuditConfigurationParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityUpdateAuditConfigurationParts::None => {
-                "/_opendistro/_security/api/audit/config".into()
+                "/_plugins/_security/api/audit/config".into()
             }
         }
     }
@@ -9032,7 +9028,7 @@ impl SecurityUpdateConfigurationParts {
     pub fn url(self) -> Cow<'static, str> {
         match self {
             SecurityUpdateConfigurationParts::None => {
-                "/_opendistro/_security/api/securityconfig/config".into()
+                "/_plugins/_security/api/securityconfig/config".into()
             }
         }
     }
@@ -9171,8 +9167,8 @@ impl<'b> SecurityUpdateDistinguishedNameParts<'b> {
             SecurityUpdateDistinguishedNameParts::ClusterName(cluster_name) => {
                 let encoded_cluster_name: Cow<str> =
                     percent_encode(cluster_name.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(35usize + encoded_cluster_name.len());
-                p.push_str("/_opendistro/_security/api/nodesdn/");
+                let mut p = String::with_capacity(32usize + encoded_cluster_name.len());
+                p.push_str("/_plugins/_security/api/nodesdn/");
                 p.push_str(encoded_cluster_name.as_ref());
                 p.into()
             }
@@ -9310,7 +9306,7 @@ impl SecurityValidateParts {
     #[doc = "Builds a relative URL path to the Security Validate API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SecurityValidateParts::None => "/_opendistro/_security/api/validate".into(),
+            SecurityValidateParts::None => "/_plugins/_security/api/validate".into(),
         }
     }
 }

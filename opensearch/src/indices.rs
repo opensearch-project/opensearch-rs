@@ -182,7 +182,7 @@ where
         self
     }
     #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -775,7 +775,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -998,7 +998,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1188,7 +1188,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1629,7 +1629,7 @@ impl<'a, 'b> IndicesDelete<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1790,7 +1790,7 @@ impl<'a, 'b> IndicesDeleteAlias<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2056,7 +2056,7 @@ impl<'a, 'b> IndicesDeleteIndexTemplate<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2202,7 +2202,7 @@ impl<'a, 'b> IndicesDeleteTemplate<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2718,7 +2718,7 @@ impl<'a, 'b> IndicesExistsIndexTemplate<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2875,7 +2875,7 @@ impl<'a, 'b> IndicesExistsTemplate<'a, 'b> {
         self
     }
     #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3489,7 +3489,7 @@ impl<'a, 'b> IndicesGet<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4151,7 +4151,7 @@ impl<'a, 'b> IndicesGetIndexTemplate<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4333,7 +4333,7 @@ impl<'a, 'b> IndicesGetMapping<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4558,7 +4558,7 @@ impl<'a, 'b> IndicesGetSettings<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is\nreceived before the timeout expires, the request fails and returns an\nerror."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4727,7 +4727,7 @@ impl<'a, 'b> IndicesGetTemplate<'a, 'b> {
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5084,7 +5084,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5314,7 +5314,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5499,7 +5499,7 @@ where
         self
     }
     #[doc = "Operation timeout for connection to cluster-manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5698,7 +5698,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -5925,7 +5925,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is\nreceived before the timeout expires, the request fails and returns an\nerror."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -6121,7 +6121,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is\nreceived before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -6776,7 +6776,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7302,7 +7302,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7494,7 +7494,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received\nbefore the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7675,7 +7675,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -7867,7 +7867,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -8292,7 +8292,7 @@ where
         self
     }
     #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self

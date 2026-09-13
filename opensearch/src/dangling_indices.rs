@@ -141,7 +141,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self
     }
     #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -327,7 +327,7 @@ where
         self
     }
     #[doc = "Specify timeout for connection to cluster manager."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self

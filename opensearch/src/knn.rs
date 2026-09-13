@@ -848,40 +848,27 @@ where
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Knn Stats API"]
 pub enum KnnStatsParts<'b> {
-    #[doc = "Stat"]
-    Stat(&'b str),
-    #[doc = "NodeId and Stat"]
-    NodeIdStat(&'b [&'b str], &'b str),
     #[doc = "No parts"]
     None,
+    #[doc = "Stat"]
+    Stat(&'b str),
     #[doc = "NodeId"]
     NodeId(&'b [&'b str]),
+    #[doc = "NodeId and Stat"]
+    NodeIdStat(&'b [&'b str], &'b str),
 }
 impl<'b> KnnStatsParts<'b> {
     #[doc = "Builds a relative URL path to the Knn Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
+            KnnStatsParts::None => "/_plugins/_knn/stats".into(),
             KnnStatsParts::Stat(stat) => {
                 let encoded_stat: Cow<str> = percent_encode(stat.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(24usize + encoded_stat.len());
-                p.push_str("/_opendistro/_knn/stats/");
+                let mut p = String::with_capacity(21usize + encoded_stat.len());
+                p.push_str("/_plugins/_knn/stats/");
                 p.push_str(encoded_stat.as_ref());
                 p.into()
             }
-            KnnStatsParts::NodeIdStat(node_id, stat) => {
-                let node_id_str = node_id.join(",");
-                let encoded_node_id: Cow<str> =
-                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let encoded_stat: Cow<str> = percent_encode(stat.as_bytes(), PARTS_ENCODED).into();
-                let mut p =
-                    String::with_capacity(25usize + encoded_node_id.len() + encoded_stat.len());
-                p.push_str("/_opendistro/_knn/");
-                p.push_str(encoded_node_id.as_ref());
-                p.push_str("/stats/");
-                p.push_str(encoded_stat.as_ref());
-                p.into()
-            }
-            KnnStatsParts::None => "/_plugins/_knn/stats".into(),
             KnnStatsParts::NodeId(node_id) => {
                 let node_id_str = node_id.join(",");
                 let encoded_node_id: Cow<str> =
@@ -890,6 +877,19 @@ impl<'b> KnnStatsParts<'b> {
                 p.push_str("/_plugins/_knn/");
                 p.push_str(encoded_node_id.as_ref());
                 p.push_str("/stats");
+                p.into()
+            }
+            KnnStatsParts::NodeIdStat(node_id, stat) => {
+                let node_id_str = node_id.join(",");
+                let encoded_node_id: Cow<str> =
+                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
+                let encoded_stat: Cow<str> = percent_encode(stat.as_bytes(), PARTS_ENCODED).into();
+                let mut p =
+                    String::with_capacity(22usize + encoded_node_id.len() + encoded_stat.len());
+                p.push_str("/_plugins/_knn/");
+                p.push_str(encoded_node_id.as_ref());
+                p.push_str("/stats/");
+                p.push_str(encoded_stat.as_ref());
                 p.into()
             }
         }
@@ -1172,8 +1172,8 @@ impl<'b> KnnWarmupParts<'b> {
                 let index_str = index.join(",");
                 let encoded_index: Cow<str> =
                     percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(25usize + encoded_index.len());
-                p.push_str("/_opendistro/_knn/warmup/");
+                let mut p = String::with_capacity(22usize + encoded_index.len());
+                p.push_str("/_plugins/_knn/warmup/");
                 p.push_str(encoded_index.as_ref());
                 p.into()
             }

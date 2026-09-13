@@ -57,13 +57,13 @@ impl<'b> NodesHotThreadsParts<'b> {
     #[doc = "Builds a relative URL path to the Nodes Hot Threads API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            NodesHotThreadsParts::None => "/_cluster/nodes/hot_threads".into(),
+            NodesHotThreadsParts::None => "/_nodes/hot_threads".into(),
             NodesHotThreadsParts::NodeId(node_id) => {
                 let node_id_str = node_id.join(",");
                 let encoded_node_id: Cow<str> =
                     percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(28usize + encoded_node_id.len());
-                p.push_str("/_cluster/nodes/");
+                let mut p = String::with_capacity(20usize + encoded_node_id.len());
+                p.push_str("/_nodes/");
                 p.push_str(encoded_node_id.as_ref());
                 p.push_str("/hot_threads");
                 p.into()

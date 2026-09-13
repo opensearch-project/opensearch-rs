@@ -283,7 +283,7 @@ impl<'a, 'b> ClusterDeleteComponentTemplate<'a, 'b> {
         self.human = Some(human);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -804,7 +804,7 @@ impl<'a, 'b> ClusterExistsComponentTemplate<'a, 'b> {
         self.local = Some(local);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -959,7 +959,7 @@ impl<'a, 'b> ClusterGetComponentTemplate<'a, 'b> {
         self.local = Some(local);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1231,7 +1231,7 @@ impl<'a, 'b> ClusterGetSettings<'a, 'b> {
         self.include_defaults = Some(include_defaults);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1542,7 +1542,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self.local = Some(local);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1738,7 +1738,7 @@ impl<'a, 'b> ClusterPendingTasks<'a, 'b> {
         self.local = Some(local);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2081,7 +2081,7 @@ where
         self.human = Some(human);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2408,7 +2408,7 @@ where
         self.human = Some(human);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2851,7 +2851,7 @@ where
         self.human = Some(human);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3071,7 +3071,7 @@ impl<'a, 'b> ClusterState<'a, 'b> {
         self.local = Some(local);
         self
     }
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self

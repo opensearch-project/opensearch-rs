@@ -52,8 +52,8 @@ impl<'b> AsynchronousSearchDeleteParts<'b> {
         match self {
             AsynchronousSearchDeleteParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(34usize + encoded_id.len());
-                p.push_str("/_opendistro/_asynchronous_search/");
+                let mut p = String::with_capacity(31usize + encoded_id.len());
+                p.push_str("/_plugins/_asynchronous_search/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -170,8 +170,8 @@ impl<'b> AsynchronousSearchGetParts<'b> {
         match self {
             AsynchronousSearchGetParts::Id(id) => {
                 let encoded_id: Cow<str> = percent_encode(id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(34usize + encoded_id.len());
-                p.push_str("/_opendistro/_asynchronous_search/");
+                let mut p = String::with_capacity(31usize + encoded_id.len());
+                p.push_str("/_plugins/_asynchronous_search/");
                 p.push_str(encoded_id.as_ref());
                 p.into()
             }
@@ -286,7 +286,7 @@ impl AsynchronousSearchSearchParts {
     #[doc = "Builds a relative URL path to the Asynchronous Search Search API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            AsynchronousSearchSearchParts::None => "/_opendistro/_asynchronous_search".into(),
+            AsynchronousSearchSearchParts::None => "/_plugins/_asynchronous_search".into(),
         }
     }
 }
@@ -461,7 +461,7 @@ impl AsynchronousSearchStatsParts {
     #[doc = "Builds a relative URL path to the Asynchronous Search Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            AsynchronousSearchStatsParts::None => "/_opendistro/_asynchronous_search/stats".into(),
+            AsynchronousSearchStatsParts::None => "/_plugins/_asynchronous_search/stats".into(),
         }
     }
 }

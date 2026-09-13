@@ -306,7 +306,7 @@ impl<'a, 'b> ListIndices<'a, 'b> {
         self
     }
     #[doc = "Operation timeout for connection to cluster-manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -563,7 +563,7 @@ impl<'a, 'b> ListShards<'a, 'b> {
         self
     }
     #[doc = "Operation timeout for connection to cluster-manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self

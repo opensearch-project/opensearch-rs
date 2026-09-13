@@ -183,7 +183,7 @@ where
         Ok(response)
     }
 }
-#[deprecated = "Use `upload_chunk` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `upload_chunk` instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ml Chunk Model API"]
 pub enum MlChunkModelParts<'b> {
@@ -214,7 +214,7 @@ impl<'b> MlChunkModelParts<'b> {
     }
 }
 #[doc = "Builder for the Ml Chunk Model API\n\nUploads model chunk."]
-#[deprecated = "Use `upload_chunk` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `upload_chunk` instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct MlChunkModel<'a, 'b, B> {
@@ -1170,7 +1170,7 @@ where
         Ok(response)
     }
 }
-#[deprecated = "Use `_register_meta` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `_register_meta` instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ml Create Model Meta API"]
 pub enum MlCreateModelMetaParts {
@@ -1187,7 +1187,7 @@ impl MlCreateModelMetaParts {
     }
 }
 #[doc = "Builder for the Ml Create Model Meta API\n\nRegisters model metadata."]
-#[deprecated = "Use `_register_meta` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `_register_meta` instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct MlCreateModelMeta<'a, 'b, B> {
@@ -5673,7 +5673,7 @@ impl<'a, 'b> MlGetTool<'a, 'b> {
         Ok(response)
     }
 }
-#[deprecated = "Use `deploy_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `deploy_model` instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ml Load Model API"]
 pub enum MlLoadModelParts<'b> {
@@ -5698,7 +5698,7 @@ impl<'b> MlLoadModelParts<'b> {
     }
 }
 #[doc = "Builder for the Ml Load Model API\n\nDeploys a model."]
-#[deprecated = "Use `deploy_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `deploy_model` instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct MlLoadModel<'a, 'b, B> {
@@ -8485,7 +8485,7 @@ where
         Ok(response)
     }
 }
-#[deprecated = "Use `undeploy_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `undeploy_model` instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ml Unload Model API"]
 pub enum MlUnloadModelParts<'b> {
@@ -8513,7 +8513,7 @@ impl<'b> MlUnloadModelParts<'b> {
     }
 }
 #[doc = "Builder for the Ml Unload Model API\n\nUnloads a model."]
-#[deprecated = "Use `undeploy_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `undeploy_model` instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct MlUnloadModel<'a, 'b, B> {
@@ -9932,7 +9932,7 @@ where
         Ok(response)
     }
 }
-#[deprecated = "Use `register_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `register_model` instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Ml Upload Model API"]
 pub enum MlUploadModelParts {
@@ -9949,7 +9949,7 @@ impl MlUploadModelParts {
     }
 }
 #[doc = "Builder for the Ml Upload Model API\n\nRegisters a model."]
-#[deprecated = "Use `register_model` instead."]
+#[deprecated = "Deprecated since OpenSearch 2.7: Use `register_model` instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct MlUploadModel<'a, 'b, B> {
@@ -10092,7 +10092,7 @@ impl<'a> Ml<'a> {
         MlAddAgenticMemory::new(self.transport(), parts)
     }
     #[doc = "Ml Chunk Model API\n\nUploads model chunk."]
-    #[deprecated = "Use `upload_chunk` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.7: Use `upload_chunk` instead."]
     #[allow(deprecated)]
     pub fn chunk_model<'b>(&'a self, parts: MlChunkModelParts<'b>) -> MlChunkModel<'a, 'b, ()> {
         MlChunkModel::new(self.transport(), parts)
@@ -10131,7 +10131,7 @@ impl<'a> Ml<'a> {
         MlCreateMessage::new(self.transport(), parts)
     }
     #[doc = "Ml Create Model Meta API\n\nRegisters model metadata."]
-    #[deprecated = "Use `_register_meta` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.7: Use `_register_meta` instead."]
     #[allow(deprecated)]
     pub fn create_model_meta<'b>(&'a self) -> MlCreateModelMeta<'a, 'b, ()> {
         MlCreateModelMeta::new(self.transport())
@@ -10324,7 +10324,7 @@ impl<'a> Ml<'a> {
         MlGetTool::new(self.transport(), parts)
     }
     #[doc = "Ml Load Model API\n\nDeploys a model."]
-    #[deprecated = "Use `deploy_model` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.7: Use `deploy_model` instead."]
     #[allow(deprecated)]
     pub fn load_model<'b>(&'a self, parts: MlLoadModelParts<'b>) -> MlLoadModel<'a, 'b, ()> {
         MlLoadModel::new(self.transport(), parts)
@@ -10424,7 +10424,7 @@ impl<'a> Ml<'a> {
         MlUndeployModel::new(self.transport(), parts)
     }
     #[doc = "Ml Unload Model API\n\nUnloads a model."]
-    #[deprecated = "Use `undeploy_model` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.7: Use `undeploy_model` instead."]
     #[allow(deprecated)]
     pub fn unload_model<'b>(&'a self, parts: MlUnloadModelParts<'b>) -> MlUnloadModel<'a, 'b, ()> {
         MlUnloadModel::new(self.transport(), parts)
@@ -10487,7 +10487,7 @@ impl<'a> Ml<'a> {
         MlUploadChunk::new(self.transport(), parts)
     }
     #[doc = "Ml Upload Model API\n\nRegisters a model."]
-    #[deprecated = "Use `register_model` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.7: Use `register_model` instead."]
     #[allow(deprecated)]
     pub fn upload_model<'b>(&'a self) -> MlUploadModel<'a, 'b, ()> {
         MlUploadModel::new(self.transport())

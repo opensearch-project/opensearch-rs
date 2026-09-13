@@ -50,7 +50,7 @@ impl SqlCloseParts {
     #[doc = "Builds a relative URL path to the Sql Close API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlCloseParts::None => "/_opendistro/_sql/close".into(),
+            SqlCloseParts::None => "/_plugins/_sql/close".into(),
         }
     }
 }
@@ -205,7 +205,7 @@ impl SqlExplainParts {
     #[doc = "Builds a relative URL path to the Sql Explain API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlExplainParts::None => "/_opendistro/_sql/_explain".into(),
+            SqlExplainParts::None => "/_plugins/_sql/_explain".into(),
         }
     }
 }
@@ -360,7 +360,7 @@ impl SqlGetStatsParts {
     #[doc = "Builds a relative URL path to the Sql Get Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlGetStatsParts::None => "/_opendistro/_sql/stats".into(),
+            SqlGetStatsParts::None => "/_plugins/_sql/stats".into(),
         }
     }
 }
@@ -490,7 +490,7 @@ impl SqlPostStatsParts {
     #[doc = "Builds a relative URL path to the Sql Post Stats API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlPostStatsParts::None => "/_opendistro/_sql/stats".into(),
+            SqlPostStatsParts::None => "/_plugins/_sql/stats".into(),
         }
     }
 }
@@ -645,7 +645,7 @@ impl SqlQueryParts {
     #[doc = "Builds a relative URL path to the Sql Query API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlQueryParts::None => "/_opendistro/_sql".into(),
+            SqlQueryParts::None => "/_plugins/_sql".into(),
         }
     }
 }
@@ -800,7 +800,7 @@ impl SqlSettingsParts {
     #[doc = "Builds a relative URL path to the Sql Settings API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SqlSettingsParts::None => "/_opendistro/_sql/settings".into(),
+            SqlSettingsParts::None => "/_plugins/_query/settings".into(),
         }
     }
 }

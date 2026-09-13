@@ -620,7 +620,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         self
     }
     #[doc = "A timeout for connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -811,7 +811,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
         self
     }
     #[doc = "A timeout for connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1698,7 +1698,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -1803,7 +1803,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         Ok(response)
     }
 }
-#[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
+#[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cat Master API"]
 pub enum CatMasterParts {
@@ -1820,7 +1820,7 @@ impl CatMasterParts {
     }
 }
 #[doc = "Builder for the [Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
-#[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
+#[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 pub struct CatMaster<'a, 'b> {
@@ -1915,7 +1915,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2104,7 +2104,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2304,13 +2304,13 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
-    #[deprecated = "This parameter does not cause this API to act locally."]
+    #[deprecated = "Deprecated since OpenSearch 1.0: This parameter does not cause this API to act locally."]
     pub fn local(mut self, local: bool) -> Self {
         self.local = Some(local);
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2512,7 +2512,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -2907,7 +2907,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3314,7 +3314,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -3796,7 +3796,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4005,7 +4005,7 @@ impl<'a, 'b> CatShards<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4217,7 +4217,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4638,7 +4638,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4840,7 +4840,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
-    #[deprecated = "To promote inclusive language, use `cluster_manager_timeout` instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
@@ -4978,7 +4978,7 @@ impl<'a> Cat<'a> {
         CatIndices::new(self.transport(), parts)
     }
     #[doc = "[Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
-    #[deprecated = "To promote inclusive language, use '/_cat/cluster_manager' instead."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
     #[allow(deprecated)]
     pub fn master<'b>(&'a self) -> CatMaster<'a, 'b> {
         CatMaster::new(self.transport())

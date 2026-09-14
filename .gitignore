@@ -11,7 +11,6 @@ yaml_test_runner/tests/free
 yaml_test_runner/tests/oss
 yaml_test_runner/tests/mod.rs
 test_results/
-api_generator/opensearch-openapi.yaml
 
 .ci/certs/esnode.*
 .ci/certs/esnode-no-san.*

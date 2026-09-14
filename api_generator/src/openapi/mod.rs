@@ -101,6 +101,10 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
                         continue;
                     }
                 };
+                if op["x-ignorable"].as_bool().unwrap_or(false) {
+                    info!("skipping ignorable operation: {} {}", method, path);
+                    continue;
+                }
                 // Skip placeholder operations documenting unsupported
                 // methods (e.g. security.cache), recognizable by the
                 // absence of any 2xx response
@@ -303,6 +307,13 @@ fn to_legacy_endpoint(
     } else {
         None
     };
+
+    // Order non-deprecated paths before deprecated
+    // ones (stable within each class, i.e. alphabetical) so that a
+    // deprecated URL is never selected for a variant when a current URL
+    // with the same parameters exists
+    let mut paths: Vec<(String, PathAccumulator)> = paths.into_iter().collect();
+    paths.sort_by_key(|(_, acc)| acc.deprecated.is_some());
 
     let paths: Vec<Value> = paths
         .into_iter()
@@ -669,6 +680,37 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/bulk'
       responses: {}
+  /_nodes/hot_threads:
+    get:
+      operationId: nodes.hot_threads.1
+      x-operation-group: nodes.hot_threads
+      description: Returns information about hot threads.
+      responses: {}
+  /_cluster/nodes/hot_threads:
+    get:
+      operationId: nodes.hot_threads.0
+      x-operation-group: nodes.hot_threads
+      deprecated: true
+      x-ignorable: true
+      x-version-deprecated: '1.0'
+      x-deprecation-message: Use '/_nodes/hot_threads' instead.
+      description: Returns information about hot threads.
+      responses: {}
+  /_nodes/usage:
+    get:
+      operationId: nodes.usage.1
+      x-operation-group: nodes.usage
+      description: Returns usage information.
+      responses: {}
+  /_cluster/nodes/usage:
+    get:
+      operationId: nodes.usage.0
+      x-operation-group: nodes.usage
+      deprecated: true
+      x-version-deprecated: '1.0'
+      x-deprecation-message: Use '/_nodes/usage' instead.
+      description: Returns usage information.
+      responses: {}
 components:
   parameters:
     _global___query.pretty:
@@ -850,6 +892,37 @@ components:
         let master = &api.namespaces["cat"].endpoints()["master"];
         let deprecated = master.deprecated.as_ref().unwrap();
         assert_eq!(deprecated.version, "2.0");
+    }
+
+    #[test]
+    fn skips_ignorable_operations() {
+        let api = fixture_api();
+        let hot_threads = &api.namespaces["nodes"].endpoints()["hot_threads"];
+        // the x-ignorable superseded path must not be ingested at all
+        let paths: Vec<&str> = hot_threads
+            .url
+            .paths
+            .iter()
+            .map(|p| p.path.0.as_str())
+            .collect();
+        assert_eq!(paths, vec!["/_nodes/hot_threads"]);
+        // a group whose only remaining operation is current is not deprecated
+        assert!(hot_threads.deprecated.is_none());
+    }
+
+    #[test]
+    fn orders_non_deprecated_paths_first() {
+        let api = fixture_api();
+        let usage = &api.namespaces["nodes"].endpoints()["usage"];
+        // both paths survive (deprecated but not ignorable), but the current
+        // URL must come first: EnumBuilder resolves same-parameter variants
+        // to the first path in this list
+        let paths: Vec<&str> = usage.url.paths.iter().map(|p| p.path.0.as_str()).collect();
+        assert_eq!(paths, vec!["/_nodes/usage", "/_cluster/nodes/usage"]);
+        assert!(usage.url.paths[0].deprecated.is_none());
+        assert!(usage.url.paths[1].deprecated.is_some());
+        // group is not all-deprecated, so the endpoint stays current
+        assert!(usage.deprecated.is_none());
     }
 
     #[test]

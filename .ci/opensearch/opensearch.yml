@@ -9,3 +9,10 @@ node.attr.testattr: test
 path.repo: /tmp
 repositories.url.allowed_urls: http://snapshot.test*
 action.destructive_requires_name: false
+# Query Insights exports top queries to a non-hidden top_queries-* index in
+# the background, leaking documents into cluster-wide searches that yaml
+# tests assert exact hit counts on. The start-opensearch action strips these
+# settings for min distributions that do not bundle the plugin.
+search.insights.top_queries.latency.enabled: false
+search.insights.top_queries.cpu.enabled: false
+search.insights.top_queries.memory.enabled: false

@@ -424,15 +424,41 @@ pub mod params;
 // GENERATED-BEGIN:namespace-modules
 // Generated code - do not edit until the next GENERATED-END marker
 
+pub mod asynchronous_search;
 pub mod cat;
 pub mod cluster;
 pub mod dangling_indices;
+pub mod flow_framework;
+pub mod geospatial;
 pub mod indices;
 pub mod ingest;
+pub mod ingestion;
+pub mod insights;
+pub mod ism;
+pub mod knn;
+pub mod list;
+pub mod ltr;
+pub mod ml;
+pub mod neural;
 pub mod nodes;
+pub mod notifications;
+pub mod observability;
+pub mod ppl;
+pub mod query;
+pub mod remote_store;
+pub mod replication;
+pub mod rollups;
+pub mod search_pipeline;
+pub mod search_relevance;
+pub mod security;
+pub mod security_analytics;
+pub mod sm;
 pub mod snapshot;
+pub mod sql;
 pub mod tasks;
-pub mod text_structure;
+pub mod transforms;
+pub mod ubi;
+pub mod wlm;
 // GENERATED-END
 
 mod client;

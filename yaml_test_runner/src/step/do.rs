@@ -34,7 +34,7 @@ use crate::{
     rusty_json::{from_set_value, rusty_json},
 };
 use anyhow::anyhow;
-use api_generator::generator::{Api, ApiEndpoint, TypeKind};
+use api_generator::generator::{Api, ApiEndpoint, HttpMethod, TypeKind};
 use inflector::Inflector;
 use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
@@ -147,6 +147,23 @@ impl Do {
             });
         }
 
+        // yaml test semantics: a `do` step without `catch` must succeed.
+        // Failing loudly here surfaces the real error body instead of
+        // letting a silently dropped write fail a later assertion. For
+        // HEAD-only endpoints (the `exists` family) a 404 is the
+        // legitimate "false" outcome, not an error.
+        if self.catch.is_none() && self.api_call.ignore.is_none() {
+            if self.api_call.head_only {
+                tokens.append_all(quote! {
+                    crate::assert_response_success_or!(response, 404);
+                });
+            } else {
+                tokens.append_all(quote! {
+                    crate::assert_response_success!(response);
+                });
+            }
+        }
+
         read_response
     }
 
@@ -238,6 +255,9 @@ pub struct ApiCall {
     headers: BTreeMap<String, String>,
     body: Option<TokenStream>,
     ignore: Option<u16>,
+    /// Whether the endpoint is HEAD-only (the `exists` family), where a
+    /// 404 is the legitimate "false" outcome rather than an error
+    head_only: bool,
 }
 
 impl ToTokens for ApiCall {
@@ -321,6 +341,13 @@ impl ApiCall {
             None
         };
 
+        let head_only = !endpoint.url.paths.is_empty()
+            && endpoint
+                .url
+                .paths
+                .iter()
+                .all(|p| p.methods == [HttpMethod::Head]);
+
         Ok(ApiCall {
             namespace,
             function,
@@ -329,6 +356,7 @@ impl ApiCall {
             headers,
             body,
             ignore,
+            head_only,
         })
     }
 
@@ -641,8 +669,11 @@ impl ApiCall {
                                     // a single-valued enum param may be passed as a
                                     // one element array in yaml tests
                                     TypeKind::Enum if result.len() == 1 => {
-                                        let e =
-                                            Self::generate_enum(n, result[0].as_str(), &ty.options)?;
+                                        let e = Self::generate_enum(
+                                            n,
+                                            result[0].as_str(),
+                                            &ty.options,
+                                        )?;
                                         tokens.append_all(quote! {
                                             .#param_ident(#e)
                                         });
@@ -765,12 +796,12 @@ impl ApiCall {
         // composite parts e.g. metric -> node_id_or_metric
         let parts: Vec<(&str, &Value)> = parts
             .iter()
-            .map(|(name, v)| {
-                match path_parts.iter().find(|pp| Self::part_matches(pp, name)) {
+            .map(
+                |(name, v)| match path_parts.iter().find(|pp| Self::part_matches(pp, name)) {
                     Some(pp) => (*pp, *v),
                     None => (*name, *v),
-                }
-            })
+                },
+            )
             .collect();
         let parts = parts.as_slice();
         let variant_name = {

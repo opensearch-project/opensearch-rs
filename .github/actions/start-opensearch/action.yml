@@ -30,6 +30,18 @@ runs:
         URL="http://localhost:9200"
         cp ./client/.ci/opensearch/opensearch.yml $CONFIG_FILE
 
+        # The Query Insights plugin (bundled in official distributions)
+        # exports top queries to a non-hidden top_queries-* index in the
+        # background, leaking documents into the cluster-wide searches that
+        # yaml tests assert exact hit counts on. Min distributions used by
+        # the unreleased-OpenSearch jobs do not bundle the plugin, and would
+        # fail to start on the unknown settings, so append them only when
+        # the plugin is present. The .ci config file carries the same
+        # settings for the docker-based clusters.
+        if [[ ! -d "$OPENSEARCH_HOME/plugins/query-insights" ]]; then
+          sed -i.bak -e '/^search\.insights\./d' $CONFIG_FILE
+        fi
+
         bash ./client/.ci/generate-certs.sh
         
         export OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin

@@ -28,8 +28,6 @@
 //!
 //! Manage tasks currently executing on one or more nodes in the cluster.
 
-#![cfg(feature = "experimental-apis")]
-#![doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
 #![allow(unused_imports)]
 use crate::{
     client::OpenSearch,
@@ -46,7 +44,6 @@ use crate::{
 use percent_encoding::percent_encode;
 use serde::Serialize;
 use std::{borrow::Cow, time::Duration};
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Tasks Cancel API"]
 pub enum TasksCancelParts<'b> {
@@ -55,7 +52,6 @@ pub enum TasksCancelParts<'b> {
     #[doc = "TaskId"]
     TaskId(&'b str),
 }
-#[cfg(feature = "experimental-apis")]
 impl<'b> TasksCancelParts<'b> {
     #[doc = "Builds a relative URL path to the Tasks Cancel API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -73,9 +69,7 @@ impl<'b> TasksCancelParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Tasks Cancel API](https://opensearch.org/docs/)\n\nCancels a task, if it can be cancelled through an API."]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Tasks Cancel API](https://opensearch.org/docs/latest/api-reference/tasks/#task-canceling)\n\nCancels a task, if it can be cancelled through an API."]
 #[derive(Clone, Debug)]
 pub struct TasksCancel<'a, 'b, B> {
     transport: &'a Transport,
@@ -93,7 +87,6 @@ pub struct TasksCancel<'a, 'b, B> {
     source: Option<&'b str>,
     wait_for_completion: Option<bool>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b, B> TasksCancel<'a, 'b, B>
 where
     B: Body,
@@ -118,7 +111,7 @@ where
             wait_for_completion: None,
         }
     }
-    #[doc = "A comma-separated list of actions that should be cancelled. Leave empty to cancel all."]
+    #[doc = "A comma-separated list of actions that should be returned. Keep empty to return all."]
     pub fn actions(mut self, actions: &'b [&'b str]) -> Self {
         self.actions = Some(actions);
         self
@@ -145,12 +138,12 @@ where
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -160,22 +153,22 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes"]
+    #[doc = "A comma-separated list of node IDs or names used to limit the returned information. Use `_local` to return information from the node you're connecting to, specify the node name to get information from a specific node, or keep the parameter empty to get information from all nodes."]
     pub fn nodes(mut self, nodes: &'b [&'b str]) -> Self {
         self.nodes = Some(nodes);
         self
     }
-    #[doc = "Cancel tasks with specified parent task id (node_id:task_number). Set to -1 to cancel all."]
+    #[doc = "Returns tasks with a specified parent task ID (`node_id:task_number`). Keep empty or set to -1 to return all."]
     pub fn parent_task_id(mut self, parent_task_id: &'b str) -> Self {
         self.parent_task_id = Some(parent_task_id);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -190,7 +183,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Should the request block until the cancellation of the task and its descendant tasks is completed. Defaults to false"]
+    #[doc = "Waits for the matching task to complete. When `true`, the request is blocked until the task has completed."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -239,14 +232,12 @@ where
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Tasks Get API"]
 pub enum TasksGetParts<'b> {
     #[doc = "TaskId"]
     TaskId(&'b str),
 }
-#[cfg(feature = "experimental-apis")]
 impl<'b> TasksGetParts<'b> {
     #[doc = "Builds a relative URL path to the Tasks Get API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -262,9 +253,7 @@ impl<'b> TasksGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Tasks Get API](https://opensearch.org/docs/)\n\nReturns information about a task."]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Tasks Get API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns information about a task."]
 #[derive(Clone, Debug)]
 pub struct TasksGet<'a, 'b> {
     transport: &'a Transport,
@@ -279,7 +268,6 @@ pub struct TasksGet<'a, 'b> {
     timeout: Option<&'b str>,
     wait_for_completion: Option<bool>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b> TasksGet<'a, 'b> {
     #[doc = "Creates a new instance of [TasksGet] with the specified API parts"]
     pub fn new(transport: &'a Transport, parts: TasksGetParts<'b>) -> Self {
@@ -298,12 +286,12 @@ impl<'a, 'b> TasksGet<'a, 'b> {
             wait_for_completion: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -313,12 +301,12 @@ impl<'a, 'b> TasksGet<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -333,12 +321,12 @@ impl<'a, 'b> TasksGet<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Wait for the matching tasks to complete (default: false)"]
+    #[doc = "Waits for the matching task to complete. When `true`, the request is blocked until the task has completed."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -381,14 +369,12 @@ impl<'a, 'b> TasksGet<'a, 'b> {
         Ok(response)
     }
 }
-#[cfg(feature = "experimental-apis")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Tasks List API"]
 pub enum TasksListParts {
     #[doc = "No parts"]
     None,
 }
-#[cfg(feature = "experimental-apis")]
 impl TasksListParts {
     #[doc = "Builds a relative URL path to the Tasks List API"]
     pub fn url(self) -> Cow<'static, str> {
@@ -397,9 +383,7 @@ impl TasksListParts {
         }
     }
 }
-#[doc = "Builder for the [Tasks List API](https://opensearch.org/docs/)\n\nReturns a list of tasks."]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
+#[doc = "Builder for the [Tasks List API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns a list of tasks."]
 #[derive(Clone, Debug)]
 pub struct TasksList<'a, 'b> {
     transport: &'a Transport,
@@ -419,7 +403,6 @@ pub struct TasksList<'a, 'b> {
     timeout: Option<&'b str>,
     wait_for_completion: Option<bool>,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a, 'b> TasksList<'a, 'b> {
     #[doc = "Creates a new instance of [TasksList]"]
     pub fn new(transport: &'a Transport) -> Self {
@@ -443,27 +426,27 @@ impl<'a, 'b> TasksList<'a, 'b> {
             wait_for_completion: None,
         }
     }
-    #[doc = "A comma-separated list of actions that should be returned. Leave empty to return all."]
+    #[doc = "A comma-separated list of actions that should be returned. Keep empty to return all."]
     pub fn actions(mut self, actions: &'b [&'b str]) -> Self {
         self.actions = Some(actions);
         self
     }
-    #[doc = "Return detailed task information (default: false)"]
+    #[doc = "When `true`, the response includes detailed information about shard recoveries."]
     pub fn detailed(mut self, detailed: bool) -> Self {
         self.detailed = Some(detailed);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
     }
-    #[doc = "Group tasks by nodes or parent/child relationships"]
+    #[doc = "Groups tasks by parent/child relationships or nodes."]
     pub fn group_by(mut self, group_by: GroupBy) -> Self {
         self.group_by = Some(group_by);
         self
@@ -473,22 +456,22 @@ impl<'a, 'b> TasksList<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes"]
+    #[doc = "A comma-separated list of node IDs or names used to limit the returned information. Use `_local` to return information from the node you're connecting to, specify the node name to get information from a specific node, or keep the parameter empty to get information from all nodes."]
     pub fn nodes(mut self, nodes: &'b [&'b str]) -> Self {
         self.nodes = Some(nodes);
         self
     }
-    #[doc = "Return tasks with specified parent task id (node_id:task_number). Set to -1 to return all."]
+    #[doc = "Returns tasks with a specified parent task ID (`node_id:task_number`). Keep empty or set to -1 to return all."]
     pub fn parent_task_id(mut self, parent_task_id: &'b str) -> Self {
         self.parent_task_id = Some(parent_task_id);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -503,12 +486,12 @@ impl<'a, 'b> TasksList<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    #[doc = "Wait for the matching tasks to complete (default: false)"]
+    #[doc = "Waits for the matching task to complete. When `true`, the request is blocked until the task has completed."]
     pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
         self.wait_for_completion = Some(wait_for_completion);
         self
@@ -564,12 +547,9 @@ impl<'a, 'b> TasksList<'a, 'b> {
     }
 }
 #[doc = "Namespace client for Tasks APIs"]
-#[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-#[cfg(feature = "experimental-apis")]
 pub struct Tasks<'a> {
     transport: &'a Transport,
 }
-#[cfg(feature = "experimental-apis")]
 impl<'a> Tasks<'a> {
     #[doc = "Creates a new instance of [Tasks]"]
     pub fn new(transport: &'a Transport) -> Self {
@@ -578,26 +558,19 @@ impl<'a> Tasks<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Tasks Cancel API](https://opensearch.org/docs/)\n\nCancels a task, if it can be cancelled through an API."]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Tasks Cancel API](https://opensearch.org/docs/latest/api-reference/tasks/#task-canceling)\n\nCancels a task, if it can be cancelled through an API."]
     pub fn cancel<'b>(&'a self, parts: TasksCancelParts<'b>) -> TasksCancel<'a, 'b, ()> {
         TasksCancel::new(self.transport(), parts)
     }
-    #[doc = "[Tasks Get API](https://opensearch.org/docs/)\n\nReturns information about a task."]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Tasks Get API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns information about a task."]
     pub fn get<'b>(&'a self, parts: TasksGetParts<'b>) -> TasksGet<'a, 'b> {
         TasksGet::new(self.transport(), parts)
     }
-    #[doc = "[Tasks List API](https://opensearch.org/docs/)\n\nReturns a list of tasks."]
-    #[doc = "&nbsp;\n# Optional, experimental\nThis requires the `experimental-apis` feature. Can have breaking changes in future\nversions or might even be removed entirely.\n        "]
-    #[cfg(feature = "experimental-apis")]
+    #[doc = "[Tasks List API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns a list of tasks."]
     pub fn list<'b>(&'a self) -> TasksList<'a, 'b> {
         TasksList::new(self.transport())
     }
 }
-#[cfg(feature = "experimental-apis")]
 impl OpenSearch {
     #[doc = "Creates a namespace client for Tasks APIs"]
     pub fn tasks(&self) -> Tasks {

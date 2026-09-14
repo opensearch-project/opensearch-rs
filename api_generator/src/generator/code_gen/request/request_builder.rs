@@ -143,9 +143,9 @@ impl<'a> RequestBuilder<'a> {
                     quote!()
                 };
 
-                // TODO: we special case expand_wildcards here to be a list, but this should be fixed upstream
-                let expand = param_type.ty == TypeKind::List || param_name == "expand_wildcards";
-                let serialize_with = if expand {
+                let comma_separated = param_type.ty == TypeKind::List
+                    || param_overrides::param_is_comma_separated(param_name, &param_type.ty);
+                let serialize_with = if comma_separated {
                     quote! {
                         #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                     }

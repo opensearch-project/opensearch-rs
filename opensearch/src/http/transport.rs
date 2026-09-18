@@ -57,8 +57,8 @@ use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use reqwest::ClientBuilder;
 use serde::Serialize;
-use std::{fmt::Debug, io::Write, time::Duration};
 use std::sync::Arc;
+use std::{fmt::Debug, io::Write, time::Duration};
 use url::Url;
 
 #[derive(Debug, thiserror::Error)]

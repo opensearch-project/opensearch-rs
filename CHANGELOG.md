@@ -17,6 +17,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added `Method::Patch` support to the HTTP transport for security plugin PATCH APIs
 - Added an `--openapi` option to `yaml_test_runner` to generate tests from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document instead of the legacy REST API specs, bridging representation differences with the yaml test suites ([#472](https://github.com/opensearch-project/opensearch-rs/issues/472))
 - `yaml_test_runner` now reuses existing yaml test suites by default for reproducible, offline test generation; pass `--download-tests` (used by the `cargo make` tasks) to download the suites matching the cluster instead
+- Added an `up-to-date` CI check that regenerates the client from the committed OpenAPI specification on every PR and fails on any difference, ensuring the generated code is always a pure function of the committed specification and generator ([#482](https://github.com/opensearch-project/opensearch-rs/issues/482))
 
 ### Dependencies
 - Bumps `sysinfo` from 0.31.2 to 0.39.1 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389), [#420](https://github.com/opensearch-project/opensearch-rs/pull/420))

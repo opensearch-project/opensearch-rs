@@ -35,5 +35,6 @@ jobs:
         run: |
           if ! git diff --exit-code opensearch/src; then
             echo "::error::Generated code is out of date. Regenerate it with 'cargo run -p api_generator -- --openapi api_generator/opensearch-openapi.yaml && cargo fmt --package opensearch' and commit the result."
+            git status --porcelain -- opensearch/src
             exit 1
           fi

@@ -169,7 +169,7 @@ impl<'a> EnumBuilder<'a> {
                     attrs: vec![],
                     by_ref: None,
                     mutability: None,
-                    ident: ident(valid_name(p)),
+                    ident: ident(&valid_name(p)),
                     subpat: None,
                 })
             })
@@ -234,7 +234,6 @@ impl<'a> EnumBuilder<'a> {
                     syn::Arm {
                         attrs: vec![],
                         pat,
-                        guard: None,
                         fat_arrow_token: FatArrow(Span::call_site()),
                         body,
                         comma: None,

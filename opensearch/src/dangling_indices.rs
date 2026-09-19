@@ -70,7 +70,7 @@ impl<'b> DanglingIndicesDeleteDanglingIndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/)\n\nDeletes the specified dangling index"]
+#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesDeleteDanglingIndex<'a, 'b> {
     transport: &'a Transport,
@@ -110,22 +110,22 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "Must be set to true in order to delete the dangling index"]
+    #[doc = "Must be set to true in order to delete the dangling index."]
     pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
         self.accept_data_loss = Some(accept_data_loss);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[doc = "Operation timeout for connection to cluster-manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -135,18 +135,18 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Specify timeout for connection to cluster manager."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -161,7 +161,7 @@ impl<'a, 'b> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Explicit operation timeout."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -229,7 +229,7 @@ impl<'b> DanglingIndicesImportDanglingIndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://opensearch.org/docs/)\n\nImports the specified dangling index"]
+#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesImportDanglingIndex<'a, 'b, B> {
     transport: &'a Transport,
@@ -274,7 +274,7 @@ where
             timeout: None,
         }
     }
-    #[doc = "Must be set to true in order to import the dangling index"]
+    #[doc = "Must be set to true in order to import the dangling index."]
     pub fn accept_data_loss(mut self, accept_data_loss: bool) -> Self {
         self.accept_data_loss = Some(accept_data_loss);
         self
@@ -301,17 +301,17 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
+    #[doc = "Operation timeout for connection to cluster-manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -321,18 +321,18 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Specify timeout for connection to cluster-manager node"]
-    #[deprecated = "To promote inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Specify timeout for connection to cluster manager."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -347,7 +347,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "Explicit operation timeout."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -408,7 +408,7 @@ impl DanglingIndicesListDanglingIndicesParts {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://opensearch.org/docs/)\n\nReturns all dangling indices."]
+#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesListDanglingIndices<'a, 'b> {
     transport: &'a Transport,
@@ -437,12 +437,12 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -452,12 +452,12 @@ impl<'a, 'b> DanglingIndicesListDanglingIndices<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -518,21 +518,21 @@ impl<'a> DanglingIndices<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/)\n\nDeletes the specified dangling index"]
+    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
     pub fn delete_dangling_index<'b>(
         &'a self,
         parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
     ) -> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         DanglingIndicesDeleteDanglingIndex::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/)\n\nImports the specified dangling index"]
+    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
     pub fn import_dangling_index<'b>(
         &'a self,
         parts: DanglingIndicesImportDanglingIndexParts<'b>,
     ) -> DanglingIndicesImportDanglingIndex<'a, 'b, ()> {
         DanglingIndicesImportDanglingIndex::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/)\n\nReturns all dangling indices."]
+    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
     pub fn list_dangling_indices<'b>(&'a self) -> DanglingIndicesListDanglingIndices<'a, 'b> {
         DanglingIndicesListDanglingIndices::new(self.transport())
     }

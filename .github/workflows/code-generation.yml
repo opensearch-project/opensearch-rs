@@ -1,0 +1,40 @@
+name: Code Generation
+
+on:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  up-to-date:
+    name: Generated code is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Rust Client
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install latest stable toolchain
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+        with:
+          components: rustfmt
+
+      - name: Cargo Cache
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4
+
+      - name: Regenerate client from the committed specification
+        run: cargo run -p api_generator -- --openapi api_generator/opensearch-openapi.yaml
+
+      - name: Format generated code
+        run: cargo fmt --package opensearch
+
+      - name: Check for differences
+        run: |
+          if ! git diff --exit-code opensearch/src; then
+            echo "::error::Generated code is out of date. Regenerate it with 'cargo run -p api_generator -- --openapi api_generator/opensearch-openapi.yaml && cargo fmt --package opensearch' and commit the result."
+            git status --porcelain -- opensearch/src
+            exit 1
+          fi

@@ -3,4 +3,5 @@
 
 pub mod error;
 pub mod generator;
+pub mod openapi;
 pub mod rest_spec;

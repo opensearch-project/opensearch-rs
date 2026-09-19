@@ -76,7 +76,7 @@ impl<'b> IngestDeletePipelineParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/)\n\nDeletes a pipeline."]
+#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
 #[derive(Clone, Debug)]
 pub struct IngestDeletePipeline<'a, 'b> {
     transport: &'a Transport,
@@ -111,17 +111,17 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -131,18 +131,18 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -157,7 +157,7 @@ impl<'a, 'b> IngestDeletePipeline<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -225,7 +225,7 @@ impl<'b> IngestGetPipelineParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/)\n\nReturns a pipeline."]
+#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
 #[derive(Clone, Debug)]
 pub struct IngestGetPipeline<'a, 'b> {
     transport: &'a Transport,
@@ -258,17 +258,17 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -278,18 +278,18 @@ impl<'a, 'b> IngestGetPipeline<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Period to wait for a connection to the cluster-manager node.\nIf no response is received before the timeout expires, the request fails and returns an error."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -356,7 +356,7 @@ impl IngestProcessorGrokParts {
         }
     }
 }
-#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/)\n\nReturns a list of the built-in patterns."]
+#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
 #[derive(Clone, Debug)]
 pub struct IngestProcessorGrok<'a, 'b> {
     transport: &'a Transport,
@@ -367,6 +367,7 @@ pub struct IngestProcessorGrok<'a, 'b> {
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
+    s: Option<bool>,
     source: Option<&'b str>,
 }
 impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
@@ -382,15 +383,16 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
             human: None,
             pretty: None,
             request_timeout: None,
+            s: None,
             source: None,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -400,12 +402,12 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -413,6 +415,11 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "Determines how to sort returned grok patterns by key name."]
+    pub fn s(mut self, s: bool) -> Self {
+        self.s = Some(s);
         self
     }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
@@ -435,6 +442,7 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
+                s: Option<bool>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -442,6 +450,7 @@ impl<'a, 'b> IngestProcessorGrok<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 pretty: self.pretty,
+                s: self.s,
                 source: self.source,
             };
             Some(query_params)
@@ -474,7 +483,7 @@ impl<'b> IngestPutPipelineParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Put Pipeline API](https://opensearch.org/docs/)\n\nCreates or updates a pipeline."]
+#[doc = "Builder for the [Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
 #[derive(Clone, Debug)]
 pub struct IngestPutPipeline<'a, 'b, B> {
     transport: &'a Transport,
@@ -535,17 +544,17 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
+    #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -555,18 +564,18 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Explicit operation timeout for connection to cluster-manager node"]
-    #[deprecated = "To support inclusive language, use 'cluster_manager_timeout' instead."]
+    #[doc = "Period to wait for a connection to the cluster-manager node. If no response is received before the timeout expires, the request fails and returns an error."]
+    #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
         self.master_timeout = Some(master_timeout);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -581,7 +590,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Explicit operation timeout"]
+    #[doc = "The amount of time to wait for a response."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -650,7 +659,7 @@ impl<'b> IngestSimulateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/)\n\nAllows to simulate a pipeline with example documents."]
+#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
 #[derive(Clone, Debug)]
 pub struct IngestSimulate<'a, 'b, B> {
     transport: &'a Transport,
@@ -705,12 +714,12 @@ where
             verbose: self.verbose,
         }
     }
-    #[doc = "Include the stack trace of returned errors."]
+    #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
         self.error_trace = Some(error_trace);
         self
     }
-    #[doc = "A comma-separated list of filters used to reduce the response."]
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
         self
@@ -720,12 +729,12 @@ where
         self.headers.insert(key, value);
         self
     }
-    #[doc = "Return human readable values for statistics."]
+    #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
         self
     }
-    #[doc = "Pretty format the returned JSON response."]
+    #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
         self
@@ -740,7 +749,7 @@ where
         self.source = Some(source);
         self
     }
-    #[doc = "Verbose mode. Display data output for each processor in executed pipeline"]
+    #[doc = "When `true`, the response includes output data for each processor in the pipeline"]
     pub fn verbose(mut self, verbose: bool) -> Self {
         self.verbose = Some(verbose);
         self
@@ -796,32 +805,32 @@ impl<'a> Ingest<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/)\n\nDeletes a pipeline."]
+    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
     pub fn delete_pipeline<'b>(
         &'a self,
         parts: IngestDeletePipelineParts<'b>,
     ) -> IngestDeletePipeline<'a, 'b> {
         IngestDeletePipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/)\n\nReturns a pipeline."]
+    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
     pub fn get_pipeline<'b>(
         &'a self,
         parts: IngestGetPipelineParts<'b>,
     ) -> IngestGetPipeline<'a, 'b> {
         IngestGetPipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/)\n\nReturns a list of the built-in patterns."]
+    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
     pub fn processor_grok<'b>(&'a self) -> IngestProcessorGrok<'a, 'b> {
         IngestProcessorGrok::new(self.transport())
     }
-    #[doc = "[Ingest Put Pipeline API](https://opensearch.org/docs/)\n\nCreates or updates a pipeline."]
+    #[doc = "[Ingest Put Pipeline API](https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/)\n\nCreates or updates an ingest pipeline."]
     pub fn put_pipeline<'b>(
         &'a self,
         parts: IngestPutPipelineParts<'b>,
     ) -> IngestPutPipeline<'a, 'b, ()> {
         IngestPutPipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/)\n\nAllows to simulate a pipeline with example documents."]
+    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
     pub fn simulate<'b>(&'a self, parts: IngestSimulateParts<'b>) -> IngestSimulate<'a, 'b, ()> {
         IngestSimulate::new(self.transport(), parts)
     }

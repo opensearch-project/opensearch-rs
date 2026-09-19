@@ -17,6 +17,7 @@
  * under the License.
  */
 pub mod namespace_clients;
+pub mod param_overrides;
 pub mod params;
 pub mod request;
 pub mod root;
@@ -102,10 +103,12 @@ pub fn parse_expr(input: TokenStream) -> syn::Expr {
 }
 
 /// Ensures that the name generated is one that is valid for Rust
-pub fn valid_name(s: &str) -> &str {
+pub fn valid_name(s: &str) -> String {
     match s {
-        "type" => "ty",
-        s => s,
+        "type" => "ty".to_string(),
+        // dotted query parameter names (e.g. "chime.url") are not valid
+        // identifiers; serde rename preserves the original wire name
+        s => s.replace('.', "_"),
     }
 }
 
@@ -126,7 +129,7 @@ fn path_segments(paths: Vec<(&str, Vec<syn::Lifetime>, Vec<syn::Type>)>) -> syn:
         segments: paths
             .into_iter()
             .map::<PathSegment, _>(|(path, lifetimes, types)| {
-                let ident = ident(valid_name(path));
+                let ident = ident(&valid_name(path));
                 PathSegment {
                     ident,
                     arguments: if !lifetimes.is_empty() || !types.is_empty() {
@@ -195,8 +198,8 @@ impl GetIdent for ImplItem {
     }
 }
 
-/// Gets the Ty syntax token for a TypeKind
-/// TODO: This function is serving too many purposes. Refactor it
+/// Gets the Ty syntax token for a TypeKind. Per-parameter deviations from
+/// the general mapping live in the [param_overrides] module.
 fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> syn::Type {
     let mut v = String::new();
     if !required {
@@ -204,47 +207,33 @@ fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> 
     }
 
     let str_type = "&'b str";
-    match kind {
-        TypeKind::Unknown(_) => v.push_str(str_type),
-        TypeKind::List => {
-            v.push_str("&'b [");
-            v.push_str(str_type);
-            v.push(']');
-        }
-        TypeKind::Enum => match name {
-            // opened https://github.com/elastic/elasticsearch/issues/53212
-            // to discuss whether this really should be a collection
-            "expand_wildcards" => {
-                // Expand wildcards should
+    if let Some(ty) = param_overrides::param_type_override(name, kind, fn_arg) {
+        v.push_str(ty);
+    } else {
+        match kind {
+            TypeKind::Unknown(_) => v.push_str(str_type),
+            TypeKind::List => {
                 v.push_str("&'b [");
-                v.push_str(name.to_pascal_case().as_str());
+                v.push_str(str_type);
                 v.push(']');
             }
-            _ => v.push_str(name.to_pascal_case().as_str()),
-        },
-        TypeKind::String => v.push_str(str_type),
-        TypeKind::Text => v.push_str(str_type),
-        TypeKind::Boolean => match name {
-            "track_total_hits" => {
-                if fn_arg {
-                    v.push_str(format!("Into<{}>", name.to_pascal_case()).as_str())
-                } else {
-                    v.push_str(name.to_pascal_case().as_str())
-                }
-            }
-            _ => v.push_str("bool"),
-        },
-        TypeKind::Number => v.push_str("i64"),
-        TypeKind::Float => v.push_str("f32"),
-        TypeKind::Double => v.push_str("f64"),
-        TypeKind::Integer => v.push_str("i32"),
-        TypeKind::Long => v.push_str("i64"),
-        TypeKind::Date => v.push_str(str_type),
-        TypeKind::Time => v.push_str(str_type),
-        TypeKind::Union(u) => match name {
-            "slices" => v.push_str("Slices"),
-            _ => panic!("unsupported union type: {:?}", u),
-        },
+            TypeKind::Enum => v.push_str(name.to_pascal_case().as_str()),
+            TypeKind::String => v.push_str(str_type),
+            TypeKind::Text => v.push_str(str_type),
+            TypeKind::Boolean => v.push_str("bool"),
+            TypeKind::Number => v.push_str("i64"),
+            TypeKind::Float => v.push_str("f32"),
+            TypeKind::Double => v.push_str("f64"),
+            TypeKind::Integer => v.push_str("i32"),
+            TypeKind::Long => v.push_str("i64"),
+            TypeKind::Date => v.push_str(str_type),
+            TypeKind::Time => v.push_str(str_type),
+            TypeKind::Union(u) => panic!(
+                "unsupported union type for `{}`: {:?}. Add a handwritten type and an entry \
+                 to code_gen/param_overrides.rs",
+                name, u
+            ),
+        }
     };
 
     if !required {
@@ -328,6 +317,7 @@ pub fn generics(lifetimes: Vec<syn::Lifetime>, types: Vec<syn::TypeParam>) -> sy
 /// AST for a path type with lifetimes and type parameters.
 pub fn ty_path(ty: &str, lifetimes: Vec<syn::Lifetime>, types: Vec<syn::Type>) -> syn::Type {
     syn::Type::Path(syn::TypePath {
+        attrs: vec![],
         qself: None,
         path: path(ty, lifetimes, types),
     })

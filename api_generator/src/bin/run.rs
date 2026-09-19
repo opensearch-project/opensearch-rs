@@ -17,9 +17,10 @@
  * under the License.
  */
 
-use api_generator::{generator, rest_spec};
+use api_generator::{generator, openapi, rest_spec};
 use dialoguer::Input;
 use std::{
+    env,
     fs::{self, File},
     io::Write,
     path::Path,
@@ -30,6 +31,16 @@ fn main() -> anyhow::Result<()> {
         .with_level(log::LevelFilter::Info)
         .init()
         .unwrap();
+
+    // Non-interactive OpenAPI mode:
+    //   run --openapi [FILE]
+    // Generates the client from the opensearch-api-specification OpenAPI
+    // document. When FILE is omitted, the latest published specification
+    // is downloaded first.
+    let args: Vec<String> = env::args().collect();
+    if let Some(pos) = args.iter().position(|a| a == "--openapi") {
+        return generate_from_openapi(args.get(pos + 1).map(String::as_str));
+    }
 
     // This must be run from the repo root directory, with cargo make generate-api
     let download_dir = fs::canonicalize(Path::new("./api_generator/rest_specs"))?;
@@ -120,4 +131,36 @@ fn main() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+/// Generates the client from an OpenAPI specification file, downloading the
+/// latest published specification when no file is given
+fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
+    let generated_dir = fs::canonicalize(Path::new("./opensearch/src"))?;
+    let docs_dir = fs::canonicalize(Path::new("./api_generator"))?.join("docs");
+
+    let default_path = Path::new("./api_generator/opensearch-openapi.yaml");
+    let spec_file = match file {
+        Some(f) => Path::new(f).to_path_buf(),
+        None => {
+            openapi::download_spec(default_path)?;
+            default_path.to_path_buf()
+        }
+    };
+
+    let api = openapi::read_api("opensearch-api-specification/main", &spec_file)?;
+
+    // Delete previously generated files
+    let mut generated = generated_dir.clone();
+    generated.push(generator::GENERATED_TOML);
+    if generated.exists() {
+        let files = toml::from_str::<generator::GeneratedFiles>(&fs::read_to_string(generated)?)?;
+        for f in files.written {
+            let mut generated_file = generated_dir.clone();
+            generated_file.push(f);
+            let _ = fs::remove_file(generated_file); // ignore missing files
+        }
+    }
+
+    generator::generate_from_api(&api, &docs_dir, &generated_dir)
 }

@@ -555,6 +555,7 @@ impl Transport {
             Method::Post => reqwest::Method::POST,
             Method::Delete => reqwest::Method::DELETE,
             Method::Head => reqwest::Method::HEAD,
+            Method::Patch => reqwest::Method::PATCH,
         }
     }
 

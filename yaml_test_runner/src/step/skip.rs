@@ -37,7 +37,7 @@ use semver::Op;
 use serde_yaml::Value;
 
 pub struct Skip {
-    version_requirements: Option<semver::VersionReq>,
+    version_requirements: Option<Vec<semver::VersionReq>>,
     version: Option<String>,
     reason: Option<String>,
     features: Option<Vec<String>>,
@@ -68,36 +68,51 @@ impl Skip {
         }
     }
 
-    /// Converts the version range specified in the yaml test into a [semver::VersionReq]
-    fn parse_version_requirements(version: &Option<String>) -> Option<semver::VersionReq> {
+    /// Converts the version range(s) specified in the yaml test into [semver::VersionReq]s.
+    /// A version specification may contain multiple comma-separated ranges,
+    /// e.g. `" - 2.6.99, 2.13.0 - "`
+    fn parse_version_requirements(version: &Option<String>) -> Option<Vec<semver::VersionReq>> {
         if let Some(v) = version {
             if v.to_lowercase() == "all" {
-                Some(semver::VersionReq::STAR)
+                Some(vec![semver::VersionReq::STAR])
             } else {
                 lazy_static! {
                     static ref VERSION_REGEX: Regex =
                         Regex::new(r"^([\w\.]+)?\s*?\-\s*?([\w\.]+)?$").unwrap();
                 }
-                if let Some(c) = VERSION_REGEX.captures(v) {
-                    match (c.get(1), c.get(2)) {
-                        (Some(start), Some(end)) => Some(
-                            semver::VersionReq::parse(
-                                format!(">={},<={}", start.as_str(), end.as_str()).as_ref(),
-                            )
-                            .unwrap(),
-                        ),
-                        (Some(start), None) => Some(
-                            semver::VersionReq::parse(format!(">={}", start.as_str()).as_ref())
-                                .unwrap(),
-                        ),
-                        (None, Some(end)) => Some(
-                            semver::VersionReq::parse(format!("<={}", end.as_str()).as_ref())
-                                .unwrap(),
-                        ),
-                        (None, None) => None,
-                    }
-                } else {
+                let requirements: Vec<semver::VersionReq> = v
+                    .split(',')
+                    .filter_map(|range| {
+                        if let Some(c) = VERSION_REGEX.captures(range.trim()) {
+                            match (c.get(1), c.get(2)) {
+                                (Some(start), Some(end)) => Some(
+                                    semver::VersionReq::parse(
+                                        format!(">={},<={}", start.as_str(), end.as_str()).as_ref(),
+                                    )
+                                    .unwrap(),
+                                ),
+                                (Some(start), None) => Some(
+                                    semver::VersionReq::parse(
+                                        format!(">={}", start.as_str()).as_ref(),
+                                    )
+                                    .unwrap(),
+                                ),
+                                (None, Some(end)) => Some(
+                                    semver::VersionReq::parse(format!("<={}", end.as_str()).as_ref())
+                                        .unwrap(),
+                                ),
+                                (None, None) => None,
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                if requirements.is_empty() {
                     None
+                } else {
+                    Some(requirements)
                 }
             }
         } else {
@@ -135,7 +150,7 @@ impl Skip {
     /// Determines if this instance matches the version
     pub fn skip_version(&self, version: &semver::Version) -> bool {
         match &self.version_requirements {
-            Some(r) => {
+            Some(requirements) => requirements.iter().any(|r| {
                 // Hack because old pre-fork version ranges are for ES versions, but OS reset back to 1.x while still being compatible(ish) with ES 7.10
                 if let Some(es_upper) = r
                     .comparators
@@ -148,7 +163,7 @@ impl Skip {
                 }
 
                 r.matches(version)
-            }
+            }),
             None => false,
         }
     }

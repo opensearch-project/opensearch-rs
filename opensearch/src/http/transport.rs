@@ -57,7 +57,10 @@ use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use reqwest::ClientBuilder;
 use serde::Serialize;
-use std::sync::Arc;
+use std::sync::{
+    atomic::{AtomicUsize, Ordering},
+    Arc,
+};
 use std::{fmt::Debug, io::Write, time::Duration};
 use url::Url;
 
@@ -570,6 +573,22 @@ impl Transport {
         Ok(transport)
     }
 
+    /// Creates a new instance of a [Transport] configured with a
+    /// [MultiNodeConnectionPool] that distributes requests across the
+    /// given node addresses in round-robin fashion.
+    pub fn multi_node<'u, U>(urls: U) -> Result<Transport, Error>
+    where
+        U: IntoIterator<Item = &'u str>,
+    {
+        let urls = urls
+            .into_iter()
+            .map(Url::parse)
+            .collect::<Result<Vec<_>, _>>()?;
+        let conn_pool = MultiNodeConnectionPool::round_robin(urls);
+        let transport = TransportBuilder::new(conn_pool).build()?;
+        Ok(transport)
+    }
+
     /// Creates an asynchronous request that can be awaited
     pub async fn send<B, Q>(
         &self,
@@ -729,6 +748,45 @@ impl ConnectionPool for SingleNodeConnectionPool {
     }
 }
 
+/// A connection pool that manages connections to multiple OpenSearch cluster nodes,
+/// distributing requests across the nodes in round-robin fashion.
+///
+/// All clones of a [MultiNodeConnectionPool] share the same rotation state, so
+/// requests sent through cloned [Transport]s continue the same round-robin sequence.
+#[derive(Debug, Clone)]
+pub struct MultiNodeConnectionPool {
+    connections: Arc<Vec<Connection>>,
+    index: Arc<AtomicUsize>,
+}
+
+impl MultiNodeConnectionPool {
+    /// Creates a new instance of [MultiNodeConnectionPool], selecting [Connection]s
+    /// from the given node addresses in round-robin fashion.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `urls` is empty.
+    pub fn round_robin(urls: Vec<Url>) -> Self {
+        assert!(
+            !urls.is_empty(),
+            "MultiNodeConnectionPool requires at least one url"
+        );
+        let connections = urls.into_iter().map(Connection::new).collect();
+        Self {
+            connections: Arc::new(connections),
+            index: Arc::new(AtomicUsize::new(0)),
+        }
+    }
+}
+
+impl ConnectionPool for MultiNodeConnectionPool {
+    /// Gets a reference to the next [Connection], rotating through the nodes
+    fn next(&self) -> Connection {
+        let i = self.index.fetch_add(1, Ordering::Relaxed);
+        self.connections[i % self.connections.len()].clone()
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -790,5 +848,62 @@ pub mod tests {
         let url = Url::parse("http://10.1.2.3/").unwrap();
         let conn = Connection::new(url);
         assert_eq!(conn.url.as_str(), "http://10.1.2.3/");
+    }
+
+    fn multi_node_urls() -> Vec<Url> {
+        vec![
+            Url::parse("http://node1:9200").unwrap(),
+            Url::parse("http://node2:9200").unwrap(),
+            Url::parse("http://node3:9200").unwrap(),
+        ]
+    }
+
+    #[test]
+    fn multi_node_connection_pool_round_robins_nodes() {
+        let pool = MultiNodeConnectionPool::round_robin(multi_node_urls());
+        let selected: Vec<String> = (0..6).map(|_| pool.next().url.to_string()).collect();
+        assert_eq!(
+            selected,
+            vec![
+                "http://node1:9200/",
+                "http://node2:9200/",
+                "http://node3:9200/",
+                "http://node1:9200/",
+                "http://node2:9200/",
+                "http://node3:9200/",
+            ]
+        );
+    }
+
+    #[test]
+    fn multi_node_connection_pool_clones_share_rotation_state() {
+        let pool = MultiNodeConnectionPool::round_robin(multi_node_urls());
+        let clone = pool.clone();
+        assert_eq!(pool.next().url.as_str(), "http://node1:9200/");
+        assert_eq!(clone.next().url.as_str(), "http://node2:9200/");
+        assert_eq!(pool.next().url.as_str(), "http://node3:9200/");
+    }
+
+    #[test]
+    #[should_panic(expected = "at least one url")]
+    fn multi_node_connection_pool_panics_on_empty_urls() {
+        MultiNodeConnectionPool::round_robin(Vec::new());
+    }
+
+    #[test]
+    fn transport_multi_node_builds_from_str_urls() {
+        let transport = Transport::multi_node(["http://node1:9200", "http://node2:9200"]).unwrap();
+        assert_eq!(
+            transport.conn_pool.next().url.as_str(),
+            "http://node1:9200/"
+        );
+        assert_eq!(
+            transport.conn_pool.next().url.as_str(),
+            "http://node2:9200/"
+        );
+        assert_eq!(
+            transport.conn_pool.next().url.as_str(),
+            "http://node1:9200/"
+        );
     }
 }

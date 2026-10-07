@@ -420,6 +420,7 @@ pub mod cert;
 pub mod http;
 pub mod models;
 pub mod params;
+pub mod types;
 
 // GENERATED-BEGIN:namespace-modules
 // Generated code - do not edit until the next GENERATED-END marker

@@ -98,8 +98,10 @@ impl Skip {
                                     .unwrap(),
                                 ),
                                 (None, Some(end)) => Some(
-                                    semver::VersionReq::parse(format!("<={}", end.as_str()).as_ref())
-                                        .unwrap(),
+                                    semver::VersionReq::parse(
+                                        format!("<={}", end.as_str()).as_ref(),
+                                    )
+                                    .unwrap(),
                                 ),
                                 (None, None) => None,
                             }

@@ -23,6 +23,10 @@ jobs:
         test-args:
           - "--features aws-auth"
           - "--no-default-features --features rustls-tls --package opensearch --test cert"
+          # typed response models must decode the same with serde_json's
+          # arbitrary_precision, which feature unification can enable from
+          # any crate in a user's dependency graph
+          - "--features _test-arbitrary-precision --package opensearch --lib --test types_roundtrip"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Rust Client

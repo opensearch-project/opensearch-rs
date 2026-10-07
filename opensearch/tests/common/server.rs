@@ -35,7 +35,7 @@
 use std::{convert::identity, net::SocketAddr, sync::mpsc as std_mpsc, thread, time::Duration};
 
 use bytes::Bytes;
-use http_body_util::Empty;
+use http_body_util::Full;
 use hyper::{
     body::Incoming, server::conn::http1, service::service_fn, HeaderMap, Method, Request, Response,
     Uri,
@@ -56,12 +56,14 @@ use super::client::TestClientBuilder;
 struct RequestState {
     requests_tx: mpsc::UnboundedSender<ReceivedRequest>,
     response_delay: Option<Duration>,
+    response: Option<(u16, &'static str)>,
     shutdown_rx: watch::Receiver<bool>,
 }
 
 #[derive(Default)]
 pub struct MockServerBuilder {
     response_delay: Option<Duration>,
+    response: Option<(u16, &'static str)>,
 }
 
 impl MockServerBuilder {
@@ -70,15 +72,28 @@ impl MockServerBuilder {
         self
     }
 
+    /// Answers every request with this status code and JSON body (by
+    /// default an empty `200`)
+    pub fn response(mut self, status: u16, body: &'static str) -> Self {
+        self.response = Some((status, body));
+        self
+    }
+
     async fn handle_request(
         req: Request<Incoming>,
         state: RequestState,
-    ) -> anyhow::Result<Response<Empty<Bytes>>> {
+    ) -> anyhow::Result<Response<Full<Bytes>>> {
         state.requests_tx.send(req.into())?;
         if let Some(response_delay) = state.response_delay {
             sleep(response_delay).await;
         }
-        Ok(Default::default())
+        Ok(match state.response {
+            Some((status, body)) => Response::builder()
+                .status(status)
+                .header("content-type", "application/json")
+                .body(Full::new(Bytes::from_static(body.as_bytes())))?,
+            None => Default::default(),
+        })
     }
 
     async fn serve_connection(io: TokioIo<TcpStream>, state: RequestState) {
@@ -124,6 +139,7 @@ impl MockServerBuilder {
             RequestState {
                 requests_tx,
                 response_delay: self.response_delay,
+                response: self.response,
                 shutdown_rx,
             },
         );

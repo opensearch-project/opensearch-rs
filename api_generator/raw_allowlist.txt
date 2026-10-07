@@ -1,0 +1,47 @@
+# Untyped-field ledger of the generated response models.
+# Regenerate with `cargo run -p api_generator -- --openapi <spec> --update-raw-allowlist`.
+#
+# Each line is a permitted raw JSON (Box<RawValue>) use in opensearch::types:
+#
+#   namespace:TypeName/field # <form> <cause> -- <review reason>
+#
+# A member "-" is a whole-type alias, "[additional]" the residual map of a
+# struct. Form and cause are computed by the generator. The review reason
+# after " -- " is written by hand and kept across updates: an entry whose reason
+# is UNREVIEWED fails generation until someone confirms the degradation is
+# intended (or fixes the generator / the specification instead).
+#
+# Causes: no-type (schema declares no type), generic (generic type parameter),
+# open-object (object without fixed fields or with untyped additionalProperties),
+# untyped-items (array without items), null-only (schema only allows null).
+
+# --- _common ---
+_common:ErrorCause/[additional] # bare no-type -- error-specific extra properties: each exception type adds its own keys
+_common:InlineGetDictUserDefined/[additional] # map<bare> open-object -- unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata
+_common:InlineGetDictUserDefined/_source # map<bare> open-object -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_common:InlineGetDictUserDefined/fields # map<map<bare>> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+_common:Metadata/[additional] # bare open-object -- user-defined `_meta`: arbitrary JSON by design
+
+# --- _common.aggregations ---
+_common.aggregations:ScriptedMetricAggregate/value # bare no-type -- scripted_metric: the reduce script decides the result type
+
+# --- _core.get ---
+_core.get:GetResponse/_source # bare generic -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.get:GetResponse/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+
+# --- _core.search ---
+_core.search:HitsMetadataHitsItem/[additional] # bare no-type -- unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata
+_core.search:HitsMetadataHitsItem/_source # bare generic -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.search:HitsMetadataHitsItem/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+_core.search:HitsMetadataJsonValueHitsItem/[additional] # bare no-type -- unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata
+_core.search:HitsMetadataJsonValueHitsItem/_source # bare no-type -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.search:HitsMetadataJsonValueHitsItem/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+_core.search:ProcessorExecutionDetail/input_data # bare no-type -- search pipeline processor input/output: request, response or document fragments depending on the processor
+_core.search:ProcessorExecutionDetail/output_data # bare no-type -- search pipeline processor input/output: request, response or document fragments depending on the processor
+_core.search:SearchResponseHitsHitsItem/[additional] # bare no-type -- unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata
+_core.search:SearchResponseHitsHitsItem/_source # bare generic -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.search:SearchResponseHitsHitsItem/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+_core.search:SuggestCompletionOptionsArrayItem/_source # bare generic -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.search:SuggestCompletionOptionsArrayItem/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping
+_core.search:SuggestCompletionOptionsObject/_source # bare generic -- document body: its shape is user-defined (decode with serde_json or a caller type)
+_core.search:SuggestCompletionOptionsObject/fields # map<bare> open-object -- stored/docvalue fields requested per query: names and value types depend on the mapping

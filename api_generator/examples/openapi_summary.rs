@@ -46,7 +46,10 @@ fn main() -> anyhow::Result<()> {
     println!("root endpoints:  {}", api.root.endpoints().len());
     println!("namespaces:      {}", api.namespaces.len());
     println!("total endpoints: {}", openapi_names.len());
-    println!("common params:   {:?}", api.common_params.keys().collect::<Vec<_>>());
+    println!(
+        "common params:   {:?}",
+        api.common_params.keys().collect::<Vec<_>>()
+    );
     println!("enums:           {}", api.enums.len());
 
     if let Some(rest_specs_dir) = args.get(2) {

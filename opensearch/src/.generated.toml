@@ -33,10 +33,18 @@ written = [
     "sql.rs",
     "tasks.rs",
     "transforms.rs",
+    "types/bulk.rs",
+    "types/common.rs",
+    "types/common_aggregations.rs",
+    "types/explain.rs",
+    "types/get.rs",
+    "types/index.rs",
+    "types/search.rs",
     "ubi.rs",
     "wlm.rs",
 ]
 merged = [
     "lib.rs",
     "params.rs",
+    "types/mod.rs",
 ]

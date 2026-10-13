@@ -476,6 +476,9 @@ impl<'a> RequestBuilder<'a> {
             api_name_for_docs
         ));
 
+        let send_typed_fn =
+            Self::create_send_typed_fn(&api_name_for_docs, endpoint, &default_fields);
+
         let cfg_attr = endpoint.stability.outer_cfg_attr();
         let cfg_doc = stability_doc(endpoint.stability);
         let (deprecated_attr, allow_deprecated_attr) = Deprecated::attr(&endpoint.deprecated);
@@ -518,6 +521,103 @@ impl<'a> RequestBuilder<'a> {
                       let response = self.transport.send(method, &path, headers, query_string.as_ref(), body, timeout).await?;
                       Ok(response)
                 }
+
+                #send_typed_fn
+            }
+        }
+    }
+
+    /// Creates the AST for `send_typed`, which sends the request and decodes
+    /// the body as the typed response model of the endpoint. Nothing is
+    /// generated for endpoints without a model (HEAD-only, non-JSON, ...):
+    /// the absence of the method tells the caller there is no model.
+    ///
+    /// `send_typed` returns the model alone. Callers needing the status code
+    /// or headers use `send`, as they do for raw JSON.
+    fn create_send_typed_fn(
+        api_name_for_docs: &str,
+        endpoint: &ApiEndpoint,
+        fields: &[&syn::Ident],
+    ) -> TokenStream {
+        let path = match &endpoint.typed_response {
+            Some(p) => p,
+            None => return quote!(),
+        };
+        let ty: syn::Type = syn::parse_str(&format!("crate::{}", path)).unwrap();
+        let type_name = lit(path);
+        let statuses = &endpoint.typed_model_statuses;
+        let has_field = |name: &str| fields.iter().any(|f| *f == name);
+
+        // a response shaped by the request no longer matches the model:
+        // refuse before sending rather than fail to decode afterwards
+        let filter_path_check = if has_field("filter_path") {
+            quote! {
+                if self.filter_path.is_some() {
+                    return Err(Error::typed_response_unavailable(
+                        "`filter_path` removes fields of the typed response model; use `send()` and decode the body into a type of your own"
+                    ));
+                }
+            }
+        } else {
+            quote!()
+        };
+        // `format` of the cat and list APIs is a short Accept header: only
+        // JSON matches the model (`format` of sql/ppl is a different option)
+        let group = endpoint.full_name.as_deref().unwrap_or_default();
+        // these APIs answer plain text unless asked for JSON, whatever the
+        // Accept header: `send_typed` asks for JSON when no format is set
+        let format_doc =
+            has_field("format") && (group.starts_with("cat.") || group.starts_with("list."));
+        let format_check = if format_doc {
+            quote! {
+                match self.format {
+                    None => self.format = Some("json"),
+                    Some(format) if format.eq_ignore_ascii_case("json") => {}
+                    Some(_) => {
+                        return Err(Error::typed_response_unavailable(
+                            "only `format=json` matches the typed response model; use `send()` for other formats"
+                        ));
+                    }
+                }
+            }
+        } else {
+            quote!()
+        };
+        let receiver = if format_doc {
+            quote!(mut self)
+        } else {
+            quote!(self)
+        };
+
+        let model_statuses_doc = if statuses.is_empty() {
+            String::new()
+        } else {
+            format!(
+                ", and for {}, for which the API answers with the same body (e.g. a document that is not found)",
+                statuses
+                    .iter()
+                    .map(|s| format!("`{}`", s))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        };
+        let doc = lit(&format!(
+            "Sends the request and decodes the response body as [`{path}`](crate::{path}), the typed response of the {api} API.\n\n\
+             The body is decoded for a success status{statuses}. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error).\n\n\
+             Use [`send`](Self::send) instead to read the status code or headers, or to decode the body into a type of your own. \
+             `send_typed` refuses a request using `filter_path`, which removes fields of the model.{format}",
+            path = path,
+            api = api_name_for_docs,
+            statuses = model_statuses_doc,
+            format = if format_doc { " The response is requested as JSON (`format=json`) unless another `format` is set, which is refused." } else { "" },
+        ));
+
+        quote! {
+            #[doc = #doc]
+            pub async fn send_typed(#receiver) -> Result<#ty, Error> {
+                #filter_path_check
+                #format_check
+                self.send().await?.typed(#type_name, &[#(#statuses),*]).await
             }
         }
     }
@@ -656,5 +756,63 @@ impl<'a> RequestBuilder<'a> {
         );
 
         (builder_struct, ctor_fn)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    fn api() -> crate::generator::Api {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
+        crate::openapi::read_api("test", Path::new(path)).unwrap()
+    }
+
+    fn send_typed(api: &crate::generator::Api, group: &str) -> String {
+        send_typed_for(api, group, api.endpoint_for_api_call(group).unwrap())
+    }
+
+    fn send_typed_for(api: &crate::generator::Api, group: &str, endpoint: &ApiEndpoint) -> String {
+        let fields: Vec<syn::Ident> = endpoint
+            .params
+            .keys()
+            .chain(api.common_params.keys())
+            .map(|k| ident(&valid_name(k).to_lowercase()))
+            .collect();
+        let refs: Vec<&syn::Ident> = fields.iter().collect();
+        RequestBuilder::create_send_typed_fn(group, endpoint, &refs).to_string()
+    }
+
+    #[test]
+    fn send_typed_returns_the_model_and_refuses_shaped_responses() {
+        let api = api();
+
+        let get = send_typed(&api, "get");
+        assert!(
+            get.contains("Result < crate :: types :: get :: GetResponse , Error >"),
+            "{}",
+            get
+        );
+        // 404 answers with the model (`found: false`)
+        assert!(get.contains("& [404u16]"), "{}", get);
+        assert!(get.contains("self . filter_path . is_some ()"), "{}", get);
+        assert!(!get.contains("self . format"), "{}", get);
+
+        // `format` of cat selects the output encoding: only JSON is typed.
+        // No cat API is typed yet: give one a model to check the output
+        let mut cat_indices = api.endpoint_for_api_call("cat.indices").unwrap().clone();
+        assert_eq!(cat_indices.typed_response, None);
+        cat_indices.typed_response = Some("types::cat_indices::IndicesResponse".to_string());
+        let cat = send_typed_for(&api, "cat.indices", &cat_indices);
+        assert!(
+            cat.contains("None => self . format = Some (\"json\")"),
+            "{}",
+            cat
+        );
+        assert!(cat.contains("& []"), "{}", cat);
+
+        // no model, no method
+        assert!(send_typed(&api, "indices.exists").is_empty());
     }
 }

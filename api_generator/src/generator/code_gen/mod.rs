@@ -20,6 +20,7 @@ pub mod namespace_clients;
 pub mod param_overrides;
 pub mod params;
 pub mod request;
+pub mod response_types;
 pub mod root;
 pub mod url;
 

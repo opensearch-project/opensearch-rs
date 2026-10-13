@@ -99,6 +99,42 @@ for hit in response_body["hits"]["hits"].as_array().unwrap() {
 }
 ```
 
+### Typed Responses
+
+`send_typed()` decodes the response body into the typed model of the API
+(`opensearch::types`), without naming the type. Documents are decoded into a
+type of your own with `source_as`.
+
+```rust
+#[derive(serde::Deserialize)]
+struct Movie {
+    title: String,
+}
+
+let response = client
+    .search(opensearch::SearchParts::Index(&["movies"]))
+    .body(serde_json::json!({ "query": { "match": { "director": "miller" } } }))
+    .send_typed()
+    .await?;
+
+println!("took {} ms", response.took);
+if let Some(total) = &response.hits.total {
+    // a lower bound beyond `track_total_hits` (10,000 by default)
+    let bound = if total.is_accurate() { "" } else { " or more" };
+    println!("{}{} hits", total.value(), bound);
+}
+for hit in &response.hits.hits {
+    if let Some(movie) = hit.source_as::<Movie>()? {
+        println!("{}", movie.title);
+    }
+}
+```
+
+An error status (e.g. a missing index) is returned as an error, whose status
+code and body are available from `Error::api_error()`. Use `send()` to read
+the status code or headers, or when `filter_path` is set: a filtered response
+no longer matches the model, so decode it into a type of your own.
+
 ### Delete the Index
 
 ```rust

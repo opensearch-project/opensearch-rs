@@ -161,6 +161,23 @@ impl Do {
                 tokens.append_all(quote! {
                     crate::assert_response_success!(response);
                 });
+                // shadow typing: for endpoints with a generated response
+                // model, verify that the successful response deserializes
+                // into it and round-trips without data loss. Only emitted
+                // on this branch: with `catch` or `ignore` the response
+                // may be an error, which the models do not describe.
+                if !read_response {
+                    if let Some(check) = typed_response_check(
+                        &self.api_call.full_name,
+                        &self.api_call.typed_response,
+                    ) {
+                        read_response = true;
+                        tokens.append_all(quote! {
+                            let (method, status_code, text, json) = client::read_response(response).await?;
+                        });
+                        tokens.append_all(check);
+                    }
+                }
             }
         }
 
@@ -249,6 +266,14 @@ impl Do {
 /// The components of an API call
 pub struct ApiCall {
     pub namespace: Option<String>,
+    /// The full name of the called operation group, e.g. `search` or
+    /// `indices.create`
+    full_name: String,
+    /// The Rust path of the generated response model of the endpoint, when
+    /// one exists (see [ApiEndpoint::typed_response]) and the response is
+    /// expected to have its shape: `None` when the call passes
+    /// `filter_path`, which removes fields from the response at will
+    typed_response: Option<String>,
     function: syn::Expr,
     parts: Option<TokenStream>,
     params: Option<TokenStream>,
@@ -330,6 +355,11 @@ impl ApiCall {
             }
         }
 
+        // `filter_path` returns an arbitrary subset of the response, which
+        // the response model is not meant to describe (callers decode such
+        // responses into their own types): no typed verification then
+        let filters_response = params.iter().any(|(k, _)| *k == "filter_path");
+
         let api_call = endpoint.full_name.as_ref().unwrap();
         let parts = Self::generate_parts(api_call, endpoint, &parts)?;
         let params = Self::generate_params(api, endpoint, &params)?;
@@ -350,6 +380,12 @@ impl ApiCall {
 
         Ok(ApiCall {
             namespace,
+            full_name: api_call.clone(),
+            typed_response: if filters_response {
+                None
+            } else {
+                endpoint.typed_response.clone()
+            },
             function,
             parts,
             params,
@@ -961,5 +997,85 @@ impl ApiCall {
             Value::Sequence(values) if endpoint.supports_nd_body() => Ok(Some(nd_body(values))),
             _ => panic!("Unsupported body: {:?}", v),
         }
+    }
+}
+
+/// The tokens verifying that the successful response of an operation
+/// group deserializes into its generated response model — or `None` when
+/// the group has no typed response model.
+///
+/// The emitted call expects the `text` binding produced by
+/// `client::read_response` to be in scope.
+fn typed_response_check(full_name: &str, typed_response: &Option<String>) -> Option<TokenStream> {
+    let path = typed_response.as_deref()?;
+    let ty: syn::Path = syn::parse_str(&format!("opensearch::{}", path)).unwrap();
+    Some(quote! {
+        client::check_typed_response::<#ty>(&text, #full_name);
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn typed_check_is_emitted_for_typed_endpoints() {
+        let tokens =
+            typed_response_check("search", &Some("types::search::SearchResponse".to_string()))
+                .unwrap();
+        assert_eq!(
+            tokens.to_string(),
+            quote! {
+                client::check_typed_response::<opensearch::types::search::SearchResponse>(&text, "search");
+            }
+            .to_string()
+        );
+        let tokens = typed_response_check(
+            "indices.create",
+            &Some("types::indices_create::CreateResponse".to_string()),
+        )
+        .unwrap();
+        assert!(tokens
+            .to_string()
+            .contains("opensearch :: types :: indices_create :: CreateResponse"));
+    }
+
+    #[test]
+    fn typed_check_is_not_emitted_without_a_model() {
+        assert!(typed_response_check("exists", &None).is_none());
+    }
+
+    /// The API model read from the vendored OpenAPI specification
+    fn spec_api() -> Api {
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../api_generator/opensearch-openapi.yaml"
+        );
+        api_generator::openapi::read_api("test", std::path::Path::new(path)).unwrap()
+    }
+
+    /// The tokens generated for a `do` step given as yaml
+    fn do_tokens(api: &Api, yaml: &str) -> String {
+        let value: Value = serde_yaml::from_str(yaml).unwrap();
+        let step = Do::try_parse(api, &value).unwrap();
+        let mut tokens = TokenStream::new();
+        step.to_tokens(false, &mut tokens);
+        tokens.to_string()
+    }
+
+    #[test]
+    fn typed_check_is_skipped_for_filter_path() {
+        let api = spec_api();
+        // a plain search is verified against its model
+        let plain = do_tokens(&api, "search:\n  index: test\n");
+        assert!(plain.contains("check_typed_response"), "{}", plain);
+        // filter_path returns an arbitrary subset of the response: not verified
+        let filtered = do_tokens(
+            &api,
+            "search:\n  index: test\n  filter_path: \"hits.hits._source\"\n",
+        );
+        assert!(!filtered.contains("check_typed_response"), "{}", filtered);
+        // the request itself still carries the parameter
+        assert!(filtered.contains("filter_path"), "{}", filtered);
     }
 }

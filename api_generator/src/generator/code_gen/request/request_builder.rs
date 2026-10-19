@@ -17,7 +17,7 @@
  * under the License.
  */
 use crate::generator::{
-    code_gen::{url::enum_builder::EnumBuilder, *},
+    code_gen::{typed_client, url::enum_builder::EnumBuilder, *},
     ApiEndpoint, Deprecated, HttpMethod, Type, TypeKind,
 };
 use inflector::Inflector;
@@ -347,26 +347,12 @@ impl<'a> RequestBuilder<'a> {
         }
     }
 
-    /// creates the AST for a builder struct
-    fn create_builder_struct(
-        builder_name: &str,
+    /// The fields of a builder struct: URL parameters, common parameters,
+    /// the headers, the request timeout and, when supported, the body
+    fn builder_fields(
         endpoint: &ApiEndpoint,
         common_params: &BTreeMap<String, Type>,
-        enum_builder: &EnumBuilder,
-        accepts_nd_body: bool,
-    ) -> TokenStream {
-        let mut common_fields: Vec<Field> = common_params
-            .iter()
-            .map(Self::create_struct_field)
-            .collect();
-
-        let mut common_builder_fns: Vec<ImplItem> =
-            common_params.iter().map(Self::create_impl_fn).collect();
-
-        let supports_body = endpoint.supports_body();
-        let builder_ident = ident(builder_name);
-        let (enum_ty, enum_struct, enum_impl) = enum_builder.clone().build();
-
+    ) -> Vec<Field> {
         // collect all the fields for the builder struct. Start with url parameters
         let mut fields: Vec<Field> = endpoint
             .params
@@ -381,39 +367,80 @@ impl<'a> RequestBuilder<'a> {
         fields.push(parse_named_field!(#headers_field_ident: HeaderMap));
         fields.push(parse_named_field!(#request_timeout_ident: Option<Duration>));
 
-        if supports_body {
+        if endpoint.supports_body() {
             fields.push(parse_named_field!(body: Option<B>));
         }
 
         // Combine common fields with struct fields, sort and deduplicate
+        let mut common_fields: Vec<Field> = common_params
+            .iter()
+            .map(Self::create_struct_field)
+            .collect();
         fields.append(&mut common_fields);
         fields.sort_by(|a, b| a.ident.cmp(&b.ident));
         fields.dedup_by(|a, b| a.ident.eq(&b.ident));
+        fields
+    }
 
+    /// The methods of a builder struct, sorted by name: one per URL and common
+    /// parameter, `header`, `request_timeout` and, when supported, `body`.
+    /// Shared by the generic builders and the typed builders wrapping them, so
+    /// that both offer the same options.
+    pub(crate) fn builder_fns(
+        builder_ident: &syn::Ident,
+        endpoint: &ApiEndpoint,
+        common_params: &BTreeMap<String, Type>,
+        accepts_nd_body: bool,
+    ) -> Vec<ImplItem> {
+        let fields = Self::builder_fields(endpoint, common_params);
+        let default_fields = fields
+            .iter()
+            .map(|f| f.ident.as_ref().unwrap())
+            .collect::<Vec<_>>();
+
+        // collect all the functions for the builder struct
+        let mut builder_fns: Vec<ImplItem> =
+            endpoint.params.iter().map(Self::create_impl_fn).collect();
+
+        builder_fns.push(Self::create_header_fn(&ident("headers")));
+        builder_fns.push(Self::create_request_timeout_fn(&ident("request_timeout")));
+
+        // add a body impl if supported
+        if endpoint.supports_body() {
+            let body_fn = Self::create_body_fn(builder_ident, &default_fields, accepts_nd_body);
+            builder_fns.push(body_fn);
+        }
+
+        // Combine common fns with builder fns, sort and deduplicate.
+        let mut common_builder_fns: Vec<ImplItem> =
+            common_params.iter().map(Self::create_impl_fn).collect();
+        builder_fns.append(&mut common_builder_fns);
+        builder_fns.sort_by(|a, b| a.get_ident().cmp(b.get_ident()));
+        builder_fns.dedup_by(|a, b| a.get_ident().eq(b.get_ident()));
+        builder_fns
+    }
+
+    /// creates the AST for a builder struct
+    fn create_builder_struct(
+        builder_name: &str,
+        endpoint: &ApiEndpoint,
+        common_params: &BTreeMap<String, Type>,
+        enum_builder: &EnumBuilder,
+        accepts_nd_body: bool,
+    ) -> TokenStream {
+        let supports_body = endpoint.supports_body();
+        let builder_ident = ident(builder_name);
+        let (enum_ty, enum_struct, enum_impl) = enum_builder.clone().build();
+
+        let fields = Self::builder_fields(endpoint, common_params);
         let default_fields = {
             fields
                 .iter()
                 .map(|f| f.ident.as_ref().unwrap())
                 .collect::<Vec<_>>()
         };
-
-        // collect all the functions for the builder struct
-        let mut builder_fns: Vec<ImplItem> =
-            endpoint.params.iter().map(Self::create_impl_fn).collect();
-
-        builder_fns.push(Self::create_header_fn(&headers_field_ident));
-        builder_fns.push(Self::create_request_timeout_fn(&request_timeout_ident));
-
-        // add a body impl if supported
-        if supports_body {
-            let body_fn = Self::create_body_fn(&builder_ident, &default_fields, accepts_nd_body);
-            builder_fns.push(body_fn);
-        }
-
-        // Combine common fns with builder fns, sort and deduplicate.
-        builder_fns.append(&mut common_builder_fns);
-        builder_fns.sort_by(|a, b| a.get_ident().cmp(b.get_ident()));
-        builder_fns.dedup_by(|a, b| a.get_ident().eq(b.get_ident()));
+        let builder_fns =
+            Self::builder_fns(&builder_ident, endpoint, common_params, accepts_nd_body);
 
         let new_fn =
             Self::create_new_fn(builder_name, &builder_ident, enum_builder, &default_fields);
@@ -524,6 +551,56 @@ impl<'a> RequestBuilder<'a> {
 
     /// Creates the AST for a fn that returns a new instance of a builder struct
     /// from the root or namespace client
+    /// The documentation of the method creating a builder on the root or
+    /// namespace client: the API description, its link, and the hand-written
+    /// markdown docs of the API when present
+    fn method_doc(
+        docs_dir: &Path,
+        namespace_name: &str,
+        name: &str,
+        builder_name: &str,
+        endpoint: &ApiEndpoint,
+        with_markdown: bool,
+    ) -> syn::Attribute {
+        let api_name_for_docs = split_on_pascal_case(builder_name);
+
+        let markdown_doc = {
+            let mut path = docs_dir.to_path_buf();
+            path.push("functions");
+            path.push(format!("{}.{}.md", namespace_name, name));
+            if with_markdown && path.exists() {
+                let mut s = fs::read_to_string(&path)
+                    .unwrap_or_else(|_| panic!("Could not read file at {:?}", &path));
+                s = s.replace("\r\n", "\n");
+                if !s.starts_with("\n\n") {
+                    s.insert_str(0, "\n\n");
+                }
+                s
+            } else {
+                String::new()
+            }
+        };
+
+        match (
+            endpoint.documentation.description.as_ref(),
+            endpoint.documentation.url.as_ref(),
+        ) {
+            (Some(d), Some(u)) if Url::parse(u).is_ok() => doc(&format!(
+                "[{} API]({})\n\n{}{}",
+                api_name_for_docs, u, d, markdown_doc
+            )),
+            (Some(d), None) => doc(&format!(
+                "{} API\n\n{}{}",
+                api_name_for_docs, d, markdown_doc
+            )),
+            (None, Some(u)) if Url::parse(u).is_ok() => doc(&format!(
+                "[{} API]({}){}",
+                api_name_for_docs, u, markdown_doc
+            )),
+            _ => doc(&format!("{} API{}", api_name_for_docs, markdown_doc)),
+        }
+    }
+
     fn create_builder_struct_ctor_fns(
         docs_dir: &Path,
         namespace_name: &str,
@@ -551,43 +628,8 @@ impl<'a> RequestBuilder<'a> {
             }
         };
 
-        let api_name_for_docs = split_on_pascal_case(builder_name);
-
-        let markdown_doc = {
-            let mut path = docs_dir.to_path_buf();
-            path.push("functions");
-            path.push(format!("{}.{}.md", namespace_name, name));
-            if path.exists() {
-                let mut s = fs::read_to_string(&path)
-                    .unwrap_or_else(|_| panic!("Could not read file at {:?}", &path));
-                s = s.replace("\r\n", "\n");
-                if !s.starts_with("\n\n") {
-                    s.insert_str(0, "\n\n");
-                }
-                s
-            } else {
-                String::new()
-            }
-        };
-
-        let method_doc = match (
-            endpoint.documentation.description.as_ref(),
-            endpoint.documentation.url.as_ref(),
-        ) {
-            (Some(d), Some(u)) if Url::parse(u).is_ok() => doc(&format!(
-                "[{} API]({})\n\n{}{}",
-                api_name_for_docs, u, d, markdown_doc
-            )),
-            (Some(d), None) => doc(&format!(
-                "{} API\n\n{}{}",
-                api_name_for_docs, d, markdown_doc
-            )),
-            (None, Some(u)) if Url::parse(u).is_ok() => doc(&format!(
-                "[{} API]({}){}",
-                api_name_for_docs, u, markdown_doc
-            )),
-            _ => doc(&format!("{} API{}", api_name_for_docs, markdown_doc)),
-        };
+        let method_doc =
+            Self::method_doc(docs_dir, namespace_name, name, builder_name, endpoint, true);
 
         let clone_expr = quote!(self.transport());
 
@@ -634,6 +676,228 @@ impl<'a> RequestBuilder<'a> {
             .collect()
     }
 
+    /// Builds the AST of the typed counterpart of this builder, when the
+    /// endpoint has a typed response model: the typed builder struct with its
+    /// methods, and the method creating it on the typed root or namespace
+    /// client. `None` for endpoints without a model.
+    ///
+    /// The typed builder wraps the generic one and delegates every option to
+    /// it, except those that change the shape of the response, which it does
+    /// not offer at all (see [typed_client::omitted_params]): `send` decodes
+    /// the body as the model, so a request that cannot produce the model's
+    /// shape must not be expressible.
+    pub fn build_typed(&self) -> Option<(TokenStream, TokenStream)> {
+        let model_path = self.endpoint.typed_response.as_deref()?;
+        let model: syn::Type = syn::parse_str(&format!("crate::{}", model_path)).unwrap();
+        let model_name = lit(model_path);
+        let statuses = &self.endpoint.typed_model_statuses;
+        let group = self.endpoint.full_name.as_deref().unwrap_or(self.name);
+        let omitted = typed_client::omitted_params(group);
+
+        let builder_ident = ident(self.builder_name);
+        let typed_ident = ident(&format!("Typed{}", self.builder_name));
+        // the generic builder and its parts, from the typed module
+        let module = if self.is_root_method {
+            quote!(crate)
+        } else {
+            let m = ident(group.split('.').next().unwrap());
+            quote!(crate::#m)
+        };
+        let supports_body = self.endpoint.supports_body();
+        let (struct_generics, impl_header) = if supports_body {
+            (
+                quote!(<'a, 'b, B>),
+                quote!(impl<'a, 'b, B> #typed_ident<'a, 'b, B> where B: Body),
+            )
+        } else {
+            (quote!(<'a, 'b>), quote!(impl<'a, 'b> #typed_ident<'a, 'b>))
+        };
+
+        // every option of the generic builder, delegated, except the omitted
+        let methods: Vec<TokenStream> = Self::builder_fns(
+            &builder_ident,
+            self.endpoint,
+            self.common_params,
+            self.accepts_nd_body,
+        )
+        .into_iter()
+        .filter_map(|item| match item {
+            ImplItem::Fn(f) => Some(f),
+            _ => None,
+        })
+        .filter(|f| !omitted.iter().any(|(name, _)| f.sig.ident == name))
+        .map(|f| Self::delegate_fn(&typed_ident, f, self.accepts_nd_body))
+        .collect();
+
+        let api_name_for_docs = split_on_pascal_case(self.builder_name);
+        let model_link = format!("[`{path}`](crate::{path})", path = model_path);
+        let omitted_doc = if omitted.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "\n\nOptions that change the shape of the response are not available here: {}. Use the generic [`{}`]({}::{}) builder for them.",
+                omitted
+                    .iter()
+                    .map(|(name, fixed)| match fixed {
+                        Some(v) => format!("`{}` (always `{}`)", name, v),
+                        None => format!("`{}`", name),
+                    })
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                self.builder_name,
+                if self.is_root_method { "crate".to_string() } else { format!("crate::{}", group.split('.').next().unwrap()) },
+                self.builder_name,
+            )
+        };
+        let struct_doc = lit(&format!(
+            "Typed builder for the {} API: [`send`](Self::send) returns {}.{}",
+            api_name_for_docs, model_link, omitted_doc
+        ));
+        let statuses_doc = if statuses.is_empty() {
+            String::new()
+        } else {
+            format!(
+                ", and for {}, for which the API answers with the same body (e.g. a document that is not found)",
+                statuses.iter().map(|s| format!("`{}`", s)).collect::<Vec<_>>().join(", ")
+            )
+        };
+        let send_doc = lit(&format!(
+            "Sends the request and decodes the response body as {}.\n\n\
+             The body is decoded for a success status{}. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). \
+             To read the status code or the headers, use the generic client instead.",
+            model_link, statuses_doc
+        ));
+
+        let cfg_attr = self.endpoint.stability.outer_cfg_attr();
+        let cfg_doc = stability_doc(self.endpoint.stability);
+        let (deprecated_attr, _) = Deprecated::attr(&self.endpoint.deprecated);
+
+        let builder = quote! {
+            #[doc = #struct_doc]
+            #cfg_doc
+            #cfg_attr
+            #deprecated_attr
+            #[derive(Clone, Debug)]
+            pub struct #typed_ident #struct_generics {
+                inner: #module::#builder_ident #struct_generics,
+            }
+
+            #cfg_attr
+            #[allow(deprecated)]
+            #impl_header {
+                #(#methods)*
+
+                #[doc = #send_doc]
+                pub async fn send(self) -> Result<#model, Error> {
+                    self.inner.send().await?.typed(#model_name, &[#(#statuses),*]).await
+                }
+            }
+        };
+
+        // the method creating the typed builder, with the omitted options that
+        // have a fixed value set on the generic builder
+        let fixed = omitted.iter().filter_map(|(name, fixed)| {
+            fixed.map(|v| {
+                let name = ident(name);
+                quote!(.#name(#v))
+            })
+        });
+        let inner_new = if self.enum_builder.contains_single_parameterless_part() {
+            quote!(#module::#builder_ident::new(self.transport()) #(#fixed)*)
+        } else {
+            quote!(#module::#builder_ident::new(self.transport(), parts) #(#fixed)*)
+        };
+        let fn_ident = ident(self.name);
+        let (fn_name, ret) = match (supports_body, self.is_root_method) {
+            (true, true) => (quote!(#fn_ident<'a, 'b>), quote!(#typed_ident<'a, 'b, ()>)),
+            (false, true) => (quote!(#fn_ident<'a, 'b>), quote!(#typed_ident<'a, 'b>)),
+            (true, false) => (quote!(#fn_ident<'b>), quote!(#typed_ident<'a, 'b, ()>)),
+            (false, false) => (quote!(#fn_ident<'b>), quote!(#typed_ident<'a, 'b>)),
+        };
+        let method_doc = Self::method_doc(
+            self.docs_dir,
+            self.namespace_name,
+            self.name,
+            self.builder_name,
+            self.endpoint,
+            false,
+        );
+        let params = if self.enum_builder.contains_single_parameterless_part() {
+            quote!()
+        } else {
+            let (enum_ty, _, _) = self.enum_builder.clone().build();
+            quote!(, parts: #module::#enum_ty)
+        };
+        let ctor = quote! {
+            #method_doc
+            #cfg_doc
+            #cfg_attr
+            #deprecated_attr
+            #[allow(deprecated)]
+            pub fn #fn_name(&'a self #params) -> #ret {
+                #typed_ident { inner: #inner_new }
+            }
+        };
+
+        Some((builder, ctor))
+    }
+
+    /// A method of a typed builder delegating to the same method of the
+    /// wrapped generic builder: same signature and docs, rewrapping the
+    /// result. `body` changes the body type parameter of the builder.
+    fn delegate_fn(
+        typed_ident: &syn::Ident,
+        f: syn::ImplItemFn,
+        accepts_nd_body: bool,
+    ) -> TokenStream {
+        let attrs = &f.attrs;
+        let name = &f.sig.ident;
+        if name == "body" {
+            let (fn_arg, body_ty, bound): (syn::Type, syn::Type, syn::Type) = if accepts_nd_body {
+                (
+                    parse_quote!(Vec<T>),
+                    parse_quote!(NdBody<T>),
+                    parse_quote!(Body),
+                )
+            } else {
+                (
+                    parse_quote!(T),
+                    parse_quote!(JsonBody<T>),
+                    parse_quote!(Serialize),
+                )
+            };
+            return quote! {
+                #(#attrs)*
+                pub fn body<T>(self, body: #fn_arg) -> #typed_ident<'a, 'b, #body_ty>
+                where T: #bound {
+                    #typed_ident { inner: self.inner.body(body) }
+                }
+            };
+        }
+        let mut sig = f.sig.clone();
+        if let Some(syn::FnArg::Receiver(receiver)) = sig.inputs.first_mut() {
+            receiver.mutability = None;
+        }
+        let args: Vec<&syn::Ident> = f
+            .sig
+            .inputs
+            .iter()
+            .filter_map(|arg| match arg {
+                syn::FnArg::Typed(t) => match &*t.pat {
+                    syn::Pat::Ident(p) => Some(&p.ident),
+                    _ => None,
+                },
+                _ => None,
+            })
+            .collect();
+        quote! {
+            #(#attrs)*
+            pub #sig {
+                Self { inner: self.inner.#name(#(#args),*) }
+            }
+        }
+    }
+
     /// builds the AST that represent the builder structs
     /// and the ctor function for the builder struct on the root/namespace client
     pub fn build(self) -> (TokenStream, TokenStream) {
@@ -656,5 +920,108 @@ impl<'a> RequestBuilder<'a> {
         );
 
         (builder_struct, ctor_fn)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    fn api() -> crate::generator::Api {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
+        crate::openapi::read_api("test", Path::new(path)).unwrap()
+    }
+
+    /// The typed builder and the typed client method of an endpoint, as text
+    fn typed(
+        api: &crate::generator::Api,
+        group: &str,
+        endpoint: &ApiEndpoint,
+    ) -> Option<(String, String)> {
+        let (namespace, name, builder, root) = match group.split_once('.') {
+            Some((ns, name)) => (
+                ns.to_pascal_case(),
+                name,
+                format!("{}{}", ns.to_pascal_case(), name.to_pascal_case()),
+                false,
+            ),
+            None => (
+                "OpenSearch".to_string(),
+                group,
+                group.to_pascal_case(),
+                true,
+            ),
+        };
+        RequestBuilder::new(
+            Path::new("/nonexistent"),
+            &namespace,
+            name,
+            &builder,
+            &api.common_params,
+            endpoint,
+            root,
+        )
+        .build_typed()
+        .map(|(b, c)| (b.to_string(), c.to_string()))
+    }
+
+    #[test]
+    fn typed_builders_return_the_model_and_omit_shape_changing_options() {
+        let api = api();
+        let get = api.endpoint_for_api_call("get").unwrap();
+        let (builder, ctor) = typed(&api, "get", get).unwrap();
+
+        // a wrapper of the generic builder whose send returns the model
+        assert!(
+            builder
+                .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , }"),
+            "{}",
+            builder
+        );
+        assert!(
+            builder.contains("Result < crate :: types :: get :: GetResponse , Error >"),
+            "{}",
+            builder
+        );
+        // 404 answers with the model (`found: false`)
+        assert!(builder.contains("& [404u16]"), "{}", builder);
+        // the options of the generic builder are delegated...
+        assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) } }"), "{}", builder);
+        // ...except those that change the shape of the response
+        assert!(!builder.contains("fn filter_path"), "{}", builder);
+        assert!(ctor.contains("pub fn get < 'a , 'b > (& 'a self , parts : crate :: GetParts < 'b >) -> TypedGet < 'a , 'b >"), "{}", ctor);
+
+        // the body changes the body type of the typed builder
+        let search = api.endpoint_for_api_call("search").unwrap();
+        let (builder, _) = typed(&api, "search", search).unwrap();
+        assert!(
+            builder.contains("-> TypedSearch < 'a , 'b , JsonBody < T > >"),
+            "{}",
+            builder
+        );
+
+        // no model, no typed builder
+        let exists = api.endpoint_for_api_call("indices.exists").unwrap();
+        assert!(typed(&api, "indices.exists", exists).is_none());
+    }
+
+    #[test]
+    fn typed_cat_builders_always_ask_for_json() {
+        // no cat API is typed yet: give one a model to check the output
+        let api = api();
+        let mut cat_indices = api.endpoint_for_api_call("cat.indices").unwrap().clone();
+        assert_eq!(cat_indices.typed_response, None);
+        cat_indices.typed_response = Some("types::cat_indices::IndicesResponse".to_string());
+        let (builder, ctor) = typed(&api, "cat.indices", &cat_indices).unwrap();
+
+        // the format option is not offered, and fixed to JSON on creation
+        assert!(!builder.contains("fn format"), "{}", builder);
+        assert!(ctor.contains("crate :: cat :: CatIndices :: new (self . transport () , parts) . format (\"json\")"), "{}", ctor);
+        assert!(
+            ctor.contains("parts : crate :: cat :: CatIndicesParts < 'b >"),
+            "{}",
+            ctor
+        );
     }
 }

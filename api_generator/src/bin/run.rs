@@ -39,7 +39,11 @@ fn main() -> anyhow::Result<()> {
     // is downloaded first.
     let args: Vec<String> = env::args().collect();
     if let Some(pos) = args.iter().position(|a| a == "--openapi") {
-        return generate_from_openapi(args.get(pos + 1).map(String::as_str));
+        let file = args
+            .get(pos + 1)
+            .filter(|a| !a.starts_with("--"))
+            .map(String::as_str);
+        return generate_from_openapi(file);
     }
 
     // This must be run from the repo root directory, with cargo make generate-api
@@ -137,7 +141,8 @@ fn main() -> anyhow::Result<()> {
 /// latest published specification when no file is given
 fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
     let generated_dir = fs::canonicalize(Path::new("./opensearch/src"))?;
-    let docs_dir = fs::canonicalize(Path::new("./api_generator"))?.join("docs");
+    let api_generator_dir = fs::canonicalize(Path::new("./api_generator"))?;
+    let docs_dir = api_generator_dir.join("docs");
 
     let default_path = Path::new("./api_generator/opensearch-openapi.yaml");
     let spec_file = match file {
@@ -149,6 +154,23 @@ fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
     };
 
     let api = openapi::read_api("opensearch-api-specification/main", &spec_file)?;
+
+    // typed response models for the selected operation groups; groups
+    // without a JSON success response are reported and skipped
+    let spec: serde_json::Value = serde_yaml::from_reader(fs::File::open(&spec_file)?)?;
+    let response_ir =
+        openapi::responses::read_response_ir(&spec, openapi::responses::TYPED_OPERATION_GROUPS)?;
+    log::info!(
+        "typed response models: {} operation groups typed, {} without a JSON success response",
+        response_ir.endpoints.len(),
+        response_ir.untyped_groups.len()
+    );
+    for (group, reason) in &response_ir.untyped_groups {
+        log::info!("  untyped: {} ({})", group, reason);
+    }
+
+    // every raw JSON fallback must be a reviewed, declared decision
+    openapi::raw_fields::enforce(&response_ir)?;
 
     // Delete previously generated files
     let mut generated = generated_dir.clone();
@@ -162,5 +184,5 @@ fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
         }
     }
 
-    generator::generate_from_api(&api, &docs_dir, &generated_dir)
+    generator::generate_from_api(&api, Some(&response_ir), &docs_dir, &generated_dir)
 }

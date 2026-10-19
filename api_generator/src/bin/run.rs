@@ -33,20 +33,17 @@ fn main() -> anyhow::Result<()> {
         .unwrap();
 
     // Non-interactive OpenAPI mode:
-    //   run --openapi [FILE] [--update-raw-allowlist]
+    //   run --openapi [FILE]
     // Generates the client from the opensearch-api-specification OpenAPI
     // document. When FILE is omitted, the latest published specification
-    // is downloaded first. `--update-raw-allowlist` rewrites the ledger of
-    // untyped response fields from the generated models instead of
-    // checking against it.
+    // is downloaded first.
     let args: Vec<String> = env::args().collect();
     if let Some(pos) = args.iter().position(|a| a == "--openapi") {
         let file = args
             .get(pos + 1)
             .filter(|a| !a.starts_with("--"))
             .map(String::as_str);
-        let update_allowlist = args.iter().any(|a| a == "--update-raw-allowlist");
-        return generate_from_openapi(file, update_allowlist);
+        return generate_from_openapi(file);
     }
 
     // This must be run from the repo root directory, with cargo make generate-api
@@ -142,11 +139,10 @@ fn main() -> anyhow::Result<()> {
 
 /// Generates the client from an OpenAPI specification file, downloading the
 /// latest published specification when no file is given
-fn generate_from_openapi(file: Option<&str>, update_allowlist: bool) -> anyhow::Result<()> {
+fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
     let generated_dir = fs::canonicalize(Path::new("./opensearch/src"))?;
     let api_generator_dir = fs::canonicalize(Path::new("./api_generator"))?;
     let docs_dir = api_generator_dir.join("docs");
-    let raw_allowlist = api_generator_dir.join(openapi::raw_allowlist::FILE_NAME);
 
     let default_path = Path::new("./api_generator/opensearch-openapi.yaml");
     let spec_file = match file {
@@ -173,9 +169,8 @@ fn generate_from_openapi(file: Option<&str>, update_allowlist: bool) -> anyhow::
         log::info!("  untyped: {} ({})", group, reason);
     }
 
-    // the untyped-field ledger: every raw JSON fallback must be a reviewed,
-    // checked-in decision
-    openapi::raw_allowlist::enforce(&response_ir, &raw_allowlist, update_allowlist)?;
+    // every raw JSON fallback must be a reviewed, declared decision
+    openapi::raw_fields::enforce(&response_ir)?;
 
     // Delete previously generated files
     let mut generated = generated_dir.clone();

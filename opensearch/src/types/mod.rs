@@ -56,7 +56,8 @@
 //! 100% typing is a non-goal: fields whose shape is decided at runtime
 //! (documents, aggregation values, ...) intentionally hold raw JSON and
 //! expose it through explicit escape hatches. Additions of such untyped
-//! fields are guarded by an allowlist at generation time.
+//! fields are reviewed: each is declared with its reason in the API
+//! generator, and generation fails on an undeclared one.
 //!
 //! Nothing the server sends is dropped. Every struct collects the keys
 //! the specification does not define for it (fields added by plugins or

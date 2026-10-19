@@ -114,8 +114,8 @@ fn is_head_only(spec: &Value, group: &str) -> bool {
 /// generated code and its compile time small while the approach is
 /// reviewed. Adding a group here generates its model and its typed
 /// builder (`opensearch::typed`);
-/// raw fields it introduces must then be reviewed in the untyped-field
-/// ledger (`--update-raw-allowlist`).
+/// the raw fields it introduces must then be declared, with the reason, in
+/// `openapi::raw_fields` (generation fails and prints the declarations).
 pub const TYPED_OPERATION_GROUPS: &[&str] = &["bulk", "get", "index", "search"];
 
 /// All operation groups declared in an OpenAPI document (`x-operation-group`
@@ -226,8 +226,8 @@ pub enum IrRef {
     Raw(RawCause),
 }
 
-/// Why the generator fell back to raw JSON: recorded in the untyped-field
-/// ledger so each degradation can be reviewed by its cause
+/// Why the generator fell back to raw JSON: declared with each raw field
+/// (`openapi::raw_fields`) so each degradation is reviewed by its cause
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum RawCause {
     /// The schema declares no type at all (`{}` or description only)
@@ -245,7 +245,7 @@ pub enum RawCause {
 }
 
 impl RawCause {
-    /// The ledger label of the cause
+    /// A short label of the cause, shown in generator messages
     pub fn label(self) -> &'static str {
         match self {
             RawCause::NoType => "no-type",

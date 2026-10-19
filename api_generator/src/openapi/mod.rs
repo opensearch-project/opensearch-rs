@@ -26,7 +26,7 @@
 //! through the existing serde model, guaranteeing that both ingestion
 //! paths produce identical structures.
 
-pub mod raw_allowlist;
+pub mod raw_fields;
 pub mod responses;
 
 use crate::generator::{build_api, endpoint_from_file, Api, Type};

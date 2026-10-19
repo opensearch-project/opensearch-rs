@@ -26,7 +26,7 @@ jobs:
           # typed response models must decode the same with serde_json's
           # arbitrary_precision, which feature unification can enable from
           # any crate in a user's dependency graph
-          - "--features _test-arbitrary-precision --package opensearch --lib --test types_roundtrip"
+          - "--features _test-arbitrary-precision --package opensearch --lib --test types_roundtrip --test typed_client"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Rust Client

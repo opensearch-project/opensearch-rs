@@ -102,9 +102,6 @@ enum Kind {
         #[source]
         source: serde_json::Error,
     },
-
-    #[error("typed response unavailable: {0}")]
-    TypedResponseUnavailable(&'static str),
 }
 
 impl From<RequestHandlerError> for Kind {
@@ -142,10 +139,6 @@ impl Error {
         })
     }
 
-    pub(crate) fn typed_response_unavailable(reason: &'static str) -> Self {
-        Self(TypedResponseUnavailable(reason))
-    }
-
     /// The status code, if the error was generated from a response
     pub fn status_code(&self) -> Option<StatusCode> {
         match &self.0 {
@@ -155,7 +148,7 @@ impl Error {
         }
     }
 
-    /// The error OpenSearch returned, when a typed call (`send_typed()`)
+    /// The error OpenSearch returned, when the typed client ([`crate::typed`])
     /// received a status code whose body is not the typed response, e.g.
     /// 404 `index_not_found_exception`
     pub fn api_error(&self) -> Option<&ApiError> {
@@ -180,7 +173,7 @@ impl Error {
 }
 
 /// An error response from OpenSearch, returned by a typed call
-/// (`send_typed()`) for a status code whose body is not the typed response.
+/// ([`crate::typed`]) for a status code whose body is not the typed response.
 ///
 /// The body is kept as text, and decoded as an [Exception] when it has the
 /// usual `{"error": ..., "status": ...}` shape. Some plugins (e.g. the

@@ -15,12 +15,12 @@
 //! Models are generated for the search, index, bulk and get APIs so far
 //! (the selection is `TYPED_OPERATION_GROUPS` in the API generator); the
 //! generator supports the whole specification, and more APIs are added by
-//! extending that list. The request builder of each of these APIs has a
-//! `send_typed()` method returning its model, so neither the type nor its
-//! path needs to be written out:
+//! extending that list. They are obtained through the typed client
+//! ([`crate::typed`]), whose `send` returns the model of the API, so neither
+//! the type nor its path needs to be written out:
 //!
 //! ```rust,no_run
-//! # use opensearch::{OpenSearch, GetParts, SearchParts};
+//! # use opensearch::{OpenSearch, SearchParts};
 //! # use serde::Deserialize;
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
 //! # let client = OpenSearch::default();
@@ -31,8 +31,9 @@
 //!
 //! // a `types::search::SearchResponse`
 //! let resp = client
+//!     .typed()
 //!     .search(SearchParts::Index(&["movies"]))
-//!     .send_typed()
+//!     .send()
 //!     .await?;
 //! // `None` when the request disabled counting; see `TotalHitCount` for
 //! // telling an exact count from a lower bound
@@ -42,44 +43,13 @@
 //!         println!("{}", movie.title);
 //!     }
 //! }
-//!
-//! // a missing document is not an error: `get` answers it with `found: false`
-//! let doc = client
-//!     .get(GetParts::IndexId("movies", "1"))
-//!     .send_typed()
-//!     .await?;
-//! println!("found: {}", doc.found);
 //! # Ok(())
 //! # }
 //! ```
 //!
-//! A status whose body is not the model (e.g. 404 `index_not_found_exception`,
-//! 400 for an invalid request) is returned as an error, whose status code
-//! and body are available from [`Error::api_error`](crate::Error::api_error):
-//!
-//! ```rust,no_run
-//! # use opensearch::{OpenSearch, SearchParts};
-//! # async fn doc() {
-//! # let client = OpenSearch::default();
-//! match client
-//!     .search(SearchParts::Index(&["movies"]))
-//!     .send_typed()
-//!     .await
-//! {
-//!     Ok(resp) => println!("took {} ms", resp.took),
-//!     Err(e) => match e.api_error() {
-//!         Some(api) => println!("OpenSearch answered {}: {}", api.status(), api.body()),
-//!         None => println!("request failed: {}", e),
-//!     },
-//! }
-//! # }
-//! ```
-//!
-//! `send_typed()` returns the model alone. To read the status code or the
-//! headers (e.g. deprecation warnings), use `send()`, and decode the body
-//! with [`Response::json`](crate::http::response::Response::json) into the
-//! model or a type of your own. APIs without a model have no
-//! `send_typed()`.
+//! See [`crate::typed`] for errors, and for when to use the generic client
+//! instead. With the generic client, a body can still be decoded into a
+//! model with [`Response::json`](crate::http::response::Response::json).
 //!
 //! # Design notes
 //!
@@ -108,11 +78,11 @@
 //! [`SearchResponse`](search::SearchResponse) fails with an error such as
 //! ``missing field `_shards` ``. This is expected, and the models are not
 //! loosened for it, as making every field optional would burden the
-//! unfiltered use. `send_typed()` therefore refuses a request using
-//! `filter_path` before sending it.
+//! unfiltered use. The typed client ([`crate::typed`]) therefore does not
+//! offer `filter_path`.
 //!
-//! Send a filtered request with `send()` and decode the response into a
-//! type of your own that mirrors what the filter keeps, or into a
+//! Send a filtered request with the generic client and decode the response
+//! into a type of your own that mirrors what the filter keeps, or into a
 //! [`serde_json::Value`]:
 //!
 //! ```rust,no_run

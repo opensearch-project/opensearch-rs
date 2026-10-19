@@ -112,7 +112,8 @@ fn is_head_only(spec: &Value, group: &str) -> bool {
 /// The generator handles the whole specification (the unit tests read every
 /// group), but models are only generated for these groups, to keep the
 /// generated code and its compile time small while the approach is
-/// reviewed. Adding a group here generates its model and `send_typed()`;
+/// reviewed. Adding a group here generates its model and its typed
+/// builder (`opensearch::typed`);
 /// raw fields it introduces must then be reviewed in the untyped-field
 /// ledger (`--update-raw-allowlist`).
 pub const TYPED_OPERATION_GROUPS: &[&str] = &["bulk", "get", "index", "search"];

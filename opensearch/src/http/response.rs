@@ -115,7 +115,7 @@ impl Response {
         Ok(body)
     }
 
-    /// Reads the body of a typed call (`send_typed()`) as `T`, the response
+    /// Reads the body of a typed call ([`crate::typed`]) as `T`, the response
     /// model of the endpoint.
     ///
     /// Any 2xx status, and the non-2xx statuses in `model_statuses` (those

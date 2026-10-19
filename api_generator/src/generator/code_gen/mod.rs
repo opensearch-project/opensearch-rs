@@ -22,6 +22,7 @@ pub mod params;
 pub mod request;
 pub mod response_types;
 pub mod root;
+pub mod typed_client;
 pub mod url;
 
 use crate::generator::{Stability, TypeKind};

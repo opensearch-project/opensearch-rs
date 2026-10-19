@@ -616,6 +616,16 @@ pub use bulk::*;
     );
     write_file(root, None, generated_dir, "root/mod.rs", &mut tracker)?;
 
+    // generate the typed client: builders of the APIs with a response model
+    let typed = code_gen::typed_client::generate(api, docs_dir)?;
+    write_file(
+        typed,
+        None,
+        generated_dir,
+        "typed/builders.rs",
+        &mut tracker,
+    )?;
+
     // declare namespace modules in the top-level lib.rs
     let mods = api
         .namespaces

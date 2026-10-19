@@ -33,6 +33,7 @@ written = [
     "sql.rs",
     "tasks.rs",
     "transforms.rs",
+    "typed/builders.rs",
     "types/bulk.rs",
     "types/common.rs",
     "types/common_aggregations.rs",

@@ -101,9 +101,11 @@ for hit in response_body["hits"]["hits"].as_array().unwrap() {
 
 ### Typed Responses
 
-`send_typed()` decodes the response body into the typed model of the API
-(`opensearch::types`), without naming the type. Documents are decoded into a
-type of your own with `source_as`.
+The typed client (`client.typed()`) returns the typed model of the API
+(`opensearch::types`) from `send`, without naming the type. It shares the
+transport of the client, and offers the APIs with a model so far (search,
+index, bulk and get). Documents are decoded into a type of your own with
+`source_as`.
 
 ```rust
 #[derive(serde::Deserialize)]
@@ -112,9 +114,10 @@ struct Movie {
 }
 
 let response = client
+    .typed()
     .search(opensearch::SearchParts::Index(&["movies"]))
     .body(serde_json::json!({ "query": { "match": { "director": "miller" } } }))
-    .send_typed()
+    .send()
     .await?;
 
 println!("took {} ms", response.took);
@@ -130,10 +133,11 @@ for hit in &response.hits.hits {
 }
 ```
 
-An error status (e.g. a missing index) is returned as an error, whose status
-code and body are available from `Error::api_error()`. Use `send()` to read
-the status code or headers, or when `filter_path` is set: a filtered response
-no longer matches the model, so decode it into a type of your own.
+With the typed client, an error status (e.g. a missing index) is returned as
+an error, whose status code and body are available from `Error::api_error()`.
+Use the generic client to read the status code or headers, and for options
+that change the shape of the response, such as `filter_path`, which the typed
+builders do not offer.
 
 ### Delete the Index
 

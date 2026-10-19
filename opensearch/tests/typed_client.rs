@@ -6,8 +6,8 @@
  * compatible open source license.
  */
 
-//! `send_typed()`: the body decoded as the typed response model of the
-//! endpoint, errors reported as `Error`
+//! The typed client: `send` decodes the body as the typed response model
+//! of the endpoint, and reports errors as `Error`
 
 pub mod common;
 use common::server::MockServer;
@@ -24,8 +24,9 @@ async fn success_is_decoded_as_the_model() -> anyhow::Result<()> {
     let server = MockServer::builder().response(200, SEARCH).start()?;
     let resp = server
         .client()
+        .typed()
         .search(SearchParts::Index(&["movies"]))
-        .send_typed()
+        .send()
         .await?;
     assert_eq!(resp.took, 3);
     let doc: serde_json::Value = resp.hits.hits[0].source_as()?.unwrap();
@@ -40,8 +41,9 @@ async fn not_found_answered_with_the_model_is_not_an_error() -> anyhow::Result<(
         .start()?;
     let resp = server
         .client()
+        .typed()
         .get(GetParts::IndexId("movies", "nope"))
-        .send_typed()
+        .send()
         .await?;
     assert!(!resp.found);
     Ok(())
@@ -58,8 +60,9 @@ async fn error_status_is_an_api_error() -> anyhow::Result<()> {
         .start()?;
     let err = server
         .client()
+        .typed()
         .search(SearchParts::Index(&["nope"]))
-        .send_typed()
+        .send()
         .await
         .unwrap_err();
 
@@ -96,8 +99,9 @@ async fn error_in_a_plugin_shape_keeps_the_body() -> anyhow::Result<()> {
         .start()?;
     let err = server
         .client()
+        .typed()
         .search(SearchParts::None)
-        .send_typed()
+        .send()
         .await
         .unwrap_err();
     let api = err.api_error().unwrap();
@@ -114,8 +118,9 @@ async fn decode_error_names_the_type_and_the_cause() -> anyhow::Result<()> {
         .start()?;
     let err = server
         .client()
+        .typed()
         .search(SearchParts::None)
-        .send_typed()
+        .send()
         .await
         .unwrap_err();
     assert!(err.is_json());
@@ -142,8 +147,9 @@ async fn model_status_with_an_error_body_is_an_api_error() -> anyhow::Result<()>
         .start()?;
     let err = server
         .client()
+        .typed()
         .get(GetParts::IndexId("nope", "1"))
-        .send_typed()
+        .send()
         .await
         .unwrap_err();
     assert_eq!(
@@ -154,24 +160,21 @@ async fn model_status_with_an_error_body_is_an_api_error() -> anyhow::Result<()>
 }
 
 #[tokio::test]
-async fn shaped_responses_are_refused_before_sending() -> anyhow::Result<()> {
+async fn the_typed_client_shares_the_transport() -> anyhow::Result<()> {
     let mut server = MockServer::builder().response(200, SEARCH).start()?;
     let client = server.client();
+    let typed: opensearch::typed::TypedOpenSearch = client.typed();
+    let resp = typed
+        .search(SearchParts::Index(&["movies"]))
+        .size(1)
+        .body(serde_json::json!({ "query": { "match_all": {} } }))
+        .send()
+        .await?;
+    assert_eq!(resp.took, 3);
 
-    let err = client
-        .search(SearchParts::None)
-        .filter_path(&["hits.hits._id"])
-        .send_typed()
-        .await
-        .unwrap_err();
-    assert!(err.to_string().contains("filter_path"), "{}", err);
-
-    // nothing reached the server
-    let next = tokio::time::timeout(
-        std::time::Duration::from_millis(200),
-        server.received_request(),
-    )
-    .await;
-    assert!(next.is_err(), "a refused request was sent");
+    // options are those of the generic builder, sent the same way
+    let request = server.received_request().await?;
+    assert_eq!(request.path(), "/movies/_search");
+    assert_eq!(request.query(), Some("size=1"));
     Ok(())
 }

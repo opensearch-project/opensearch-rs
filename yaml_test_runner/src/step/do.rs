@@ -163,7 +163,8 @@ impl Do {
                 });
                 // shadow typing: for endpoints with a generated response
                 // model, verify that the successful response deserializes
-                // into it and round-trips without data loss. Only emitted
+                // into it and round-trips (keys unknown to the model are
+                // reported separately). Only emitted
                 // on this branch: with `catch` or `ignore` the response
                 // may be an error, which the models do not describe.
                 if !read_response {

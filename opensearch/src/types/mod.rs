@@ -59,14 +59,14 @@
 //! fields are reviewed: each is declared with its reason in the API
 //! generator, and generation fails on an undeclared one.
 //!
-//! Nothing the server sends is dropped. Every struct collects the keys
-//! the specification does not define for it (fields added by plugins or
-//! newer OpenSearch versions, or missing from the specification) into a
-//! `unknown_fields` map of raw JSON, and serializes them back unchanged,
-//! so a response round-trips even when the specification lags behind the
-//! server. Structs whose specification declares `additionalProperties`
-//! keep that typed map (`additional`, or `aggregations` in buckets)
-//! instead. The maps are filled by generated `Deserialize` impls rather
+//! Keys of a response that its model does not define (fields added by
+//! plugins or newer OpenSearch versions, or missing from the specification)
+//! are ignored, as by the other OpenSearch clients. The typed client can
+//! report them as an error instead: see
+//! [Fields unknown to the models](crate::typed#fields-unknown-to-the-models).
+//! Structs whose specification declares `additionalProperties` keep the
+//! remaining keys in that typed map (`additional`, or `aggregations` in
+//! buckets). These maps are filled by generated `Deserialize` impls rather
 //! than `#[serde(flatten)]`, which cannot decode the `Box<RawValue>`
 //! fields these structs contain.
 //!

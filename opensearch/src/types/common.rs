@@ -28,96 +28,15 @@
 
 #![allow(missing_docs)]
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ClusterStatistics {
     pub skipped: i32,
     pub successful: i32,
     pub total: i32,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for ClusterStatistics {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = ClusterStatistics;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a ClusterStatistics object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_skipped: Option<i32> = None;
-                let mut f_successful: Option<i32> = None;
-                let mut f_total: Option<i32> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "skipped" => {
-                            if f_skipped.is_some() {
-                                return Err(serde::de::Error::duplicate_field("skipped"));
-                            }
-                            f_skipped = Some(map.next_value::<i32>()?);
-                        }
-                        "successful" => {
-                            if f_successful.is_some() {
-                                return Err(serde::de::Error::duplicate_field("successful"));
-                            }
-                            f_successful = Some(map.next_value::<i32>()?);
-                        }
-                        "total" => {
-                            if f_total.is_some() {
-                                return Err(serde::de::Error::duplicate_field("total"));
-                            }
-                            f_total = Some(map.next_value::<i32>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(ClusterStatistics {
-                    skipped: f_skipped.ok_or_else(|| serde::de::Error::missing_field("skipped"))?,
-                    successful: f_successful
-                        .ok_or_else(|| serde::de::Error::missing_field("successful"))?,
-                    total: f_total.ok_or_else(|| serde::de::Error::missing_field("total"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for ClusterStatistics {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("skipped", &self.skipped)?;
-        map.serialize_entry("successful", &self.successful)?;
-        map.serialize_entry("total", &self.total)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "The geographical bounds specified using coordinate values."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoordsGeoBounds {
     #[doc = "The bottom boundary latitude."]
     pub bottom: f64,
@@ -127,95 +46,6 @@ pub struct CoordsGeoBounds {
     pub right: f64,
     #[doc = "The top boundary latitude."]
     pub top: f64,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for CoordsGeoBounds {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = CoordsGeoBounds;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a CoordsGeoBounds object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_bottom: Option<f64> = None;
-                let mut f_left: Option<f64> = None;
-                let mut f_right: Option<f64> = None;
-                let mut f_top: Option<f64> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "bottom" => {
-                            if f_bottom.is_some() {
-                                return Err(serde::de::Error::duplicate_field("bottom"));
-                            }
-                            f_bottom = Some(map.next_value::<f64>()?);
-                        }
-                        "left" => {
-                            if f_left.is_some() {
-                                return Err(serde::de::Error::duplicate_field("left"));
-                            }
-                            f_left = Some(map.next_value::<f64>()?);
-                        }
-                        "right" => {
-                            if f_right.is_some() {
-                                return Err(serde::de::Error::duplicate_field("right"));
-                            }
-                            f_right = Some(map.next_value::<f64>()?);
-                        }
-                        "top" => {
-                            if f_top.is_some() {
-                                return Err(serde::de::Error::duplicate_field("top"));
-                            }
-                            f_top = Some(map.next_value::<f64>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(CoordsGeoBounds {
-                    bottom: f_bottom.ok_or_else(|| serde::de::Error::missing_field("bottom"))?,
-                    left: f_left.ok_or_else(|| serde::de::Error::missing_field("left"))?,
-                    right: f_right.ok_or_else(|| serde::de::Error::missing_field("right"))?,
-                    top: f_top.ok_or_else(|| serde::de::Error::missing_field("top"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for CoordsGeoBounds {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("bottom", &self.bottom)?;
-        map.serialize_entry("left", &self.left)?;
-        map.serialize_entry("right", &self.right)?;
-        map.serialize_entry("top", &self.top)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "A date histogram interval, similar to `Duration`, with support for additional units: `w` (week), `M` (month), `q` (quarter), and `y` (year)."]
@@ -485,71 +315,9 @@ impl GeoBounds {
 pub type GeoHash = String;
 
 #[doc = "The geographical location specified using a geohash."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeoHashLocation {
     pub geohash: crate::types::common::GeoHash,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for GeoHashLocation {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = GeoHashLocation;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a GeoHashLocation object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_geohash: Option<crate::types::common::GeoHash> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "geohash" => {
-                            if f_geohash.is_some() {
-                                return Err(serde::de::Error::duplicate_field("geohash"));
-                            }
-                            f_geohash = Some(map.next_value::<crate::types::common::GeoHash>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(GeoHashLocation {
-                    geohash: f_geohash.ok_or_else(|| serde::de::Error::missing_field("geohash"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for GeoHashLocation {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("geohash", &self.geohash)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "A latitude/longitude as a two-dimensional point. It can be represented in the following ways:  - As a `{lat, long}` object.  - As a geohash value.  - As a `[lon, lat]` array.  - As a string in `<lat>, <lon>` or WKT point format."]
@@ -772,90 +540,19 @@ impl serde::Serialize for InlineGetDictUserDefined {
 }
 
 #[doc = "The geographical location specified using latitude and longitude."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LatLonGeoLocation {
     #[doc = "The latitude coordinate."]
     pub lat: f64,
     #[doc = "The longitude coordinate."]
     pub lon: f64,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for LatLonGeoLocation {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = LatLonGeoLocation;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a LatLonGeoLocation object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_lat: Option<f64> = None;
-                let mut f_lon: Option<f64> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "lat" => {
-                            if f_lat.is_some() {
-                                return Err(serde::de::Error::duplicate_field("lat"));
-                            }
-                            f_lat = Some(map.next_value::<f64>()?);
-                        }
-                        "lon" => {
-                            if f_lon.is_some() {
-                                return Err(serde::de::Error::duplicate_field("lon"));
-                            }
-                            f_lon = Some(map.next_value::<f64>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(LatLonGeoLocation {
-                    lat: f_lat.ok_or_else(|| serde::de::Error::missing_field("lat"))?,
-                    lon: f_lon.ok_or_else(|| serde::de::Error::missing_field("lon"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for LatLonGeoLocation {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("lat", &self.lat)?;
-        map.serialize_entry("lon", &self.lon)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "The custom metadata attached to a resource."]
 pub type Metadata = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[doc = "The time taken by different phases of the search."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhaseTook {
     #[doc = "The time taken for the `can_match` phase."]
     pub can_match: i64,
@@ -869,116 +566,6 @@ pub struct PhaseTook {
     pub fetch: i64,
     #[doc = "The time taken for the `query` phase."]
     pub query: i64,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for PhaseTook {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = PhaseTook;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a PhaseTook object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_can_match: Option<i64> = None;
-                let mut f_dfs_pre_query: Option<i64> = None;
-                let mut f_dfs_query: Option<i64> = None;
-                let mut f_expand: Option<i64> = None;
-                let mut f_fetch: Option<i64> = None;
-                let mut f_query: Option<i64> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "can_match" => {
-                            if f_can_match.is_some() {
-                                return Err(serde::de::Error::duplicate_field("can_match"));
-                            }
-                            f_can_match = Some(map.next_value::<i64>()?);
-                        }
-                        "dfs_pre_query" => {
-                            if f_dfs_pre_query.is_some() {
-                                return Err(serde::de::Error::duplicate_field("dfs_pre_query"));
-                            }
-                            f_dfs_pre_query = Some(map.next_value::<i64>()?);
-                        }
-                        "dfs_query" => {
-                            if f_dfs_query.is_some() {
-                                return Err(serde::de::Error::duplicate_field("dfs_query"));
-                            }
-                            f_dfs_query = Some(map.next_value::<i64>()?);
-                        }
-                        "expand" => {
-                            if f_expand.is_some() {
-                                return Err(serde::de::Error::duplicate_field("expand"));
-                            }
-                            f_expand = Some(map.next_value::<i64>()?);
-                        }
-                        "fetch" => {
-                            if f_fetch.is_some() {
-                                return Err(serde::de::Error::duplicate_field("fetch"));
-                            }
-                            f_fetch = Some(map.next_value::<i64>()?);
-                        }
-                        "query" => {
-                            if f_query.is_some() {
-                                return Err(serde::de::Error::duplicate_field("query"));
-                            }
-                            f_query = Some(map.next_value::<i64>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(PhaseTook {
-                    can_match: f_can_match
-                        .ok_or_else(|| serde::de::Error::missing_field("can_match"))?,
-                    dfs_pre_query: f_dfs_pre_query
-                        .ok_or_else(|| serde::de::Error::missing_field("dfs_pre_query"))?,
-                    dfs_query: f_dfs_query
-                        .ok_or_else(|| serde::de::Error::missing_field("dfs_query"))?,
-                    expand: f_expand.ok_or_else(|| serde::de::Error::missing_field("expand"))?,
-                    fetch: f_fetch.ok_or_else(|| serde::de::Error::missing_field("fetch"))?,
-                    query: f_query.ok_or_else(|| serde::de::Error::missing_field("query"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for PhaseTook {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("can_match", &self.can_match)?;
-        map.serialize_entry("dfs_pre_query", &self.dfs_pre_query)?;
-        map.serialize_entry("dfs_query", &self.dfs_query)?;
-        map.serialize_entry("expand", &self.expand)?;
-        map.serialize_entry("fetch", &self.fetch)?;
-        map.serialize_entry("query", &self.query)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1042,462 +629,51 @@ pub type ScrollId = String;
 #[doc = "The sequence number of the document."]
 pub type SequenceNumber = i64;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardFailure {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::common::IndexName>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node: Option<String>,
     pub primary: bool,
     pub reason: crate::types::common::ErrorCause,
     pub shard: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for ShardFailure {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = ShardFailure;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a ShardFailure object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_index: Option<crate::types::common::IndexName> = None;
-                let mut seen_index = false;
-                let mut f_node: Option<String> = None;
-                let mut seen_node = false;
-                let mut f_primary: Option<bool> = None;
-                let mut f_reason: Option<crate::types::common::ErrorCause> = None;
-                let mut f_shard: Option<i64> = None;
-                let mut f_status: Option<String> = None;
-                let mut seen_status = false;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "index" => {
-                            if seen_index {
-                                return Err(serde::de::Error::duplicate_field("index"));
-                            }
-                            seen_index = true;
-                            f_index =
-                                map.next_value::<Option<crate::types::common::IndexName>>()?;
-                        }
-                        "node" => {
-                            if seen_node {
-                                return Err(serde::de::Error::duplicate_field("node"));
-                            }
-                            seen_node = true;
-                            f_node = map.next_value::<Option<String>>()?;
-                        }
-                        "primary" => {
-                            if f_primary.is_some() {
-                                return Err(serde::de::Error::duplicate_field("primary"));
-                            }
-                            f_primary = Some(map.next_value::<bool>()?);
-                        }
-                        "reason" => {
-                            if f_reason.is_some() {
-                                return Err(serde::de::Error::duplicate_field("reason"));
-                            }
-                            f_reason = Some(map.next_value::<crate::types::common::ErrorCause>()?);
-                        }
-                        "shard" => {
-                            if f_shard.is_some() {
-                                return Err(serde::de::Error::duplicate_field("shard"));
-                            }
-                            f_shard = Some(map.next_value::<i64>()?);
-                        }
-                        "status" => {
-                            if seen_status {
-                                return Err(serde::de::Error::duplicate_field("status"));
-                            }
-                            seen_status = true;
-                            f_status = map.next_value::<Option<String>>()?;
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(ShardFailure {
-                    index: f_index,
-                    node: f_node,
-                    primary: f_primary.ok_or_else(|| serde::de::Error::missing_field("primary"))?,
-                    reason: f_reason.ok_or_else(|| serde::de::Error::missing_field("reason"))?,
-                    shard: f_shard.ok_or_else(|| serde::de::Error::missing_field("shard"))?,
-                    status: f_status,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for ShardFailure {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        if let Some(v) = &self.index {
-            map.serialize_entry("index", v)?;
-        }
-        if let Some(v) = &self.node {
-            map.serialize_entry("node", v)?;
-        }
-        map.serialize_entry("primary", &self.primary)?;
-        map.serialize_entry("reason", &self.reason)?;
-        map.serialize_entry("shard", &self.shard)?;
-        if let Some(v) = &self.status {
-            map.serialize_entry("status", v)?;
-        }
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardInfo {
     pub failed: crate::types::common::Uint,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub failures: Option<Vec<crate::types::common::ShardFailure>>,
     pub successful: crate::types::common::Uint,
     pub total: crate::types::common::Uint,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for ShardInfo {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = ShardInfo;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a ShardInfo object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_failed: Option<crate::types::common::Uint> = None;
-                let mut f_failures: Option<Vec<crate::types::common::ShardFailure>> = None;
-                let mut seen_failures = false;
-                let mut f_successful: Option<crate::types::common::Uint> = None;
-                let mut f_total: Option<crate::types::common::Uint> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "failed" => {
-                            if f_failed.is_some() {
-                                return Err(serde::de::Error::duplicate_field("failed"));
-                            }
-                            f_failed = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        "failures" => {
-                            if seen_failures {
-                                return Err(serde::de::Error::duplicate_field("failures"));
-                            }
-                            seen_failures = true;
-                            f_failures = map
-                                .next_value::<Option<Vec<crate::types::common::ShardFailure>>>()?;
-                        }
-                        "successful" => {
-                            if f_successful.is_some() {
-                                return Err(serde::de::Error::duplicate_field("successful"));
-                            }
-                            f_successful = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        "total" => {
-                            if f_total.is_some() {
-                                return Err(serde::de::Error::duplicate_field("total"));
-                            }
-                            f_total = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(ShardInfo {
-                    failed: f_failed.ok_or_else(|| serde::de::Error::missing_field("failed"))?,
-                    failures: f_failures,
-                    successful: f_successful
-                        .ok_or_else(|| serde::de::Error::missing_field("successful"))?,
-                    total: f_total.ok_or_else(|| serde::de::Error::missing_field("total"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for ShardInfo {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("failed", &self.failed)?;
-        if let Some(v) = &self.failures {
-            map.serialize_entry("failures", v)?;
-        }
-        map.serialize_entry("successful", &self.successful)?;
-        map.serialize_entry("total", &self.total)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "Represents a failure to search on a specific shard. Used in search responses."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardSearchFailure {
     #[doc = "The index name where the failure occurred."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<String>,
     #[doc = "The node id where the failure occurred."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node: Option<String>,
     pub reason: crate::types::common::ErrorCause,
     #[doc = "The shard id where the failure occurred."]
     pub shard: i64,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for ShardSearchFailure {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = ShardSearchFailure;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a ShardSearchFailure object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_index: Option<String> = None;
-                let mut seen_index = false;
-                let mut f_node: Option<String> = None;
-                let mut seen_node = false;
-                let mut f_reason: Option<crate::types::common::ErrorCause> = None;
-                let mut f_shard: Option<i64> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "index" => {
-                            if seen_index {
-                                return Err(serde::de::Error::duplicate_field("index"));
-                            }
-                            seen_index = true;
-                            f_index = map.next_value::<Option<String>>()?;
-                        }
-                        "node" => {
-                            if seen_node {
-                                return Err(serde::de::Error::duplicate_field("node"));
-                            }
-                            seen_node = true;
-                            f_node = map.next_value::<Option<String>>()?;
-                        }
-                        "reason" => {
-                            if f_reason.is_some() {
-                                return Err(serde::de::Error::duplicate_field("reason"));
-                            }
-                            f_reason = Some(map.next_value::<crate::types::common::ErrorCause>()?);
-                        }
-                        "shard" => {
-                            if f_shard.is_some() {
-                                return Err(serde::de::Error::duplicate_field("shard"));
-                            }
-                            f_shard = Some(map.next_value::<i64>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(ShardSearchFailure {
-                    index: f_index,
-                    node: f_node,
-                    reason: f_reason.ok_or_else(|| serde::de::Error::missing_field("reason"))?,
-                    shard: f_shard.ok_or_else(|| serde::de::Error::missing_field("shard"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for ShardSearchFailure {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        if let Some(v) = &self.index {
-            map.serialize_entry("index", v)?;
-        }
-        if let Some(v) = &self.node {
-            map.serialize_entry("node", v)?;
-        }
-        map.serialize_entry("reason", &self.reason)?;
-        map.serialize_entry("shard", &self.shard)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardStatistics {
     pub failed: crate::types::common::Uint,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub failures: Option<Vec<crate::types::common::ShardSearchFailure>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub skipped: Option<crate::types::common::Uint>,
     pub successful: crate::types::common::Uint,
     pub total: crate::types::common::Uint,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for ShardStatistics {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = ShardStatistics;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a ShardStatistics object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_failed: Option<crate::types::common::Uint> = None;
-                let mut f_failures: Option<Vec<crate::types::common::ShardSearchFailure>> = None;
-                let mut seen_failures = false;
-                let mut f_skipped: Option<crate::types::common::Uint> = None;
-                let mut seen_skipped = false;
-                let mut f_successful: Option<crate::types::common::Uint> = None;
-                let mut f_total: Option<crate::types::common::Uint> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "failed" => {
-                            if f_failed.is_some() {
-                                return Err(serde::de::Error::duplicate_field("failed"));
-                            }
-                            f_failed = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        "failures" => {
-                            if seen_failures {
-                                return Err(serde::de::Error::duplicate_field("failures"));
-                            }
-                            seen_failures = true;
-                            f_failures = map.next_value::<Option<Vec<crate::types::common::ShardSearchFailure>>>()?;
-                        }
-                        "skipped" => {
-                            if seen_skipped {
-                                return Err(serde::de::Error::duplicate_field("skipped"));
-                            }
-                            seen_skipped = true;
-                            f_skipped = map.next_value::<Option<crate::types::common::Uint>>()?;
-                        }
-                        "successful" => {
-                            if f_successful.is_some() {
-                                return Err(serde::de::Error::duplicate_field("successful"));
-                            }
-                            f_successful = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        "total" => {
-                            if f_total.is_some() {
-                                return Err(serde::de::Error::duplicate_field("total"));
-                            }
-                            f_total = Some(map.next_value::<crate::types::common::Uint>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(ShardStatistics {
-                    failed: f_failed.ok_or_else(|| serde::de::Error::missing_field("failed"))?,
-                    failures: f_failures,
-                    skipped: f_skipped,
-                    successful: f_successful
-                        .ok_or_else(|| serde::de::Error::missing_field("successful"))?,
-                    total: f_total.ok_or_else(|| serde::de::Error::missing_field("total"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for ShardStatistics {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("failed", &self.failed)?;
-        if let Some(v) = &self.failures {
-            map.serialize_entry("failures", v)?;
-        }
-        if let Some(v) = &self.skipped {
-            map.serialize_entry("skipped", v)?;
-        }
-        map.serialize_entry("successful", &self.successful)?;
-        map.serialize_entry("total", &self.total)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 pub type SortResults = Vec<crate::types::common::FieldValue>;
@@ -1536,171 +712,21 @@ impl<'de> serde::Deserialize<'de> for StringOrStringArray {
 }
 
 #[doc = "The geographical bounds specified using upper-left and lower-right points."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TopLeftBottomRightGeoBounds {
     #[doc = "The lower-right corner coordinates."]
     pub bottom_right: crate::types::common::GeoLocation,
     #[doc = "The upper-left corner coordinates."]
     pub top_left: crate::types::common::GeoLocation,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for TopLeftBottomRightGeoBounds {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = TopLeftBottomRightGeoBounds;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a TopLeftBottomRightGeoBounds object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_bottom_right: Option<crate::types::common::GeoLocation> = None;
-                let mut f_top_left: Option<crate::types::common::GeoLocation> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "bottom_right" => {
-                            if f_bottom_right.is_some() {
-                                return Err(serde::de::Error::duplicate_field("bottom_right"));
-                            }
-                            f_bottom_right =
-                                Some(map.next_value::<crate::types::common::GeoLocation>()?);
-                        }
-                        "top_left" => {
-                            if f_top_left.is_some() {
-                                return Err(serde::de::Error::duplicate_field("top_left"));
-                            }
-                            f_top_left =
-                                Some(map.next_value::<crate::types::common::GeoLocation>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(TopLeftBottomRightGeoBounds {
-                    bottom_right: f_bottom_right
-                        .ok_or_else(|| serde::de::Error::missing_field("bottom_right"))?,
-                    top_left: f_top_left
-                        .ok_or_else(|| serde::de::Error::missing_field("top_left"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for TopLeftBottomRightGeoBounds {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("bottom_right", &self.bottom_right)?;
-        map.serialize_entry("top_left", &self.top_left)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "The geographical bounds specified using upper-right and lower-left points."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TopRightBottomLeftGeoBounds {
     #[doc = "The lower-left corner coordinates."]
     pub bottom_left: crate::types::common::GeoLocation,
     #[doc = "The upper-right corner coordinates."]
     pub top_right: crate::types::common::GeoLocation,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for TopRightBottomLeftGeoBounds {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = TopRightBottomLeftGeoBounds;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a TopRightBottomLeftGeoBounds object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_bottom_left: Option<crate::types::common::GeoLocation> = None;
-                let mut f_top_right: Option<crate::types::common::GeoLocation> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "bottom_left" => {
-                            if f_bottom_left.is_some() {
-                                return Err(serde::de::Error::duplicate_field("bottom_left"));
-                            }
-                            f_bottom_left =
-                                Some(map.next_value::<crate::types::common::GeoLocation>()?);
-                        }
-                        "top_right" => {
-                            if f_top_right.is_some() {
-                                return Err(serde::de::Error::duplicate_field("top_right"));
-                            }
-                            f_top_right =
-                                Some(map.next_value::<crate::types::common::GeoLocation>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(TopRightBottomLeftGeoBounds {
-                    bottom_left: f_bottom_left
-                        .ok_or_else(|| serde::de::Error::missing_field("bottom_left"))?,
-                    top_right: f_top_right
-                        .ok_or_else(|| serde::de::Error::missing_field("top_right"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for TopRightBottomLeftGeoBounds {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("bottom_left", &self.bottom_left)?;
-        map.serialize_entry("top_right", &self.top_right)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "The type of document or resource."]
@@ -1720,232 +746,32 @@ pub type VersionNumber = i64;
 pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[doc = "The geographical bounds specified using Well-Known Text (WKT) format."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WktGeoBounds {
     #[doc = "The WKT string representation of the geographical bounds."]
     pub wkt: String,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for WktGeoBounds {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = WktGeoBounds;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a WktGeoBounds object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_wkt: Option<String> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "wkt" => {
-                            if f_wkt.is_some() {
-                                return Err(serde::de::Error::duplicate_field("wkt"));
-                            }
-                            f_wkt = Some(map.next_value::<String>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(WktGeoBounds {
-                    wkt: f_wkt.ok_or_else(|| serde::de::Error::missing_field("wkt"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for WktGeoBounds {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("wkt", &self.wkt)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }
 
 #[doc = "The base response for write operations."]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WriteResponseBase {
+    #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
+    #[serde(rename = "_index")]
     pub index: crate::types::common::IndexName,
     #[doc = "The primary term of the document."]
+    #[serde(rename = "_primary_term")]
     pub primary_term: i64,
+    #[serde(rename = "_seq_no")]
     pub seq_no: crate::types::common::SequenceNumber,
+    #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
+    #[serde(rename = "_type")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub r#type: Option<crate::types::common::Type>,
+    #[serde(rename = "_version")]
     pub version: crate::types::common::VersionNumber,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forced_refresh: Option<bool>,
     pub result: crate::types::common::Result,
-    #[doc = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged."]
-    pub unknown_fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
-}
-impl<'de> serde::Deserialize<'de> for WriteResponseBase {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = WriteResponseBase;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a WriteResponseBase object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_id: Option<crate::types::common::Id> = None;
-                let mut f_index: Option<crate::types::common::IndexName> = None;
-                let mut f_primary_term: Option<i64> = None;
-                let mut f_seq_no: Option<crate::types::common::SequenceNumber> = None;
-                let mut f_shards: Option<crate::types::common::ShardStatistics> = None;
-                let mut f_type: Option<crate::types::common::Type> = None;
-                let mut seen_type = false;
-                let mut f_version: Option<crate::types::common::VersionNumber> = None;
-                let mut f_forced_refresh: Option<bool> = None;
-                let mut seen_forced_refresh = false;
-                let mut f_result: Option<crate::types::common::Result> = None;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    Box<serde_json::value::RawValue>,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "_id" => {
-                            if f_id.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_id"));
-                            }
-                            f_id = Some(map.next_value::<crate::types::common::Id>()?);
-                        }
-                        "_index" => {
-                            if f_index.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_index"));
-                            }
-                            f_index = Some(map.next_value::<crate::types::common::IndexName>()?);
-                        }
-                        "_primary_term" => {
-                            if f_primary_term.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_primary_term"));
-                            }
-                            f_primary_term = Some(map.next_value::<i64>()?);
-                        }
-                        "_seq_no" => {
-                            if f_seq_no.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_seq_no"));
-                            }
-                            f_seq_no =
-                                Some(map.next_value::<crate::types::common::SequenceNumber>()?);
-                        }
-                        "_shards" => {
-                            if f_shards.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_shards"));
-                            }
-                            f_shards =
-                                Some(map.next_value::<crate::types::common::ShardStatistics>()?);
-                        }
-                        "_type" => {
-                            if seen_type {
-                                return Err(serde::de::Error::duplicate_field("_type"));
-                            }
-                            seen_type = true;
-                            f_type = map.next_value::<Option<crate::types::common::Type>>()?;
-                        }
-                        "_version" => {
-                            if f_version.is_some() {
-                                return Err(serde::de::Error::duplicate_field("_version"));
-                            }
-                            f_version =
-                                Some(map.next_value::<crate::types::common::VersionNumber>()?);
-                        }
-                        "forced_refresh" => {
-                            if seen_forced_refresh {
-                                return Err(serde::de::Error::duplicate_field("forced_refresh"));
-                            }
-                            seen_forced_refresh = true;
-                            f_forced_refresh = map.next_value::<Option<bool>>()?;
-                        }
-                        "result" => {
-                            if f_result.is_some() {
-                                return Err(serde::de::Error::duplicate_field("result"));
-                            }
-                            f_result = Some(map.next_value::<crate::types::common::Result>()?);
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(WriteResponseBase {
-                    id: f_id.ok_or_else(|| serde::de::Error::missing_field("_id"))?,
-                    index: f_index.ok_or_else(|| serde::de::Error::missing_field("_index"))?,
-                    primary_term: f_primary_term
-                        .ok_or_else(|| serde::de::Error::missing_field("_primary_term"))?,
-                    seq_no: f_seq_no.ok_or_else(|| serde::de::Error::missing_field("_seq_no"))?,
-                    shards: f_shards.ok_or_else(|| serde::de::Error::missing_field("_shards"))?,
-                    r#type: f_type,
-                    version: f_version
-                        .ok_or_else(|| serde::de::Error::missing_field("_version"))?,
-                    forced_refresh: f_forced_refresh,
-                    result: f_result.ok_or_else(|| serde::de::Error::missing_field("result"))?,
-                    unknown_fields: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for WriteResponseBase {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        map.serialize_entry("_id", &self.id)?;
-        map.serialize_entry("_index", &self.index)?;
-        map.serialize_entry("_primary_term", &self.primary_term)?;
-        map.serialize_entry("_seq_no", &self.seq_no)?;
-        map.serialize_entry("_shards", &self.shards)?;
-        if let Some(v) = &self.r#type {
-            map.serialize_entry("_type", v)?;
-        }
-        map.serialize_entry("_version", &self.version)?;
-        if let Some(v) = &self.forced_refresh {
-            map.serialize_entry("forced_refresh", v)?;
-        }
-        map.serialize_entry("result", &self.result)?;
-        for (k, v) in &self.unknown_fields {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
 }

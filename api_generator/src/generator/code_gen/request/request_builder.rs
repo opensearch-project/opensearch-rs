@@ -780,6 +780,7 @@ impl<'a> RequestBuilder<'a> {
             #[derive(Clone, Debug)]
             pub struct #typed_ident #struct_generics {
                 inner: #module::#builder_ident #struct_generics,
+                report_unknown_fields: bool,
             }
 
             #cfg_attr
@@ -789,7 +790,11 @@ impl<'a> RequestBuilder<'a> {
 
                 #[doc = #send_doc]
                 pub async fn send(self) -> Result<#model, Error> {
-                    self.inner.send().await?.typed(#model_name, &[#(#statuses),*]).await
+                    self.inner
+                        .send()
+                        .await?
+                        .typed(#model_name, &[#(#statuses),*], self.report_unknown_fields)
+                        .await
                 }
             }
         };
@@ -835,7 +840,10 @@ impl<'a> RequestBuilder<'a> {
             #deprecated_attr
             #[allow(deprecated)]
             pub fn #fn_name(&'a self #params) -> #ret {
-                #typed_ident { inner: #inner_new }
+                #typed_ident {
+                    inner: #inner_new,
+                    report_unknown_fields: self.reports_unknown_fields(),
+                }
             }
         };
 
@@ -870,7 +878,10 @@ impl<'a> RequestBuilder<'a> {
                 #(#attrs)*
                 pub fn body<T>(self, body: #fn_arg) -> #typed_ident<'a, 'b, #body_ty>
                 where T: #bound {
-                    #typed_ident { inner: self.inner.body(body) }
+                    #typed_ident {
+                        inner: self.inner.body(body),
+                        report_unknown_fields: self.report_unknown_fields,
+                    }
                 }
             };
         }
@@ -893,7 +904,10 @@ impl<'a> RequestBuilder<'a> {
         quote! {
             #(#attrs)*
             pub #sig {
-                Self { inner: self.inner.#name(#(#args),*) }
+                Self {
+                    inner: self.inner.#name(#(#args),*),
+                    report_unknown_fields: self.report_unknown_fields,
+                }
             }
         }
     }
@@ -975,7 +989,7 @@ mod tests {
         // a wrapper of the generic builder whose send returns the model
         assert!(
             builder
-                .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , }"),
+                .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , report_unknown_fields : bool , }"),
             "{}",
             builder
         );
@@ -987,7 +1001,18 @@ mod tests {
         // 404 answers with the model (`found: false`)
         assert!(builder.contains("& [404u16]"), "{}", builder);
         // the options of the generic builder are delegated...
-        assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) } }"), "{}", builder);
+        assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) , report_unknown_fields : self . report_unknown_fields , } }"), "{}", builder);
+        // the client's unknown-field setting reaches send
+        assert!(
+            builder.contains("self . report_unknown_fields) . await"),
+            "{}",
+            builder
+        );
+        assert!(
+            ctor.contains("report_unknown_fields : self . reports_unknown_fields ()"),
+            "{}",
+            ctor
+        );
         // ...except those that change the shape of the response
         assert!(!builder.contains("fn filter_path"), "{}", builder);
         assert!(ctor.contains("pub fn get < 'a , 'b > (& 'a self , parts : crate :: GetParts < 'b >) -> TypedGet < 'a , 'b >"), "{}", ctor);

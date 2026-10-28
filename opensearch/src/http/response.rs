@@ -124,27 +124,42 @@ impl Response {
     /// [ApiError](crate::ApiError). A listed non-2xx status whose body is not
     /// `T` is an error too: `get` answers 404 both for a missing document
     /// (`{"found": false}`) and for a missing index (`index_not_found_exception`).
+    ///
+    /// Keys `T` does not define are ignored, unless `report_unknown_fields`
+    /// is set: the body is then an error listing them.
     pub(crate) async fn typed<T>(
         self,
         type_name: &'static str,
         model_statuses: &[u16],
+        report_unknown_fields: bool,
     ) -> Result<T, ClientError>
     where
-        T: DeserializeOwned,
+        T: DeserializeOwned + Serialize,
     {
         let status = self.status_code();
         let url = self.url().clone();
         let body = self.response.bytes().await?;
-        if status.is_success() {
-            return serde_json::from_slice(&body)
-                .map_err(|e| ClientError::decode(url, type_name, e));
-        }
-        if model_statuses.contains(&status.as_u16()) {
-            if let Ok(model) = serde_json::from_slice(&body) {
-                return Ok(model);
+        let model = if status.is_success() {
+            serde_json::from_slice(&body)
+                .map_err(|e| ClientError::decode(url.clone(), type_name, e))?
+        } else {
+            match model_statuses
+                .contains(&status.as_u16())
+                .then(|| serde_json::from_slice(&body).ok())
+                .flatten()
+            {
+                Some(model) => model,
+                None => return Err(ClientError::api(status, url, &body)),
+            }
+        };
+        if report_unknown_fields {
+            let unknown = crate::typed::unknown_fields(&body, &model)
+                .map_err(|e| ClientError::decode(url.clone(), type_name, e))?;
+            if !unknown.is_empty() {
+                return Err(ClientError::unknown_fields_error(url, type_name, unknown));
             }
         }
-        Err(ClientError::api(status, url, &body))
+        Ok(model)
     }
 
     /// Gets the response headers.

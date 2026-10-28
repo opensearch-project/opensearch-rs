@@ -132,7 +132,10 @@ fn typed_assert_mode() -> String {
 
 /// Shadow typing verification: checks that the successful JSON response of
 /// a typed endpoint deserializes into its generated response model `T` and
-/// serializes back to the same JSON (i.e. the model loses no data).
+/// serializes back to the same JSON. Keys the model does not define are
+/// ignored by the models (as by the other OpenSearch clients): they are
+/// reported separately as unknown fields, i.e. gaps of the specification,
+/// while any other difference means the model reads a value wrongly.
 ///
 /// This runs alongside the untyped yaml assertions of the generated tests,
 /// turning every yaml test against a real cluster into a verification
@@ -192,47 +195,65 @@ where
         }
     };
 
-    first_divergence(&original, &back, String::new()).map(|path| {
-        format!(
+    first_divergence(&original, &back, String::new()).map(|d| match d {
+        Divergence::Unknown(path) => format!(
+            "typed response check [{}]: unknown field `{}` (not in the model). Response: {}",
+            endpoint, path, text
+        ),
+        Divergence::Changed(path) => format!(
             "typed response check [{}]: round-trip diverged at `{}`. Response: {}",
             endpoint, path, text
-        )
+        ),
     })
 }
 
-/// The path of the first divergence between the original response JSON and
-/// the round-tripped JSON, or `None` when they are equivalent.
+/// A difference between the original response JSON and the round-tripped
+/// JSON, by the path where it occurs
+#[derive(Debug, PartialEq)]
+enum Divergence {
+    /// A key the model does not keep: unknown to the model
+    Unknown(String),
+    /// A value the model reads or writes back differently
+    Changed(String),
+}
+
+/// The first divergence between the original response JSON and the
+/// round-tripped JSON, or `None` when they are equivalent.
 ///
 /// Two normalizations apply: numbers are compared by value regardless of
 /// integer/float encoding, and a missing object key is equivalent to an
 /// explicit `null` (optional model fields are skipped when `None`).
-fn first_divergence(original: &Value, back: &Value, path: String) -> Option<String> {
+fn first_divergence(original: &Value, back: &Value, path: String) -> Option<Divergence> {
     match (original, back) {
         (Value::Object(a), Value::Object(b)) => {
             let keys: std::collections::BTreeSet<&String> = a.keys().chain(b.keys()).collect();
             for key in keys {
+                let child = format!("{}.{}", path, key);
+                // a key the model drops is unknown to it
+                if !b.contains_key(key) && !a[key].is_null() {
+                    return Some(Divergence::Unknown(child));
+                }
                 let left = a.get(key).unwrap_or(&Value::Null);
                 let right = b.get(key).unwrap_or(&Value::Null);
-                let child = format!("{}.{}", path, key);
-                if let Some(p) = first_divergence(left, right, child) {
-                    return Some(p);
+                if let Some(d) = first_divergence(left, right, child) {
+                    return Some(d);
                 }
             }
             None
         }
         (Value::Array(a), Value::Array(b)) => {
             if a.len() != b.len() {
-                return Some(format!(
+                return Some(Divergence::Changed(format!(
                     "{} (array length {} vs {})",
                     path,
                     a.len(),
                     b.len()
-                ));
+                )));
             }
             for (i, (left, right)) in a.iter().zip(b.iter()).enumerate() {
                 let child = format!("{}[{}]", path, i);
-                if let Some(p) = first_divergence(left, right, child) {
-                    return Some(p);
+                if let Some(d) = first_divergence(left, right, child) {
+                    return Some(d);
                 }
             }
             None
@@ -248,18 +269,18 @@ fn first_divergence(original: &Value, back: &Value, path: String) -> Option<Stri
             if eq {
                 None
             } else {
-                Some(format!("{} ({} vs {})", path, a, b))
+                Some(Divergence::Changed(format!("{} ({} vs {})", path, a, b)))
             }
         }
         (left, right) => {
             if left == right {
                 None
             } else {
-                Some(if path.is_empty() {
+                Some(Divergence::Changed(if path.is_empty() {
                     "(root)".to_string()
                 } else {
                     path
-                })
+                }))
             }
         }
     }
@@ -267,12 +288,15 @@ fn first_divergence(original: &Value, back: &Value, path: String) -> Option<Stri
 
 #[cfg(test)]
 mod typed_response_tests {
-    use super::{first_divergence, typed_divergence};
+    use super::{first_divergence, typed_divergence, Divergence};
     use opensearch::types::search::SearchResponse;
     use serde_json::json;
 
+    /// The path of the first divergence, of either kind
     fn divergence(a: &serde_json::Value, b: &serde_json::Value) -> Option<String> {
-        first_divergence(a, b, String::new())
+        first_divergence(a, b, String::new()).map(|d| match d {
+            Divergence::Unknown(p) | Divergence::Changed(p) => p,
+        })
     }
 
     #[test]
@@ -364,6 +388,26 @@ mod typed_response_tests {
                 &json!({ "total": 1 })
             ),
             None
+        );
+    }
+
+    #[test]
+    fn a_dropped_key_is_an_unknown_field_and_a_changed_value_is_not() {
+        assert_eq!(
+            first_divergence(
+                &json!({ "hits": { "total": 1, "extra": "x" } }),
+                &json!({ "hits": { "total": 1 } }),
+                String::new()
+            ),
+            Some(Divergence::Unknown(".hits.extra".to_string()))
+        );
+        assert_eq!(
+            first_divergence(
+                &json!({ "durability": "async" }),
+                &json!({ "durability": "ASYNC" }),
+                String::new()
+            ),
+            Some(Divergence::Changed(".durability".to_string()))
         );
     }
 

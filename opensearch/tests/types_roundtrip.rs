@@ -331,10 +331,11 @@ fn search_sort_values_and_integer_totals_decode() {
 }
 
 #[test]
-fn fields_unknown_to_the_specification_are_kept() {
+fn fields_unknown_to_the_specification_are_ignored() {
     // `ext` (search pipeline processors) and `plugin_stats` are not part of
     // the specification's search response; `extra` is not part of shard
-    // statistics. None of them may be dropped.
+    // statistics. They are ignored, as by the other OpenSearch clients: the
+    // typed client can report them instead (`ignore_unknown_fields(false)`)
     let fixture = json!({
         "took": 5,
         "timed_out": false,
@@ -349,59 +350,16 @@ fn fields_unknown_to_the_specification_are_kept() {
         "ext": { "retrieval_augmented_generation": { "answer": "42" } },
         "plugin_stats": 7
     });
-    // the round trip itself proves nothing was lost
-    let resp: SearchResponse = round_trip(&fixture);
-
-    // top level: typed fields still decode, unknown keys are reachable
+    let resp: SearchResponse = serde_json::from_value(fixture).unwrap();
     assert_eq!(resp.took, 5);
-    let ext: Value = serde_json::from_str(resp.unknown_fields["ext"].get()).unwrap();
-    assert_eq!(ext["retrieval_augmented_generation"]["answer"], "42");
-    assert_eq!(resp.unknown_fields["plugin_stats"].get(), "7");
-    assert_eq!(resp.unknown_fields.len(), 2);
-
-    // nested struct
-    assert_eq!(resp.shards.unknown_fields["extra"].get(), "[1,2]");
-
-    // a struct sibling of a raw `_source` decodes: `#[serde(flatten)]`
-    // would fail here ("invalid type: newtype struct")
+    assert_eq!(resp.shards.total, 1);
     let hit = &resp.hits.hits[0];
     assert_eq!(hit.source.as_ref().unwrap().get(), r#"{"t":"x"}"#);
-}
 
-#[test]
-fn a_response_the_specification_fully_describes_has_no_unknown_fields() {
-    let resp: SearchResponse = serde_json::from_value(json!({
-        "took": 1,
-        "timed_out": false,
-        "_shards": { "total": 1, "successful": 1, "failed": 0 },
-        "hits": { "hits": [] }
-    }))
-    .unwrap();
-    assert!(resp.unknown_fields.is_empty());
-    assert!(resp.shards.unknown_fields.is_empty());
-}
-
-#[test]
-fn unknown_fields_keep_numbers_verbatim() {
-    // raw JSON keeps the server's text: no f64 rounding of large integers
-    // or decimals, with or without serde_json's arbitrary_precision
-    let fixture = json!({
-        "took": 1,
-        "timed_out": false,
-        "_shards": { "total": 1, "successful": 1, "failed": 0 },
-        "hits": { "hits": [] },
-        "big": 18446744073709551615u64
-    });
-    let text = r#"{"took":1,"timed_out":false,"_shards":{"total":1,"successful":1,"failed":0},"hits":{"hits":[]},"big":18446744073709551615,"dec":0.1000000000000000055511151231257827}"#;
-    let resp: SearchResponse = serde_json::from_str(text).unwrap();
-    assert_eq!(resp.unknown_fields["big"].get(), "18446744073709551615");
-    assert_eq!(
-        resp.unknown_fields["dec"].get(),
-        "0.1000000000000000055511151231257827"
-    );
-    let back = serde_json::to_string(&resp).unwrap();
-    assert!(back.contains(r#""dec":0.1000000000000000055511151231257827"#));
-    let _: SearchResponse = round_trip(&fixture);
+    // serializing writes the known fields only
+    let back = serde_json::to_value(&resp).unwrap();
+    assert!(back.get("ext").is_none() && back.get("plugin_stats").is_none());
+    assert!(back["_shards"].get("extra").is_none());
 }
 
 #[test]

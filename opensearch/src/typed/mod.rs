@@ -83,6 +83,34 @@
 //! # }
 //! ```
 //!
+//! # Fields unknown to the models
+//!
+//! Keys of the response that the model does not define (fields added by
+//! plugins or newer OpenSearch versions, or missing from the specification)
+//! are ignored by default, as by the other OpenSearch clients. A typed client
+//! set with [`ignore_unknown_fields(false)`](TypedOpenSearch::ignore_unknown_fields)
+//! reports them instead, as an error listing their paths, available from
+//! [`Error::unknown_fields`](crate::Error::unknown_fields):
+//!
+//! ```rust,no_run
+//! # use opensearch::{OpenSearch, SearchParts};
+//! # async fn doc() {
+//! # let client = OpenSearch::default();
+//! let strict = client.typed().ignore_unknown_fields(false);
+//! match strict.search(SearchParts::Index(&["movies"])).send().await {
+//!     Ok(resp) => println!("took {} ms", resp.took),
+//!     Err(e) => match e.unknown_fields() {
+//!         // e.g. [".ext"] with a search pipeline adding `ext`
+//!         Some(fields) => println!("not in the model: {:?}", fields),
+//!         None => println!("request failed: {}", e),
+//!     },
+//! }
+//! # }
+//! ```
+//!
+//! Values kept as raw JSON by the models (documents, aggregations, maps the
+//! specification leaves open) are not checked.
+//!
 //! # The typed and the generic client
 //!
 //! The generic client ([`OpenSearch`]) is unchanged: its `send` returns the
@@ -112,27 +140,96 @@ pub use builders::*;
 /// The typed client: the APIs with a typed response model, whose `send`
 /// returns the model. Created with [`OpenSearch::typed`], or from a
 /// [`Transport`].
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct TypedOpenSearch {
     transport: Transport,
+    ignore_unknown_fields: bool,
+}
+
+impl Default for TypedOpenSearch {
+    fn default() -> Self {
+        Self::new(Transport::default())
+    }
 }
 
 impl TypedOpenSearch {
     /// Creates a typed client using the given transport
     pub fn new(transport: Transport) -> Self {
-        Self { transport }
+        Self {
+            transport,
+            ignore_unknown_fields: true,
+        }
     }
 
     /// The transport used by this client
     pub fn transport(&self) -> &Transport {
         &self.transport
     }
+
+    /// Whether keys of a response that its model does not define are
+    /// ignored (`true`, the default), or make the call fail with an error
+    /// listing them (`false`). See [Fields unknown to the models](crate::typed#fields-unknown-to-the-models).
+    pub fn ignore_unknown_fields(mut self, ignore: bool) -> Self {
+        self.ignore_unknown_fields = ignore;
+        self
+    }
+
+    /// Whether the typed builders created by this client report unknown fields
+    #[doc(hidden)]
+    pub fn reports_unknown_fields(&self) -> bool {
+        !self.ignore_unknown_fields
+    }
+}
+
+/// The paths of the keys of `body` that `model` does not keep: the model is
+/// serialized back and compared with the body, so that a key is reported
+/// wherever the model drops it, including inside unions. A key whose value
+/// is `null` is not reported, as optional fields are skipped when absent.
+pub(crate) fn unknown_fields<T: serde::Serialize>(
+    body: &[u8],
+    model: &T,
+) -> Result<Vec<String>, serde_json::Error> {
+    use serde_json::Value;
+
+    fn walk(original: &Value, back: &Value, path: &mut String, out: &mut Vec<String>) {
+        match (original, back) {
+            (Value::Object(a), Value::Object(b)) => {
+                for (key, value) in a {
+                    let len = path.len();
+                    path.push('.');
+                    path.push_str(key);
+                    match b.get(key) {
+                        Some(kept) => walk(value, kept, path, out),
+                        None if !value.is_null() => out.push(path.clone()),
+                        None => {}
+                    }
+                    path.truncate(len);
+                }
+            }
+            (Value::Array(a), Value::Array(b)) => {
+                for (i, (value, kept)) in a.iter().zip(b).enumerate() {
+                    let len = path.len();
+                    path.push_str(&format!("[{}]", i));
+                    walk(value, kept, path, out);
+                    path.truncate(len);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let original: Value = serde_json::from_slice(body)?;
+    let back = serde_json::to_value(model)?;
+    let mut out = Vec::new();
+    walk(&original, &back, &mut String::new(), &mut out);
+    Ok(out)
 }
 
 impl OpenSearch {
     /// The typed client of this client, sharing its transport: the APIs with
-    /// a typed response model, whose `send` returns the model. See
-    /// [`crate::typed`].
+    /// a typed response model, whose `send` returns the model. Keys of the
+    /// responses unknown to the models are ignored; see
+    /// [`TypedOpenSearch::ignore_unknown_fields`] and [`crate::typed`].
     pub fn typed(&self) -> TypedOpenSearch {
         TypedOpenSearch::new(self.transport().clone())
     }

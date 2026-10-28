@@ -252,47 +252,55 @@ fn render_struct(
     let fields = prepare_fields(ir_name, s, boxed);
     let mut out = String::new();
 
-    // Every struct collects the keys it has no field for. A residual the
-    // specification declares (`additionalProperties`, sub-aggregations)
-    // keeps its name and value type; otherwise the keys the specification
-    // does not know (plugin additions, newer server versions, gaps in the
-    // specification) are kept as raw JSON in `unknown_fields` instead of
-    // being silently dropped, and serialized back unchanged.
-    let (residual_name, residual_value, residual_doc) = match &s.residual {
-        Some((name, ty)) => (name.clone(), render_ref(ty), None),
-        None => (
-            unknown_fields_ident(&fields),
-            "Box<serde_json::value::RawValue>".to_string(),
-            Some(UNKNOWN_FIELDS_DOC),
-        ),
-    };
-
+    // A struct whose specification declares a residual
+    // (`additionalProperties`, sub-aggregations in buckets) collects the
+    // remaining keys into that map through a generated visitor. Every other
+    // struct derives its impls: keys the specification does not define are
+    // ignored, as by the other OpenSearch clients; the typed client can
+    // report them instead (`ignore_unknown_fields(false)`).
     doc(&mut out, s.description.as_deref());
-    out.push_str("#[derive(Debug, Clone)]\n");
+    if s.residual.is_some() {
+        out.push_str("#[derive(Debug, Clone)]\n");
+    } else {
+        out.push_str("#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]\n");
+    }
     let _ = writeln!(out, "pub struct {} {{", rust_name);
     for f in &fields {
         doc(&mut out, f.ir.description.as_deref());
+        if s.residual.is_none() {
+            let rename = f.ident.trim_start_matches("r#");
+            if rename != f.ir.json_name {
+                let _ = writeln!(out, "    #[serde(rename = \"{}\")]", f.ir.json_name);
+            }
+            if f.optional {
+                out.push_str("    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n");
+            }
+        }
         if f.optional {
             let _ = writeln!(out, "    pub {}: Option<{}>,", f.ident, f.payload);
         } else {
             let _ = writeln!(out, "    pub {}: {},", f.ident, f.payload);
         }
     }
-    doc(&mut out, residual_doc);
-    let _ = writeln!(
-        out,
-        "    pub {}: std::collections::BTreeMap<String, {}>,",
-        residual_name, residual_value
-    );
+    if let Some((residual_name, residual_ty)) = &s.residual {
+        let _ = writeln!(
+            out,
+            "    pub {}: std::collections::BTreeMap<String, {}>,",
+            residual_name,
+            render_ref(residual_ty)
+        );
+    }
     out.push_str("}\n");
 
-    render_residual_impls(
-        &mut out,
-        rust_name,
-        &fields,
-        &residual_name,
-        &residual_value,
-    );
+    if let Some((residual_name, residual_ty)) = &s.residual {
+        render_residual_impls(
+            &mut out,
+            rust_name,
+            &fields,
+            residual_name,
+            &render_ref(residual_ty),
+        );
+    }
     render_source_accessor(&mut out, rust_name, &fields);
     render_total_value(&mut out, rust_name, &fields, total_hits_unions);
 
@@ -458,27 +466,10 @@ fn render_source_accessor(out: &mut String, rust_name: &str, fields: &[Field<'_>
     );
 }
 
-/// The documentation of the generated map of keys a struct has no field for
-const UNKNOWN_FIELDS_DOC: &str = "Keys of the JSON object that the specification does not define, kept as raw JSON so that nothing the server sends is lost: fields added by plugins or newer OpenSearch versions, or missing from the specification. Serialized back unchanged.";
-
-/// The identifier of the unknown-fields map: `unknown_fields`, unless a
-/// field of the specification already maps to it
-fn unknown_fields_ident(fields: &[Field<'_>]) -> String {
-    let taken: BTreeSet<&str> = fields
-        .iter()
-        .map(|f| f.ident.trim_start_matches("r#"))
-        .collect();
-    let mut ident = "unknown_fields".to_string();
-    while taken.contains(ident.as_str()) {
-        ident.insert(0, '_');
-    }
-    ident
-}
-
-/// Renders `Deserialize`/`Serialize` for a struct: known keys go to their
-/// fields, all remaining keys are collected into the residual map
-/// (sub-aggregations inside a bucket, declared `additionalProperties`, or
-/// the keys the specification does not define).
+/// Renders `Deserialize`/`Serialize` for a struct with a residual map the
+/// specification declares: known keys go to their fields, all remaining
+/// keys are collected into the residual map (sub-aggregations inside a
+/// bucket, declared `additionalProperties`).
 ///
 /// A hand-written visitor rather than `#[serde(flatten)]`: flatten buffers
 /// the object into serde's internal `Content`, which cannot deserialize a

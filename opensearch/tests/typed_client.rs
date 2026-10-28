@@ -178,3 +178,95 @@ async fn the_typed_client_shares_the_transport() -> anyhow::Result<()> {
     assert_eq!(request.query(), Some("size=1"));
     Ok(())
 }
+
+/// A search response with keys the model does not define: at the top
+/// level, nested in `_shards`, inside a hit, and inside `hits.total` (a
+/// union), plus a `null` one
+const SEARCH_WITH_UNKNOWN_FIELDS: &str = r#"{"took":3,"timed_out":false,
+  "_shards":{"total":1,"successful":1,"skipped":0,"failed":0,"extra":[1,2]},
+  "hits":{"total":{"value":1,"relation":"eq","approx":true},"max_score":1.0,
+    "hits":[{"_index":"movies","_id":"1","_score":1.0,"_source":{"title":"Moneyball"},"_plugin":"x"}]},
+  "ext":{"rag":{"answer":"42"}},"absent":null}"#;
+
+#[tokio::test]
+async fn unknown_fields_are_ignored_by_default() -> anyhow::Result<()> {
+    let server = MockServer::builder()
+        .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
+        .start()?;
+    let resp = server
+        .client()
+        .typed()
+        .search(SearchParts::Index(&["movies"]))
+        .send()
+        .await?;
+    assert_eq!(resp.took, 3);
+    assert_eq!(resp.hits.total_value(), Some(1));
+    // keys the specification allows are kept where it declares them
+    assert_eq!(resp.hits.hits[0].additional["_plugin"].get(), r#""x""#);
+    Ok(())
+}
+
+#[tokio::test]
+async fn unknown_fields_can_be_reported() -> anyhow::Result<()> {
+    let server = MockServer::builder()
+        .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
+        .start()?;
+    let err = server
+        .client()
+        .typed()
+        .ignore_unknown_fields(false)
+        .search(SearchParts::Index(&["movies"]))
+        .size(1) // the setting survives the builder options
+        .send()
+        .await
+        .unwrap_err();
+
+    // every unknown key, wherever it is, by its path; `null` is not
+    // reported, and neither is a key the specification allows: hits declare
+    // `additionalProperties`, so the hit's `_plugin` is kept in `additional`
+    assert_eq!(
+        err.unknown_fields().unwrap(),
+        &[
+            "._shards.extra".to_string(),
+            ".ext".to_string(),
+            ".hits.total.approx".to_string(),
+        ]
+    );
+    assert!(err.is_json());
+    assert!(err.api_error().is_none());
+    let message = err.to_string();
+    assert!(
+        message.contains("types::search::SearchResponse"),
+        "{}",
+        message
+    );
+    assert!(message.contains(".ext"), "{}", message);
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_response_the_model_fully_describes_passes_the_strict_check() -> anyhow::Result<()> {
+    let server = MockServer::builder().response(200, SEARCH).start()?;
+    let resp = server
+        .client()
+        .typed()
+        .ignore_unknown_fields(false)
+        .search(SearchParts::Index(&["movies"]))
+        .send()
+        .await?;
+    assert_eq!(resp.took, 3);
+
+    // a 404 answered with the model is checked the same way
+    let server = MockServer::builder()
+        .response(404, r#"{"_index":"movies","_id":"nope","found":false}"#)
+        .start()?;
+    let doc = server
+        .client()
+        .typed()
+        .ignore_unknown_fields(false)
+        .get(GetParts::IndexId("movies", "nope"))
+        .send()
+        .await?;
+    assert!(!doc.found);
+    Ok(())
+}

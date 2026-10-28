@@ -167,7 +167,7 @@ impl Error {
         })
     }
 
-    /// The fields of the response unknown to the typed response model, when
+    /// The fields of the response unknown to the response type, when
     /// the typed client is set to report them
     /// ([`TypedOpenSearch::ignore_unknown_fields`](crate::typed::TypedOpenSearch::ignore_unknown_fields)):
     /// the path of each, e.g. `.ext` or `._shards.extra`

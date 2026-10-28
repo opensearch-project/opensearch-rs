@@ -447,16 +447,16 @@ pub struct ApiEndpoint {
     pub params: BTreeMap<String, Type>,
     pub body: Option<Body>,
     /// The Rust path, relative to the `opensearch` crate root, of the
-    /// generated typed response model of this endpoint (e.g.
+    /// generated response type of this endpoint (e.g.
     /// `types::search::SearchResponse`), when one exists. Filled in from
-    /// the response IR when reading an OpenAPI specification; `None` for
+    /// the response model when reading an OpenAPI specification; `None` for
     /// the legacy REST specs and for endpoints without a JSON success body.
     #[serde(skip)]
     pub typed_response: Option<String>,
-    /// The non-2xx status codes whose body is the typed response model
-    /// (e.g. `404` of `get`); see `ResponseIr::model_statuses`
+    /// The non-2xx status codes whose body is the response type
+    /// (e.g. `404` of `get`); see `ResponseModel::typed_statuses`
     #[serde(skip)]
-    pub typed_model_statuses: Vec<u16>,
+    pub typed_response_statuses: Vec<u16>,
 }
 
 impl ApiEndpoint {
@@ -562,12 +562,12 @@ pub fn generate(
 }
 
 /// Generates all client source code from an [Api], regardless of which
-/// specification format it was read from. Typed response models are
-/// generated when a [ResponseIr](crate::openapi::responses::ResponseIr)
+/// specification format it was read from. Typed response types are
+/// generated when a [ResponseModel](crate::openapi::responses::ResponseModel)
 /// is given (only the OpenAPI specification carries response schemas).
 pub fn generate_from_api(
     api: &Api,
-    responses: Option<&crate::openapi::responses::ResponseIr>,
+    responses: Option<&crate::openapi::responses::ResponseModel>,
     docs_dir: &std::path::Path,
     generated_dir: &std::path::Path,
 ) -> anyhow::Result<()> {
@@ -616,7 +616,7 @@ pub use bulk::*;
     );
     write_file(root, None, generated_dir, "root/mod.rs", &mut tracker)?;
 
-    // generate the typed client: builders of the APIs with a response model
+    // generate the typed client: builders of the APIs with a response type
     let typed = code_gen::typed_client::generate(api, docs_dir)?;
     write_file(
         typed,
@@ -643,9 +643,9 @@ pub use bulk::*;
         &mut tracker,
     )?;
 
-    // generate typed response models
-    if let Some(ir) = responses {
-        let (files, section) = code_gen::response_types::generate(ir)?;
+    // generate typed response types
+    if let Some(model) = responses {
+        let (files, section) = code_gen::response_types::generate(model)?;
         for (module, source) in files {
             write_file(
                 source,

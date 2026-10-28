@@ -122,10 +122,10 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
         }
     }
 
-    // the response models generated for the specification: every endpoint
-    // records the Rust path of its model so consumers (the yaml test
+    // the response types generated for the specification: every endpoint
+    // records the Rust path of its response type so consumers (the yaml test
     // runner's typed verification) need no second source of truth
-    let response_ir = responses::read_response_ir(&spec, responses::TYPED_OPERATION_GROUPS)?;
+    let response_model = responses::read_response_model(&spec, responses::TYPED_OPERATION_GROUPS)?;
 
     let mut endpoints = Vec::with_capacity(groups.len());
     for (name, operations) in groups {
@@ -133,10 +133,10 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
         let json = serde_json::to_string(&json!({ &name: legacy }))?;
         let (name, mut endpoint) =
             endpoint_from_file(format!("openapi:{}", name), &mut json.as_bytes())?;
-        endpoint.typed_response = responses::typed_response_path(&response_ir, &name);
+        endpoint.typed_response = responses::typed_response_path(&response_model, &name);
         if endpoint.typed_response.is_some() {
-            endpoint.typed_model_statuses = response_ir
-                .model_statuses
+            endpoint.typed_response_statuses = response_model
+                .typed_statuses
                 .get(&name)
                 .cloned()
                 .unwrap_or_default();
@@ -851,7 +851,7 @@ components:
                 .as_deref(),
             Some("types::search::SearchResponse")
         );
-        // only the selected groups get a model
+        // only the selected groups get a response type
         for group in responses::TYPED_OPERATION_GROUPS {
             assert!(
                 api.endpoint_for_api_call(group)
@@ -868,24 +868,24 @@ components:
                 .typed_response,
             None
         );
-        // HEAD-only endpoints have no JSON body and thus no model
+        // HEAD-only endpoints have no JSON body and thus no response type
         assert_eq!(
             api.endpoint_for_api_call("indices.exists")
                 .unwrap()
                 .typed_response,
             None
         );
-        // the statuses a typed call decodes as the model besides 2xx
+        // the statuses a typed call decodes as the response type besides 2xx
         assert_eq!(
             api.endpoint_for_api_call("get")
                 .unwrap()
-                .typed_model_statuses,
+                .typed_response_statuses,
             vec![404]
         );
         assert!(api
             .endpoint_for_api_call("search")
             .unwrap()
-            .typed_model_statuses
+            .typed_response_statuses
             .is_empty());
     }
 

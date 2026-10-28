@@ -131,15 +131,15 @@ fn typed_assert_mode() -> String {
 }
 
 /// Shadow typing verification: checks that the successful JSON response of
-/// a typed endpoint deserializes into its generated response model `T` and
-/// serializes back to the same JSON. Keys the model does not define are
-/// ignored by the models (as by the other OpenSearch clients): they are
+/// a typed endpoint deserializes into its generated response type `T` and
+/// serializes back to the same JSON. Keys the response type does not define are
+/// ignored by the response types (as by the other OpenSearch clients): they are
 /// reported separately as unknown fields, i.e. gaps of the specification,
-/// while any other difference means the model reads a value wrongly.
+/// while any other difference means the response type reads a value wrongly.
 ///
 /// This runs alongside the untyped yaml assertions of the generated tests,
 /// turning every yaml test against a real cluster into a verification
-/// corpus for the generated response models. A divergence means either a
+/// corpus for the generated response types. A divergence means either a
 /// bug in the type generation or a bug in the API specification.
 ///
 /// The comparison normalizes two representation differences that are not
@@ -167,19 +167,19 @@ where
 
 /// The failure message of the typed-response verification for the given
 /// response body, or `None` when the body is not JSON (nothing to verify)
-/// or the model round-trips it faithfully
+/// or the response type round-trips it faithfully
 fn typed_divergence<T>(text: &str, endpoint: &str) -> Option<String>
 where
     T: serde::de::DeserializeOwned + serde::Serialize,
 {
-    // only JSON bodies are described by the response models
+    // only JSON bodies are described by the response types
     let original: Value = serde_json::from_str(text).ok()?;
 
     let typed: T = match serde_json::from_str(text) {
         Ok(t) => t,
         Err(e) => {
             return Some(format!(
-                "typed response check [{}]: response does not deserialize into the generated model: {}. Response: {}",
+                "typed response check [{}]: response does not deserialize into the generated response type: {}. Response: {}",
                 endpoint, e, text
             ));
         }
@@ -197,7 +197,7 @@ where
 
     first_divergence(&original, &back, String::new()).map(|d| match d {
         Divergence::Unknown(path) => format!(
-            "typed response check [{}]: unknown field `{}` (not in the model). Response: {}",
+            "typed response check [{}]: unknown field `{}` (not in the response type). Response: {}",
             endpoint, path, text
         ),
         Divergence::Changed(path) => format!(
@@ -211,9 +211,9 @@ where
 /// JSON, by the path where it occurs
 #[derive(Debug, PartialEq)]
 enum Divergence {
-    /// A key the model does not keep: unknown to the model
+    /// A key the response type does not keep: unknown to the response type
     Unknown(String),
-    /// A value the model reads or writes back differently
+    /// A value the response type reads or writes back differently
     Changed(String),
 }
 
@@ -222,14 +222,14 @@ enum Divergence {
 ///
 /// Two normalizations apply: numbers are compared by value regardless of
 /// integer/float encoding, and a missing object key is equivalent to an
-/// explicit `null` (optional model fields are skipped when `None`).
+/// explicit `null` (optional fields of the response types are skipped when `None`).
 fn first_divergence(original: &Value, back: &Value, path: String) -> Option<Divergence> {
     match (original, back) {
         (Value::Object(a), Value::Object(b)) => {
             let keys: std::collections::BTreeSet<&String> = a.keys().chain(b.keys()).collect();
             for key in keys {
                 let child = format!("{}.{}", path, key);
-                // a key the model drops is unknown to it
+                // a key the response type drops is unknown to it
                 if !b.contains_key(key) && !a[key].is_null() {
                     return Some(Divergence::Unknown(child));
                 }
@@ -301,8 +301,8 @@ mod typed_response_tests {
 
     #[test]
     fn a_realistic_search_response_passes_the_check() {
-        // full path through the generated model, including a lazily
-        // decoded aggregation and an explicit null the model drops
+        // full path through the generated response type, including a lazily
+        // decoded aggregation and an explicit null the response type drops
         let text = json!({
             "took": 5,
             "timed_out": false,
@@ -326,7 +326,7 @@ mod typed_response_tests {
 
     #[test]
     fn a_missing_required_field_is_reported() {
-        // `took` is required by the model
+        // `took` is required by the response type
         let text = json!({
             "timed_out": false,
             "_shards": { "total": 1, "successful": 1, "skipped": 0, "failed": 0 },
@@ -381,7 +381,7 @@ mod typed_response_tests {
 
     #[test]
     fn explicit_null_and_missing_key_are_equivalent() {
-        // optional model fields serialize as absent, servers send explicit null
+        // optional fields of the response types serialize as absent, servers send explicit null
         assert_eq!(
             divergence(
                 &json!({ "max_score": null, "total": 1 }),

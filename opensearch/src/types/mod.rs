@@ -6,17 +6,17 @@
  * compatible open source license.
  */
 
-//! Typed response models generated from the
+//! Typed response types generated from the
 //! [OpenSearch API specification](https://github.com/opensearch-project/opensearch-api-specification),
 //! together with the hand-written runtime support they rely on.
 //!
 //! # Getting the typed response of an API
 //!
-//! Models are generated for the search, index, bulk and get APIs so far
+//! Response types are generated for the search, index, bulk and get APIs so far
 //! (the selection is `TYPED_OPERATION_GROUPS` in the API generator); the
 //! generator supports the whole specification, and more APIs are added by
 //! extending that list. They are obtained through the typed client
-//! ([`crate::typed`]), whose `send` returns the model of the API, so neither
+//! ([`crate::typed`]), whose `send` returns the response type of the API, so neither
 //! the type nor its path needs to be written out:
 //!
 //! ```rust,no_run
@@ -49,7 +49,7 @@
 //!
 //! See [`crate::typed`] for errors, and for when to use the generic client
 //! instead. With the generic client, a body can still be decoded into a
-//! model with [`Response::json`](crate::http::response::Response::json).
+//! response type with [`Response::json`](crate::http::response::Response::json).
 //!
 //! # Design notes
 //!
@@ -59,11 +59,11 @@
 //! fields are reviewed: each is declared with its reason in the API
 //! generator, and generation fails on an undeclared one.
 //!
-//! Keys of a response that its model does not define (fields added by
+//! Keys of a response that its response type does not define (fields added by
 //! plugins or newer OpenSearch versions, or missing from the specification)
 //! are ignored, as by the other OpenSearch clients. The typed client can
 //! report them as an error instead: see
-//! [Fields unknown to the models](crate::typed#fields-unknown-to-the-models).
+//! [Fields unknown to the response types](crate::typed#fields-unknown-to-the-response-types).
 //! Structs whose specification declares `additionalProperties` keep the
 //! remaining keys in that typed map (`additional`, or `aggregations` in
 //! buckets). These maps are filled by generated `Deserialize` impls rather
@@ -72,12 +72,12 @@
 //!
 //! # Filtered responses (`filter_path`)
 //!
-//! The models describe the full response of an API. The `filter_path`
+//! The response types describe the full response of an API. The `filter_path`
 //! parameter, accepted by almost every API, removes from the response
-//! everything it does not match, including fields the models require:
+//! everything it does not match, including fields the response types require:
 //! decoding a filtered search response as
 //! [`SearchResponse`](search::SearchResponse) fails with an error such as
-//! ``missing field `_shards` ``. This is expected, and the models are not
+//! ``missing field `_shards` ``. This is expected, and the response types are not
 //! loosened for it, as making every field optional would burden the
 //! unfiltered use. The typed client ([`crate::typed`]) therefore does not
 //! offer `filter_path`.

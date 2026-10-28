@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-//! The typed client: `send` decodes the body as the typed response model
+//! The typed client: `send` decodes the body as the response type
 //! of the endpoint, and reports errors as `Error`
 
 pub mod common;
@@ -20,7 +20,7 @@ const SEARCH: &str = r#"{"took":3,"timed_out":false,
     "hits":[{"_index":"movies","_id":"1","_score":1.0,"_source":{"title":"Moneyball"}}]}}"#;
 
 #[tokio::test]
-async fn success_is_decoded_as_the_model() -> anyhow::Result<()> {
+async fn success_is_decoded_as_the_response_type() -> anyhow::Result<()> {
     let server = MockServer::builder().response(200, SEARCH).start()?;
     let resp = server
         .client()
@@ -35,7 +35,7 @@ async fn success_is_decoded_as_the_model() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn not_found_answered_with_the_model_is_not_an_error() -> anyhow::Result<()> {
+async fn not_found_answered_with_the_response_type_is_not_an_error() -> anyhow::Result<()> {
     let server = MockServer::builder()
         .response(404, r#"{"_index":"movies","_id":"nope","found":false}"#)
         .start()?;
@@ -136,8 +136,8 @@ async fn decode_error_names_the_type_and_the_cause() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn model_status_with_an_error_body_is_an_api_error() -> anyhow::Result<()> {
-    // `get` answers 404 for a missing document (the model) and for a
+async fn typed_status_with_an_error_body_is_an_api_error() -> anyhow::Result<()> {
+    // `get` answers 404 for a missing document (the response type) and for a
     // missing index (an error body)
     let server = MockServer::builder()
         .response(
@@ -179,7 +179,7 @@ async fn the_typed_client_shares_the_transport() -> anyhow::Result<()> {
     Ok(())
 }
 
-/// A search response with keys the model does not define: at the top
+/// A search response with keys the response type does not define: at the top
 /// level, nested in `_shards`, inside a hit, and inside `hits.total` (a
 /// union), plus a `null` one
 const SEARCH_WITH_UNKNOWN_FIELDS: &str = r#"{"took":3,"timed_out":false,
@@ -245,7 +245,7 @@ async fn unknown_fields_can_be_reported() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn a_response_the_model_fully_describes_passes_the_strict_check() -> anyhow::Result<()> {
+async fn a_response_its_type_fully_describes_passes_the_strict_check() -> anyhow::Result<()> {
     let server = MockServer::builder().response(200, SEARCH).start()?;
     let resp = server
         .client()
@@ -256,7 +256,7 @@ async fn a_response_the_model_fully_describes_passes_the_strict_check() -> anyho
         .await?;
     assert_eq!(resp.took, 3);
 
-    // a 404 answered with the model is checked the same way
+    // a 404 answered with the response type is checked the same way
     let server = MockServer::builder()
         .response(404, r#"{"_index":"movies","_id":"nope","found":false}"#)
         .start()?;

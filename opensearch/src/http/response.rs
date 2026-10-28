@@ -116,9 +116,9 @@ impl Response {
     }
 
     /// Reads the body of a typed call ([`crate::typed`]) as `T`, the response
-    /// model of the endpoint.
+    /// response type of the endpoint.
     ///
-    /// Any 2xx status, and the non-2xx statuses in `model_statuses` (those
+    /// Any 2xx status, and the non-2xx statuses in `typed_statuses` (those
     /// for which the specification declares the same body as for success,
     /// e.g. 404 of `get`), are decoded as `T`; every other status becomes an
     /// [ApiError](crate::ApiError). A listed non-2xx status whose body is not
@@ -130,7 +130,7 @@ impl Response {
     pub(crate) async fn typed<T>(
         self,
         type_name: &'static str,
-        model_statuses: &[u16],
+        typed_statuses: &[u16],
         report_unknown_fields: bool,
     ) -> Result<T, ClientError>
     where
@@ -139,27 +139,27 @@ impl Response {
         let status = self.status_code();
         let url = self.url().clone();
         let body = self.response.bytes().await?;
-        let model = if status.is_success() {
+        let value = if status.is_success() {
             serde_json::from_slice(&body)
                 .map_err(|e| ClientError::decode(url.clone(), type_name, e))?
         } else {
-            match model_statuses
+            match typed_statuses
                 .contains(&status.as_u16())
                 .then(|| serde_json::from_slice(&body).ok())
                 .flatten()
             {
-                Some(model) => model,
+                Some(value) => value,
                 None => return Err(ClientError::api(status, url, &body)),
             }
         };
         if report_unknown_fields {
-            let unknown = crate::typed::unknown_fields(&body, &model)
+            let unknown = crate::typed::unknown_fields(&body, &value)
                 .map_err(|e| ClientError::decode(url.clone(), type_name, e))?;
             if !unknown.is_empty() {
                 return Err(ClientError::unknown_fields_error(url, type_name, unknown));
             }
         }
-        Ok(model)
+        Ok(value)
     }
 
     /// Gets the response headers.

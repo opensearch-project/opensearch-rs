@@ -6,10 +6,10 @@
  * compatible open source license.
  */
 
-//! The fields of the generated response models declared as raw JSON, with
+//! The fields of the generated response types declared as raw JSON, with
 //! the reason each cannot, or should not, be typed. See the parent module.
 //!
-//! Generation fails when this table and the generated models disagree, and
+//! Generation fails when this table and the generated response types disagree, and
 //! prints the declarations to add. Keep the entries grouped by namespace and
 //! sorted by key.
 

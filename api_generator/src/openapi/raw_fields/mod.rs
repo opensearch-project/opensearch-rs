@@ -6,18 +6,18 @@
  * compatible open source license.
  */
 
-//! The fields of the generated response models that are left as raw JSON.
+//! The fields of the generated response types that are left as raw JSON.
 //!
 //! 100% typing is a non-goal: shapes decided at runtime (documents,
 //! generic type parameters, untyped `additionalProperties`, schemas
-//! without a type) are held as raw JSON ([IrRef::Raw]). Each of them is
+//! without a type) are held as raw JSON ([TypeRef::Raw]). Each of them is
 //! however a deliberate, reviewed decision, declared in [declared::RAW_FIELDS]
 //! with the reason it cannot be typed. Generation checks the generated
-//! models against that table and fails when
+//! response types against that table and fails when
 //!
 //! - a field is generated as raw JSON but not declared: a specification
 //!   change silently turning a typed field into raw JSON fails generation
-//!   instead of quietly shipping a weaker model,
+//!   instead of quietly shipping a weaker response type,
 //! - a declaration has no review reason ([UNREVIEWED]): the table cannot be
 //!   filled by pasting whatever the generator emits without a review,
 //! - a declaration does not match a raw field any more (stale), or its
@@ -27,7 +27,7 @@
 
 mod declared;
 
-use super::responses::{IrRef, IrType, RawCause, ResponseIr};
+use super::responses::{RawCause, ResponseModel, TypeModel, TypeRef};
 use anyhow::bail;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
@@ -38,10 +38,10 @@ pub use declared::RAW_FIELDS;
 /// fails while a declaration has it.
 pub const UNREVIEWED: &str = "UNREVIEWED";
 
-/// A field of the generated response models declared as raw JSON
+/// A field of the generated response types declared as raw JSON
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RawField {
-    /// `namespace:TypeName/member`: the IR namespace and type name of the
+    /// `namespace:TypeName/member`: the namespace and type name of the
     /// owning type, and the JSON name of the field, `-` for a whole-type
     /// alias, `[additional]` for a residual map, or the variant name of a
     /// union variant. The namespace qualifies the key, as type names repeat
@@ -49,7 +49,7 @@ pub struct RawField {
     /// `IndexSettings`)
     pub key: &'static str,
     /// Why the generator falls back to raw JSON. Checked against the
-    /// generated models, so that a change of cause is reviewed again
+    /// generated response types, so that a change of cause is reviewed again
     pub cause: RawCause,
     /// Why the field cannot, or should not, be typed
     pub reason: &'static str,
@@ -60,10 +60,10 @@ pub const fn raw(key: &'static str, cause: RawCause, reason: &'static str) -> Ra
     RawField { key, cause, reason }
 }
 
-/// One raw-JSON use in the generated models
+/// One raw-JSON use in the generated response types
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RawUse {
-    /// The IR namespace of the owning type
+    /// The namespace of the owning type
     pub namespace: String,
     /// The key of the use: see [RawField::key]
     pub key: String,
@@ -73,13 +73,13 @@ pub struct RawUse {
     pub cause: RawCause,
 }
 
-/// Collects every raw-JSON use reachable in the IR, sorted by namespace
+/// Collects every raw-JSON use reachable in the model, sorted by namespace
 /// then key
-pub fn collect_raw_uses(ir: &ResponseIr) -> Vec<RawUse> {
+pub fn collect_raw_uses(model: &ResponseModel) -> Vec<RawUse> {
     let mut uses = BTreeSet::new();
-    for (ir_name, ty) in &ir.types {
-        let namespace = super::responses::namespace(ir_name).to_string();
-        let type_name = super::responses::type_name(ir_name);
+    for (type_key, ty) in &model.types {
+        let namespace = super::responses::namespace(type_key).to_string();
+        let type_name = super::responses::type_name(type_key);
         let mut push = |member: &str, raw: Option<(String, RawCause)>| {
             if let Some((form, cause)) = raw {
                 uses.insert(RawUse {
@@ -91,7 +91,7 @@ pub fn collect_raw_uses(ir: &ResponseIr) -> Vec<RawUse> {
             }
         };
         match ty {
-            IrType::Struct(s) => {
+            TypeModel::Struct(s) => {
                 for f in &s.fields {
                     push(&f.json_name, raw_form(&f.ty));
                 }
@@ -99,13 +99,13 @@ pub fn collect_raw_uses(ir: &ResponseIr) -> Vec<RawUse> {
                     push("[additional]", raw_form(t));
                 }
             }
-            IrType::DispatchUnion(u) | IrType::LazyUnion(u) => {
+            TypeModel::DispatchUnion(u) | TypeModel::LazyUnion(u) => {
                 for v in &u.variants {
                     push(&v.name, raw_form(&v.ty));
                 }
             }
-            IrType::Alias(a) => push("-", raw_form(&a.ty)),
-            IrType::StrEnum(_) => {}
+            TypeModel::Alias(a) => push("-", raw_form(&a.ty)),
+            TypeModel::StrEnum(_) => {}
         }
     }
     uses.into_iter().collect()
@@ -113,16 +113,16 @@ pub fn collect_raw_uses(ir: &ResponseIr) -> Vec<RawUse> {
 
 /// The form and cause of a raw use inside a reference, or `None` when the
 /// reference holds no raw JSON
-fn raw_form(ty: &IrRef) -> Option<(String, RawCause)> {
+fn raw_form(ty: &TypeRef) -> Option<(String, RawCause)> {
     match ty {
-        IrRef::Raw(cause) => Some(("bare".to_string(), *cause)),
-        IrRef::List(inner) => raw_form(inner).map(|(f, c)| (format!("list<{}>", f), c)),
-        IrRef::Map(inner) => raw_form(inner).map(|(f, c)| (format!("map<{}>", f), c)),
-        IrRef::Named(_) | IrRef::Scalar(_) => None,
+        TypeRef::Raw(cause) => Some(("bare".to_string(), *cause)),
+        TypeRef::List(inner) => raw_form(inner).map(|(f, c)| (format!("list<{}>", f), c)),
+        TypeRef::Map(inner) => raw_form(inner).map(|(f, c)| (format!("map<{}>", f), c)),
+        TypeRef::Named(_) | TypeRef::Scalar(_) => None,
     }
 }
 
-/// The result of checking the generated models against the declarations
+/// The result of checking the generated response types against the declarations
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Check {
     /// Raw uses that are not declared
@@ -139,13 +139,13 @@ pub struct Check {
 }
 
 impl Check {
-    /// Whether the generated models match the declarations
+    /// Whether the generated response types match the declarations
     pub fn is_ok(&self) -> bool {
         *self == Check::default()
     }
 }
 
-/// Compares the raw uses of the generated models with the declarations
+/// Compares the raw uses of the generated response types with the declarations
 pub fn check(uses: &[RawUse], declared: &[RawField]) -> Check {
     let mut by_key: BTreeMap<&str, &RawField> = BTreeMap::new();
     let mut result = Check::default();
@@ -195,14 +195,14 @@ pub fn declaration(u: &RawUse) -> String {
     )
 }
 
-/// Checks the generated models against [RAW_FIELDS], failing generation
+/// Checks the generated response types against [RAW_FIELDS], failing generation
 /// with a description of every problem and the declarations to add
-pub fn enforce(ir: &ResponseIr) -> anyhow::Result<()> {
-    enforce_with(ir, RAW_FIELDS)
+pub fn enforce(model: &ResponseModel) -> anyhow::Result<()> {
+    enforce_with(model, RAW_FIELDS)
 }
 
-fn enforce_with(ir: &ResponseIr, declared: &[RawField]) -> anyhow::Result<()> {
-    let result = check(&collect_raw_uses(ir), declared);
+fn enforce_with(model: &ResponseModel, declared: &[RawField]) -> anyhow::Result<()> {
+    let result = check(&collect_raw_uses(model), declared);
     if result.is_ok() {
         return Ok(());
     }
@@ -261,7 +261,7 @@ fn enforce_with(ir: &ResponseIr, declared: &[RawField]) -> anyhow::Result<()> {
         );
     }
     bail!(
-        "raw fields of the response models (api_generator/src/openapi/raw_fields/declared.rs):\n{}",
+        "raw fields of the response types (api_generator/src/openapi/raw_fields/declared.rs):\n{}",
         out.trim_end()
     )
 }
@@ -269,18 +269,18 @@ fn enforce_with(ir: &ResponseIr, declared: &[RawField]) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openapi::responses::{IrAlias, IrField, IrStruct, Scalar};
+    use crate::openapi::responses::{AliasModel, FieldModel, Scalar, StructModel};
 
-    fn ir_with(types: Vec<(&str, IrType)>) -> ResponseIr {
-        let mut ir = ResponseIr::default();
+    fn model_with(types: Vec<(&str, TypeModel)>) -> ResponseModel {
+        let mut model = ResponseModel::default();
         for (n, t) in types {
-            ir.types.insert(n.to_string(), t);
+            model.types.insert(n.to_string(), t);
         }
-        ir
+        model
     }
 
-    fn field(name: &str, ty: IrRef) -> IrField {
-        IrField {
+    fn field(name: &str, ty: TypeRef) -> FieldModel {
+        FieldModel {
             json_name: name.to_string(),
             ty,
             required: false,
@@ -300,32 +300,35 @@ mod tests {
 
     #[test]
     fn collects_raw_uses_with_their_form_and_cause() {
-        let ir = ir_with(vec![
+        let model = model_with(vec![
             (
                 "_core.search___Hit",
-                IrType::Struct(IrStruct {
+                TypeModel::Struct(StructModel {
                     description: None,
                     fields: vec![
-                        field("_source", IrRef::Raw(RawCause::GenericParameter)),
-                        field("_id", IrRef::Scalar(Scalar::String)),
+                        field("_source", TypeRef::Raw(RawCause::GenericParameter)),
+                        field("_id", TypeRef::Scalar(Scalar::String)),
                         field(
                             "fields",
-                            IrRef::Map(Box::new(IrRef::Raw(RawCause::OpenObject))),
+                            TypeRef::Map(Box::new(TypeRef::Raw(RawCause::OpenObject))),
                         ),
-                        field("sort", IrRef::List(Box::new(IrRef::Raw(RawCause::NoType)))),
+                        field(
+                            "sort",
+                            TypeRef::List(Box::new(TypeRef::Raw(RawCause::NoType))),
+                        ),
                     ],
-                    residual: Some(("additional".to_string(), IrRef::Raw(RawCause::OpenObject))),
+                    residual: Some(("additional".to_string(), TypeRef::Raw(RawCause::OpenObject))),
                 }),
             ),
             (
                 "_common___Metadata",
-                IrType::Alias(IrAlias {
+                TypeModel::Alias(AliasModel {
                     description: None,
-                    ty: IrRef::Map(Box::new(IrRef::Raw(RawCause::OpenObject))),
+                    ty: TypeRef::Map(Box::new(TypeRef::Raw(RawCause::OpenObject))),
                 }),
             ),
         ]);
-        let uses = collect_raw_uses(&ir);
+        let uses = collect_raw_uses(&model);
         let got: Vec<(&str, &str, &str)> = uses
             .iter()
             .map(|u| (u.key.as_str(), u.form.as_str(), u.cause.label()))
@@ -380,18 +383,18 @@ mod tests {
 
     #[test]
     fn a_failure_prints_the_declarations_to_add() {
-        let ir = ir_with(vec![(
+        let model = model_with(vec![(
             "ns___T",
-            IrType::Struct(IrStruct {
+            TypeModel::Struct(StructModel {
                 description: None,
                 fields: vec![field(
                     "a",
-                    IrRef::Map(Box::new(IrRef::Raw(RawCause::OpenObject))),
+                    TypeRef::Map(Box::new(TypeRef::Raw(RawCause::OpenObject))),
                 )],
                 residual: None,
             }),
         )]);
-        let err = enforce_with(&ir, &[]).unwrap_err().to_string();
+        let err = enforce_with(&model, &[]).unwrap_err().to_string();
         assert!(
             err.contains(
                 "    // map<bare> open-object\n    raw(\"ns:T/a\", OpenObject, UNREVIEWED),"
@@ -400,7 +403,7 @@ mod tests {
             err
         );
         // pasting it as is still fails: a reason is required
-        let err = enforce_with(&ir, &[raw("ns:T/a", RawCause::OpenObject, UNREVIEWED)])
+        let err = enforce_with(&model, &[raw("ns:T/a", RawCause::OpenObject, UNREVIEWED)])
             .unwrap_err()
             .to_string();
         assert!(
@@ -408,7 +411,7 @@ mod tests {
             "{}",
             err
         );
-        assert!(enforce_with(&ir, &[raw("ns:T/a", RawCause::OpenObject, "reviewed")]).is_ok());
+        assert!(enforce_with(&model, &[raw("ns:T/a", RawCause::OpenObject, "reviewed")]).is_ok());
     }
 
     #[test]
@@ -417,12 +420,12 @@ mod tests {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
         let spec: serde_json::Value =
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
-        let ir = crate::openapi::responses::read_response_ir(
+        let model = crate::openapi::responses::read_response_model(
             &spec,
             crate::openapi::responses::TYPED_OPERATION_GROUPS,
         )
         .unwrap();
-        enforce(&ir).unwrap();
+        enforce(&model).unwrap();
     }
 
     #[test]
@@ -434,8 +437,8 @@ mod tests {
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
         let groups = crate::openapi::responses::all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        let ir = crate::openapi::responses::read_response_ir(&spec, &refs).unwrap();
-        let uses = collect_raw_uses(&ir);
+        let model = crate::openapi::responses::read_response_model(&spec, &refs).unwrap();
+        let uses = collect_raw_uses(&model);
         let keys: BTreeSet<&str> = uses.iter().map(|u| u.key.as_str()).collect();
         assert_eq!(keys.len(), uses.len(), "duplicate keys");
     }

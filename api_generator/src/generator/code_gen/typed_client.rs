@@ -7,8 +7,8 @@
  */
 
 //! Generates the typed client (`opensearch::typed`): for every endpoint with
-//! a typed response model, a typed builder wrapping the generic one, whose
-//! `send` returns the model, and the method creating it on the typed root or
+//! a response type, a typed builder wrapping the generic one, whose
+//! `send` returns the response type, and the method creating it on the typed root or
 //! namespace client.
 
 use super::{
@@ -21,22 +21,22 @@ use quote::{quote, TokenStreamExt};
 use std::path::Path;
 
 /// A request option that changes the shape of the response, so that the
-/// response no longer matches the typed model
+/// response no longer matches the response type
 struct OmittedParam {
     /// Operation groups the option is omitted from: a group name, a
     /// namespace prefix ending with `.`, or `*` for every group
     groups: &'static str,
     name: &'static str,
     /// The value the typed builder always sends, when the API needs one to
-    /// answer with the model
+    /// answer with the response type
     fixed: Option<&'static str>,
 }
 
 /// The options the typed builders do not offer. A typed builder must not be
-/// able to express a request whose response cannot be decoded as its model.
+/// able to express a request whose response cannot be decoded as its response type.
 const OMITTED_PARAMS: &[OmittedParam] = &[
     // keeps only the matching parts of the response, dropping fields the
-    // model requires
+    // response type requires
     OmittedParam {
         groups: "*",
         name: "filter_path",
@@ -133,7 +133,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<String> {
         let fn_ident = ident(namespace_name);
         let name_for_docs = namespace_name.replace('_', " ").to_pascal_case();
         let client_doc = doc(&format!(
-            "Typed namespace client for {} APIs: the APIs with a typed response model",
+            "Typed namespace client for {} APIs: the APIs with a response type",
             name_for_docs
         ));
         let fn_doc = doc(&format!(

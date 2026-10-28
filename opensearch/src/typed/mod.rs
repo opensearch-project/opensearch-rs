@@ -6,11 +6,11 @@
  * compatible open source license.
  */
 
-//! The typed client: APIs whose `send` returns the typed response model
+//! The typed client: APIs whose `send` returns the response type
 //! ([`crate::types`]) instead of a generic [`Response`](crate::http::response::Response).
 //!
 //! The typed client shares the transport of the generic client it is
-//! created from, and offers the APIs that have a response model so far (see
+//! created from, and offers the APIs that have a response type so far (see
 //! [`crate::types`]). Its builders take the same parts and options as the
 //! generic builders, except the options that change the shape of the
 //! response, which the typed builders do not offer at all:
@@ -40,7 +40,7 @@
 //! # }
 //! ```
 //!
-//! `filter_path`, which removes fields the model requires, does not exist
+//! `filter_path`, which removes fields the response type requires, does not exist
 //! on the typed builders:
 //!
 //! ```rust,compile_fail
@@ -57,10 +57,10 @@
 //!
 //! # Errors
 //!
-//! A status whose body is not the model (e.g. 404 `index_not_found_exception`,
+//! A status whose body is not the response type (e.g. 404 `index_not_found_exception`,
 //! 400 for an invalid request) is an error, whose status code and body are
 //! available from [`Error::api_error`](crate::Error::api_error). A status the
-//! API answers with the model is decoded, e.g. 404 of `get` for a document
+//! API answers with the response type is decoded, e.g. 404 of `get` for a document
 //! that is not found (`found: false`):
 //!
 //! ```rust,no_run
@@ -83,9 +83,9 @@
 //! # }
 //! ```
 //!
-//! # Fields unknown to the models
+//! # Fields unknown to the response types
 //!
-//! Keys of the response that the model does not define (fields added by
+//! Keys of the response that the response type does not define (fields added by
 //! plugins or newer OpenSearch versions, or missing from the specification)
 //! are ignored by default, as by the other OpenSearch clients. A typed client
 //! set with [`ignore_unknown_fields(false)`](TypedOpenSearch::ignore_unknown_fields)
@@ -101,14 +101,14 @@
 //!     Ok(resp) => println!("took {} ms", resp.took),
 //!     Err(e) => match e.unknown_fields() {
 //!         // e.g. [".ext"] with a search pipeline adding `ext`
-//!         Some(fields) => println!("not in the model: {:?}", fields),
+//!         Some(fields) => println!("not in the response type: {:?}", fields),
 //!         None => println!("request failed: {}", e),
 //!     },
 //! }
 //! # }
 //! ```
 //!
-//! Values kept as raw JSON by the models (documents, aggregations, maps the
+//! Values kept as raw JSON by the response types (documents, aggregations, maps the
 //! specification leaves open) are not checked.
 //!
 //! # The typed and the generic client
@@ -116,8 +116,8 @@
 //! The generic client ([`OpenSearch`]) is unchanged: its `send` returns the
 //! [`Response`](crate::http::response::Response) for any status. Use it to read the status code or the
 //! headers (e.g. deprecation warnings), for options the typed builders do not
-//! offer, and for the APIs without a model. Its body can still be decoded
-//! into a model with `Response::json`:
+//! offer, and for the APIs without a response type. Its body can still be decoded
+//! into a response type with `Response::json`:
 //!
 //! ```rust,no_run
 //! # use opensearch::{OpenSearch, SearchParts};
@@ -137,8 +137,8 @@ use crate::{client::OpenSearch, http::transport::Transport};
 mod builders;
 pub use builders::*;
 
-/// The typed client: the APIs with a typed response model, whose `send`
-/// returns the model. Created with [`OpenSearch::typed`], or from a
+/// The typed client: the APIs with a response type, whose `send`
+/// returns the response type. Created with [`OpenSearch::typed`], or from a
 /// [`Transport`].
 #[derive(Clone, Debug)]
 pub struct TypedOpenSearch {
@@ -166,9 +166,9 @@ impl TypedOpenSearch {
         &self.transport
     }
 
-    /// Whether keys of a response that its model does not define are
+    /// Whether keys of a response that its response type does not define are
     /// ignored (`true`, the default), or make the call fail with an error
-    /// listing them (`false`). See [Fields unknown to the models](crate::typed#fields-unknown-to-the-models).
+    /// listing them (`false`). See [Fields unknown to the response types](crate::typed#fields-unknown-to-the-response-types).
     pub fn ignore_unknown_fields(mut self, ignore: bool) -> Self {
         self.ignore_unknown_fields = ignore;
         self
@@ -181,13 +181,13 @@ impl TypedOpenSearch {
     }
 }
 
-/// The paths of the keys of `body` that `model` does not keep: the model is
+/// The paths of the keys of `body` that `value` does not keep: `value` is
 /// serialized back and compared with the body, so that a key is reported
-/// wherever the model drops it, including inside unions. A key whose value
+/// wherever the response type drops it, including inside unions. A key whose value
 /// is `null` is not reported, as optional fields are skipped when absent.
 pub(crate) fn unknown_fields<T: serde::Serialize>(
     body: &[u8],
-    model: &T,
+    value: &T,
 ) -> Result<Vec<String>, serde_json::Error> {
     use serde_json::Value;
 
@@ -219,7 +219,7 @@ pub(crate) fn unknown_fields<T: serde::Serialize>(
     }
 
     let original: Value = serde_json::from_slice(body)?;
-    let back = serde_json::to_value(model)?;
+    let back = serde_json::to_value(value)?;
     let mut out = Vec::new();
     walk(&original, &back, &mut String::new(), &mut out);
     Ok(out)
@@ -227,8 +227,8 @@ pub(crate) fn unknown_fields<T: serde::Serialize>(
 
 impl OpenSearch {
     /// The typed client of this client, sharing its transport: the APIs with
-    /// a typed response model, whose `send` returns the model. Keys of the
-    /// responses unknown to the models are ignored; see
+    /// a response type, whose `send` returns the response type. Keys of the
+    /// responses unknown to the response types are ignored; see
     /// [`TypedOpenSearch::ignore_unknown_fields`] and [`crate::typed`].
     pub fn typed(&self) -> TypedOpenSearch {
         TypedOpenSearch::new(self.transport().clone())

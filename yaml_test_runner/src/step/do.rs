@@ -162,11 +162,11 @@ impl Do {
                     crate::assert_response_success!(response);
                 });
                 // shadow typing: for endpoints with a generated response
-                // model, verify that the successful response deserializes
-                // into it and round-trips (keys unknown to the model are
+                // response type, verify that the successful response deserializes
+                // into it and round-trips (keys unknown to the response type are
                 // reported separately). Only emitted
                 // on this branch: with `catch` or `ignore` the response
-                // may be an error, which the models do not describe.
+                // may be an error, which the response types do not describe.
                 if !read_response {
                     if let Some(check) = typed_response_check(
                         &self.api_call.full_name,
@@ -270,7 +270,7 @@ pub struct ApiCall {
     /// The full name of the called operation group, e.g. `search` or
     /// `indices.create`
     full_name: String,
-    /// The Rust path of the generated response model of the endpoint, when
+    /// The Rust path of the generated response type of the endpoint, when
     /// one exists (see [ApiEndpoint::typed_response]) and the response is
     /// expected to have its shape: `None` when the call passes
     /// `filter_path`, which removes fields from the response at will
@@ -357,7 +357,7 @@ impl ApiCall {
         }
 
         // `filter_path` returns an arbitrary subset of the response, which
-        // the response model is not meant to describe (callers decode such
+        // the response type is not meant to describe (callers decode such
         // responses into their own types): no typed verification then
         let filters_response = params.iter().any(|(k, _)| *k == "filter_path");
 
@@ -1002,8 +1002,8 @@ impl ApiCall {
 }
 
 /// The tokens verifying that the successful response of an operation
-/// group deserializes into its generated response model — or `None` when
-/// the group has no typed response model.
+/// group deserializes into its generated response type — or `None` when
+/// the group has no response type.
 ///
 /// The emitted call expects the `text` binding produced by
 /// `client::read_response` to be in scope.
@@ -1042,7 +1042,7 @@ mod tests {
     }
 
     #[test]
-    fn typed_check_is_not_emitted_without_a_model() {
+    fn typed_check_is_not_emitted_without_a_response_type() {
         assert!(typed_response_check("exists", &None).is_none());
     }
 
@@ -1067,7 +1067,7 @@ mod tests {
     #[test]
     fn typed_check_is_skipped_for_filter_path() {
         let api = spec_api();
-        // a plain search is verified against its model
+        // a plain search is verified against its response type
         let plain = do_tokens(&api, "search:\n  index: test\n");
         assert!(plain.contains("check_typed_response"), "{}", plain);
         // filter_path returns an arbitrary subset of the response: not verified

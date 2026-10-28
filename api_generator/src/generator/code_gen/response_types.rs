@@ -6,8 +6,8 @@
  * compatible open source license.
  */
 
-//! Generates typed response models under `opensearch/src/types/` from a
-//! [ResponseIr] built by the OpenAPI response reader.
+//! Generates typed response types under `opensearch/src/types/` from a
+//! [ResponseModel] built by the OpenAPI response reader.
 //!
 //! One module is generated per specification namespace (`_core.search`
 //! becomes `types/search.rs`, `_common.aggregations` becomes
@@ -16,8 +16,8 @@
 //! declarations and cannot conflict.
 
 use crate::openapi::responses::{
-    namespace, type_name, IrField, IrRef, IrStrEnum, IrStruct, IrType, IrUnion, JsonKind,
-    ResponseIr, Scalar,
+    namespace, type_name, FieldModel, JsonKind, ResponseModel, Scalar, StrEnumModel, StructModel,
+    TypeModel, TypeRef, UnionModel,
 };
 use inflector::Inflector;
 use std::collections::{BTreeMap, BTreeSet};
@@ -26,27 +26,29 @@ use std::fmt::Write;
 /// Generates the response type modules: returns `(module name, source)`
 /// pairs and the content of the `response-modules` section of
 /// `types/mod.rs`
-pub fn generate(ir: &ResponseIr) -> anyhow::Result<(Vec<(String, String)>, String)> {
-    let boxed = boxed_edges(ir);
-    let total_hits_unions = total_hits_unions(ir);
+pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>, String)> {
+    let boxed = boxed_edges(model);
+    let total_hits_unions = total_hits_unions(model);
 
     // render each type into its module
     let mut modules: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
-    for (ir_name, ty) in &ir.types {
-        let module = module_name(namespace(ir_name));
-        let rust_name = rust_type_name(ir_name);
+    for (type_key, ty) in &model.types {
+        let module = module_name(namespace(type_key));
+        let rust_name = rust_type_name(type_key);
         let source = match ty {
-            IrType::Struct(s) => render_struct(ir_name, &rust_name, s, &boxed, &total_hits_unions),
-            IrType::DispatchUnion(u) => {
-                let mut out = render_dispatch_union(ir_name, &rust_name, u, &boxed);
-                if total_hits_unions.contains(ir_name) {
+            TypeModel::Struct(s) => {
+                render_struct(type_key, &rust_name, s, &boxed, &total_hits_unions)
+            }
+            TypeModel::DispatchUnion(u) => {
+                let mut out = render_dispatch_union(type_key, &rust_name, u, &boxed);
+                if total_hits_unions.contains(type_key) {
                     render_total_hit_count(&mut out, &rust_name, u);
                 }
                 out
             }
-            IrType::LazyUnion(u) => render_lazy_union(&rust_name, u),
-            IrType::StrEnum(e) => render_str_enum(&rust_name, e),
-            IrType::Alias(a) => {
+            TypeModel::LazyUnion(u) => render_lazy_union(&rust_name, u),
+            TypeModel::StrEnum(e) => render_str_enum(&rust_name, e),
+            TypeModel::Alias(a) => {
                 let mut out = String::new();
                 doc(&mut out, a.description.as_deref());
                 let _ = writeln!(out, "pub type {} = {};", rust_name, render_ref(&a.ty));
@@ -58,7 +60,7 @@ pub fn generate(ir: &ResponseIr) -> anyhow::Result<(Vec<(String, String)>, Strin
 
     // per-endpoint response aliases, e.g. `IndexResponse` for the `index`
     // operation group whose root schema is the shared WriteResponseBase
-    for (group, root) in &ir.endpoints {
+    for (group, root) in &model.endpoints {
         let (desired_module, desired_name) =
             crate::openapi::responses::endpoint_response_alias(group);
         let root_module = module_name(namespace(root));
@@ -113,9 +115,9 @@ pub fn module_name(ns: &str) -> String {
     ns.replace("._", "_").replace('.', "_")
 }
 
-/// The Rust type name of an IR name
-fn rust_type_name(ir_name: &str) -> String {
-    let name = type_name(ir_name);
+/// The Rust type name of a type key
+fn rust_type_name(type_key: &str) -> String {
+    let name = type_name(type_key);
     if name.chars().next().is_some_and(|c| c.is_lowercase()) {
         name.to_pascal_case()
     } else {
@@ -123,18 +125,18 @@ fn rust_type_name(ir_name: &str) -> String {
     }
 }
 
-/// Renders an [IrRef] as a fully qualified Rust type
-fn render_ref(ty: &IrRef) -> String {
+/// Renders an [TypeRef] as a fully qualified Rust type
+fn render_ref(ty: &TypeRef) -> String {
     match ty {
-        IrRef::Named(n) => format!(
+        TypeRef::Named(n) => format!(
             "crate::types::{}::{}",
             module_name(namespace(n)),
             rust_type_name(n)
         ),
-        IrRef::Scalar(s) => scalar_type(*s).to_string(),
-        IrRef::List(t) => format!("Vec<{}>", render_ref(t)),
-        IrRef::Map(t) => format!("std::collections::BTreeMap<String, {}>", render_ref(t)),
-        IrRef::Raw(_) => "Box<serde_json::value::RawValue>".to_string(),
+        TypeRef::Scalar(s) => scalar_type(*s).to_string(),
+        TypeRef::List(t) => format!("Vec<{}>", render_ref(t)),
+        TypeRef::Map(t) => format!("std::collections::BTreeMap<String, {}>", render_ref(t)),
+        TypeRef::Raw(_) => "Box<serde_json::value::RawValue>".to_string(),
     }
 }
 
@@ -188,7 +190,7 @@ fn field_ident(json_name: &str, taken: &BTreeSet<String>) -> String {
 
 /// A struct field prepared for rendering
 struct Field<'a> {
-    ir: &'a IrField,
+    model: &'a FieldModel,
     ident: String,
     /// The payload type (without the `Option` of optional fields)
     payload: String,
@@ -198,8 +200,8 @@ struct Field<'a> {
 /// Prepares the fields of a struct: identifiers, payload types (boxed
 /// when part of a containment cycle) and optionality
 fn prepare_fields<'a>(
-    ir_name: &str,
-    s: &'a IrStruct,
+    type_key: &str,
+    s: &'a StructModel,
     boxed: &BTreeSet<(String, String)>,
 ) -> Vec<Field<'a>> {
     let mut taken: BTreeSet<String> = BTreeSet::new();
@@ -208,13 +210,13 @@ fn prepare_fields<'a>(
         let ident = field_ident(&f.json_name, &taken);
         taken.insert(ident.clone());
         let mut payload = render_ref(&f.ty);
-        if let IrRef::Named(target) = &f.ty {
-            if boxed.contains(&(ir_name.to_string(), target.clone())) {
+        if let TypeRef::Named(target) = &f.ty {
+            if boxed.contains(&(type_key.to_string(), target.clone())) {
                 payload = format!("Box<{}>", payload);
             }
         }
         fields.push(Field {
-            ir: f,
+            model: f,
             ident,
             payload,
             optional: !f.required || f.nullable,
@@ -227,9 +229,9 @@ fn prepare_fields<'a>(
 /// get hand-rolled `Deserialize`/`Serialize` impls that route unknown keys
 /// into the residual map; plain structs derive both.
 fn render_struct(
-    ir_name: &str,
+    type_key: &str,
     rust_name: &str,
-    s: &IrStruct,
+    s: &StructModel,
     boxed: &BTreeSet<(String, String)>,
     total_hits_unions: &BTreeSet<String>,
 ) -> String {
@@ -249,7 +251,7 @@ fn render_struct(
         return out;
     }
 
-    let fields = prepare_fields(ir_name, s, boxed);
+    let fields = prepare_fields(type_key, s, boxed);
     let mut out = String::new();
 
     // A struct whose specification declares a residual
@@ -266,11 +268,11 @@ fn render_struct(
     }
     let _ = writeln!(out, "pub struct {} {{", rust_name);
     for f in &fields {
-        doc(&mut out, f.ir.description.as_deref());
+        doc(&mut out, f.model.description.as_deref());
         if s.residual.is_none() {
             let rename = f.ident.trim_start_matches("r#");
-            if rename != f.ir.json_name {
-                let _ = writeln!(out, "    #[serde(rename = \"{}\")]", f.ir.json_name);
+            if rename != f.model.json_name {
+                let _ = writeln!(out, "    #[serde(rename = \"{}\")]", f.model.json_name);
             }
             if f.optional {
                 out.push_str("    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n");
@@ -307,35 +309,36 @@ fn render_struct(
     out
 }
 
-/// The IR name of the object form of a search's total hit count
+/// The type key of the object form of a search's total hit count
 const TOTAL_HITS: &str = "_core.search___TotalHits";
 
 /// The unions of the shape `TotalHits | integer`: the total hit count of a
 /// search (`hits.total`). The specification declares it inline in each kind
 /// of hits object, so the generator synthesizes one such union per hits
 /// object (search, inner hits, msearch, search_template, plugin searches).
-fn total_hits_unions(ir: &ResponseIr) -> BTreeSet<String> {
-    ir.types
+fn total_hits_unions(model: &ResponseModel) -> BTreeSet<String> {
+    model
+        .types
         .iter()
         .filter_map(|(name, ty)| match ty {
-            IrType::DispatchUnion(u) if is_total_hits_union(u) => Some(name.clone()),
+            TypeModel::DispatchUnion(u) if is_total_hits_union(u) => Some(name.clone()),
             _ => None,
         })
         .collect()
 }
 
-fn is_total_hits_union(u: &IrUnion) -> bool {
+fn is_total_hits_union(u: &UnionModel) -> bool {
     if u.nullable || u.variants.len() != 2 {
         return false;
     }
     let object = u
         .variants
         .iter()
-        .any(|v| matches!(&v.ty, IrRef::Named(n) if n == TOTAL_HITS));
+        .any(|v| matches!(&v.ty, TypeRef::Named(n) if n == TOTAL_HITS));
     let integer = u
         .variants
         .iter()
-        .any(|v| matches!(v.ty, IrRef::Scalar(Scalar::I64)));
+        .any(|v| matches!(v.ty, TypeRef::Scalar(Scalar::I64)));
     object && integer
 }
 
@@ -343,11 +346,11 @@ fn is_total_hits_union(u: &IrUnion) -> bool {
 /// `opensearch::types::TotalHitCount` implementation, shared by every such
 /// union, and the same methods as inherent methods, callable without
 /// importing the trait
-fn render_total_hit_count(out: &mut String, rust_name: &str, u: &IrUnion) {
+fn render_total_hit_count(out: &mut String, rust_name: &str, u: &UnionModel) {
     let variant = |object: bool| {
         u.variants
             .iter()
-            .find(|v| matches!(&v.ty, IrRef::Named(_)) == object)
+            .find(|v| matches!(&v.ty, TypeRef::Named(_)) == object)
             .map(|v| v.name.to_pascal_case())
             .unwrap()
     };
@@ -402,8 +405,8 @@ fn render_total_value(
     total_hits_unions: &BTreeSet<String>,
 ) {
     let total = match fields.iter().find(|f| {
-        f.ir.json_name == "total"
-            && matches!(&f.ir.ty, IrRef::Named(n) if total_hits_unions.contains(n))
+        f.model.json_name == "total"
+            && matches!(&f.model.ty, TypeRef::Named(n) if total_hits_unions.contains(n))
     }) {
         Some(f) => f,
         None => return,
@@ -431,14 +434,14 @@ The number may be a lower bound: by default the count is only tracked accurately
 /// Renders `source_as` for a struct holding a document body: a `_source`
 /// field generated as raw JSON (the generic `TDocument` of the
 /// specification, or an untyped `_source`). Documents are user-defined, so
-/// the model keeps them raw; `source_as` decodes one into the caller's type
+/// the response type keeps them raw; `source_as` decodes one into the caller's type
 /// without `serde_json` plumbing and without panicking when the response
 /// carries no `_source` (`_source: false` in the request, or a mapping that
 /// disables it).
 fn render_source_accessor(out: &mut String, rust_name: &str, fields: &[Field<'_>]) {
     let source = match fields
         .iter()
-        .find(|f| f.ir.json_name == "_source" && matches!(f.ir.ty, IrRef::Raw(_)))
+        .find(|f| f.model.json_name == "_source" && matches!(f.model.ty, TypeRef::Raw(_)))
     {
         Some(f) => f,
         None => return,
@@ -547,7 +550,7 @@ fn render_residual_impls(
         let _ = writeln!(
             out,
             "                        {json:?} => {{\n                            if {present} {{\n                                return Err(serde::de::Error::duplicate_field({json:?}));\n                            }}\n                            {assign}\n                        }}",
-            json = f.ir.json_name,
+            json = f.model.json_name,
             present = present,
             assign = assign
         );
@@ -565,7 +568,7 @@ fn render_residual_impls(
             let _ = writeln!(
                 out,
                 "                    {}: f_{}.ok_or_else(|| serde::de::Error::missing_field({:?}))?,",
-                f.ident, var, f.ir.json_name
+                f.ident, var, f.model.json_name
             );
         }
     }
@@ -591,13 +594,13 @@ fn render_residual_impls(
             let _ = writeln!(
                 out,
                 "        if let Some(v) = &self.{} {{\n            map.serialize_entry({:?}, v)?;\n        }}",
-                f.ident, f.ir.json_name
+                f.ident, f.model.json_name
             );
         } else {
             let _ = writeln!(
                 out,
                 "        map.serialize_entry({:?}, &self.{})?;",
-                f.ir.json_name, f.ident
+                f.model.json_name, f.ident
             );
         }
     }
@@ -616,7 +619,7 @@ fn render_residual_impls(
 /// added by newer versions or plugins never fail a response and round-trip
 /// unchanged. `#[serde(other)]` cannot carry the string, hence the
 /// generated `Serialize` / `Deserialize` impls.
-fn render_str_enum(rust_name: &str, e: &IrStrEnum) -> String {
+fn render_str_enum(rust_name: &str, e: &StrEnumModel) -> String {
     let mut out = String::new();
     doc(&mut out, e.description.as_deref());
     out.push_str("#[derive(Debug, Clone, PartialEq, Eq, Hash)]\n");
@@ -737,9 +740,9 @@ fn render_str_enum(rust_name: &str, e: &IrStrEnum) -> String {
 /// `RawValue`, unaffected by that feature, and the selected branch is then
 /// decoded from it through its own type-driven `Deserialize`.
 fn render_dispatch_union(
-    ir_name: &str,
+    type_key: &str,
     rust_name: &str,
-    u: &IrUnion,
+    u: &UnionModel,
     boxed: &BTreeSet<(String, String)>,
 ) -> String {
     let mut out = String::new();
@@ -750,8 +753,8 @@ fn render_dispatch_union(
     for v in &u.variants {
         let ident = v.name.to_pascal_case();
         let mut payload = render_ref(&v.ty);
-        if let IrRef::Named(target) = &v.ty {
-            if boxed.contains(&(ir_name.to_string(), target.clone())) {
+        if let TypeRef::Named(target) = &v.ty {
+            if boxed.contains(&(type_key.to_string(), target.clone())) {
                 payload = format!("Box<{}>", payload);
             }
         }
@@ -823,7 +826,7 @@ fn render_dispatch_union(
 
 /// Renders a lazily decoded union: the raw JSON is captured unparsed and
 /// decoded only when a branch accessor is called
-fn render_lazy_union(rust_name: &str, u: &IrUnion) -> String {
+fn render_lazy_union(rust_name: &str, u: &UnionModel) -> String {
     let mut out = String::new();
     doc(&mut out, u.description.as_deref());
     let _ = writeln!(
@@ -873,33 +876,33 @@ impl {name} {{
 /// Computes the `(container, contained)` edges that must be boxed to keep
 /// recursive types finite: an edge is boxed when the contained type can
 /// reach the container back through direct (non-indirected) containment
-fn boxed_edges(ir: &ResponseIr) -> BTreeSet<(String, String)> {
+fn boxed_edges(model: &ResponseModel) -> BTreeSet<(String, String)> {
     // direct containment edges: a contained value stored inline (fields
     // and dispatch variants); Vec / BTreeMap / lazy raw already indirect
     let mut edges: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
-    for (name, ty) in &ir.types {
+    for (name, ty) in &model.types {
         let mut targets = BTreeSet::new();
         match ty {
-            IrType::Struct(s) => {
+            TypeModel::Struct(s) => {
                 for f in &s.fields {
-                    if let IrRef::Named(n) = &f.ty {
+                    if let TypeRef::Named(n) = &f.ty {
                         targets.insert(n.as_str());
                     }
                 }
             }
-            IrType::DispatchUnion(u) => {
+            TypeModel::DispatchUnion(u) => {
                 for v in &u.variants {
-                    if let IrRef::Named(n) = &v.ty {
+                    if let TypeRef::Named(n) = &v.ty {
                         targets.insert(n.as_str());
                     }
                 }
             }
-            IrType::Alias(a) => {
-                if let IrRef::Named(n) = &a.ty {
+            TypeModel::Alias(a) => {
+                if let TypeRef::Named(n) = &a.ty {
                     targets.insert(n.as_str());
                 }
             }
-            IrType::LazyUnion(_) | IrType::StrEnum(_) => {}
+            TypeModel::LazyUnion(_) | TypeModel::StrEnum(_) => {}
         }
         edges.insert(name.as_str(), targets);
     }
@@ -937,20 +940,20 @@ fn boxed_edges(ir: &ResponseIr) -> BTreeSet<(String, String)> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openapi::responses::{all_operation_groups, read_response_ir};
+    use crate::openapi::responses::{all_operation_groups, read_response_model};
 
-    fn spec_ir() -> ResponseIr {
+    fn spec_model() -> ResponseModel {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
         let spec: serde_json::Value =
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        read_response_ir(&spec, &refs).unwrap()
+        read_response_model(&spec, &refs).unwrap()
     }
 
     #[test]
     fn total_hit_count_unions_are_found_in_every_search_like_response() {
-        let found = total_hits_unions(&spec_ir());
+        let found = total_hits_unions(&spec_model());
         // one per kind of hits object: the specification declares
         // `hits.total` inline in each
         for name in [
@@ -966,15 +969,15 @@ mod tests {
 
     #[test]
     fn string_enum_aliases_are_read_and_the_first_spelling_written() {
-        use crate::openapi::responses::{IrStrEnum, IrStrValue};
-        let e = IrStrEnum {
+        use crate::openapi::responses::{StrEnumModel, StrEnumValue};
+        let e = StrEnumModel {
             description: None,
             values: vec![
-                IrStrValue {
+                StrEnumValue {
                     value: "ASYNC".into(),
                     aliases: vec!["async".into()],
                 },
-                IrStrValue {
+                StrEnumValue {
                     value: "request".into(),
                     aliases: vec![],
                 },
@@ -1004,13 +1007,13 @@ mod tests {
 
     #[test]
     fn only_the_total_hits_or_integer_shape_is_a_total_hit_count() {
-        use crate::openapi::responses::IrVariant;
-        let union = |variants: Vec<IrRef>, nullable: bool| IrUnion {
+        use crate::openapi::responses::VariantModel;
+        let union = |variants: Vec<TypeRef>, nullable: bool| UnionModel {
             description: None,
             variants: variants
                 .into_iter()
                 .enumerate()
-                .map(|(i, ty)| IrVariant {
+                .map(|(i, ty)| VariantModel {
                     name: format!("v{}", i),
                     ty,
                     kind: None,
@@ -1018,8 +1021,8 @@ mod tests {
                 .collect(),
             nullable,
         };
-        let object = || IrRef::Named(TOTAL_HITS.to_string());
-        let integer = || IrRef::Scalar(Scalar::I64);
+        let object = || TypeRef::Named(TOTAL_HITS.to_string());
+        let integer = || TypeRef::Scalar(Scalar::I64);
 
         assert!(is_total_hits_union(&union(
             vec![object(), integer()],
@@ -1036,15 +1039,15 @@ mod tests {
         )));
         // another object, or another number type
         assert!(!is_total_hits_union(&union(
-            vec![IrRef::Named("_common___Other".into()), integer()],
+            vec![TypeRef::Named("_common___Other".into()), integer()],
             false
         )));
         assert!(!is_total_hits_union(&union(
-            vec![object(), IrRef::Scalar(Scalar::F64)],
+            vec![object(), TypeRef::Scalar(Scalar::F64)],
             false
         )));
         assert!(!is_total_hits_union(&union(
-            vec![object(), integer(), IrRef::Scalar(Scalar::String)],
+            vec![object(), integer(), TypeRef::Scalar(Scalar::String)],
             false
         )));
     }

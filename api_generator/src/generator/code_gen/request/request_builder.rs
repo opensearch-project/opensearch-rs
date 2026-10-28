@@ -677,20 +677,21 @@ impl<'a> RequestBuilder<'a> {
     }
 
     /// Builds the AST of the typed counterpart of this builder, when the
-    /// endpoint has a typed response model: the typed builder struct with its
+    /// endpoint has a response type: the typed builder struct with its
     /// methods, and the method creating it on the typed root or namespace
-    /// client. `None` for endpoints without a model.
+    /// client. `None` for endpoints without a response type.
     ///
     /// The typed builder wraps the generic one and delegates every option to
     /// it, except those that change the shape of the response, which it does
     /// not offer at all (see [typed_client::omitted_params]): `send` decodes
-    /// the body as the model, so a request that cannot produce the model's
+    /// the body as the response type, so a request that cannot produce the response type's
     /// shape must not be expressible.
     pub fn build_typed(&self) -> Option<(TokenStream, TokenStream)> {
-        let model_path = self.endpoint.typed_response.as_deref()?;
-        let model: syn::Type = syn::parse_str(&format!("crate::{}", model_path)).unwrap();
-        let model_name = lit(model_path);
-        let statuses = &self.endpoint.typed_model_statuses;
+        let response_type_path = self.endpoint.typed_response.as_deref()?;
+        let response_type: syn::Type =
+            syn::parse_str(&format!("crate::{}", response_type_path)).unwrap();
+        let response_type_name = lit(response_type_path);
+        let statuses = &self.endpoint.typed_response_statuses;
         let group = self.endpoint.full_name.as_deref().unwrap_or(self.name);
         let omitted = typed_client::omitted_params(group);
 
@@ -730,7 +731,7 @@ impl<'a> RequestBuilder<'a> {
         .collect();
 
         let api_name_for_docs = split_on_pascal_case(self.builder_name);
-        let model_link = format!("[`{path}`](crate::{path})", path = model_path);
+        let response_type_link = format!("[`{path}`](crate::{path})", path = response_type_path);
         let omitted_doc = if omitted.is_empty() {
             String::new()
         } else {
@@ -751,7 +752,7 @@ impl<'a> RequestBuilder<'a> {
         };
         let struct_doc = lit(&format!(
             "Typed builder for the {} API: [`send`](Self::send) returns {}.{}",
-            api_name_for_docs, model_link, omitted_doc
+            api_name_for_docs, response_type_link, omitted_doc
         ));
         let statuses_doc = if statuses.is_empty() {
             String::new()
@@ -765,7 +766,7 @@ impl<'a> RequestBuilder<'a> {
             "Sends the request and decodes the response body as {}.\n\n\
              The body is decoded for a success status{}. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). \
              To read the status code or the headers, use the generic client instead.",
-            model_link, statuses_doc
+            response_type_link, statuses_doc
         ));
 
         let cfg_attr = self.endpoint.stability.outer_cfg_attr();
@@ -789,11 +790,11 @@ impl<'a> RequestBuilder<'a> {
                 #(#methods)*
 
                 #[doc = #send_doc]
-                pub async fn send(self) -> Result<#model, Error> {
+                pub async fn send(self) -> Result<#response_type, Error> {
                     self.inner
                         .send()
                         .await?
-                        .typed(#model_name, &[#(#statuses),*], self.report_unknown_fields)
+                        .typed(#response_type_name, &[#(#statuses),*], self.report_unknown_fields)
                         .await
                 }
             }
@@ -981,12 +982,12 @@ mod tests {
     }
 
     #[test]
-    fn typed_builders_return_the_model_and_omit_shape_changing_options() {
+    fn typed_builders_return_the_response_type_and_omit_shape_changing_options() {
         let api = api();
         let get = api.endpoint_for_api_call("get").unwrap();
         let (builder, ctor) = typed(&api, "get", get).unwrap();
 
-        // a wrapper of the generic builder whose send returns the model
+        // a wrapper of the generic builder whose send returns the response type
         assert!(
             builder
                 .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , report_unknown_fields : bool , }"),
@@ -998,7 +999,7 @@ mod tests {
             "{}",
             builder
         );
-        // 404 answers with the model (`found: false`)
+        // 404 answers with the response type (`found: false`)
         assert!(builder.contains("& [404u16]"), "{}", builder);
         // the options of the generic builder are delegated...
         assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) , report_unknown_fields : self . report_unknown_fields , } }"), "{}", builder);
@@ -1026,14 +1027,14 @@ mod tests {
             builder
         );
 
-        // no model, no typed builder
+        // no response type, no typed builder
         let exists = api.endpoint_for_api_call("indices.exists").unwrap();
         assert!(typed(&api, "indices.exists", exists).is_none());
     }
 
     #[test]
     fn typed_cat_builders_always_ask_for_json() {
-        // no cat API is typed yet: give one a model to check the output
+        // no cat API is typed yet: give one a response type to check the output
         let api = api();
         let mut cat_indices = api.endpoint_for_api_call("cat.indices").unwrap().clone();
         assert_eq!(cat_indices.typed_response, None);

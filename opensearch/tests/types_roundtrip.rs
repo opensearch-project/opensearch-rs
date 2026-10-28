@@ -7,7 +7,7 @@
  */
 
 //! Round-trip tests for the generated response types: realistic server
-//! response fixtures must deserialize into the typed models and serialize
+//! response fixtures must deserialize into the response types and serialize
 //! back to the same JSON. No server is required.
 
 use opensearch::types::{

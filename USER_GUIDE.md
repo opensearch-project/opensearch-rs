@@ -101,9 +101,9 @@ for hit in response_body["hits"]["hits"].as_array().unwrap() {
 
 ### Typed Responses
 
-The typed client (`client.typed()`) returns the typed model of the API
+The typed client (`client.typed()`) returns the response type of the API
 (`opensearch::types`) from `send`, without naming the type. It shares the
-transport of the client, and offers the APIs with a model so far (search,
+transport of the client, and offers the APIs with a response type so far (search,
 index, bulk and get). Documents are decoded into a type of your own with
 `source_as`.
 

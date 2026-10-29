@@ -10,8 +10,8 @@
 //! ([`crate::types`]) instead of a generic [`Response`](crate::http::response::Response).
 //!
 //! The typed client shares the transport of the generic client it is
-//! created from, and offers the APIs that have a response type so far (see
-//! [`crate::types`]). Its builders take the same parts and options as the
+//! created from, and offers every API whose specification declares a JSON
+//! response, through the same namespaces (`client.typed().cluster().health(..)`). Its builders take the same parts and options as the
 //! generic builders, except the options that change the shape of the
 //! response, which the typed builders do not offer at all:
 //!

@@ -778,6 +778,8 @@ impl<'a> RequestBuilder<'a> {
             #cfg_doc
             #cfg_attr
             #deprecated_attr
+            // the field holds the deprecated generic builder of a deprecated API
+            #[allow(deprecated)]
             #[derive(Clone, Debug)]
             pub struct #typed_ident #struct_generics {
                 inner: #module::#builder_ident #struct_generics,
@@ -1034,12 +1036,10 @@ mod tests {
 
     #[test]
     fn typed_cat_builders_always_ask_for_json() {
-        // no cat API is typed yet: give one a response type to check the output
         let api = api();
-        let mut cat_indices = api.endpoint_for_api_call("cat.indices").unwrap().clone();
-        assert_eq!(cat_indices.typed_response, None);
-        cat_indices.typed_response = Some("types::cat_indices::IndicesResponse".to_string());
-        let (builder, ctor) = typed(&api, "cat.indices", &cat_indices).unwrap();
+        let cat_indices = api.endpoint_for_api_call("cat.indices").unwrap();
+        assert!(cat_indices.typed_response.is_some());
+        let (builder, ctor) = typed(&api, "cat.indices", cat_indices).unwrap();
 
         // the format option is not offered, and fixed to JSON on creation
         assert!(!builder.contains("fn format"), "{}", builder);

@@ -107,19 +107,12 @@ fn is_head_only(spec: &Value, group: &str) -> bool {
     !methods.is_empty() && methods.iter().all(|m| m == "head")
 }
 
-/// The operation groups for which typed response types are generated.
-///
-/// The generator handles the whole specification (the unit tests read every
-/// group), but response types are only generated for these groups, to keep the
-/// generated code and its compile time small while the approach is
-/// reviewed. Adding a group here generates its response type and its typed
-/// builder (`opensearch::typed`);
-/// the raw fields it introduces must then be declared, with the reason, in
-/// `openapi::raw_fields` (generation fails and prints the declarations).
-pub const TYPED_OPERATION_GROUPS: &[&str] = &["bulk", "get", "index", "search"];
-
 /// All operation groups declared in an OpenAPI document (`x-operation-group`
-/// of every operation), sorted
+/// of every operation), sorted. Response types are generated for every
+/// one of them that declares a JSON success response; the others are
+/// listed in [ResponseModel::untyped_groups] with the reason. The raw
+/// fields a group introduces must be declared, with the reason, in
+/// `openapi::raw_fields` (generation fails and prints the declarations).
 pub fn all_operation_groups(spec: &Value) -> Vec<String> {
     let mut groups = BTreeSet::new();
     if let Some(paths) = spec["paths"].as_object() {
@@ -134,6 +127,13 @@ pub fn all_operation_groups(spec: &Value) -> Vec<String> {
         }
     }
     groups.into_iter().collect()
+}
+
+/// Reads the response model of every operation group of the document
+pub fn read_all_response_models(spec: &Value) -> anyhow::Result<ResponseModel> {
+    let groups = all_operation_groups(spec);
+    let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
+    read_response_model(spec, &refs)
 }
 
 /// A type in the response model, keyed by its type key
@@ -1239,6 +1239,7 @@ mod tests {
     }
 
     /// Reads the model of the four core APIs from the vendored specification
+    /// (a subset, to keep the assertions below focused)
     fn core_model() -> ResponseModel {
         read_response_model(&spec(), &["search", "index", "bulk", "get"]).unwrap()
     }

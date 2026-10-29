@@ -123,13 +123,359 @@ pub async fn read_response(
     Ok((method, status_code, text, json))
 }
 
+/// How typed-response divergences are reported, from the `TYPED_ASSERT`
+/// environment variable: `off` skips the check entirely, `fail` panics,
+/// anything else (the default) logs a warning to stderr.
+fn typed_assert_mode() -> String {
+    std::env::var("TYPED_ASSERT").unwrap_or_else(|_| "warn".to_string())
+}
+
+/// Shadow typing verification: checks that the successful JSON response of
+/// a typed endpoint deserializes into its generated response type `T` and
+/// serializes back to the same JSON. Keys the response type does not define are
+/// ignored by the response types (as by the other OpenSearch clients): they are
+/// reported separately as unknown fields, i.e. gaps of the specification,
+/// while any other difference means the response type reads a value wrongly.
+///
+/// This runs alongside the untyped yaml assertions of the generated tests,
+/// turning every yaml test against a real cluster into a verification
+/// corpus for the generated response types. A divergence means either a
+/// bug in the type generation or a bug in the API specification.
+///
+/// The comparison normalizes two representation differences that are not
+/// data loss: integer vs float encodings of the same number (`42` vs
+/// `42.0`), and an explicit `null` vs an absent optional field.
+///
+/// Non-JSON responses are skipped. Reporting is controlled by the
+/// `TYPED_ASSERT` environment variable, see [typed_assert_mode].
+pub fn check_typed_response<T>(text: &str, endpoint: &str)
+where
+    T: serde::de::DeserializeOwned + serde::Serialize,
+{
+    let mode = typed_assert_mode();
+    if mode == "off" {
+        return;
+    }
+    if let Some(message) = typed_divergence::<T>(text, endpoint) {
+        if mode == "fail" {
+            panic!("{}", message);
+        } else {
+            eprintln!("WARN {}", message);
+        }
+    }
+}
+
+/// The failure message of the typed-response verification for the given
+/// response body, or `None` when the body is not JSON (nothing to verify)
+/// or the response type round-trips it faithfully
+fn typed_divergence<T>(text: &str, endpoint: &str) -> Option<String>
+where
+    T: serde::de::DeserializeOwned + serde::Serialize,
+{
+    // only JSON bodies are described by the response types
+    let original: Value = serde_json::from_str(text).ok()?;
+
+    let typed: T = match serde_json::from_str(text) {
+        Ok(t) => t,
+        Err(e) => {
+            return Some(format!(
+                "typed response check [{}]: response does not deserialize into the generated response type: {}. Response: {}",
+                endpoint, e, text
+            ));
+        }
+    };
+
+    let back = match serde_json::to_value(&typed) {
+        Ok(v) => v,
+        Err(e) => {
+            return Some(format!(
+                "typed response check [{}]: re-serialization failed: {}",
+                endpoint, e
+            ));
+        }
+    };
+
+    first_divergence(&original, &back, String::new()).map(|d| match d {
+        Divergence::Unknown(path) => format!(
+            "typed response check [{}]: unknown field `{}` (not in the response type). Response: {}",
+            endpoint, path, text
+        ),
+        Divergence::Changed(path) => format!(
+            "typed response check [{}]: round-trip diverged at `{}`. Response: {}",
+            endpoint, path, text
+        ),
+    })
+}
+
+/// A difference between the original response JSON and the round-tripped
+/// JSON, by the path where it occurs
+#[derive(Debug, PartialEq)]
+enum Divergence {
+    /// A key the response type does not keep: unknown to the response type
+    Unknown(String),
+    /// A value the response type reads or writes back differently
+    Changed(String),
+}
+
+/// The first divergence between the original response JSON and the
+/// round-tripped JSON, or `None` when they are equivalent.
+///
+/// Two normalizations apply: numbers are compared by value regardless of
+/// integer/float encoding, and a missing object key is equivalent to an
+/// explicit `null` (optional fields of the response types are skipped when `None`).
+fn first_divergence(original: &Value, back: &Value, path: String) -> Option<Divergence> {
+    match (original, back) {
+        (Value::Object(a), Value::Object(b)) => {
+            let keys: std::collections::BTreeSet<&String> = a.keys().chain(b.keys()).collect();
+            for key in keys {
+                let child = format!("{}.{}", path, key);
+                // a key the response type drops is unknown to it
+                if !b.contains_key(key) && !a[key].is_null() {
+                    return Some(Divergence::Unknown(child));
+                }
+                let left = a.get(key).unwrap_or(&Value::Null);
+                let right = b.get(key).unwrap_or(&Value::Null);
+                if let Some(d) = first_divergence(left, right, child) {
+                    return Some(d);
+                }
+            }
+            None
+        }
+        (Value::Array(a), Value::Array(b)) => {
+            if a.len() != b.len() {
+                return Some(Divergence::Changed(format!(
+                    "{} (array length {} vs {})",
+                    path,
+                    a.len(),
+                    b.len()
+                )));
+            }
+            for (i, (left, right)) in a.iter().zip(b.iter()).enumerate() {
+                let child = format!("{}[{}]", path, i);
+                if let Some(d) = first_divergence(left, right, child) {
+                    return Some(d);
+                }
+            }
+            None
+        }
+        (Value::Number(a), Value::Number(b)) => {
+            // compare by value: `42` and `42.0` encode the same number.
+            // Integers beyond f64 precision compare exactly first.
+            let eq = a == b
+                || match (a.as_f64(), b.as_f64()) {
+                    (Some(x), Some(y)) => x == y,
+                    _ => false,
+                };
+            if eq {
+                None
+            } else {
+                Some(Divergence::Changed(format!("{} ({} vs {})", path, a, b)))
+            }
+        }
+        (left, right) => {
+            if left == right {
+                None
+            } else {
+                Some(Divergence::Changed(if path.is_empty() {
+                    "(root)".to_string()
+                } else {
+                    path
+                }))
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod typed_response_tests {
+    use super::{first_divergence, typed_divergence, Divergence};
+    use opensearch::types::search::SearchResponse;
+    use serde_json::json;
+
+    /// The path of the first divergence, of either kind
+    fn divergence(a: &serde_json::Value, b: &serde_json::Value) -> Option<String> {
+        first_divergence(a, b, String::new()).map(|d| match d {
+            Divergence::Unknown(p) | Divergence::Changed(p) => p,
+        })
+    }
+
+    #[test]
+    fn a_realistic_search_response_passes_the_check() {
+        // full path through the generated response type, including a lazily
+        // decoded aggregation and an explicit null the response type drops
+        let text = json!({
+            "took": 5,
+            "timed_out": false,
+            "_shards": { "total": 2, "successful": 2, "skipped": 0, "failed": 0 },
+            "hits": {
+                "total": { "value": 42, "relation": "eq" },
+                "max_score": null,
+                "hits": [
+                    { "_index": "movies", "_id": "1", "_score": 1.3,
+                      "_source": { "title": "Moneyball", "year": 2011 } }
+                ]
+            },
+            "aggregations": {
+                "avg_year": { "value": 2001.25 },
+                "some_plugin_agg": { "custom": { "shape": [1, 2] } }
+            }
+        })
+        .to_string();
+        assert_eq!(typed_divergence::<SearchResponse>(&text, "search"), None);
+    }
+
+    #[test]
+    fn a_missing_required_field_is_reported() {
+        // `took` is required by the response type
+        let text = json!({
+            "timed_out": false,
+            "_shards": { "total": 1, "successful": 1, "skipped": 0, "failed": 0 },
+            "hits": { "hits": [] }
+        })
+        .to_string();
+        let message = typed_divergence::<SearchResponse>(&text, "search").unwrap();
+        assert!(message.contains("does not deserialize"), "{}", message);
+        assert!(message.contains("[search]"), "{}", message);
+    }
+
+    #[test]
+    fn non_json_bodies_are_skipped() {
+        assert_eq!(
+            typed_divergence::<SearchResponse>("green open index1\n", "search"),
+            None
+        );
+        assert_eq!(typed_divergence::<SearchResponse>("", "search"), None);
+    }
+
+    #[test]
+    fn the_call_shape_emitted_by_the_generator_compiles() {
+        // mirrors the exact call emitted into generated tests, where
+        // `text` is the String binding produced by client::read_response
+        let text = json!({
+            "took": 1,
+            "timed_out": false,
+            "_shards": { "total": 1, "successful": 1, "skipped": 0, "failed": 0 },
+            "hits": { "hits": [] }
+        })
+        .to_string();
+        super::check_typed_response::<SearchResponse>(&text, "search");
+    }
+
+    #[test]
+    fn equal_json_has_no_divergence() {
+        let v = json!({ "took": 5, "hits": { "hits": [{ "_id": "1" }] } });
+        assert_eq!(divergence(&v, &v), None);
+    }
+
+    #[test]
+    fn integer_and_float_encodings_are_equivalent() {
+        assert_eq!(
+            divergence(&json!({ "value": 42 }), &json!({ "value": 42.0 })),
+            None
+        );
+        assert_eq!(
+            divergence(&json!({ "value": 42.5 }), &json!({ "value": 42 })),
+            Some(".value (42.5 vs 42)".to_string())
+        );
+    }
+
+    #[test]
+    fn explicit_null_and_missing_key_are_equivalent() {
+        // optional fields of the response types serialize as absent, servers send explicit null
+        assert_eq!(
+            divergence(
+                &json!({ "max_score": null, "total": 1 }),
+                &json!({ "total": 1 })
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn a_dropped_key_is_an_unknown_field_and_a_changed_value_is_not() {
+        assert_eq!(
+            first_divergence(
+                &json!({ "hits": { "total": 1, "extra": "x" } }),
+                &json!({ "hits": { "total": 1 } }),
+                String::new()
+            ),
+            Some(Divergence::Unknown(".hits.extra".to_string()))
+        );
+        assert_eq!(
+            first_divergence(
+                &json!({ "durability": "async" }),
+                &json!({ "durability": "ASYNC" }),
+                String::new()
+            ),
+            Some(Divergence::Changed(".durability".to_string()))
+        );
+    }
+
+    #[test]
+    fn a_dropped_field_is_reported_with_its_path() {
+        assert_eq!(
+            divergence(
+                &json!({ "hits": { "total": 1, "extra": "x" } }),
+                &json!({ "hits": { "total": 1 } })
+            ),
+            Some(".hits.extra".to_string())
+        );
+    }
+
+    #[test]
+    fn a_changed_array_element_is_reported_with_its_index() {
+        assert_eq!(
+            divergence(
+                &json!({ "items": [{ "a": 1 }, { "a": 2 }] }),
+                &json!({ "items": [{ "a": 1 }, { "a": 3 }] })
+            ),
+            Some(".items[1].a (2 vs 3)".to_string())
+        );
+    }
+
+    #[test]
+    fn array_length_mismatch_is_reported() {
+        assert_eq!(
+            divergence(&json!([1, 2, 3]), &json!([1, 2])),
+            Some(" (array length 3 vs 2)".to_string())
+        );
+    }
+
+    #[test]
+    fn type_mismatch_at_root_is_reported() {
+        assert_eq!(
+            divergence(&json!("a"), &json!(1)),
+            Some("(root)".to_string())
+        );
+    }
+}
+
 /// general setup step for an OSS yaml test
 pub async fn general_cluster_setup() -> Result<(), Error> {
     let client = get();
+    reset_cluster_settings(client).await?;
     delete_indices(client).await?;
     delete_snapshots(client).await?;
     delete_templates(client).await?;
 
+    Ok(())
+}
+
+/// Clears the persistent and transient cluster settings a previous test may
+/// have left behind: a test disabling shard allocation would otherwise make
+/// every later test fail with unassigned shards
+async fn reset_cluster_settings(client: &OpenSearch) -> Result<(), Error> {
+    let response = client
+        .cluster()
+        .put_settings()
+        .body(serde_json::json!({
+            "persistent": { "*": null },
+            "transient": { "*": null }
+        }))
+        .send()
+        .await?;
+
+    assert_response_success!(response);
     Ok(())
 }
 

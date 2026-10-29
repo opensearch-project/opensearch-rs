@@ -147,11 +147,7 @@ fn main() -> anyhow::Result<()> {
     let download_dir = PathBuf::from(format!("./{}/yaml", env!("CARGO_PKG_NAME")));
     let generated_dir = PathBuf::from(format!("./{}/tests", env!("CARGO_PKG_NAME")));
 
-    github::ensure_test_suites(
-        &branch,
-        &download_dir,
-        matches.is_present("download-tests"),
-    )?;
+    github::ensure_test_suites(&branch, &download_dir, matches.is_present("download-tests"))?;
 
     // delete everything under the generated_dir except common dir
     if generated_dir.exists() {

@@ -99,6 +99,46 @@ for hit in response_body["hits"]["hits"].as_array().unwrap() {
 }
 ```
 
+### Typed Responses
+
+The typed client (`client.typed()`) returns the response type of the API
+(`opensearch::types`) from `send`, without naming the type. It shares the
+transport of the client, and offers the APIs with a response type so far (search,
+index, bulk and get). Documents are decoded into a type of your own with
+`source_as`.
+
+```rust
+#[derive(serde::Deserialize)]
+struct Movie {
+    title: String,
+}
+
+let response = client
+    .typed()
+    .search(opensearch::SearchParts::Index(&["movies"]))
+    .body(serde_json::json!({ "query": { "match": { "director": "miller" } } }))
+    .send()
+    .await?;
+
+println!("took {} ms", response.took);
+if let Some(total) = &response.hits.total {
+    // a lower bound beyond `track_total_hits` (10,000 by default)
+    let bound = if total.is_accurate() { "" } else { " or more" };
+    println!("{}{} hits", total.value(), bound);
+}
+for hit in &response.hits.hits {
+    if let Some(movie) = hit.source_as::<Movie>()? {
+        println!("{}", movie.title);
+    }
+}
+```
+
+With the typed client, an error status (e.g. a missing index) is returned as
+an error, whose status code and body are available from `Error::api_error()`.
+Use the generic client to read the status code or headers, and for options
+that change the shape of the response, such as `filter_path`, which the typed
+builders do not offer.
+
 ### Delete the Index
 
 ```rust

@@ -115,6 +115,53 @@ impl Response {
         Ok(body)
     }
 
+    /// Reads the body of a typed call ([`crate::typed`]) as `T`, the response
+    /// response type of the endpoint.
+    ///
+    /// Any 2xx status, and the non-2xx statuses in `typed_statuses` (those
+    /// for which the specification declares the same body as for success,
+    /// e.g. 404 of `get`), are decoded as `T`; every other status becomes an
+    /// [ApiError](crate::ApiError). A listed non-2xx status whose body is not
+    /// `T` is an error too: `get` answers 404 both for a missing document
+    /// (`{"found": false}`) and for a missing index (`index_not_found_exception`).
+    ///
+    /// Keys `T` does not define are ignored, unless `report_unknown_fields`
+    /// is set: the body is then an error listing them.
+    pub(crate) async fn typed<T>(
+        self,
+        type_name: &'static str,
+        typed_statuses: &[u16],
+        report_unknown_fields: bool,
+    ) -> Result<T, ClientError>
+    where
+        T: DeserializeOwned + Serialize,
+    {
+        let status = self.status_code();
+        let url = self.url().clone();
+        let body = self.response.bytes().await?;
+        let value = if status.is_success() {
+            serde_json::from_slice(&body)
+                .map_err(|e| ClientError::decode(url.clone(), type_name, e))?
+        } else {
+            match typed_statuses
+                .contains(&status.as_u16())
+                .then(|| serde_json::from_slice(&body).ok())
+                .flatten()
+            {
+                Some(value) => value,
+                None => return Err(ClientError::api(status, url, &body)),
+            }
+        };
+        if report_unknown_fields {
+            let unknown = crate::typed::unknown_fields(&body, &value)
+                .map_err(|e| ClientError::decode(url.clone(), type_name, e))?;
+            if !unknown.is_empty() {
+                return Err(ClientError::unknown_fields_error(url, type_name, unknown));
+            }
+        }
+        Ok(value)
+    }
+
     /// Gets the response headers.
     pub fn headers(&self) -> &HeaderMap {
         self.response.headers()

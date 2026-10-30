@@ -12,7 +12,7 @@
 pub mod common;
 use common::server::MockServer;
 
-use opensearch::{http::StatusCode, GetParts, SearchParts};
+use opensearch::{cluster::ClusterHealthParts, http::StatusCode, GetParts, SearchParts};
 
 const SEARCH: &str = r#"{"took":3,"timed_out":false,
   "_shards":{"total":1,"successful":1,"skipped":0,"failed":0},
@@ -268,5 +268,62 @@ async fn a_response_its_type_fully_describes_passes_the_strict_check() -> anyhow
         .send()
         .await?;
     assert!(!doc.found);
+    Ok(())
+}
+
+const HEALTH: &str = r#"{"cluster_name":"docker-cluster","status":"green","timed_out":false,
+  "number_of_nodes":1,"number_of_data_nodes":1,"active_primary_shards":1,"active_shards":1,
+  "relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,
+  "number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,
+  "active_shards_percent_as_number":100.0,"discovered_master":true,"discovered_cluster_manager":true}"#;
+
+#[tokio::test]
+async fn namespace_apis_are_typed() -> anyhow::Result<()> {
+    let server = MockServer::builder().response(200, HEALTH).start()?;
+    let resp = server
+        .client()
+        .typed()
+        .cluster()
+        .health(ClusterHealthParts::None)
+        .send()
+        .await?;
+    assert_eq!(resp.cluster_name, "docker-cluster");
+    assert_eq!(resp.number_of_nodes, 1);
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_namespace_client_inherits_the_unknown_fields_setting() -> anyhow::Result<()> {
+    let body = HEALTH.replacen('{', r#"{"extra":1,"#, 1).leak();
+    let server = MockServer::builder().response(200, body).start()?;
+    let err = server
+        .client()
+        .typed()
+        .ignore_unknown_fields(false)
+        .cluster()
+        .health(ClusterHealthParts::None)
+        .send()
+        .await
+        .unwrap_err();
+    assert_eq!(err.unknown_fields().unwrap(), &[".extra".to_string()]);
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_timed_out_health_check_is_decoded() -> anyhow::Result<()> {
+    // `wait_for_*` timing out answers 408 with the regular body, a status
+    // the specification does not declare (UNDECLARED_TYPED_STATUSES)
+    let body = HEALTH
+        .replace(r#""timed_out":false"#, r#""timed_out":true"#)
+        .leak();
+    let server = MockServer::builder().response(408, body).start()?;
+    let resp = server
+        .client()
+        .typed()
+        .cluster()
+        .health(ClusterHealthParts::None)
+        .send()
+        .await?;
+    assert!(resp.timed_out);
     Ok(())
 }

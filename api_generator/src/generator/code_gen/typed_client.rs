@@ -151,6 +151,7 @@ pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<String> {
             #[derive(Clone, Debug)]
             pub struct #client_ident<'a> {
                 transport: &'a Transport,
+                report_unknown_fields: bool,
             }
 
             #cfg_attr
@@ -160,6 +161,14 @@ pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<String> {
                     self.transport
                 }
 
+                /// Whether keys of a response unknown to its response type are
+                /// reported as an error; inherited from the typed client
+                /// ([`TypedOpenSearch::ignore_unknown_fields`])
+                #[doc(hidden)]
+                pub fn reports_unknown_fields(&self) -> bool {
+                    self.report_unknown_fields
+                }
+
                 #(#methods)*
             }
 
@@ -167,7 +176,10 @@ pub fn generate(api: &Api, docs_dir: &Path) -> anyhow::Result<String> {
             impl TypedOpenSearch {
                 #fn_doc
                 pub fn #fn_ident(&self) -> #client_ident<'_> {
-                    #client_ident { transport: self.transport() }
+                    #client_ident {
+                        transport: self.transport(),
+                        report_unknown_fields: self.reports_unknown_fields(),
+                    }
                 }
             }
         ));

@@ -134,6 +134,96 @@ pub struct AggregationProfileDelegateDebugFilter {
     pub specialized_for: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BoundaryScanner {
+    #[doc = "`chars`"]
+    Chars,
+    #[doc = "`sentence`"]
+    Sentence,
+    #[doc = "`word`"]
+    Word,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl BoundaryScanner {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            BoundaryScanner::Chars => "chars",
+            BoundaryScanner::Sentence => "sentence",
+            BoundaryScanner::Word => "word",
+            BoundaryScanner::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for BoundaryScanner {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for BoundaryScanner {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "chars" => BoundaryScanner::Chars,
+            "sentence" => BoundaryScanner::Sentence,
+            "word" => BoundaryScanner::Word,
+            _ => BoundaryScanner::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BuiltinHighlighterType {
+    #[doc = "`plain`"]
+    Plain,
+    #[doc = "`fvh`"]
+    Fvh,
+    #[doc = "`unified`"]
+    Unified,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl BuiltinHighlighterType {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            BuiltinHighlighterType::Plain => "plain",
+            BuiltinHighlighterType::Fvh => "fvh",
+            BuiltinHighlighterType::Unified => "unified",
+            BuiltinHighlighterType::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for BuiltinHighlighterType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for BuiltinHighlighterType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "plain" => BuiltinHighlighterType::Plain,
+            "fvh" => BuiltinHighlighterType::Fvh,
+            "unified" => BuiltinHighlighterType::Unified,
+            _ => BuiltinHighlighterType::Unknown(s),
+        })
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Collector {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -141,6 +231,69 @@ pub struct Collector {
     pub name: String,
     pub reason: String,
     pub time_in_nanos: crate::types::common::DurationValueUnitNanos,
+}
+
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct CompletionContext {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl CompletionContext {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `context` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_context(
+        &self,
+    ) -> std::result::Result<crate::types::search::Context, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "context")
+    }
+    #[doc = "Parses the value as the `object` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_object(
+        &self,
+    ) -> std::result::Result<
+        crate::types::search::CompletionContextObject,
+        crate::types::UnionBranchError,
+    > {
+        crate::types::union::parse_branch(&self.raw, "object")
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CompletionContextObject {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boost: Option<f64>,
+    pub context: crate::types::search::Context,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub neighbours: Option<Vec<crate::types::common::GeoHashPrecision>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub precision: Option<crate::types::common::GeoHashPrecision>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix: Option<bool>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CompletionSuggester {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analyzer: Option<String>,
+    pub field: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contexts:
+        Option<std::collections::BTreeMap<String, Vec<crate::types::search::CompletionContext>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fuzzy: Option<crate::types::search::SuggestFuzziness>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub regex: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub skip_duplicates: Option<bool>,
 }
 
 #[doc = "Text or location that we want similar documents for or a lookup to a document's field for the text."]
@@ -170,6 +323,31 @@ impl Context {
     {
         crate::types::union::parse_branch(&self.raw, "location")
     }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DirectGenerator {
+    pub field: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_edits: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_inspections: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_term_freq: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_doc_freq: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_word_length: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub post_filter: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pre_filter: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix_length: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suggest_mode: Option<crate::types::common::SuggestMode>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -210,6 +388,423 @@ pub struct FetchProfileDebug {
     pub fast_path: Option<i32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stored_fields: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct FieldCollapse {
+    pub field: crate::types::common::Field,
+    #[doc = "The number of inner hits and their sort order."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inner_hits: Option<Box<crate::types::search::FieldCollapseInnerHits>>,
+    #[doc = "The number of concurrent requests that are allowed to be retrieved by the `inner_hits` parameter per group."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_concurrent_group_searches: Option<i64>,
+}
+
+#[doc = "The number of inner hits and their sort order."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum FieldCollapseInnerHits {
+    InnerHits(Box<crate::types::search::InnerHits>),
+    Array(Vec<crate::types::search::InnerHits>),
+}
+impl<'de> serde::Deserialize<'de> for FieldCollapseInnerHits {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'{') => serde_json::from_str(text).map(FieldCollapseInnerHits::InnerHits),
+            Some(b'[') => serde_json::from_str(text).map(FieldCollapseInnerHits::Array),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "FieldCollapseInnerHits"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct FieldSuggester {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub regex: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completion: Option<crate::types::search::CompletionSuggester>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phrase: Option<crate::types::search::PhraseSuggester>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub term: Option<crate::types::search::TermSuggester>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Highlight {
+    #[doc = "A string that contains each boundary character."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_chars: Option<String>,
+    #[doc = "How far to scan for boundary characters."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_max_scan: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_scanner: Option<crate::types::search::BoundaryScanner>,
+    #[doc = "Controls which locale is used to search for sentence and word boundaries. This parameter takes the form of a language tag, for example, `\"en-US\"`, `\"fr-FR\"`, or `\"ja-JP\"`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_scanner_locale: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub force_source: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragment_offset: Option<i32>,
+    #[doc = "The size of the highlighted fragment in characters."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragment_size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragmenter: Option<crate::types::search::HighlighterFragmenter>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight_filter: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight_query: Option<Box<crate::types::common_query_dsl::QueryContainer>>,
+    #[doc = "If set to a non-negative value, highlighting stops at this defined maximum limit. The rest of the text is not processed or highlighted, and no error is returned. The `max_analyzer_offset` query setting does not override the `index.highlight.max_analyzed_offset` setting, which takes precedence when it is set to a lower value than the query setting."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_analyzer_offset: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_fragment_length: Option<i32>,
+    #[doc = "The amount of text you want to return from the beginning of the field if there are no matching fragments to highlight."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub no_match_size: Option<i32>,
+    #[doc = "The maximum number of fragments to return. When the number of fragments is set to `0`, no fragments are returned. Instead, the entirety of a field's contents are highlighted and returned. This is useful when you need to highlight short texts, such as a title or address, in which fragmentation is not required. If `number_of_fragments` is set to `0`, the `fragment_size` is ignored."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub number_of_fragments: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub options: Option<
+        std::collections::BTreeMap<
+            String,
+            std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
+        >,
+    >,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub order: Option<crate::types::search::HighlighterOrder>,
+    #[doc = "Controls the number of matching phrases in a document that are considered. This prevents the `fvh` highlighter from analyzing too many phrases and consuming too much memory. When using `matched_fields`, phrase-limited phrases per matched field are considered. Raising the limit increases the query time and consumes more memory. This setting is only supported by the `fvh` highlighter."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phrase_limit: Option<i32>,
+    #[doc = "When used in conjunction with `pre_tags`, defines the HTML tags to use for the highlighted text. By default, highlighted text is wrapped in `<em>` and `</em>` tags."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub post_tags: Option<Vec<String>>,
+    #[doc = "When used in conjunction with `post_tags`, defines the HTML tags to use for the highlighted text. By default, highlighted text is wrapped in `<em>` and `</em>` tags."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pre_tags: Option<Vec<String>>,
+    #[doc = "By default, only fields that contains a query match are highlighted. Set to `false` to highlight all fields."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub require_field_match: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tags_schema: Option<crate::types::search::HighlighterTagsSchema>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<crate::types::search::HighlighterType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encoder: Option<crate::types::search::HighlighterEncoder>,
+    pub fields: crate::types::search::HighlightFields,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct HighlightField {
+    #[doc = "A string that contains each boundary character."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_chars: Option<String>,
+    #[doc = "How far to scan for boundary characters."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_max_scan: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_scanner: Option<crate::types::search::BoundaryScanner>,
+    #[doc = "Controls which locale is used to search for sentence and word boundaries. This parameter takes the form of a language tag, for example, `\"en-US\"`, `\"fr-FR\"`, or `\"ja-JP\"`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boundary_scanner_locale: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub force_source: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragment_offset: Option<i32>,
+    #[doc = "The size of the highlighted fragment in characters."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragment_size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fragmenter: Option<crate::types::search::HighlighterFragmenter>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight_filter: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight_query: Option<crate::types::common_query_dsl::QueryContainer>,
+    #[doc = "If set to a non-negative value, highlighting stops at this defined maximum limit. The rest of the text is not processed or highlighted, and no error is returned. The `max_analyzer_offset` query setting does not override the `index.highlight.max_analyzed_offset` setting, which takes precedence when it is set to a lower value than the query setting."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_analyzer_offset: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_fragment_length: Option<i32>,
+    #[doc = "The amount of text you want to return from the beginning of the field if there are no matching fragments to highlight."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub no_match_size: Option<i32>,
+    #[doc = "The maximum number of fragments to return. When the number of fragments is set to `0`, no fragments are returned. Instead, the entirety of a field's contents are highlighted and returned. This is useful when you need to highlight short texts, such as a title or address, in which fragmentation is not required. If `number_of_fragments` is set to `0`, the `fragment_size` is ignored."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub number_of_fragments: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub options: Option<
+        std::collections::BTreeMap<
+            String,
+            std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
+        >,
+    >,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub order: Option<crate::types::search::HighlighterOrder>,
+    #[doc = "Controls the number of matching phrases in a document that are considered. This prevents the `fvh` highlighter from analyzing too many phrases and consuming too much memory. When using `matched_fields`, phrase-limited phrases per matched field are considered. Raising the limit increases the query time and consumes more memory. This setting is only supported by the `fvh` highlighter."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phrase_limit: Option<i32>,
+    #[doc = "When used in conjunction with `pre_tags`, defines the HTML tags to use for the highlighted text. By default, highlighted text is wrapped in `<em>` and `</em>` tags."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub post_tags: Option<Vec<String>>,
+    #[doc = "When used in conjunction with `post_tags`, defines the HTML tags to use for the highlighted text. By default, highlighted text is wrapped in `<em>` and `</em>` tags."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pre_tags: Option<Vec<String>>,
+    #[doc = "By default, only fields that contains a query match are highlighted. Set to `false` to highlight all fields."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub require_field_match: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tags_schema: Option<crate::types::search::HighlighterTagsSchema>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<crate::types::search::HighlighterType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub matched_fields: Option<crate::types::common::Fields>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum HighlightFields {
+    Object(std::collections::BTreeMap<String, crate::types::search::HighlightField>),
+    Array(Vec<std::collections::BTreeMap<String, crate::types::search::HighlightField>>),
+}
+impl<'de> serde::Deserialize<'de> for HighlightFields {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'{') => serde_json::from_str(text).map(HighlightFields::Object),
+            Some(b'[') => serde_json::from_str(text).map(HighlightFields::Array),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "HighlightFields"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HighlighterEncoder {
+    #[doc = "`default`"]
+    Default,
+    #[doc = "`html`"]
+    Html,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl HighlighterEncoder {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            HighlighterEncoder::Default => "default",
+            HighlighterEncoder::Html => "html",
+            HighlighterEncoder::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for HighlighterEncoder {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for HighlighterEncoder {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "default" => HighlighterEncoder::Default,
+            "html" => HighlighterEncoder::Html,
+            _ => HighlighterEncoder::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HighlighterFragmenter {
+    #[doc = "`simple`"]
+    Simple,
+    #[doc = "`span`"]
+    Span,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl HighlighterFragmenter {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            HighlighterFragmenter::Simple => "simple",
+            HighlighterFragmenter::Span => "span",
+            HighlighterFragmenter::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for HighlighterFragmenter {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for HighlighterFragmenter {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "simple" => HighlighterFragmenter::Simple,
+            "span" => HighlighterFragmenter::Span,
+            _ => HighlighterFragmenter::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HighlighterOrder {
+    #[doc = "`score`"]
+    Score,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl HighlighterOrder {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            HighlighterOrder::Score => "score",
+            HighlighterOrder::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for HighlighterOrder {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for HighlighterOrder {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "score" => HighlighterOrder::Score,
+            _ => HighlighterOrder::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HighlighterTagsSchema {
+    #[doc = "`default`"]
+    Default,
+    #[doc = "`styled`"]
+    Styled,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl HighlighterTagsSchema {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            HighlighterTagsSchema::Default => "default",
+            HighlighterTagsSchema::Styled => "styled",
+            HighlighterTagsSchema::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for HighlighterTagsSchema {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for HighlighterTagsSchema {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "default" => HighlighterTagsSchema::Default,
+            "styled" => HighlighterTagsSchema::Styled,
+            _ => HighlighterTagsSchema::Unknown(s),
+        })
+    }
+}
+
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct HighlighterType {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl HighlighterType {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `builtin` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_builtin(
+        &self,
+    ) -> std::result::Result<
+        crate::types::search::BuiltinHighlighterType,
+        crate::types::UnionBranchError,
+    > {
+        crate::types::union::parse_branch(&self.raw, "builtin")
+    }
+    #[doc = "Parses the value as the `custom` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_custom(&self) -> std::result::Result<String, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "custom")
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1217,8 +1812,60 @@ impl HitsMetadataTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct InnerHits {
+    #[serde(rename = "_source")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<crate::types::search::SourceConfig>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub collapse: Option<Box<crate::types::search::FieldCollapse>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub docvalue_fields: Option<Vec<crate::types::common_query_dsl::FieldAndFormat>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub explain: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fields: Option<Vec<crate::types::common_query_dsl::FieldAndFormat>>,
+    #[doc = "The inner hit that initiates document offset."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight: Option<Box<crate::types::search::Highlight>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ignore_unmapped: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<crate::types::common::Name>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub script_fields:
+        Option<std::collections::BTreeMap<String, crate::types::common::ScriptField>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seq_no_primary_term: Option<bool>,
+    #[doc = "The maximum number of hits to return per `inner_hits`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sort: Option<crate::types::common::Sort>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stored_fields: Option<crate::types::common::Fields>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub track_scores: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version: Option<bool>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct InnerHitsResult {
     pub hits: crate::types::search::HitsMetadata,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct LaplaceSmoothingModel {
+    pub alpha: f64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct LinearInterpolationSmoothingModel {
+    pub bigram_lambda: f64,
+    pub trigram_lambda: f64,
+    pub unigram_lambda: f64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1236,6 +1883,29 @@ pub struct PhraseSuggest {
     pub offset: i32,
     pub text: String,
     pub options: crate::types::search::PhraseSuggestOptions,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhraseSuggestCollate {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub params: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prune: Option<bool>,
+    pub query: crate::types::search::PhraseSuggestCollateQuery,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhraseSuggestCollateQuery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhraseSuggestHighlight {
+    pub post_tag: String,
+    pub pre_tag: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1279,6 +1949,48 @@ impl<'de> serde::Deserialize<'de> for PhraseSuggestOptions {
         };
         parsed.map_err(serde::de::Error::custom)
     }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhraseSuggester {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analyzer: Option<String>,
+    pub field: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub collate: Option<crate::types::search::PhraseSuggestCollate>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub confidence: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub direct_generator: Option<Vec<crate::types::search::DirectGenerator>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub force_unigrams: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gram_size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub highlight: Option<crate::types::search::PhraseSuggestHighlight>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_errors: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub real_word_error_likelihood: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub separator: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub smoothing: Option<crate::types::search::SmoothingModel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub token_limit: Option<i32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PointInTimeReference {
+    pub id: crate::types::common::Id,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub keep_alive: Option<crate::types::common::Duration>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1879,12 +2591,682 @@ impl SearchResponseHitsTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SearchResult {
+    #[serde(rename = "_clusters")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub clusters: Option<crate::types::common::ClusterStatistics>,
+    #[serde(rename = "_scroll_id")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scroll_id: Option<crate::types::common::ScrollId>,
+    #[serde(rename = "_shards")]
+    pub shards: crate::types::common::ShardStatistics,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aggregations:
+        Option<std::collections::BTreeMap<String, crate::types::common_aggregations::Aggregate>>,
+    pub hits: crate::types::search::SearchResultHits,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub num_reduce_phases: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phase_took: Option<crate::types::common::PhaseTook>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pit_id: Option<crate::types::common::Id>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processor_results: Option<Vec<crate::types::search::ProcessorExecutionDetail>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub profile: Option<crate::types::search::Profile>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suggest: Option<std::collections::BTreeMap<String, Vec<crate::types::search::Suggest>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub terminated_early: Option<bool>,
+    pub timed_out: bool,
+    pub took: i64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SearchResultHits {
+    pub hits: Vec<crate::types::search::SearchResultHitsHitsItem>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_score: Option<f64>,
+    #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total: Option<crate::types::search::SearchResultHitsTotal>,
+}
+impl SearchResultHits {
+    #[doc = "The total number of hits (`total`), or `None` when the request disabled counting (`track_total_hits: false`).
+
+The number may be a lower bound: by default the count is only tracked accurately up to 10,000 hits. Use `total` and its [`is_accurate`](crate::types::TotalHitCount::is_accurate) when that matters."]
+    pub fn total_value(&self) -> Option<i64> {
+        self.total.as_ref().map(|total| total.value())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchResultHitsHitsItem {
+    pub explanation: Option<crate::types::explain::Explanation>,
+    pub id: Option<crate::types::common::Id>,
+    pub ignored: Option<Vec<String>>,
+    pub index: Option<crate::types::common::IndexName>,
+    pub nested: Option<crate::types::search::NestedIdentity>,
+    pub node: Option<String>,
+    pub primary_term: Option<i64>,
+    pub routing: Option<String>,
+    pub score: Option<f64>,
+    pub seq_no: Option<crate::types::common::SequenceNumber>,
+    pub shard: Option<String>,
+    pub source: Option<Box<serde_json::value::RawValue>>,
+    pub r#type: Option<crate::types::common::Type>,
+    pub version: Option<crate::types::common::VersionNumber>,
+    pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    pub inner_hits:
+        Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
+    #[doc = "The names of queries that matched the document. When `include_named_queries_score` is false (default), returns an array of query names. When true, returns an object mapping query names to their scores."]
+    pub matched_queries: Option<crate::types::search::SearchResultHitsHitsItemMatchedQueries>,
+    pub sort: Option<crate::types::common::SortResults>,
+    pub additional: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
+}
+impl<'de> serde::Deserialize<'de> for SearchResultHitsHitsItem {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct ResidualVisitor;
+        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
+            type Value = SearchResultHitsHitsItem;
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("a SearchResultHitsHitsItem object")
+            }
+            // locals are named after the field identifiers, which keep a
+            // leading underscore when two JSON names would otherwise clash
+            // (`_nodes` -> `f__nodes`)
+            #[allow(non_snake_case)]
+            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let mut f_explanation: Option<crate::types::explain::Explanation> = None;
+                let mut seen_explanation = false;
+                let mut f_id: Option<crate::types::common::Id> = None;
+                let mut seen_id = false;
+                let mut f_ignored: Option<Vec<String>> = None;
+                let mut seen_ignored = false;
+                let mut f_index: Option<crate::types::common::IndexName> = None;
+                let mut seen_index = false;
+                let mut f_nested: Option<crate::types::search::NestedIdentity> = None;
+                let mut seen_nested = false;
+                let mut f_node: Option<String> = None;
+                let mut seen_node = false;
+                let mut f_primary_term: Option<i64> = None;
+                let mut seen_primary_term = false;
+                let mut f_routing: Option<String> = None;
+                let mut seen_routing = false;
+                let mut f_score: Option<f64> = None;
+                let mut seen_score = false;
+                let mut f_seq_no: Option<crate::types::common::SequenceNumber> = None;
+                let mut seen_seq_no = false;
+                let mut f_shard: Option<String> = None;
+                let mut seen_shard = false;
+                let mut f_source: Option<Box<serde_json::value::RawValue>> = None;
+                let mut seen_source = false;
+                let mut f_type: Option<crate::types::common::Type> = None;
+                let mut seen_type = false;
+                let mut f_version: Option<crate::types::common::VersionNumber> = None;
+                let mut seen_version = false;
+                let mut f_fields: Option<
+                    std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
+                > = None;
+                let mut seen_fields = false;
+                let mut f_highlight: Option<std::collections::BTreeMap<String, Vec<String>>> = None;
+                let mut seen_highlight = false;
+                let mut f_ignored_field_values: Option<
+                    std::collections::BTreeMap<String, Vec<String>>,
+                > = None;
+                let mut seen_ignored_field_values = false;
+                let mut f_inner_hits: Option<
+                    std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>,
+                > = None;
+                let mut seen_inner_hits = false;
+                let mut f_matched_queries: Option<
+                    crate::types::search::SearchResultHitsHitsItemMatchedQueries,
+                > = None;
+                let mut seen_matched_queries = false;
+                let mut f_sort: Option<crate::types::common::SortResults> = None;
+                let mut seen_sort = false;
+                let mut residual: std::collections::BTreeMap<
+                    String,
+                    Box<serde_json::value::RawValue>,
+                > = Default::default();
+                while let Some(k) = map.next_key::<String>()? {
+                    match k.as_str() {
+                        "_explanation" => {
+                            if seen_explanation {
+                                return Err(serde::de::Error::duplicate_field("_explanation"));
+                            }
+                            seen_explanation = true;
+                            f_explanation =
+                                map.next_value::<Option<crate::types::explain::Explanation>>()?;
+                        }
+                        "_id" => {
+                            if seen_id {
+                                return Err(serde::de::Error::duplicate_field("_id"));
+                            }
+                            seen_id = true;
+                            f_id = map.next_value::<Option<crate::types::common::Id>>()?;
+                        }
+                        "_ignored" => {
+                            if seen_ignored {
+                                return Err(serde::de::Error::duplicate_field("_ignored"));
+                            }
+                            seen_ignored = true;
+                            f_ignored = map.next_value::<Option<Vec<String>>>()?;
+                        }
+                        "_index" => {
+                            if seen_index {
+                                return Err(serde::de::Error::duplicate_field("_index"));
+                            }
+                            seen_index = true;
+                            f_index =
+                                map.next_value::<Option<crate::types::common::IndexName>>()?;
+                        }
+                        "_nested" => {
+                            if seen_nested {
+                                return Err(serde::de::Error::duplicate_field("_nested"));
+                            }
+                            seen_nested = true;
+                            f_nested =
+                                map.next_value::<Option<crate::types::search::NestedIdentity>>()?;
+                        }
+                        "_node" => {
+                            if seen_node {
+                                return Err(serde::de::Error::duplicate_field("_node"));
+                            }
+                            seen_node = true;
+                            f_node = map.next_value::<Option<String>>()?;
+                        }
+                        "_primary_term" => {
+                            if seen_primary_term {
+                                return Err(serde::de::Error::duplicate_field("_primary_term"));
+                            }
+                            seen_primary_term = true;
+                            f_primary_term = map.next_value::<Option<i64>>()?;
+                        }
+                        "_routing" => {
+                            if seen_routing {
+                                return Err(serde::de::Error::duplicate_field("_routing"));
+                            }
+                            seen_routing = true;
+                            f_routing = map.next_value::<Option<String>>()?;
+                        }
+                        "_score" => {
+                            if seen_score {
+                                return Err(serde::de::Error::duplicate_field("_score"));
+                            }
+                            seen_score = true;
+                            f_score = map.next_value::<Option<f64>>()?;
+                        }
+                        "_seq_no" => {
+                            if seen_seq_no {
+                                return Err(serde::de::Error::duplicate_field("_seq_no"));
+                            }
+                            seen_seq_no = true;
+                            f_seq_no =
+                                map.next_value::<Option<crate::types::common::SequenceNumber>>()?;
+                        }
+                        "_shard" => {
+                            if seen_shard {
+                                return Err(serde::de::Error::duplicate_field("_shard"));
+                            }
+                            seen_shard = true;
+                            f_shard = map.next_value::<Option<String>>()?;
+                        }
+                        "_source" => {
+                            if seen_source {
+                                return Err(serde::de::Error::duplicate_field("_source"));
+                            }
+                            seen_source = true;
+                            f_source =
+                                map.next_value::<Option<Box<serde_json::value::RawValue>>>()?;
+                        }
+                        "_type" => {
+                            if seen_type {
+                                return Err(serde::de::Error::duplicate_field("_type"));
+                            }
+                            seen_type = true;
+                            f_type = map.next_value::<Option<crate::types::common::Type>>()?;
+                        }
+                        "_version" => {
+                            if seen_version {
+                                return Err(serde::de::Error::duplicate_field("_version"));
+                            }
+                            seen_version = true;
+                            f_version =
+                                map.next_value::<Option<crate::types::common::VersionNumber>>()?;
+                        }
+                        "fields" => {
+                            if seen_fields {
+                                return Err(serde::de::Error::duplicate_field("fields"));
+                            }
+                            seen_fields = true;
+                            f_fields = map.next_value::<Option<
+                                std::collections::BTreeMap<
+                                    String,
+                                    Box<serde_json::value::RawValue>,
+                                >,
+                            >>()?;
+                        }
+                        "highlight" => {
+                            if seen_highlight {
+                                return Err(serde::de::Error::duplicate_field("highlight"));
+                            }
+                            seen_highlight = true;
+                            f_highlight = map.next_value::<Option<std::collections::BTreeMap<String, Vec<String>>>>()?;
+                        }
+                        "ignored_field_values" => {
+                            if seen_ignored_field_values {
+                                return Err(serde::de::Error::duplicate_field(
+                                    "ignored_field_values",
+                                ));
+                            }
+                            seen_ignored_field_values = true;
+                            f_ignored_field_values = map.next_value::<Option<std::collections::BTreeMap<String, Vec<String>>>>()?;
+                        }
+                        "inner_hits" => {
+                            if seen_inner_hits {
+                                return Err(serde::de::Error::duplicate_field("inner_hits"));
+                            }
+                            seen_inner_hits = true;
+                            f_inner_hits = map.next_value::<Option<
+                                std::collections::BTreeMap<
+                                    String,
+                                    crate::types::search::InnerHitsResult,
+                                >,
+                            >>()?;
+                        }
+                        "matched_queries" => {
+                            if seen_matched_queries {
+                                return Err(serde::de::Error::duplicate_field("matched_queries"));
+                            }
+                            seen_matched_queries = true;
+                            f_matched_queries = map.next_value::<Option<
+                                crate::types::search::SearchResultHitsHitsItemMatchedQueries,
+                            >>()?;
+                        }
+                        "sort" => {
+                            if seen_sort {
+                                return Err(serde::de::Error::duplicate_field("sort"));
+                            }
+                            seen_sort = true;
+                            f_sort =
+                                map.next_value::<Option<crate::types::common::SortResults>>()?;
+                        }
+                        _ => {
+                            residual.insert(k, map.next_value()?);
+                        }
+                    }
+                }
+                Ok(SearchResultHitsHitsItem {
+                    explanation: f_explanation,
+                    id: f_id,
+                    ignored: f_ignored,
+                    index: f_index,
+                    nested: f_nested,
+                    node: f_node,
+                    primary_term: f_primary_term,
+                    routing: f_routing,
+                    score: f_score,
+                    seq_no: f_seq_no,
+                    shard: f_shard,
+                    source: f_source,
+                    r#type: f_type,
+                    version: f_version,
+                    fields: f_fields,
+                    highlight: f_highlight,
+                    ignored_field_values: f_ignored_field_values,
+                    inner_hits: f_inner_hits,
+                    matched_queries: f_matched_queries,
+                    sort: f_sort,
+                    additional: residual,
+                })
+            }
+        }
+        deserializer.deserialize_map(ResidualVisitor)
+    }
+}
+impl serde::Serialize for SearchResultHitsHitsItem {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(None)?;
+        if let Some(v) = &self.explanation {
+            map.serialize_entry("_explanation", v)?;
+        }
+        if let Some(v) = &self.id {
+            map.serialize_entry("_id", v)?;
+        }
+        if let Some(v) = &self.ignored {
+            map.serialize_entry("_ignored", v)?;
+        }
+        if let Some(v) = &self.index {
+            map.serialize_entry("_index", v)?;
+        }
+        if let Some(v) = &self.nested {
+            map.serialize_entry("_nested", v)?;
+        }
+        if let Some(v) = &self.node {
+            map.serialize_entry("_node", v)?;
+        }
+        if let Some(v) = &self.primary_term {
+            map.serialize_entry("_primary_term", v)?;
+        }
+        if let Some(v) = &self.routing {
+            map.serialize_entry("_routing", v)?;
+        }
+        if let Some(v) = &self.score {
+            map.serialize_entry("_score", v)?;
+        }
+        if let Some(v) = &self.seq_no {
+            map.serialize_entry("_seq_no", v)?;
+        }
+        if let Some(v) = &self.shard {
+            map.serialize_entry("_shard", v)?;
+        }
+        if let Some(v) = &self.source {
+            map.serialize_entry("_source", v)?;
+        }
+        if let Some(v) = &self.r#type {
+            map.serialize_entry("_type", v)?;
+        }
+        if let Some(v) = &self.version {
+            map.serialize_entry("_version", v)?;
+        }
+        if let Some(v) = &self.fields {
+            map.serialize_entry("fields", v)?;
+        }
+        if let Some(v) = &self.highlight {
+            map.serialize_entry("highlight", v)?;
+        }
+        if let Some(v) = &self.ignored_field_values {
+            map.serialize_entry("ignored_field_values", v)?;
+        }
+        if let Some(v) = &self.inner_hits {
+            map.serialize_entry("inner_hits", v)?;
+        }
+        if let Some(v) = &self.matched_queries {
+            map.serialize_entry("matched_queries", v)?;
+        }
+        if let Some(v) = &self.sort {
+            map.serialize_entry("sort", v)?;
+        }
+        for (k, v) in &self.additional {
+            map.serialize_entry(k, v)?;
+        }
+        map.end()
+    }
+}
+impl SearchResultHitsHitsItem {
+    #[doc = "Decodes the document body (`_source`) into `T`.\n\nReturns `Ok(None)` when the response carries no `_source` (`_source: false` in the request, or a mapping that disables it), and an error when the document does not match `T`.\n\n`T` may borrow from the response to avoid copying strings: use `#[serde(borrow)] Cow<'a, str>` fields rather than `&'a str`, which cannot hold a string containing JSON escapes."]
+    pub fn source_as<'a, T>(&'a self) -> std::result::Result<Option<T>, serde_json::Error>
+    where
+        T: serde::Deserialize<'a>,
+    {
+        self.source
+            .as_deref()
+            .map(|raw| serde_json::from_str(raw.get()))
+            .transpose()
+    }
+}
+
+#[doc = "The names of queries that matched the document. When `include_named_queries_score` is false (default), returns an array of query names. When true, returns an object mapping query names to their scores."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum SearchResultHitsHitsItemMatchedQueries {
+    Names(Vec<String>),
+    Scores(std::collections::BTreeMap<String, f64>),
+}
+impl<'de> serde::Deserialize<'de> for SearchResultHitsHitsItemMatchedQueries {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'[') => {
+                serde_json::from_str(text).map(SearchResultHitsHitsItemMatchedQueries::Names)
+            }
+            Some(b'{') => {
+                serde_json::from_str(text).map(SearchResultHitsHitsItemMatchedQueries::Scores)
+            }
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "SearchResultHitsHitsItemMatchedQueries"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+
+#[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum SearchResultHitsTotal {
+    TotalHits(crate::types::search::TotalHits),
+    Integer(i64),
+}
+impl<'de> serde::Deserialize<'de> for SearchResultHitsTotal {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'{') => serde_json::from_str(text).map(SearchResultHitsTotal::TotalHits),
+            Some(b'-') | Some(b'0'..=b'9') => {
+                serde_json::from_str(text).map(SearchResultHitsTotal::Integer)
+            }
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "SearchResultHitsTotal"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl crate::types::TotalHitCount for SearchResultHitsTotal {
+    fn value(&self) -> i64 {
+        match self {
+            Self::TotalHits(total) => total.value,
+            Self::Integer(value) => *value,
+        }
+    }
+
+    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+        match self {
+            Self::TotalHits(total) => &total.relation,
+            Self::Integer(_) => &crate::types::total_hits::ACCURATE,
+        }
+    }
+}
+
+impl SearchResultHitsTotal {
+    #[doc = "The number of hits: exact when [`is_accurate`](Self::is_accurate) is true, and otherwise a lower bound. See [`TotalHitCount`](crate::types::TotalHitCount)."]
+    pub fn value(&self) -> i64 {
+        crate::types::TotalHitCount::value(self)
+    }
+
+    #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
+    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+        crate::types::TotalHitCount::relation(self)
+    }
+
+    #[doc = "Whether [`value`](Self::value) is the exact number of hits (relation `eq`). False for a lower bound, and for a relation this client does not know."]
+    pub fn is_accurate(&self) -> bool {
+        crate::types::TotalHitCount::is_accurate(self)
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardProfile {
     pub aggregations: Vec<crate::types::search::AggregationProfile>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fetch: Option<crate::types::search::FetchProfile>,
     pub id: String,
     pub searches: Vec<crate::types::search::SearchProfile>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SmoothingModel {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub laplace: Option<crate::types::search::LaplaceSmoothingModel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub linear_interpolation: Option<crate::types::search::LinearInterpolationSmoothingModel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stupid_backoff: Option<crate::types::search::StupidBackoffSmoothingModel>,
+}
+
+#[doc = "Defines how to fetch a source. Fetching can be disabled entirely, or the source can be filtered."]
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct SourceConfig {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl SourceConfig {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `fetch` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_fetch(&self) -> std::result::Result<bool, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "fetch")
+    }
+    #[doc = "Parses the value as the `filter` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_filter(
+        &self,
+    ) -> std::result::Result<crate::types::search::SourceFilter, crate::types::UnionBranchError>
+    {
+        crate::types::union::parse_branch(&self.raw, "filter")
+    }
+}
+
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct SourceFilter {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl SourceFilter {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `includes` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_includes(
+        &self,
+    ) -> std::result::Result<crate::types::common::Fields, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "includes")
+    }
+    #[doc = "Parses the value as the `object` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_object(
+        &self,
+    ) -> std::result::Result<crate::types::search::SourceFilterObject, crate::types::UnionBranchError>
+    {
+        crate::types::union::parse_branch(&self.raw, "object")
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SourceFilterObject {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub excludes: Option<crate::types::common::Fields>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub includes: Option<crate::types::common::Fields>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StringDistance {
+    #[doc = "`damerau_levenshtein`"]
+    DamerauLevenshtein,
+    #[doc = "`internal`"]
+    Internal,
+    #[doc = "`jaro_winkler`"]
+    JaroWinkler,
+    #[doc = "`levenshtein`"]
+    Levenshtein,
+    #[doc = "`ngram`"]
+    Ngram,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl StringDistance {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            StringDistance::DamerauLevenshtein => "damerau_levenshtein",
+            StringDistance::Internal => "internal",
+            StringDistance::JaroWinkler => "jaro_winkler",
+            StringDistance::Levenshtein => "levenshtein",
+            StringDistance::Ngram => "ngram",
+            StringDistance::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for StringDistance {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for StringDistance {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "damerau_levenshtein" => StringDistance::DamerauLevenshtein,
+            "internal" => StringDistance::Internal,
+            "jaro_winkler" => StringDistance::JaroWinkler,
+            "levenshtein" => StringDistance::Levenshtein,
+            "ngram" => StringDistance::Ngram,
+            _ => StringDistance::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StupidBackoffSmoothingModel {
+    pub discount: f64,
 }
 
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
@@ -2049,6 +3431,127 @@ impl SuggestCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SuggestFuzziness {
+    pub fuzziness: String,
+    pub min_length: i32,
+    pub prefix_length: i32,
+    pub transpositions: bool,
+    pub unicode_aware: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SuggestSort {
+    #[doc = "`frequency`"]
+    Frequency,
+    #[doc = "`score`"]
+    Score,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SuggestSort {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SuggestSort::Frequency => "frequency",
+            SuggestSort::Score => "score",
+            SuggestSort::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SuggestSort {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SuggestSort {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "frequency" => SuggestSort::Frequency,
+            "score" => SuggestSort::Score,
+            _ => SuggestSort::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Suggester {
+    #[doc = "The global suggest text, which avoids repetition when the same text is used in several suggesters."]
+    pub text: Option<String>,
+    pub additional: std::collections::BTreeMap<String, crate::types::search::FieldSuggester>,
+}
+impl<'de> serde::Deserialize<'de> for Suggester {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct ResidualVisitor;
+        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
+            type Value = Suggester;
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("a Suggester object")
+            }
+            // locals are named after the field identifiers, which keep a
+            // leading underscore when two JSON names would otherwise clash
+            // (`_nodes` -> `f__nodes`)
+            #[allow(non_snake_case)]
+            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let mut f_text: Option<String> = None;
+                let mut seen_text = false;
+                let mut residual: std::collections::BTreeMap<
+                    String,
+                    crate::types::search::FieldSuggester,
+                > = Default::default();
+                while let Some(k) = map.next_key::<String>()? {
+                    match k.as_str() {
+                        "text" => {
+                            if seen_text {
+                                return Err(serde::de::Error::duplicate_field("text"));
+                            }
+                            seen_text = true;
+                            f_text = map.next_value::<Option<String>>()?;
+                        }
+                        _ => {
+                            residual.insert(k, map.next_value()?);
+                        }
+                    }
+                }
+                Ok(Suggester {
+                    text: f_text,
+                    additional: residual,
+                })
+            }
+        }
+        deserializer.deserialize_map(ResidualVisitor)
+    }
+}
+impl serde::Serialize for Suggester {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(None)?;
+        if let Some(v) = &self.text {
+            map.serialize_entry("text", v)?;
+        }
+        for (k, v) in &self.additional {
+            map.serialize_entry(k, v)?;
+        }
+        map.end()
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TermSuggest {
     pub length: i32,
     pub offset: i32,
@@ -2102,6 +3605,39 @@ impl<'de> serde::Deserialize<'de> for TermSuggestOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TermSuggester {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analyzer: Option<String>,
+    pub field: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lowercase_terms: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_edits: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_inspections: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_term_freq: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_doc_freq: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_word_length: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix_length: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_size: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sort: Option<crate::types::search::SuggestSort>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub string_distance: Option<crate::types::search::StringDistance>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suggest_mode: Option<crate::types::common::SuggestMode>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TotalHits {
     pub relation: crate::types::search::TotalHitsRelation,
     pub value: i64,
@@ -2145,5 +3681,39 @@ impl<'de> serde::Deserialize<'de> for TotalHitsRelation {
             "gte" => TotalHitsRelation::Gte,
             _ => TotalHitsRelation::Unknown(s),
         })
+    }
+}
+
+#[doc = "The number of hits matching the query. When `true`, the exact number of hits is returned at the cost of some performance. When `false`, the response does not include the total number of hits matching the query. Default is `10,000` hits."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum TrackHits {
+    Enabled(bool),
+    Count(i32),
+}
+impl<'de> serde::Deserialize<'de> for TrackHits {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b't') | Some(b'f') => serde_json::from_str(text).map(TrackHits::Enabled),
+            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(TrackHits::Count),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "TrackHits"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
     }
 }

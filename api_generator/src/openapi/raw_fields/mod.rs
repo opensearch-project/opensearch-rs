@@ -420,11 +420,7 @@ mod tests {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
         let spec: serde_json::Value =
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
-        let model = crate::openapi::responses::read_response_model(
-            &spec,
-            crate::openapi::responses::TYPED_OPERATION_GROUPS,
-        )
-        .unwrap();
+        let model = crate::openapi::responses::read_all_response_models(&spec).unwrap();
         enforce(&model).unwrap();
     }
 

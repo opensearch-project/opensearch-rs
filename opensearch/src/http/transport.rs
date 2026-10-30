@@ -46,13 +46,14 @@ use crate::{
         middleware::*,
         request::Body,
         response::Response,
+        retry::RetryPolicy,
         Method,
     },
 };
 #[cfg(feature = "aws-auth")]
 use aws_types::sdk_config::SharedTimeSource;
 use base64::{prelude::BASE64_STANDARD, write::EncoderWriter as Base64Encoder};
-use bytes::BytesMut;
+use bytes::{Bytes, BytesMut};
 use dyn_clone::clone_trait_object;
 use lazy_static::lazy_static;
 use reqwest::ClientBuilder;
@@ -126,6 +127,7 @@ pub struct TransportBuilder {
     client_initializers: Vec<Box<dyn BoxedClientInitializer>>,
     request_initializers: Vec<Box<dyn BoxedRequestInitializer>>,
     request_handlers: Vec<Box<dyn BoxedRequestHandler>>,
+    retry: RetryPolicy,
 }
 
 impl TransportBuilder {
@@ -152,6 +154,7 @@ impl TransportBuilder {
             client_initializers: Vec::new(),
             request_initializers: Vec::new(),
             request_handlers: Vec::new(),
+            retry: RetryPolicy::default(),
         }
     }
 
@@ -216,6 +219,75 @@ impl TransportBuilder {
     /// Default is no timeout.
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
+        self
+    }
+
+    /// Sets the number of times a request is sent again after a failed
+    /// attempt. `0` disables retries.
+    ///
+    /// An attempt fails when the response status is one of
+    /// [retry_on_status](Self::retry_on_status), or when the request cannot
+    /// be sent or its response cannot be received (e.g. connection refused
+    /// or reset); a timeout only with [retry_on_timeout](Self::retry_on_timeout).
+    /// Each attempt takes the next [Connection] of the [ConnectionPool], so
+    /// with a [MultiNodeConnectionPool] a retry goes to another node. When the
+    /// retries are exhausted, the last response or error is returned.
+    ///
+    /// Default is `3`.
+    ///
+    /// A request is sent again with the same body. A request whose effect
+    /// cannot be repeated (e.g. indexing without an id) may be applied twice
+    /// when a connection fails after the server received it; disable retries
+    /// with [disable_retry](Self::disable_retry) if this matters.
+    pub fn max_retries(mut self, max_retries: usize) -> Self {
+        self.retry.max_retries = max_retries;
+        self
+    }
+
+    /// Disables retries: every request is sent once. Same as
+    /// [max_retries(0)](Self::max_retries).
+    pub fn disable_retry(self) -> Self {
+        self.max_retries(0)
+    }
+
+    /// Sets the response statuses that are retried.
+    ///
+    /// Default is `502`, `503` and `504`. An empty list retries no status,
+    /// while failed connections are still retried.
+    pub fn retry_on_status(mut self, statuses: &[u16]) -> Self {
+        self.retry.retry_on_status = statuses.to_vec();
+        self
+    }
+
+    /// Sets whether an attempt that times out (see [timeout](Self::timeout))
+    /// is retried.
+    ///
+    /// Default is `false`: a request that timed out may still be applied by
+    /// the server, and retrying it would apply it again.
+    pub fn retry_on_timeout(mut self, retry_on_timeout: bool) -> Self {
+        self.retry.retry_on_timeout = retry_on_timeout;
+        self
+    }
+
+    /// Sets the backoff before a retry: the delay before the first retry is
+    /// drawn uniformly between zero and `backoff`, and the upper bound
+    /// doubles for each retry after it (exponential backoff with full
+    /// jitter), so that clients failing together do not retry together.
+    /// [Duration::ZERO] retries without delay.
+    ///
+    /// Default is 100 milliseconds.
+    pub fn retry_backoff(mut self, backoff: Duration) -> Self {
+        self.retry.backoff = backoff;
+        self
+    }
+
+    /// Bounds the delays of one request's retries together: a retry whose
+    /// delay would take the total past `budget` is not made, and the last
+    /// response or error is returned. `None` sets no bound.
+    ///
+    /// Default is 5 seconds.
+    pub fn retry_budget(mut self, budget: Option<Duration>) -> Self {
+        self.retry.budget = budget;
         self
     }
 
@@ -499,6 +571,7 @@ impl TransportBuilder {
             sigv4_time_source: self.sigv4_time_source.unwrap_or_default(),
             request_initializers: self.request_initializers.into_boxed_slice(),
             request_handlers: self.request_handlers.into_boxed_slice(),
+            retry: self.retry,
         })
     }
 }
@@ -545,6 +618,7 @@ pub struct Transport {
     sigv4_time_source: SharedTimeSource,
     request_initializers: Box<[Box<dyn BoxedRequestInitializer>]>,
     request_handlers: Box<[Box<dyn BoxedRequestHandler>]>,
+    retry: RetryPolicy,
 }
 
 impl Transport {
@@ -589,7 +663,12 @@ impl Transport {
         Ok(transport)
     }
 
-    /// Creates an asynchronous request that can be awaited
+    /// Creates an asynchronous request that can be awaited.
+    ///
+    /// A failed attempt is retried according to the retry settings of the
+    /// [TransportBuilder] (see [TransportBuilder::max_retries]), each attempt
+    /// on the next [Connection] of the pool. The body is serialized once and
+    /// sent unchanged on every attempt.
     pub async fn send<B, Q>(
         &self,
         method: Method,
@@ -601,6 +680,64 @@ impl Transport {
     ) -> Result<Response, Error>
     where
         B: Body,
+        Q: Serialize + ?Sized,
+    {
+        let body = match body {
+            Some(b) => Some(match b.bytes() {
+                Some(bytes) => bytes,
+                None => {
+                    let mut bytes_mut = self.bytes_mut();
+                    b.write(&mut bytes_mut)?;
+                    bytes_mut.split().freeze()
+                }
+            }),
+            None => None,
+        };
+
+        let mut delays = Duration::ZERO;
+        let mut attempt = 0;
+        loop {
+            let result = self
+                .send_once(method, path, &headers, query_string, body.clone(), timeout)
+                .await?;
+
+            let retry = match &result {
+                Ok(response) => self.retry.retries_status(response.status().as_u16()),
+                Err(err) => self.retry.retries_error(err),
+            };
+            if !retry || attempt >= self.retry.max_retries {
+                return Ok(Response::new(result?, method));
+            }
+            attempt += 1;
+            let delay = self.retry.delay(attempt);
+            if !self.retry.within_budget(delays, delay) {
+                return Ok(Response::new(result?, method));
+            }
+            delays += delay;
+            // read the body of a retried response, so that its connection
+            // can be reused for the next attempt rather than closed
+            if let Ok(response) = result {
+                let _ = response.bytes().await;
+            }
+            if !delay.is_zero() {
+                tokio::time::sleep(delay).await;
+            }
+        }
+    }
+
+    /// Sends one attempt of a request to the next [Connection] of the pool.
+    /// The outer error is a failure to build the request, which is not
+    /// retried; the inner result is the outcome of sending it.
+    async fn send_once<Q>(
+        &self,
+        method: Method,
+        path: &str,
+        headers: &HeaderMap,
+        query_string: Option<&Q>,
+        body: Option<Bytes>,
+        timeout: Option<Duration>,
+    ) -> Result<Result<reqwest::Response, RequestHandlerError>, Error>
+    where
         Q: Serialize + ?Sized,
     {
         let connection = self.conn_pool.next();
@@ -647,21 +784,13 @@ impl Transport {
         for (name, value) in self.default_headers.iter() {
             request_headers.insert(name, value.clone());
         }
-        for (name, value) in headers {
-            request_headers.insert(name.unwrap(), value);
+        for (name, value) in headers.iter() {
+            request_headers.insert(name, value.clone());
         }
 
         request_builder = request_builder.headers(request_headers);
 
-        if let Some(b) = body {
-            let bytes = if let Some(bytes) = b.bytes() {
-                bytes
-            } else {
-                let mut bytes_mut = self.bytes_mut();
-                b.write(&mut bytes_mut)?;
-                bytes_mut.split().freeze()
-            };
-
+        if let Some(bytes) = body {
             request_builder = request_builder.body(bytes);
         }
 
@@ -692,11 +821,11 @@ impl Transport {
             .await?;
         }
 
-        let response = RequestHandlerChain::new(&self.client, &self.request_handlers)
-            .run(request)
-            .await?;
-
-        Ok(Response::new(response, method))
+        Ok(
+            RequestHandlerChain::new(&self.client, &self.request_handlers)
+                .run(request)
+                .await,
+        )
     }
 }
 

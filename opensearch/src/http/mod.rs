@@ -37,6 +37,7 @@ pub mod headers;
 pub mod middleware;
 pub mod request;
 pub mod response;
+mod retry;
 pub mod transport;
 
 pub use reqwest::{self, Request, StatusCode};

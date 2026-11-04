@@ -12,25 +12,21 @@
 use crate::http::middleware::{RequestHandlerError, RequestHandlerErrorKind};
 use std::{convert::TryFrom, time::Duration};
 
-/// The response statuses retried by default: a node that is overloaded,
-/// restarting, or behind a proxy that cannot reach it
 pub(crate) const DEFAULT_RETRY_ON_STATUS: &[u16] = &[502, 503, 504];
 
-/// The number of retries after the first attempt, by default
 pub(crate) const DEFAULT_MAX_RETRIES: usize = 3;
 
-/// The ceiling of the delay before the first retry, by default; it doubles
-/// for each retry after it
 pub(crate) const DEFAULT_RETRY_BACKOFF: Duration = Duration::from_millis(100);
 
-/// The bound of the delays of one request's retries together, by default
 pub(crate) const DEFAULT_RETRY_BUDGET: Duration = Duration::from_secs(5);
 
-/// The largest number of doublings of the backoff ceiling, so that it cannot
-/// overflow with a large number of retries
+/// Bounds the doublings of the backoff ceiling, so that it cannot overflow
 const MAX_BACKOFF_SHIFT: u32 = 16;
 
-/// When and how the transport sends a request again after a failed attempt
+/// The longest delay before a retry, whatever the backoff and the number of
+/// retries before it
+pub(crate) const MAX_RETRY_DELAY: Duration = Duration::from_secs(60);
+
 #[derive(Debug, Clone)]
 pub(crate) struct RetryPolicy {
     pub(crate) max_retries: usize,
@@ -53,15 +49,12 @@ impl Default for RetryPolicy {
 }
 
 impl RetryPolicy {
-    /// Whether a response with this status is retried
     pub(crate) fn retries_status(&self, status: u16) -> bool {
         self.retry_on_status.contains(&status)
     }
 
-    /// Whether an attempt that failed with this error is retried: a failure
-    /// to send the request or to receive the response (connection refused or
-    /// reset), and a timeout only when enabled. Errors of request handlers
-    /// (middleware) are not retried: they are not transient.
+    /// Errors of request handlers (middleware) are not retried: they are not
+    /// transient.
     pub(crate) fn retries_error(&self, err: &RequestHandlerError) -> bool {
         match &err.0 {
             RequestHandlerErrorKind::Http(err) => {
@@ -88,16 +81,15 @@ impl RetryPolicy {
         Duration::from_nanos(fastrand::u64(0..=nanos))
     }
 
-    /// The largest delay before retry `attempt` (counted from 1)
     fn ceiling(&self, attempt: usize) -> Duration {
         let shift = u32::try_from(attempt.saturating_sub(1))
             .unwrap_or(u32::MAX)
             .min(MAX_BACKOFF_SHIFT);
-        self.backoff.saturating_mul(1u32 << shift)
+        self.backoff
+            .saturating_mul(1u32 << shift)
+            .min(MAX_RETRY_DELAY)
     }
 
-    /// Whether a retry after `spent` of delays, waiting `delay` more, stays
-    /// within the budget
     pub(crate) fn within_budget(&self, spent: Duration, delay: Duration) -> bool {
         match self.budget {
             Some(budget) => spent.saturating_add(delay) <= budget,
@@ -129,9 +121,28 @@ mod tests {
         assert_eq!(policy.ceiling(1), Duration::from_millis(100));
         assert_eq!(policy.ceiling(2), Duration::from_millis(200));
         assert_eq!(policy.ceiling(3), Duration::from_millis(400));
-        // bounded, and no overflow for absurd attempt counts
-        assert_eq!(policy.ceiling(1000), policy.ceiling(17));
-        assert_eq!(policy.ceiling(usize::MAX), policy.ceiling(17));
+        assert_eq!(policy.ceiling(10), Duration::from_millis(51_200));
+    }
+
+    #[test]
+    fn the_backoff_ceiling_stops_at_one_minute() {
+        let policy = RetryPolicy::default();
+        // 100 ms doubled 10 times is 102.4 s
+        assert_eq!(policy.ceiling(11), MAX_RETRY_DELAY);
+        // no overflow for absurd attempt counts
+        assert_eq!(policy.ceiling(1000), MAX_RETRY_DELAY);
+        assert_eq!(policy.ceiling(usize::MAX), MAX_RETRY_DELAY);
+
+        // a backoff above the bound is bounded from the first retry
+        let policy = RetryPolicy {
+            backoff: Duration::MAX,
+            budget: None,
+            ..Default::default()
+        };
+        assert_eq!(policy.ceiling(1), MAX_RETRY_DELAY);
+        for _ in 0..100 {
+            assert!(policy.delay(1) <= MAX_RETRY_DELAY);
+        }
     }
 
     #[test]

@@ -127,7 +127,8 @@ pub struct TransportBuilder {
     client_initializers: Vec<Box<dyn BoxedClientInitializer>>,
     request_initializers: Vec<Box<dyn BoxedRequestInitializer>>,
     request_handlers: Vec<Box<dyn BoxedRequestHandler>>,
-    retry: RetryPolicy,
+    /// `None` when retries are disabled
+    retry: Option<RetryPolicy>,
 }
 
 impl TransportBuilder {
@@ -154,7 +155,7 @@ impl TransportBuilder {
             client_initializers: Vec::new(),
             request_initializers: Vec::new(),
             request_handlers: Vec::new(),
-            retry: RetryPolicy::default(),
+            retry: Some(RetryPolicy::default()),
         }
     }
 
@@ -240,14 +241,22 @@ impl TransportBuilder {
     /// when a connection fails after the server received it; disable retries
     /// with [disable_retry](Self::disable_retry) if this matters.
     pub fn max_retries(mut self, max_retries: usize) -> Self {
-        self.retry.max_retries = max_retries;
+        self.retry_policy().max_retries = max_retries;
         self
     }
 
-    /// Disables retries: every request is sent once. Same as
-    /// [max_retries(0)](Self::max_retries).
-    pub fn disable_retry(self) -> Self {
-        self.max_retries(0)
+    /// Disables retries: every request is sent once. Calling a retry
+    /// setting afterwards (e.g. [max_retries](Self::max_retries)) enables
+    /// them again, with the defaults for the other settings.
+    pub fn disable_retry(mut self) -> Self {
+        self.retry = None;
+        self
+    }
+
+    /// The retry policy being configured, enabled with the defaults if
+    /// retries were disabled
+    fn retry_policy(&mut self) -> &mut RetryPolicy {
+        self.retry.get_or_insert_with(RetryPolicy::default)
     }
 
     /// Sets the response statuses that are retried.
@@ -255,7 +264,7 @@ impl TransportBuilder {
     /// Default is `502`, `503` and `504`. An empty list retries no status,
     /// while failed connections are still retried.
     pub fn retry_on_status(mut self, statuses: &[u16]) -> Self {
-        self.retry.retry_on_status = statuses.to_vec();
+        self.retry_policy().retry_on_status = statuses.to_vec();
         self
     }
 
@@ -265,7 +274,7 @@ impl TransportBuilder {
     /// Default is `false`: a request that timed out may still be applied by
     /// the server, and retrying it would apply it again.
     pub fn retry_on_timeout(mut self, retry_on_timeout: bool) -> Self {
-        self.retry.retry_on_timeout = retry_on_timeout;
+        self.retry_policy().retry_on_timeout = retry_on_timeout;
         self
     }
 
@@ -273,11 +282,12 @@ impl TransportBuilder {
     /// drawn uniformly between zero and `backoff`, and the upper bound
     /// doubles for each retry after it (exponential backoff with full
     /// jitter), so that clients failing together do not retry together.
+    /// The upper bound stops at one minute, so no single delay is longer.
     /// [Duration::ZERO] retries without delay.
     ///
     /// Default is 100 milliseconds.
     pub fn retry_backoff(mut self, backoff: Duration) -> Self {
-        self.retry.backoff = backoff;
+        self.retry_policy().backoff = backoff;
         self
     }
 
@@ -287,7 +297,7 @@ impl TransportBuilder {
     ///
     /// Default is 5 seconds.
     pub fn retry_budget(mut self, budget: Option<Duration>) -> Self {
-        self.retry.budget = budget;
+        self.retry_policy().budget = budget;
         self
     }
 
@@ -618,7 +628,8 @@ pub struct Transport {
     sigv4_time_source: SharedTimeSource,
     request_initializers: Box<[Box<dyn BoxedRequestInitializer>]>,
     request_handlers: Box<[Box<dyn BoxedRequestHandler>]>,
-    retry: RetryPolicy,
+    /// `None` when retries are disabled
+    retry: Option<RetryPolicy>,
 }
 
 impl Transport {
@@ -694,6 +705,16 @@ impl Transport {
             None => None,
         };
 
+        let policy = match &self.retry {
+            Some(policy) => policy,
+            None => {
+                let result = self
+                    .send_once(method, path, &headers, query_string, body, timeout)
+                    .await?;
+                return Ok(Response::new(result?, method));
+            }
+        };
+
         let mut delays = Duration::ZERO;
         let mut attempt = 0;
         loop {
@@ -702,15 +723,15 @@ impl Transport {
                 .await?;
 
             let retry = match &result {
-                Ok(response) => self.retry.retries_status(response.status().as_u16()),
-                Err(err) => self.retry.retries_error(err),
+                Ok(response) => policy.retries_status(response.status().as_u16()),
+                Err(err) => policy.retries_error(err),
             };
-            if !retry || attempt >= self.retry.max_retries {
+            if !retry || attempt >= policy.max_retries {
                 return Ok(Response::new(result?, method));
             }
             attempt += 1;
-            let delay = self.retry.delay(attempt);
-            if !self.retry.within_budget(delays, delay) {
+            let delay = policy.delay(attempt);
+            if !policy.within_budget(delays, delay) {
                 return Ok(Response::new(result?, method));
             }
             delays += delay;
@@ -1017,6 +1038,30 @@ pub mod tests {
     #[should_panic(expected = "at least one url")]
     fn multi_node_connection_pool_panics_on_empty_urls() {
         MultiNodeConnectionPool::round_robin(Vec::new());
+    }
+
+    #[test]
+    fn retries_are_enabled_by_default() {
+        let builder = TransportBuilder::default();
+        assert_eq!(builder.retry.unwrap().max_retries, 3);
+        let transport = Transport::default();
+        assert!(transport.retry.is_some());
+    }
+
+    #[test]
+    fn disable_retry_removes_the_policy() {
+        let transport = TransportBuilder::default().disable_retry().build().unwrap();
+        assert!(transport.retry.is_none());
+    }
+
+    #[test]
+    fn a_retry_setting_after_disable_retry_enables_the_default_policy() {
+        let builder = TransportBuilder::default()
+            .disable_retry()
+            .retry_on_status(&[429]);
+        let policy = builder.retry.unwrap();
+        assert_eq!(policy.retry_on_status, vec![429]);
+        assert_eq!(policy.max_retries, 3);
     }
 
     #[test]

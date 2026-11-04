@@ -334,8 +334,7 @@ fn search_sort_values_and_integer_totals_decode() {
 fn fields_unknown_to_the_specification_are_ignored() {
     // `ext` (search pipeline processors) and `plugin_stats` are not part of
     // the specification's search response; `extra` is not part of shard
-    // statistics. They are ignored, as by the other OpenSearch clients: the
-    // typed client can report them instead (`ignore_unknown_fields(false)`)
+    // statistics. They are ignored, as by the other OpenSearch clients
     let fixture = json!({
         "took": 5,
         "timed_out": false,

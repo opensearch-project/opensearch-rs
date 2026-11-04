@@ -60,9 +60,8 @@
 //!
 //! Keys of a response that its response type does not define (fields added by
 //! plugins or newer OpenSearch versions, or missing from the specification)
-//! are ignored, as by the other OpenSearch clients. The typed client can
-//! report them as an error instead: see
-//! [Fields unknown to the response types](crate::typed#fields-unknown-to-the-response-types).
+//! are ignored, as by the other OpenSearch clients; the generic client reads
+//! them (see [Fields unknown to the response types](crate::typed#fields-unknown-to-the-response-types)).
 //! Structs whose specification declares `additionalProperties` keep the
 //! remaining keys in that typed map (`additional`, or `aggregations` in
 //! buckets). These maps are filled by generated `Deserialize` impls rather

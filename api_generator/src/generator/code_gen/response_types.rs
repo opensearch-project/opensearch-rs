@@ -258,8 +258,7 @@ fn render_struct(
     // (`additionalProperties`, sub-aggregations in buckets) collects the
     // remaining keys into that map through a generated visitor. Every other
     // struct derives its impls: keys the specification does not define are
-    // ignored, as by the other OpenSearch clients; the typed client can
-    // report them instead (`ignore_unknown_fields(false)`).
+    // ignored, as by the other OpenSearch clients.
     doc(&mut out, s.description.as_deref());
     if s.residual.is_some() {
         out.push_str("#[derive(Debug, Clone)]\n");

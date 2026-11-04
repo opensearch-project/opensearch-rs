@@ -189,7 +189,7 @@ const SEARCH_WITH_UNKNOWN_FIELDS: &str = r#"{"took":3,"timed_out":false,
   "ext":{"rag":{"answer":"42"}},"absent":null}"#;
 
 #[tokio::test]
-async fn unknown_fields_are_ignored_by_default() -> anyhow::Result<()> {
+async fn unknown_fields_are_ignored() -> anyhow::Result<()> {
     let server = MockServer::builder()
         .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
         .start()?;
@@ -203,71 +203,6 @@ async fn unknown_fields_are_ignored_by_default() -> anyhow::Result<()> {
     assert_eq!(resp.hits.total_value(), Some(1));
     // keys the specification allows are kept where it declares them
     assert_eq!(resp.hits.hits[0].additional["_plugin"].get(), r#""x""#);
-    Ok(())
-}
-
-#[tokio::test]
-async fn unknown_fields_can_be_reported() -> anyhow::Result<()> {
-    let server = MockServer::builder()
-        .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
-        .start()?;
-    let err = server
-        .client()
-        .typed()
-        .ignore_unknown_fields(false)
-        .search(SearchParts::Index(&["movies"]))
-        .size(1) // the setting survives the builder options
-        .send()
-        .await
-        .unwrap_err();
-
-    // every unknown key, wherever it is, by its path; `null` is not
-    // reported, and neither is a key the specification allows: hits declare
-    // `additionalProperties`, so the hit's `_plugin` is kept in `additional`
-    assert_eq!(
-        err.unknown_fields().unwrap(),
-        &[
-            "._shards.extra".to_string(),
-            ".ext".to_string(),
-            ".hits.total.approx".to_string(),
-        ]
-    );
-    assert!(err.is_json());
-    assert!(err.api_error().is_none());
-    let message = err.to_string();
-    assert!(
-        message.contains("types::search::SearchResponse"),
-        "{}",
-        message
-    );
-    assert!(message.contains(".ext"), "{}", message);
-    Ok(())
-}
-
-#[tokio::test]
-async fn a_response_its_type_fully_describes_passes_the_strict_check() -> anyhow::Result<()> {
-    let server = MockServer::builder().response(200, SEARCH).start()?;
-    let resp = server
-        .client()
-        .typed()
-        .ignore_unknown_fields(false)
-        .search(SearchParts::Index(&["movies"]))
-        .send()
-        .await?;
-    assert_eq!(resp.took, 3);
-
-    // a 404 answered with the response type is checked the same way
-    let server = MockServer::builder()
-        .response(404, r#"{"_index":"movies","_id":"nope","found":false}"#)
-        .start()?;
-    let doc = server
-        .client()
-        .typed()
-        .ignore_unknown_fields(false)
-        .get(GetParts::IndexId("movies", "nope"))
-        .send()
-        .await?;
-    assert!(!doc.found);
     Ok(())
 }
 
@@ -289,23 +224,6 @@ async fn namespace_apis_are_typed() -> anyhow::Result<()> {
         .await?;
     assert_eq!(resp.cluster_name, "docker-cluster");
     assert_eq!(resp.number_of_nodes, 1);
-    Ok(())
-}
-
-#[tokio::test]
-async fn a_namespace_client_inherits_the_unknown_fields_setting() -> anyhow::Result<()> {
-    let body = HEALTH.replacen('{', r#"{"extra":1,"#, 1).leak();
-    let server = MockServer::builder().response(200, body).start()?;
-    let err = server
-        .client()
-        .typed()
-        .ignore_unknown_fields(false)
-        .cluster()
-        .health(ClusterHealthParts::None)
-        .send()
-        .await
-        .unwrap_err();
-    assert_eq!(err.unknown_fields().unwrap(), &[".extra".to_string()]);
     Ok(())
 }
 

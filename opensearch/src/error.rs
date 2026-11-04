@@ -102,13 +102,6 @@ enum Kind {
         #[source]
         source: serde_json::Error,
     },
-
-    #[error("the response body of {url} has field(s) unknown to {type_name}: {}", .fields.join(", "))]
-    UnknownFields {
-        url: Box<Url>,
-        type_name: &'static str,
-        fields: Vec<String>,
-    },
 }
 
 impl From<RequestHandlerError> for Kind {
@@ -155,29 +148,6 @@ impl Error {
         }
     }
 
-    pub(crate) fn unknown_fields_error(
-        url: Url,
-        type_name: &'static str,
-        fields: Vec<String>,
-    ) -> Self {
-        Self(UnknownFields {
-            url: Box::new(url),
-            type_name,
-            fields,
-        })
-    }
-
-    /// The fields of the response unknown to the response type, when
-    /// the typed client is set to report them
-    /// ([`TypedOpenSearch::ignore_unknown_fields`](crate::typed::TypedOpenSearch::ignore_unknown_fields)):
-    /// the path of each, e.g. `.ext` or `._shards.extra`
-    pub fn unknown_fields(&self) -> Option<&[String]> {
-        match &self.0 {
-            UnknownFields { fields, .. } => Some(fields),
-            _ => None,
-        }
-    }
-
     /// The error OpenSearch returned, when the typed client ([`crate::typed`])
     /// received a status code whose body is not the typed response, e.g.
     /// 404 `index_not_found_exception`
@@ -198,7 +168,7 @@ impl Error {
 
     /// Returns true if the error is related to serialization or deserialization
     pub fn is_json(&self) -> bool {
-        matches!(self.0, Json(_) | Decode { .. } | UnknownFields { .. })
+        matches!(self.0, Json(_) | Decode { .. })
     }
 }
 

@@ -116,7 +116,7 @@ impl Response {
     }
 
     /// Reads the body of a typed call ([`crate::typed`]) as `T`, the response
-    /// response type of the endpoint.
+    /// type of the endpoint.
     ///
     /// Any 2xx status, and the non-2xx statuses in `typed_statuses` (those
     /// for which the specification declares the same body as for success,
@@ -125,16 +125,14 @@ impl Response {
     /// `T` is an error too: `get` answers 404 both for a missing document
     /// (`{"found": false}`) and for a missing index (`index_not_found_exception`).
     ///
-    /// Keys `T` does not define are ignored, unless `report_unknown_fields`
-    /// is set: the body is then an error listing them.
+    /// Keys `T` does not define are ignored.
     pub(crate) async fn typed<T>(
         self,
         type_name: &'static str,
         typed_statuses: &[u16],
-        report_unknown_fields: bool,
     ) -> Result<T, ClientError>
     where
-        T: DeserializeOwned + Serialize,
+        T: DeserializeOwned,
     {
         let status = self.status_code();
         let url = self.url().clone();
@@ -152,13 +150,6 @@ impl Response {
                 None => return Err(ClientError::api(status, url, &body)),
             }
         };
-        if report_unknown_fields {
-            let unknown = crate::typed::unknown_fields(&body, &value)
-                .map_err(|e| ClientError::decode(url.clone(), type_name, e))?;
-            if !unknown.is_empty() {
-                return Err(ClientError::unknown_fields_error(url, type_name, unknown));
-            }
-        }
         Ok(value)
     }
 

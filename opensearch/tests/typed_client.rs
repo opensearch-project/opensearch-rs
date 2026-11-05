@@ -12,7 +12,7 @@
 pub mod common;
 use common::server::MockServer;
 
-use opensearch::{http::StatusCode, GetParts, SearchParts};
+use opensearch::{cluster::ClusterHealthParts, http::StatusCode, GetParts, SearchParts};
 
 const SEARCH: &str = r#"{"took":3,"timed_out":false,
   "_shards":{"total":1,"successful":1,"skipped":0,"failed":0},
@@ -189,7 +189,7 @@ const SEARCH_WITH_UNKNOWN_FIELDS: &str = r#"{"took":3,"timed_out":false,
   "ext":{"rag":{"answer":"42"}},"absent":null}"#;
 
 #[tokio::test]
-async fn unknown_fields_are_ignored_by_default() -> anyhow::Result<()> {
+async fn unknown_fields_are_ignored() -> anyhow::Result<()> {
     let server = MockServer::builder()
         .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
         .start()?;
@@ -206,67 +206,42 @@ async fn unknown_fields_are_ignored_by_default() -> anyhow::Result<()> {
     Ok(())
 }
 
+const HEALTH: &str = r#"{"cluster_name":"docker-cluster","status":"green","timed_out":false,
+  "number_of_nodes":1,"number_of_data_nodes":1,"active_primary_shards":1,"active_shards":1,
+  "relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,
+  "number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,
+  "active_shards_percent_as_number":100.0,"discovered_master":true,"discovered_cluster_manager":true}"#;
+
 #[tokio::test]
-async fn unknown_fields_can_be_reported() -> anyhow::Result<()> {
-    let server = MockServer::builder()
-        .response(200, SEARCH_WITH_UNKNOWN_FIELDS)
-        .start()?;
-    let err = server
+async fn namespace_apis_are_typed() -> anyhow::Result<()> {
+    let server = MockServer::builder().response(200, HEALTH).start()?;
+    let resp = server
         .client()
         .typed()
-        .ignore_unknown_fields(false)
-        .search(SearchParts::Index(&["movies"]))
-        .size(1) // the setting survives the builder options
+        .cluster()
+        .health(ClusterHealthParts::None)
         .send()
-        .await
-        .unwrap_err();
-
-    // every unknown key, wherever it is, by its path; `null` is not
-    // reported, and neither is a key the specification allows: hits declare
-    // `additionalProperties`, so the hit's `_plugin` is kept in `additional`
-    assert_eq!(
-        err.unknown_fields().unwrap(),
-        &[
-            "._shards.extra".to_string(),
-            ".ext".to_string(),
-            ".hits.total.approx".to_string(),
-        ]
-    );
-    assert!(err.is_json());
-    assert!(err.api_error().is_none());
-    let message = err.to_string();
-    assert!(
-        message.contains("types::search::SearchResponse"),
-        "{}",
-        message
-    );
-    assert!(message.contains(".ext"), "{}", message);
+        .await?;
+    assert_eq!(resp.cluster_name, "docker-cluster");
+    assert_eq!(resp.number_of_nodes, 1);
     Ok(())
 }
 
 #[tokio::test]
-async fn a_response_its_type_fully_describes_passes_the_strict_check() -> anyhow::Result<()> {
-    let server = MockServer::builder().response(200, SEARCH).start()?;
+async fn a_timed_out_health_check_is_decoded() -> anyhow::Result<()> {
+    // `wait_for_*` timing out answers 408 with the regular body, a status
+    // the specification does not declare (UNDECLARED_TYPED_STATUSES)
+    let body = HEALTH
+        .replace(r#""timed_out":false"#, r#""timed_out":true"#)
+        .leak();
+    let server = MockServer::builder().response(408, body).start()?;
     let resp = server
         .client()
         .typed()
-        .ignore_unknown_fields(false)
-        .search(SearchParts::Index(&["movies"]))
+        .cluster()
+        .health(ClusterHealthParts::None)
         .send()
         .await?;
-    assert_eq!(resp.took, 3);
-
-    // a 404 answered with the response type is checked the same way
-    let server = MockServer::builder()
-        .response(404, r#"{"_index":"movies","_id":"nope","found":false}"#)
-        .start()?;
-    let doc = server
-        .client()
-        .typed()
-        .ignore_unknown_fields(false)
-        .get(GetParts::IndexId("movies", "nope"))
-        .send()
-        .await?;
-    assert!(!doc.found);
+    assert!(resp.timed_out);
     Ok(())
 }

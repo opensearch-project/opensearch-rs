@@ -125,7 +125,7 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
     // the response types generated for the specification: every endpoint
     // records the Rust path of its response type so consumers (the yaml test
     // runner's typed verification) need no second source of truth
-    let response_model = responses::read_response_model(&spec, responses::TYPED_OPERATION_GROUPS)?;
+    let response_model = responses::read_all_response_models(&spec)?;
 
     let mut endpoints = Vec::with_capacity(groups.len());
     for (name, operations) in groups {
@@ -851,8 +851,15 @@ components:
                 .as_deref(),
             Some("types::search::SearchResponse")
         );
-        // only the selected groups get a response type
-        for group in responses::TYPED_OPERATION_GROUPS {
+        // every group with a JSON success response gets a response type
+        for group in [
+            "get",
+            "index",
+            "bulk",
+            "indices.create",
+            "cluster.health",
+            "cat.indices",
+        ] {
             assert!(
                 api.endpoint_for_api_call(group)
                     .unwrap()
@@ -862,12 +869,6 @@ components:
                 group
             );
         }
-        assert_eq!(
-            api.endpoint_for_api_call("indices.create")
-                .unwrap()
-                .typed_response,
-            None
-        );
         // HEAD-only endpoints have no JSON body and thus no response type
         assert_eq!(
             api.endpoint_for_api_call("indices.exists")

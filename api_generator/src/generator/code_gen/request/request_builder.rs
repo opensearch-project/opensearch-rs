@@ -778,10 +778,11 @@ impl<'a> RequestBuilder<'a> {
             #cfg_doc
             #cfg_attr
             #deprecated_attr
+            // the field holds the deprecated generic builder of a deprecated API
+            #[allow(deprecated)]
             #[derive(Clone, Debug)]
             pub struct #typed_ident #struct_generics {
                 inner: #module::#builder_ident #struct_generics,
-                report_unknown_fields: bool,
             }
 
             #cfg_attr
@@ -794,7 +795,7 @@ impl<'a> RequestBuilder<'a> {
                     self.inner
                         .send()
                         .await?
-                        .typed(#response_type_name, &[#(#statuses),*], self.report_unknown_fields)
+                        .typed(#response_type_name, &[#(#statuses),*])
                         .await
                 }
             }
@@ -843,7 +844,6 @@ impl<'a> RequestBuilder<'a> {
             pub fn #fn_name(&'a self #params) -> #ret {
                 #typed_ident {
                     inner: #inner_new,
-                    report_unknown_fields: self.reports_unknown_fields(),
                 }
             }
         };
@@ -881,7 +881,6 @@ impl<'a> RequestBuilder<'a> {
                 where T: #bound {
                     #typed_ident {
                         inner: self.inner.body(body),
-                        report_unknown_fields: self.report_unknown_fields,
                     }
                 }
             };
@@ -907,7 +906,6 @@ impl<'a> RequestBuilder<'a> {
             pub #sig {
                 Self {
                     inner: self.inner.#name(#(#args),*),
-                    report_unknown_fields: self.report_unknown_fields,
                 }
             }
         }
@@ -990,7 +988,7 @@ mod tests {
         // a wrapper of the generic builder whose send returns the response type
         assert!(
             builder
-                .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , report_unknown_fields : bool , }"),
+                .contains("pub struct TypedGet < 'a , 'b > { inner : crate :: Get < 'a , 'b > , }"),
             "{}",
             builder
         );
@@ -1002,18 +1000,7 @@ mod tests {
         // 404 answers with the response type (`found: false`)
         assert!(builder.contains("& [404u16]"), "{}", builder);
         // the options of the generic builder are delegated...
-        assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) , report_unknown_fields : self . report_unknown_fields , } }"), "{}", builder);
-        // the client's unknown-field setting reaches send
-        assert!(
-            builder.contains("self . report_unknown_fields) . await"),
-            "{}",
-            builder
-        );
-        assert!(
-            ctor.contains("report_unknown_fields : self . reports_unknown_fields ()"),
-            "{}",
-            ctor
-        );
+        assert!(builder.contains("pub fn routing (self , routing : & 'b [& 'b str]) -> Self { Self { inner : self . inner . routing (routing) , } }"), "{}", builder);
         // ...except those that change the shape of the response
         assert!(!builder.contains("fn filter_path"), "{}", builder);
         assert!(ctor.contains("pub fn get < 'a , 'b > (& 'a self , parts : crate :: GetParts < 'b >) -> TypedGet < 'a , 'b >"), "{}", ctor);
@@ -1034,12 +1021,10 @@ mod tests {
 
     #[test]
     fn typed_cat_builders_always_ask_for_json() {
-        // no cat API is typed yet: give one a response type to check the output
         let api = api();
-        let mut cat_indices = api.endpoint_for_api_call("cat.indices").unwrap().clone();
-        assert_eq!(cat_indices.typed_response, None);
-        cat_indices.typed_response = Some("types::cat_indices::IndicesResponse".to_string());
-        let (builder, ctor) = typed(&api, "cat.indices", &cat_indices).unwrap();
+        let cat_indices = api.endpoint_for_api_call("cat.indices").unwrap();
+        assert!(cat_indices.typed_response.is_some());
+        let (builder, ctor) = typed(&api, "cat.indices", cat_indices).unwrap();
 
         // the format option is not offered, and fixed to JSON on creation
         assert!(!builder.contains("fn format"), "{}", builder);

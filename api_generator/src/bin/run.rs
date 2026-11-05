@@ -155,11 +155,10 @@ fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
 
     let api = openapi::read_api("opensearch-api-specification/main", &spec_file)?;
 
-    // typed response types for the selected operation groups; groups
-    // without a JSON success response are reported and skipped
+    // typed response types for every operation group; groups without a
+    // JSON success response are reported and skipped
     let spec: serde_json::Value = serde_yaml::from_reader(fs::File::open(&spec_file)?)?;
-    let response_model =
-        openapi::responses::read_response_model(&spec, openapi::responses::TYPED_OPERATION_GROUPS)?;
+    let response_model = openapi::responses::read_all_response_models(&spec)?;
     log::info!(
         "typed response types: {} operation groups typed, {} without a JSON success response",
         response_model.endpoints.len(),

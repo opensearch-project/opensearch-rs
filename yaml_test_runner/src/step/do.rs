@@ -356,10 +356,23 @@ impl ApiCall {
             }
         }
 
-        // `filter_path` returns an arbitrary subset of the response, which
-        // the response type is not meant to describe (callers decode such
-        // responses into their own types): no typed verification then
-        let filters_response = params.iter().any(|(k, _)| *k == "filter_path");
+        // a request the typed client cannot send is not verified: one using
+        // an option the typed builders omit because it changes the shape of
+        // the response (`filter_path`), or one missing the value they always
+        // send (`format=json` for cat and list, which answer plain text
+        // otherwise)
+        let filters_response = endpoint.full_name.as_deref().is_some_and(|group| {
+            api_generator::generator::code_gen::typed_client::omitted_params(group)
+                .into_iter()
+                .any(|(name, fixed)| {
+                    let value = params.iter().find(|(k, _)| *k == name).map(|(_, v)| *v);
+                    match (fixed, value) {
+                        (None, value) => value.is_some(),
+                        (Some(fixed), Some(value)) => value.as_str() != Some(fixed),
+                        (Some(_), None) => true,
+                    }
+                })
+        });
 
         let api_call = endpoint.full_name.as_ref().unwrap();
         let parts = Self::generate_parts(api_call, endpoint, &parts)?;
@@ -1078,5 +1091,17 @@ mod tests {
         assert!(!filtered.contains("check_typed_response"), "{}", filtered);
         // the request itself still carries the parameter
         assert!(filtered.contains("filter_path"), "{}", filtered);
+    }
+
+    #[test]
+    fn typed_check_follows_the_fixed_format_of_cat_apis() {
+        let api = spec_api();
+        // without format=json, cat answers plain text: not verified
+        let text = do_tokens(&api, "cat.count: {}\n");
+        assert!(!text.contains("check_typed_response"), "{}", text);
+        let json = do_tokens(&api, "cat.count:\n  format: json\n");
+        assert!(json.contains("check_typed_response"), "{}", json);
+        let yaml = do_tokens(&api, "cat.count:\n  format: yaml\n");
+        assert!(!yaml.contains("check_typed_response"), "{}", yaml);
     }
 }

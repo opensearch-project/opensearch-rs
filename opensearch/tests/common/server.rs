@@ -32,10 +32,19 @@
 // Licensed under Apache License, Version 2.0
 // https://github.com/seanmonstar/reqwest/blob/master/LICENSE-APACHE
 
-use std::{convert::identity, net::SocketAddr, sync::mpsc as std_mpsc, thread, time::Duration};
+use std::{
+    convert::identity,
+    net::SocketAddr,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        mpsc as std_mpsc, Arc,
+    },
+    thread,
+    time::Duration,
+};
 
 use bytes::Bytes;
-use http_body_util::Full;
+use http_body_util::{BodyExt, Full};
 use hyper::{
     body::Incoming, server::conn::http1, service::service_fn, HeaderMap, Method, Request, Response,
     Uri,
@@ -56,14 +65,15 @@ use super::client::TestClientBuilder;
 struct RequestState {
     requests_tx: mpsc::UnboundedSender<ReceivedRequest>,
     response_delay: Option<Duration>,
-    response: Option<(u16, &'static str)>,
+    responses: Arc<Vec<(u16, &'static str)>>,
+    served: Arc<AtomicUsize>,
     shutdown_rx: watch::Receiver<bool>,
 }
 
 #[derive(Default)]
 pub struct MockServerBuilder {
     response_delay: Option<Duration>,
-    response: Option<(u16, &'static str)>,
+    responses: Vec<(u16, &'static str)>,
 }
 
 impl MockServerBuilder {
@@ -75,7 +85,14 @@ impl MockServerBuilder {
     /// Answers every request with this status code and JSON body (by
     /// default an empty `200`)
     pub fn response(mut self, status: u16, body: &'static str) -> Self {
-        self.response = Some((status, body));
+        self.responses = vec![(status, body)];
+        self
+    }
+
+    /// Answers the requests with these status codes and JSON bodies in
+    /// turn, repeating the last one once they are used up
+    pub fn responses(mut self, responses: &[(u16, &'static str)]) -> Self {
+        self.responses = responses.to_vec();
         self
     }
 
@@ -83,11 +100,24 @@ impl MockServerBuilder {
         req: Request<Incoming>,
         state: RequestState,
     ) -> anyhow::Result<Response<Full<Bytes>>> {
-        state.requests_tx.send(req.into())?;
+        let (parts, body) = req.into_parts();
+        let body = body.collect().await?.to_bytes();
+        state.requests_tx.send(ReceivedRequest {
+            method: parts.method,
+            uri: parts.uri,
+            headers: parts.headers,
+            body,
+        })?;
         if let Some(response_delay) = state.response_delay {
             sleep(response_delay).await;
         }
-        Ok(match state.response {
+        let n = state.served.fetch_add(1, Ordering::SeqCst);
+        let response = state
+            .responses
+            .get(n)
+            .or_else(|| state.responses.last())
+            .copied();
+        Ok(match response {
             Some((status, body)) => Response::builder()
                 .status(status)
                 .header("content-type", "application/json")
@@ -139,7 +169,8 @@ impl MockServerBuilder {
             RequestState {
                 requests_tx,
                 response_delay: self.response_delay,
-                response: self.response,
+                responses: Arc::new(self.responses),
+                served: Arc::new(AtomicUsize::new(0)),
                 shutdown_rx,
             },
         );
@@ -207,6 +238,20 @@ impl MockServer {
             .await
             .ok_or_else(|| anyhow::anyhow!("no request received"))
     }
+
+    /// The requests received so far, without waiting for more
+    pub fn received_requests(&mut self) -> Vec<ReceivedRequest> {
+        let mut requests = Vec::new();
+        while let Ok(request) = self.requests_rx.try_recv() {
+            requests.push(request);
+        }
+        requests
+    }
+
+    /// The address of the server, e.g. `http://127.0.0.1:1234`
+    pub fn uri(&self) -> &str {
+        &self.uri
+    }
 }
 
 impl Drop for MockServer {
@@ -227,6 +272,7 @@ pub struct ReceivedRequest {
     method: Method,
     uri: Uri,
     headers: HeaderMap,
+    body: Bytes,
 }
 
 impl ReceivedRequest {
@@ -245,14 +291,8 @@ impl ReceivedRequest {
     pub fn header(&self, name: &str) -> Option<&str> {
         self.headers.get(name).and_then(|v| v.to_str().ok())
     }
-}
 
-impl From<Request<Incoming>> for ReceivedRequest {
-    fn from(req: Request<Incoming>) -> Self {
-        ReceivedRequest {
-            method: req.method().clone(),
-            uri: req.uri().clone(),
-            headers: req.headers().clone(),
-        }
+    pub fn body(&self) -> &[u8] {
+        &self.body
     }
 }

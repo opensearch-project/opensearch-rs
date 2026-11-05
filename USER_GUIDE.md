@@ -37,6 +37,28 @@ let transport = Transport::single_node("https://example.com")?;
 let client = OpenSearch::new(transport);
 ```
 
+### Retries
+
+A request is sent again when the response status is 502, 503 or 504, or when
+the connection fails, up to 3 times with an exponential backoff. Each attempt
+takes the next node of the connection pool, so with several nodes a retry goes
+to another node. Timeouts are not retried unless enabled, as the server may
+still apply a request that timed out. The policy is set on the `TransportBuilder`:
+
+```rust
+let pool = MultiNodeConnectionPool::round_robin(vec![node1, node2]);
+let transport = TransportBuilder::new(pool)
+    .max_retries(5)
+    .retry_on_status(&[429, 502, 503, 504])
+    .retry_backoff(Duration::from_millis(200))
+    .build()?;
+let client = OpenSearch::new(transport);
+```
+
+Use `disable_retry()` to send every request once, e.g. for requests whose
+effect must not be repeated when a connection fails after the server received
+them.
+
 ### Display Server Version
 
 ```rust

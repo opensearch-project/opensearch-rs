@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GroupingType {
     #[doc = "`NONE` (also accepted: `none`)"]
     None,
@@ -70,6 +71,7 @@ impl<'de> serde::Deserialize<'de> for GroupingType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Measurement {
     #[serde(rename = "aggregationType")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -81,6 +83,7 @@ pub struct Measurement {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Measurements {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu: Option<crate::types::insights_common::Measurement>,
@@ -91,6 +94,7 @@ pub struct Measurements {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Source {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -177,6 +181,7 @@ pub struct Source {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskResourceUsage {
     #[doc = "The CPU time used in nanoseconds."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -187,6 +192,7 @@ pub struct TaskResourceUsage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskResourceUsages {
     #[doc = "The action type of the task."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -209,11 +215,13 @@ pub struct TaskResourceUsages {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TopQueriesResponse {
     pub top_queries: Vec<crate::types::insights_common::TopQuery>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TopQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub group_by: Option<crate::types::insights_common::GroupingType>,

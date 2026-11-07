@@ -31,6 +31,7 @@
 pub type GetModelResponse = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -68,6 +69,7 @@ pub struct SearchModelsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseHits {
     pub hits: Vec<crate::types::knn::SearchModelsResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -86,6 +88,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchModelsResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -609,6 +612,7 @@ impl SearchModelsResponseSuggestValueItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletion {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub options: Option<crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptions>,
@@ -650,6 +654,7 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseSuggestValueItemComple
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -669,6 +674,7 @@ impl SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsObject {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -688,6 +694,7 @@ impl SearchModelsResponseSuggestValueItemCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TrainModelResponse {
     pub model_id: String,
 }

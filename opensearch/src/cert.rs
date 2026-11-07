@@ -154,6 +154,7 @@ let _response = client.ping().send().await?;
 /// # }
 /// ```
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
+#[non_exhaustive]
 pub enum CertificateValidation {
     /// Default validation of the certificate, which validates that the certificate provided by the
     /// server is signed by a trusted Certificate Authority (CA) and also verifies that the server’s hostname

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ErrorPolicy {
     #[doc = "`BLOCK`"]
     Block,
@@ -70,6 +71,7 @@ impl<'de> serde::Deserialize<'de> for ErrorPolicy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetIngestionStateResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -88,6 +90,7 @@ pub struct GetIngestionStateResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestionStateShardFailure {
     #[doc = "Indicates the shard level error message."]
     pub error: String,
@@ -96,6 +99,7 @@ pub struct IngestionStateShardFailure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PauseIngestionResponse {
     #[doc = "Indicates if the pause request has been acknowledged."]
     pub acknowledged: bool,
@@ -108,6 +112,7 @@ pub struct PauseIngestionResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PollerState {
     #[doc = "`CLOSED`"]
     Closed,
@@ -161,6 +166,7 @@ impl<'de> serde::Deserialize<'de> for PollerState {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResumeIngestionResponse {
     #[doc = "Indicates if the resume request has been acknowledged."]
     pub acknowledged: bool,
@@ -173,6 +179,7 @@ pub struct ResumeIngestionResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIngestionState {
     #[doc = "Indicates the shard pointer from where the poller will resume during shard recovery."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReindexNode {
     #[doc = "The attributes of the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +47,13 @@ pub struct ReindexNode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReindexRethrottleResponse {
     pub nodes: std::collections::BTreeMap<String, crate::types::reindex_rethrottle::ReindexNode>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReindexStatus {
     #[doc = "The number of scroll responses shown by the reindex."]
     pub batches: i64,
@@ -78,6 +81,7 @@ pub struct ReindexStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReindexTask {
     pub action: String,
     pub cancellable: bool,

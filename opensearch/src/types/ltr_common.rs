@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AcknowledgedResponse {
     #[doc = "Indicates whether the request was acknowledged."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -43,6 +44,7 @@ pub struct AcknowledgedResponse {
 
 #[doc = "Aggregate cache statistics across all nodes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheAllStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<crate::types::ltr_common::CacheItemStats>,
@@ -55,6 +57,7 @@ pub struct CacheAllStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheItemStats {
     #[doc = "Count of cached items."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -65,6 +68,7 @@ pub struct CacheItemStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheStat {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entry_count: Option<i64>,
@@ -79,6 +83,7 @@ pub struct CacheStat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub feature: Option<crate::types::ltr_common::CacheStat>,
@@ -89,6 +94,7 @@ pub struct CacheStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheStatsResponse {
     #[serde(rename = "_nodes")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -107,12 +113,14 @@ pub struct CacheStatsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ListStoresResponse {
     #[doc = "Map of available feature stores."]
     pub stores: std::collections::BTreeMap<String, crate::types::ltr_common::StoreDetails>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeDetails {
     #[doc = "Node hostname."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -125,6 +133,7 @@ pub struct NodeDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cache: Option<crate::types::ltr_common::CacheStats>,
@@ -136,6 +145,7 @@ pub struct NodeStats {
 
 #[doc = "Cache statistics for a node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeStatsDetails {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<crate::types::ltr_common::CacheItemStats>,
@@ -148,6 +158,7 @@ pub struct NodeStatsDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Stats {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -165,6 +176,7 @@ pub struct Stats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoreDetails {
     #[doc = "Count statistics for this store."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -181,6 +193,7 @@ pub struct StoreDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoreExistsResponse {
     #[doc = "Indicates whether the store exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -188,6 +201,7 @@ pub struct StoreExistsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoreStat {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub feature_count: Option<i64>,

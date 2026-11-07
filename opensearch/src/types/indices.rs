@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AddBlockResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -37,6 +38,7 @@ pub struct AddBlockResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AnalyzeResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<crate::types::indices_analyze::AnalyzeDetail>,
@@ -45,6 +47,7 @@ pub struct AnalyzeResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CloneResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -53,6 +56,7 @@ pub struct CloneResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CloseResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -61,6 +65,7 @@ pub struct CloseResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateResponse {
     pub acknowledged: bool,
     pub index: crate::types::common::IndexName,
@@ -68,6 +73,7 @@ pub struct CreateResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStreamsStatsResponse {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
@@ -84,6 +90,7 @@ pub struct DataStreamsStatsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ForcemergeResponse {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
@@ -96,6 +103,7 @@ pub type GetAliasResponse =
     std::collections::BTreeMap<String, crate::types::indices_get_alias::IndexAliases>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetDataStreamResponse {
     pub data_streams: Vec<crate::types::indices_common::DataStream>,
 }
@@ -104,6 +112,7 @@ pub type GetFieldMappingResponse =
     std::collections::BTreeMap<String, crate::types::indices_get_field_mapping::TypeFieldMappings>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetIndexTemplateResponse {
     pub index_templates: Vec<crate::types::indices_get_index_template::IndexTemplateItem>,
 }
@@ -155,12 +164,14 @@ impl OpenResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OpenResponseObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task: Option<crate::types::common::TaskId>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OpenResponseObjectObject {
     pub acknowledged: bool,
     pub shards_acknowledged: bool,
@@ -170,6 +181,7 @@ pub type RecoveryResponse =
     std::collections::BTreeMap<String, crate::types::indices_recovery::RecoveryStatus>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResolveIndexResponse {
     pub aliases: Vec<crate::types::indices_resolve_index::ResolveIndexAliasItem>,
     pub data_streams: Vec<crate::types::indices_resolve_index::ResolveIndexDataStreamsItem>,
@@ -177,6 +189,7 @@ pub struct ResolveIndexResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RolloverResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -189,6 +202,7 @@ pub struct RolloverResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SegmentsResponse {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
@@ -196,12 +210,14 @@ pub struct SegmentsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardStoresResponse {
     pub indices:
         std::collections::BTreeMap<String, crate::types::indices_shard_stores::IndicesShardStores>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShrinkResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -210,6 +226,7 @@ pub struct ShrinkResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimulateIndexTemplateResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub overlapping: Option<Vec<crate::types::indices_simulate_template::Overlapping>>,
@@ -218,6 +235,7 @@ pub struct SimulateIndexTemplateResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimulateTemplateResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub overlapping: Option<Vec<crate::types::indices_simulate_template::Overlapping>>,
@@ -225,6 +243,7 @@ pub struct SimulateTemplateResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SplitResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -233,6 +252,7 @@ pub struct SplitResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsResponse {
     #[serde(rename = "_all")]
     pub all: crate::types::indices_stats::AllIndicesStats,
@@ -244,6 +264,7 @@ pub struct StatsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpgradeResponse {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
@@ -254,6 +275,7 @@ pub struct UpgradeResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ValidateQueryResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]

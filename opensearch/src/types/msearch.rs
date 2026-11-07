@@ -32,6 +32,7 @@
 pub type MsearchResponse = crate::types::msearch::MultiSearchResult;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiSearchItem {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -66,6 +67,7 @@ pub struct MultiSearchItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiSearchItemHits {
     pub hits: Vec<crate::types::msearch::MultiSearchItemHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -84,6 +86,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct MultiSearchItemHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -569,6 +572,7 @@ impl MultiSearchItemHitsTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiSearchResult {
     pub responses: Vec<crate::types::msearch::ResponseItem>,
     pub took: f64,

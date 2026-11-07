@@ -265,6 +265,9 @@ fn render_struct(
     } else {
         out.push_str("#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]\n");
     }
+    // the specification adds properties over time: a field for one must not
+    // be a breaking change
+    out.push_str("#[non_exhaustive]\n");
     let _ = writeln!(out, "pub struct {} {{", rust_name);
     for f in &fields {
         doc(&mut out, f.model.description.as_deref());
@@ -622,6 +625,9 @@ fn render_str_enum(rust_name: &str, e: &StrEnumModel) -> String {
     let mut out = String::new();
     doc(&mut out, e.description.as_deref());
     out.push_str("#[derive(Debug, Clone, PartialEq, Eq, Hash)]\n");
+    // newer servers and plugins add values: a variant for one must not be a
+    // breaking change
+    out.push_str("#[non_exhaustive]\n");
     let _ = writeln!(out, "pub enum {} {{", rust_name);
 
     // (variant, serialized spelling, accepted spellings)

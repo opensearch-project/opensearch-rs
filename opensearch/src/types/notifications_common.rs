@@ -29,11 +29,13 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Chime {
     pub url: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteConfigsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub delete_response_list: Option<crate::types::notifications_common::DeleteResponseList>,
@@ -43,6 +45,7 @@ pub type DeleteResponseList =
     std::collections::BTreeMap<String, crate::types::notifications_common::RestStatus>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeliveryStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status_code: Option<String>,
@@ -51,6 +54,7 @@ pub struct DeliveryStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Email {
     pub email_account_id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -58,6 +62,7 @@ pub struct Email {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum EmailEncryptionMethod {
     #[doc = "`none`"]
     None,
@@ -103,6 +108,7 @@ impl<'de> serde::Deserialize<'de> for EmailEncryptionMethod {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EmailGroup {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub email_group_id_list: Option<Vec<String>>,
@@ -110,6 +116,7 @@ pub struct EmailGroup {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EmailRecipientStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub delivery_status: Option<crate::types::notifications_common::DeliveryStatus>,
@@ -118,6 +125,7 @@ pub struct EmailRecipientStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EventSource {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reference_id: Option<String>,
@@ -130,6 +138,7 @@ pub struct EventSource {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EventStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_id: Option<String>,
@@ -145,6 +154,7 @@ pub struct EventStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetConfigsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_list:
@@ -160,6 +170,7 @@ pub struct GetConfigsResponse {
 pub type HeaderParamsMap = std::collections::BTreeMap<String, i32>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HttpMethodType {
     #[doc = "`PATCH`"]
     Patch,
@@ -205,11 +216,13 @@ impl<'de> serde::Deserialize<'de> for HttpMethodType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MicrosoftTeamsItem {
     pub url: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationChannel {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_id: Option<String>,
@@ -225,6 +238,7 @@ pub struct NotificationChannel {
 
 #[doc = "Type of notification configuration."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NotificationConfigType {
     #[doc = "`chime`"]
     Chime,
@@ -294,6 +308,7 @@ impl<'de> serde::Deserialize<'de> for NotificationConfigType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationsConfigItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub chime: Option<crate::types::notifications_common::Chime>,
@@ -322,6 +337,7 @@ pub struct NotificationsConfigItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationsConfigsOutputItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config: Option<crate::types::notifications_common::NotificationsConfigItem>,
@@ -336,12 +352,14 @@ pub struct NotificationsConfigsOutputItem {
 pub type NotificationsPluginFeaturesMap = std::collections::BTreeMap<String, String>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecipientListItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recipient: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RestStatus {
     #[doc = "`ACCEPTED`"]
     Accepted,
@@ -407,6 +425,7 @@ impl<'de> serde::Deserialize<'de> for RestStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SesAccount {
     pub from_address: String,
     pub region: String,
@@ -415,6 +434,7 @@ pub struct SesAccount {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SeverityType {
     #[doc = "`critical`"]
     Critical,
@@ -460,11 +480,13 @@ impl<'de> serde::Deserialize<'de> for SeverityType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SlackItem {
     pub url: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SmtpAccount {
     pub from_address: String,
     pub host: String,
@@ -473,6 +495,7 @@ pub struct SmtpAccount {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnsItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role_arn: Option<String>,
@@ -480,6 +503,7 @@ pub struct SnsItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TotalHitRelation {
     #[doc = "`eq`"]
     Eq,
@@ -521,6 +545,7 @@ impl<'de> serde::Deserialize<'de> for TotalHitRelation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Webhook {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub header_params: Option<crate::types::notifications_common::HeaderParamsMap>,

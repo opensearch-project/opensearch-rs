@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregationBreakdown {
     pub build_aggregation: i64,
     pub build_aggregation_count: i64,
@@ -47,6 +48,7 @@ pub struct AggregationBreakdown {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregationProfile {
     pub breakdown: crate::types::search::AggregationBreakdown,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -59,6 +61,7 @@ pub struct AggregationProfile {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregationProfileDebug {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub built_buckets: Option<i32>,
@@ -109,6 +112,7 @@ pub struct AggregationProfileDebug {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregationProfileDelegateDebug {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filters: Option<Vec<crate::types::search::AggregationProfileDelegateDebugFilter>>,
@@ -123,6 +127,7 @@ pub struct AggregationProfileDelegateDebug {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregationProfileDelegateDebugFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query: Option<String>,
@@ -135,6 +140,7 @@ pub struct AggregationProfileDelegateDebugFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BoundaryScanner {
     #[doc = "`chars`"]
     Chars,
@@ -180,6 +186,7 @@ impl<'de> serde::Deserialize<'de> for BoundaryScanner {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BuiltinHighlighterType {
     #[doc = "`plain`"]
     Plain,
@@ -225,6 +232,7 @@ impl<'de> serde::Deserialize<'de> for BuiltinHighlighterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Collector {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<crate::types::search::Collector>>,
@@ -266,6 +274,7 @@ impl CompletionContext {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompletionContextObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub boost: Option<f64>,
@@ -279,6 +288,7 @@ pub struct CompletionContextObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompletionSuggester {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analyzer: Option<String>,
@@ -326,6 +336,7 @@ impl Context {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DirectGenerator {
     pub field: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -351,6 +362,7 @@ pub struct DirectGenerator {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FetchProfile {
     pub breakdown: crate::types::search::FetchProfileBreakdown,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -363,6 +375,7 @@ pub struct FetchProfile {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FetchProfileBreakdown {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub load_source: Option<i32>,
@@ -383,6 +396,7 @@ pub struct FetchProfileBreakdown {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FetchProfileDebug {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fast_path: Option<i32>,
@@ -391,6 +405,7 @@ pub struct FetchProfileDebug {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldCollapse {
     pub field: crate::types::common::Field,
     #[doc = "The number of inner hits and their sort order."]
@@ -436,6 +451,7 @@ impl<'de> serde::Deserialize<'de> for FieldCollapseInnerHits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldSuggester {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prefix: Option<String>,
@@ -452,6 +468,7 @@ pub struct FieldSuggester {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Highlight {
     #[doc = "A string that contains each boundary character."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -519,6 +536,7 @@ pub struct Highlight {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HighlightField {
     #[doc = "A string that contains each boundary character."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -618,6 +636,7 @@ impl<'de> serde::Deserialize<'de> for HighlightFields {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HighlighterEncoder {
     #[doc = "`default`"]
     Default,
@@ -659,6 +678,7 @@ impl<'de> serde::Deserialize<'de> for HighlighterEncoder {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HighlighterFragmenter {
     #[doc = "`simple`"]
     Simple,
@@ -700,6 +720,7 @@ impl<'de> serde::Deserialize<'de> for HighlighterFragmenter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HighlighterOrder {
     #[doc = "`score`"]
     Score,
@@ -737,6 +758,7 @@ impl<'de> serde::Deserialize<'de> for HighlighterOrder {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HighlighterTagsSchema {
     #[doc = "`default`"]
     Default,
@@ -808,6 +830,7 @@ impl HighlighterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HitsMetadata {
     pub hits: Vec<crate::types::search::HitsMetadataHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -826,6 +849,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct HitsMetadataHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -1242,6 +1266,7 @@ impl<'de> serde::Deserialize<'de> for HitsMetadataHitsItemMatchedQueries {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HitsMetadataJsonValue {
     pub hits: Vec<crate::types::search::HitsMetadataJsonValueHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1260,6 +1285,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct HitsMetadataJsonValueHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -1812,6 +1838,7 @@ impl HitsMetadataTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InnerHits {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1852,16 +1879,19 @@ pub struct InnerHits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InnerHitsResult {
     pub hits: crate::types::search::HitsMetadata,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LaplaceSmoothingModel {
     pub alpha: f64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LinearInterpolationSmoothingModel {
     pub bigram_lambda: f64,
     pub trigram_lambda: f64,
@@ -1869,6 +1899,7 @@ pub struct LinearInterpolationSmoothingModel {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedIdentity {
     #[serde(rename = "_nested")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1878,6 +1909,7 @@ pub struct NestedIdentity {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggest {
     pub length: i32,
     pub offset: i32,
@@ -1886,6 +1918,7 @@ pub struct PhraseSuggest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggestCollate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub params: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
@@ -1895,6 +1928,7 @@ pub struct PhraseSuggestCollate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggestCollateQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -1903,12 +1937,14 @@ pub struct PhraseSuggestCollateQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggestHighlight {
     pub post_tag: String,
     pub pre_tag: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggestOption {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub collate_match: Option<bool>,
@@ -1952,6 +1988,7 @@ impl<'de> serde::Deserialize<'de> for PhraseSuggestOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhraseSuggester {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analyzer: Option<String>,
@@ -1987,6 +2024,7 @@ pub struct PhraseSuggester {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PointInTimeReference {
     pub id: crate::types::common::Id,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1994,6 +2032,7 @@ pub struct PointInTimeReference {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessorExecutionDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub duration_millis: Option<i64>,
@@ -2012,11 +2051,13 @@ pub struct ProcessorExecutionDetail {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Profile {
     pub shards: Vec<crate::types::search::ShardProfile>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryBreakdown {
     pub advance: i64,
     pub advance_count: i64,
@@ -2039,6 +2080,7 @@ pub struct QueryBreakdown {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryProfile {
     pub breakdown: crate::types::search::QueryBreakdown,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2049,6 +2091,7 @@ pub struct QueryProfile {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchProfile {
     pub collector: Vec<crate::types::search::Collector>,
     pub query: Vec<crate::types::search::QueryProfile>,
@@ -2056,6 +2099,7 @@ pub struct SearchProfile {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2088,6 +2132,7 @@ pub struct SearchResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchResponseHits {
     pub hits: Vec<crate::types::search::SearchResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2106,6 +2151,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -2591,6 +2637,7 @@ impl SearchResponseHitsTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchResult {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2623,6 +2670,7 @@ pub struct SearchResult {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchResultHits {
     pub hits: Vec<crate::types::search::SearchResultHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2641,6 +2689,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchResultHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -3126,6 +3175,7 @@ impl SearchResultHitsTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardProfile {
     pub aggregations: Vec<crate::types::search::AggregationProfile>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3135,6 +3185,7 @@ pub struct ShardProfile {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SmoothingModel {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub laplace: Option<crate::types::search::LaplaceSmoothingModel>,
@@ -3204,6 +3255,7 @@ impl SourceFilter {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SourceFilterObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub excludes: Option<crate::types::common::Fields>,
@@ -3212,6 +3264,7 @@ pub struct SourceFilterObject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StringDistance {
     #[doc = "`damerau_levenshtein`"]
     DamerauLevenshtein,
@@ -3265,6 +3318,7 @@ impl<'de> serde::Deserialize<'de> for StringDistance {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StupidBackoffSmoothingModel {
     pub discount: f64,
 }
@@ -3308,6 +3362,7 @@ impl Suggest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SuggestCompletion {
     pub length: i32,
     pub offset: i32,
@@ -3349,6 +3404,7 @@ impl<'de> serde::Deserialize<'de> for SuggestCompletionOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SuggestCompletionOptionsArrayItem {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3390,6 +3446,7 @@ impl SuggestCompletionOptionsArrayItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SuggestCompletionOptionsObject {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3431,6 +3488,7 @@ impl SuggestCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SuggestFuzziness {
     pub fuzziness: String,
     pub min_length: i32,
@@ -3440,6 +3498,7 @@ pub struct SuggestFuzziness {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SuggestSort {
     #[doc = "`frequency`"]
     Frequency,
@@ -3481,6 +3540,7 @@ impl<'de> serde::Deserialize<'de> for SuggestSort {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Suggester {
     #[doc = "The global suggest text, which avoids repetition when the same text is used in several suggesters."]
     pub text: Option<String>,
@@ -3552,6 +3612,7 @@ impl serde::Serialize for Suggester {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermSuggest {
     pub length: i32,
     pub offset: i32,
@@ -3560,6 +3621,7 @@ pub struct TermSuggest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermSuggestOption {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub collate_match: Option<bool>,
@@ -3605,6 +3667,7 @@ impl<'de> serde::Deserialize<'de> for TermSuggestOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermSuggester {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analyzer: Option<String>,
@@ -3638,12 +3701,14 @@ pub struct TermSuggester {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TotalHits {
     pub relation: crate::types::search::TotalHitsRelation,
     pub value: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TotalHitsRelation {
     #[doc = "`eq`"]
     Eq,

@@ -32,11 +32,13 @@ pub type GetPipelineResponse =
     std::collections::BTreeMap<String, crate::types::ingest_common::Pipeline>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessorGrokResponse {
     pub patterns: std::collections::BTreeMap<String, String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimulateResponse {
     pub docs: Vec<crate::types::ingest_simulate::PipelineSimulation>,
 }

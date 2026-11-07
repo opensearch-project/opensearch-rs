@@ -30,6 +30,7 @@
 
 #[doc = "The resolved information for an index alias."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResolveIndexAliasItem {
     pub indices: crate::types::common::Indices,
     pub name: crate::types::common::Name,
@@ -37,6 +38,7 @@ pub struct ResolveIndexAliasItem {
 
 #[doc = "The resolved information for a data stream."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResolveIndexDataStreamsItem {
     pub backing_indices: crate::types::common::Indices,
     pub name: crate::types::common::DataStreamName,
@@ -45,6 +47,7 @@ pub struct ResolveIndexDataStreamsItem {
 
 #[doc = "The resolved information for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResolveIndexItem {
     #[doc = "The list of aliases associated with the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

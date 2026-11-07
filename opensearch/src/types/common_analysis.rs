@@ -208,6 +208,7 @@ impl Analyzer {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AsciiFoldingTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -217,6 +218,7 @@ pub struct AsciiFoldingTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AsciiFoldingTokenFilterType {
     #[doc = "`asciifolding`"]
     Asciifolding,
@@ -346,6 +348,7 @@ impl CharFilterDefinition {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CharGroupTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -356,6 +359,7 @@ pub struct CharGroupTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CharGroupTokenizerType {
     #[doc = "`char_group`"]
     CharGroup,
@@ -393,6 +397,7 @@ impl<'de> serde::Deserialize<'de> for CharGroupTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CjkAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stopwords: Option<crate::types::common_analysis::StopWords>,
@@ -403,6 +408,7 @@ pub struct CjkAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CjkAnalyzerType {
     #[doc = "`cjk`"]
     Cjk,
@@ -440,6 +446,7 @@ impl<'de> serde::Deserialize<'de> for CjkAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CommonGramsTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -455,6 +462,7 @@ pub struct CommonGramsTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CommonGramsTokenFilterType {
     #[doc = "`common_grams`"]
     CommonGrams,
@@ -492,6 +500,7 @@ impl<'de> serde::Deserialize<'de> for CommonGramsTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ConditionTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -501,6 +510,7 @@ pub struct ConditionTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ConditionTokenFilterType {
     #[doc = "`condition`"]
     Condition,
@@ -538,6 +548,7 @@ impl<'de> serde::Deserialize<'de> for ConditionTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CustomAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub char_filter: Option<Vec<String>>,
@@ -552,6 +563,7 @@ pub struct CustomAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CustomAnalyzerType {
     #[doc = "`custom`"]
     Custom,
@@ -589,6 +601,7 @@ impl<'de> serde::Deserialize<'de> for CustomAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CustomNormalizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub char_filter: Option<Vec<String>>,
@@ -598,6 +611,7 @@ pub struct CustomNormalizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CustomNormalizerType {
     #[doc = "`custom`"]
     Custom,
@@ -635,6 +649,7 @@ impl<'de> serde::Deserialize<'de> for CustomNormalizerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DelimitedPayloadEncoding {
     #[doc = "`float`"]
     Float,
@@ -680,6 +695,7 @@ impl<'de> serde::Deserialize<'de> for DelimitedPayloadEncoding {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DelimitedPayloadTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -691,6 +707,7 @@ pub struct DelimitedPayloadTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DelimitedPayloadTokenFilterType {
     #[doc = "`delimited_payload`"]
     DelimitedPayload,
@@ -728,6 +745,7 @@ impl<'de> serde::Deserialize<'de> for DelimitedPayloadTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DictionaryDecompounderTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -749,6 +767,7 @@ pub struct DictionaryDecompounderTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DictionaryDecompounderTokenFilterType {
     #[doc = "`dictionary_decompounder`"]
     DictionaryDecompounder,
@@ -790,6 +809,7 @@ impl<'de> serde::Deserialize<'de> for DictionaryDecompounderTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DutchAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stopwords: Option<crate::types::common_analysis::StopWords>,
@@ -797,6 +817,7 @@ pub struct DutchAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DutchAnalyzerType {
     #[doc = "`dutch`"]
     Dutch,
@@ -834,6 +855,7 @@ impl<'de> serde::Deserialize<'de> for DutchAnalyzerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum EdgeNGramSide {
     #[doc = "`back`"]
     Back,
@@ -875,6 +897,7 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramSide {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EdgeNGramTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -890,6 +913,7 @@ pub struct EdgeNGramTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum EdgeNGramTokenFilterType {
     #[doc = "`edge_ngram`"]
     EdgeNgram,
@@ -927,6 +951,7 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct EdgeNGramTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -939,6 +964,7 @@ pub struct EdgeNGramTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum EdgeNGramTokenizerType {
     #[doc = "`edge_ngram`"]
     EdgeNgram,
@@ -976,6 +1002,7 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ElisionTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -989,6 +1016,7 @@ pub struct ElisionTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ElisionTokenFilterType {
     #[doc = "`elision`"]
     Elision,
@@ -1026,6 +1054,7 @@ impl<'de> serde::Deserialize<'de> for ElisionTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FingerprintAnalyzer {
     pub max_output_size: i64,
     pub preserve_original: bool,
@@ -1040,6 +1069,7 @@ pub struct FingerprintAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FingerprintAnalyzerType {
     #[doc = "`fingerprint`"]
     Fingerprint,
@@ -1077,6 +1107,7 @@ impl<'de> serde::Deserialize<'de> for FingerprintAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FingerprintTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1088,6 +1119,7 @@ pub struct FingerprintTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FingerprintTokenFilterType {
     #[doc = "`fingerprint`"]
     Fingerprint,
@@ -1125,6 +1157,7 @@ impl<'de> serde::Deserialize<'de> for FingerprintTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HtmlStripCharFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1132,6 +1165,7 @@ pub struct HtmlStripCharFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HtmlStripCharFilterType {
     #[doc = "`html_strip`"]
     HtmlStrip,
@@ -1169,6 +1203,7 @@ impl<'de> serde::Deserialize<'de> for HtmlStripCharFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HunspellTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1183,6 +1218,7 @@ pub struct HunspellTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HunspellTokenFilterType {
     #[doc = "`hunspell`"]
     Hunspell,
@@ -1220,6 +1256,7 @@ impl<'de> serde::Deserialize<'de> for HunspellTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HyphenationDecompounderTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1241,6 +1278,7 @@ pub struct HyphenationDecompounderTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HyphenationDecompounderTokenFilterType {
     #[doc = "`hyphenation_decompounder`"]
     HyphenationDecompounder,
@@ -1282,6 +1320,7 @@ impl<'de> serde::Deserialize<'de> for HyphenationDecompounderTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuAnalyzer {
     pub method: crate::types::common_analysis::IcuNormalizationType,
     pub mode: crate::types::common_analysis::IcuNormalizationMode,
@@ -1289,6 +1328,7 @@ pub struct IcuAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuAnalyzerType {
     #[doc = "`icu_analyzer`"]
     IcuAnalyzer,
@@ -1326,6 +1366,7 @@ impl<'de> serde::Deserialize<'de> for IcuAnalyzerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationAlternate {
     #[doc = "`non-ignorable`"]
     NonIgnorable,
@@ -1367,6 +1408,7 @@ impl<'de> serde::Deserialize<'de> for IcuCollationAlternate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationCaseFirst {
     #[doc = "`lower`"]
     Lower,
@@ -1408,6 +1450,7 @@ impl<'de> serde::Deserialize<'de> for IcuCollationCaseFirst {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationDecomposition {
     #[doc = "`canonical`"]
     Canonical,
@@ -1449,6 +1492,7 @@ impl<'de> serde::Deserialize<'de> for IcuCollationDecomposition {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationStrength {
     #[doc = "`identical`"]
     Identical,
@@ -1502,6 +1546,7 @@ impl<'de> serde::Deserialize<'de> for IcuCollationStrength {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuCollationTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1537,6 +1582,7 @@ pub struct IcuCollationTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationTokenFilterType {
     #[doc = "`icu_collation`"]
     IcuCollation,
@@ -1574,6 +1620,7 @@ impl<'de> serde::Deserialize<'de> for IcuCollationTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuFoldingTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1582,6 +1629,7 @@ pub struct IcuFoldingTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuFoldingTokenFilterType {
     #[doc = "`icu_folding`"]
     IcuFolding,
@@ -1619,6 +1667,7 @@ impl<'de> serde::Deserialize<'de> for IcuFoldingTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuNormalizationCharFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1630,6 +1679,7 @@ pub struct IcuNormalizationCharFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuNormalizationCharFilterType {
     #[doc = "`icu_normalizer`"]
     IcuNormalizer,
@@ -1667,6 +1717,7 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationCharFilterType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuNormalizationMode {
     #[doc = "`compose`"]
     Compose,
@@ -1708,6 +1759,7 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuNormalizationTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1716,6 +1768,7 @@ pub struct IcuNormalizationTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuNormalizationTokenFilterType {
     #[doc = "`icu_normalizer`"]
     IcuNormalizer,
@@ -1753,6 +1806,7 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationTokenFilterType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuNormalizationType {
     #[doc = "`nfc`"]
     Nfc,
@@ -1798,6 +1852,7 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1806,6 +1861,7 @@ pub struct IcuTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuTokenizerType {
     #[doc = "`icu_tokenizer`"]
     IcuTokenizer,
@@ -1843,6 +1899,7 @@ impl<'de> serde::Deserialize<'de> for IcuTokenizerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuTransformDirection {
     #[doc = "`forward`"]
     Forward,
@@ -1884,6 +1941,7 @@ impl<'de> serde::Deserialize<'de> for IcuTransformDirection {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuTransformTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1894,6 +1952,7 @@ pub struct IcuTransformTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuTransformTokenFilterType {
     #[doc = "`icu_transform`"]
     IcuTransform,
@@ -1931,6 +1990,7 @@ impl<'de> serde::Deserialize<'de> for IcuTransformTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KStemTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -1938,6 +1998,7 @@ pub struct KStemTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KStemTokenFilterType {
     #[doc = "`kstem`"]
     Kstem,
@@ -1975,6 +2036,7 @@ impl<'de> serde::Deserialize<'de> for KStemTokenFilterType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeepTypesMode {
     #[doc = "`exclude`"]
     Exclude,
@@ -2016,6 +2078,7 @@ impl<'de> serde::Deserialize<'de> for KeepTypesMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeepTypesTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2027,6 +2090,7 @@ pub struct KeepTypesTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeepTypesTokenFilterType {
     #[doc = "`keep_types`"]
     KeepTypes,
@@ -2064,6 +2128,7 @@ impl<'de> serde::Deserialize<'de> for KeepTypesTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeepWordsTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2077,6 +2142,7 @@ pub struct KeepWordsTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeepWordsTokenFilterType {
     #[doc = "`keep`"]
     Keep,
@@ -2114,6 +2180,7 @@ impl<'de> serde::Deserialize<'de> for KeepWordsTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeywordAnalyzer {
     pub r#type: crate::types::common_analysis::KeywordAnalyzerType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2121,6 +2188,7 @@ pub struct KeywordAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeywordAnalyzerType {
     #[doc = "`keyword`"]
     Keyword,
@@ -2158,6 +2226,7 @@ impl<'de> serde::Deserialize<'de> for KeywordAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeywordMarkerTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2173,6 +2242,7 @@ pub struct KeywordMarkerTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeywordMarkerTokenFilterType {
     #[doc = "`keyword_marker`"]
     KeywordMarker,
@@ -2210,6 +2280,7 @@ impl<'de> serde::Deserialize<'de> for KeywordMarkerTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeywordTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2218,6 +2289,7 @@ pub struct KeywordTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeywordTokenizerType {
     #[doc = "`keyword`"]
     Keyword,
@@ -2255,6 +2327,7 @@ impl<'de> serde::Deserialize<'de> for KeywordTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiAnalyzer {
     pub mode: crate::types::common_analysis::KuromojiTokenizationMode,
     pub r#type: crate::types::common_analysis::KuromojiAnalyzerType,
@@ -2263,6 +2336,7 @@ pub struct KuromojiAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiAnalyzerType {
     #[doc = "`kuromoji`"]
     Kuromoji,
@@ -2300,6 +2374,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiIterationMarkCharFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2309,6 +2384,7 @@ pub struct KuromojiIterationMarkCharFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiIterationMarkCharFilterType {
     #[doc = "`kuromoji_iteration_mark`"]
     KuromojiIterationMark,
@@ -2346,6 +2422,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiIterationMarkCharFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiPartOfSpeechTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2354,6 +2431,7 @@ pub struct KuromojiPartOfSpeechTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiPartOfSpeechTokenFilterType {
     #[doc = "`kuromoji_part_of_speech`"]
     KuromojiPartOfSpeech,
@@ -2391,6 +2469,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiPartOfSpeechTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiReadingFormTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2399,6 +2478,7 @@ pub struct KuromojiReadingFormTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiReadingFormTokenFilterType {
     #[doc = "`kuromoji_readingform`"]
     KuromojiReadingform,
@@ -2436,6 +2516,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiReadingFormTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiStemmerTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2444,6 +2525,7 @@ pub struct KuromojiStemmerTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiStemmerTokenFilterType {
     #[doc = "`kuromoji_stemmer`"]
     KuromojiStemmer,
@@ -2481,6 +2563,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiStemmerTokenFilterType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiTokenizationMode {
     #[doc = "`extended`"]
     Extended,
@@ -2526,6 +2609,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiTokenizationMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KuromojiTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2546,6 +2630,7 @@ pub struct KuromojiTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KuromojiTokenizerType {
     #[doc = "`kuromoji_tokenizer`"]
     KuromojiTokenizer,
@@ -2583,6 +2668,7 @@ impl<'de> serde::Deserialize<'de> for KuromojiTokenizerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Language {
     #[doc = "`Arabic`"]
     Arabic,
@@ -2752,6 +2838,7 @@ impl<'de> serde::Deserialize<'de> for Language {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LanguageAnalyzer {
     pub language: crate::types::common_analysis::Language,
     pub stem_exclusion: Vec<String>,
@@ -2765,6 +2852,7 @@ pub struct LanguageAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LanguageAnalyzerType {
     #[doc = "`language`"]
     Language,
@@ -2802,6 +2890,7 @@ impl<'de> serde::Deserialize<'de> for LanguageAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LengthTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2813,6 +2902,7 @@ pub struct LengthTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LengthTokenFilterType {
     #[doc = "`length`"]
     Length,
@@ -2850,6 +2940,7 @@ impl<'de> serde::Deserialize<'de> for LengthTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LetterTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2857,6 +2948,7 @@ pub struct LetterTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LetterTokenizerType {
     #[doc = "`letter`"]
     Letter,
@@ -2894,6 +2986,7 @@ impl<'de> serde::Deserialize<'de> for LetterTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LimitTokenCountTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2905,6 +2998,7 @@ pub struct LimitTokenCountTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LimitTokenCountTokenFilterType {
     #[doc = "`limit`"]
     Limit,
@@ -2942,11 +3036,13 @@ impl<'de> serde::Deserialize<'de> for LimitTokenCountTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LowercaseNormalizer {
     pub r#type: crate::types::common_analysis::LowercaseNormalizerType,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LowercaseNormalizerType {
     #[doc = "`lowercase`"]
     Lowercase,
@@ -2984,6 +3080,7 @@ impl<'de> serde::Deserialize<'de> for LowercaseNormalizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LowercaseTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -2993,6 +3090,7 @@ pub struct LowercaseTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LowercaseTokenFilterType {
     #[doc = "`lowercase`"]
     Lowercase,
@@ -3030,6 +3128,7 @@ impl<'de> serde::Deserialize<'de> for LowercaseTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LowercaseTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3037,6 +3136,7 @@ pub struct LowercaseTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LowercaseTokenizerType {
     #[doc = "`lowercase`"]
     Lowercase,
@@ -3074,6 +3174,7 @@ impl<'de> serde::Deserialize<'de> for LowercaseTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MappingCharFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3085,6 +3186,7 @@ pub struct MappingCharFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MappingCharFilterType {
     #[doc = "`mapping`"]
     Mapping,
@@ -3122,6 +3224,7 @@ impl<'de> serde::Deserialize<'de> for MappingCharFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiplexerTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3132,6 +3235,7 @@ pub struct MultiplexerTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MultiplexerTokenFilterType {
     #[doc = "`multiplexer`"]
     Multiplexer,
@@ -3169,6 +3273,7 @@ impl<'de> serde::Deserialize<'de> for MultiplexerTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NGramTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3182,6 +3287,7 @@ pub struct NGramTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NGramTokenFilterType {
     #[doc = "`ngram`"]
     Ngram,
@@ -3219,6 +3325,7 @@ impl<'de> serde::Deserialize<'de> for NGramTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NGramTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3231,6 +3338,7 @@ pub struct NGramTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NGramTokenizerType {
     #[doc = "`ngram`"]
     Ngram,
@@ -3268,6 +3376,7 @@ impl<'de> serde::Deserialize<'de> for NGramTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NoriAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub decompound_mode: Option<crate::types::common_analysis::NoriDecompoundMode>,
@@ -3281,6 +3390,7 @@ pub struct NoriAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NoriAnalyzerType {
     #[doc = "`nori`"]
     Nori,
@@ -3318,6 +3428,7 @@ impl<'de> serde::Deserialize<'de> for NoriAnalyzerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NoriDecompoundMode {
     #[doc = "`discard`"]
     Discard,
@@ -3363,6 +3474,7 @@ impl<'de> serde::Deserialize<'de> for NoriDecompoundMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NoriPartOfSpeechTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3372,6 +3484,7 @@ pub struct NoriPartOfSpeechTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NoriPartOfSpeechTokenFilterType {
     #[doc = "`nori_part_of_speech`"]
     NoriPartOfSpeech,
@@ -3409,6 +3522,7 @@ impl<'de> serde::Deserialize<'de> for NoriPartOfSpeechTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NoriTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3424,6 +3538,7 @@ pub struct NoriTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NoriTokenizerType {
     #[doc = "`nori_tokenizer`"]
     NoriTokenizer,
@@ -3496,6 +3611,7 @@ impl Normalizer {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PathHierarchyTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3509,6 +3625,7 @@ pub struct PathHierarchyTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PathHierarchyTokenizerType {
     #[doc = "`path_hierarchy`"]
     PathHierarchy,
@@ -3546,6 +3663,7 @@ impl<'de> serde::Deserialize<'de> for PathHierarchyTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PatternAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flags: Option<String>,
@@ -3560,6 +3678,7 @@ pub struct PatternAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PatternAnalyzerType {
     #[doc = "`pattern`"]
     Pattern,
@@ -3597,6 +3716,7 @@ impl<'de> serde::Deserialize<'de> for PatternAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PatternCaptureTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3607,6 +3727,7 @@ pub struct PatternCaptureTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PatternCaptureTokenFilterType {
     #[doc = "`pattern_capture`"]
     PatternCapture,
@@ -3644,6 +3765,7 @@ impl<'de> serde::Deserialize<'de> for PatternCaptureTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PatternReplaceCharFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3656,6 +3778,7 @@ pub struct PatternReplaceCharFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PatternReplaceCharFilterType {
     #[doc = "`pattern_replace`"]
     PatternReplace,
@@ -3693,6 +3816,7 @@ impl<'de> serde::Deserialize<'de> for PatternReplaceCharFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PatternReplaceTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3707,6 +3831,7 @@ pub struct PatternReplaceTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PatternReplaceTokenFilterType {
     #[doc = "`pattern_replace`"]
     PatternReplace,
@@ -3744,6 +3869,7 @@ impl<'de> serde::Deserialize<'de> for PatternReplaceTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PatternTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3757,6 +3883,7 @@ pub struct PatternTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PatternTokenizerType {
     #[doc = "`pattern`"]
     Pattern,
@@ -3794,6 +3921,7 @@ impl<'de> serde::Deserialize<'de> for PatternTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PersianStemTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -3801,6 +3929,7 @@ pub struct PersianStemTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PersianStemTokenFilterType {
     #[doc = "`persian_stem`"]
     PersianStem,
@@ -3838,6 +3967,7 @@ impl<'de> serde::Deserialize<'de> for PersianStemTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhoneAnalyzer {
     #[doc = "Optional ISO 3166 country code, defaults to \"ZZ\" (unknown region)."]
     #[serde(rename = "phone-region")]
@@ -3847,6 +3977,7 @@ pub struct PhoneAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneAnalyzerType {
     #[doc = "`phone`"]
     Phone,
@@ -3884,6 +4015,7 @@ impl<'de> serde::Deserialize<'de> for PhoneAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhoneSearchAnalyzer {
     #[doc = "Optional ISO 3166 country code, defaults to \"ZZ\" (unknown region)."]
     #[serde(rename = "phone-region")]
@@ -3893,6 +4025,7 @@ pub struct PhoneSearchAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneSearchAnalyzerType {
     #[doc = "`phone-search`"]
     PhoneSearch,
@@ -3930,6 +4063,7 @@ impl<'de> serde::Deserialize<'de> for PhoneSearchAnalyzerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneticEncoder {
     #[doc = "`beider_morse`"]
     BeiderMorse,
@@ -4011,6 +4145,7 @@ impl<'de> serde::Deserialize<'de> for PhoneticEncoder {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneticLanguage {
     #[doc = "`any`"]
     Any,
@@ -4092,6 +4227,7 @@ impl<'de> serde::Deserialize<'de> for PhoneticLanguage {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneticNameType {
     #[doc = "`ashkenazi`"]
     Ashkenazi,
@@ -4137,6 +4273,7 @@ impl<'de> serde::Deserialize<'de> for PhoneticNameType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneticRuleType {
     #[doc = "`approx`"]
     Approx,
@@ -4178,6 +4315,7 @@ impl<'de> serde::Deserialize<'de> for PhoneticRuleType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhoneticTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4193,6 +4331,7 @@ pub struct PhoneticTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PhoneticTokenFilterType {
     #[doc = "`phonetic`"]
     Phonetic,
@@ -4230,6 +4369,7 @@ impl<'de> serde::Deserialize<'de> for PhoneticTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PorterStemTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4237,6 +4377,7 @@ pub struct PorterStemTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PorterStemTokenFilterType {
     #[doc = "`porter_stem`"]
     PorterStem,
@@ -4274,6 +4415,7 @@ impl<'de> serde::Deserialize<'de> for PorterStemTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredicateTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4282,6 +4424,7 @@ pub struct PredicateTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PredicateTokenFilterType {
     #[doc = "`predicate_token_filter`"]
     PredicateTokenFilter,
@@ -4319,6 +4462,7 @@ impl<'de> serde::Deserialize<'de> for PredicateTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoveDuplicatesTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4326,6 +4470,7 @@ pub struct RemoveDuplicatesTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RemoveDuplicatesTokenFilterType {
     #[doc = "`remove_duplicates`"]
     RemoveDuplicates,
@@ -4363,6 +4508,7 @@ impl<'de> serde::Deserialize<'de> for RemoveDuplicatesTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReverseTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4370,6 +4516,7 @@ pub struct ReverseTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ReverseTokenFilterType {
     #[doc = "`reverse`"]
     Reverse,
@@ -4407,6 +4554,7 @@ impl<'de> serde::Deserialize<'de> for ReverseTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShingleTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4426,6 +4574,7 @@ pub struct ShingleTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShingleTokenFilterType {
     #[doc = "`shingle`"]
     Shingle,
@@ -4463,6 +4612,7 @@ impl<'de> serde::Deserialize<'de> for ShingleTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimpleAnalyzer {
     pub r#type: crate::types::common_analysis::SimpleAnalyzerType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4470,6 +4620,7 @@ pub struct SimpleAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SimpleAnalyzerType {
     #[doc = "`simple`"]
     Simple,
@@ -4507,6 +4658,7 @@ impl<'de> serde::Deserialize<'de> for SimpleAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimplePatternSplitTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4516,6 +4668,7 @@ pub struct SimplePatternSplitTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SimplePatternSplitTokenizerType {
     #[doc = "`simple_pattern_split`"]
     SimplePatternSplit,
@@ -4553,6 +4706,7 @@ impl<'de> serde::Deserialize<'de> for SimplePatternSplitTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimplePatternTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4562,6 +4716,7 @@ pub struct SimplePatternTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SimplePatternTokenizerType {
     #[doc = "`simple_pattern`"]
     SimplePattern,
@@ -4599,12 +4754,14 @@ impl<'de> serde::Deserialize<'de> for SimplePatternTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SmartcnAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub r#type: Option<crate::types::common_analysis::SmartcnAnalyzerType>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SmartcnAnalyzerType {
     #[doc = "`smartcn`"]
     Smartcn,
@@ -4642,6 +4799,7 @@ impl<'de> serde::Deserialize<'de> for SmartcnAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SmartcnStopTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4649,6 +4807,7 @@ pub struct SmartcnStopTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SmartcnStopTokenFilterType {
     #[doc = "`smartcn_stop`"]
     SmartcnStop,
@@ -4686,6 +4845,7 @@ impl<'de> serde::Deserialize<'de> for SmartcnStopTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SmartcnTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4693,6 +4853,7 @@ pub struct SmartcnTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SmartcnTokenizerType {
     #[doc = "`smartcn_tokenizer`"]
     SmartcnTokenizer,
@@ -4730,6 +4891,7 @@ impl<'de> serde::Deserialize<'de> for SmartcnTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnowballAnalyzer {
     pub language: crate::types::common_analysis::SnowballLanguage,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4740,6 +4902,7 @@ pub struct SnowballAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SnowballAnalyzerType {
     #[doc = "`snowball`"]
     Snowball,
@@ -4777,6 +4940,7 @@ impl<'de> serde::Deserialize<'de> for SnowballAnalyzerType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SnowballLanguage {
     #[doc = "`Armenian`"]
     Armenian,
@@ -4898,6 +5062,7 @@ impl<'de> serde::Deserialize<'de> for SnowballLanguage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnowballTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4906,6 +5071,7 @@ pub struct SnowballTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SnowballTokenFilterType {
     #[doc = "`snowball`"]
     Snowball,
@@ -4943,6 +5109,7 @@ impl<'de> serde::Deserialize<'de> for SnowballTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StandardAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_token_length: Option<i64>,
@@ -4952,6 +5119,7 @@ pub struct StandardAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StandardAnalyzerType {
     #[doc = "`standard`"]
     Standard,
@@ -4989,6 +5157,7 @@ impl<'de> serde::Deserialize<'de> for StandardAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StandardTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -4998,6 +5167,7 @@ pub struct StandardTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StandardTokenizerType {
     #[doc = "`standard`"]
     Standard,
@@ -5035,6 +5205,7 @@ impl<'de> serde::Deserialize<'de> for StandardTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StemmerOverrideTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -5046,6 +5217,7 @@ pub struct StemmerOverrideTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StemmerOverrideTokenFilterType {
     #[doc = "`stemmer_override`"]
     StemmerOverride,
@@ -5083,6 +5255,7 @@ impl<'de> serde::Deserialize<'de> for StemmerOverrideTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StemmerTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -5092,6 +5265,7 @@ pub struct StemmerTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StemmerTokenFilterType {
     #[doc = "`stemmer`"]
     Stemmer,
@@ -5129,6 +5303,7 @@ impl<'de> serde::Deserialize<'de> for StemmerTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StopAnalyzer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stopwords: Option<crate::types::common_analysis::StopWords>,
@@ -5140,6 +5315,7 @@ pub struct StopAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StopAnalyzerType {
     #[doc = "`stop`"]
     Stop,
@@ -5177,6 +5353,7 @@ impl<'de> serde::Deserialize<'de> for StopAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StopTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -5192,6 +5369,7 @@ pub struct StopTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StopTokenFilterType {
     #[doc = "`stop`"]
     Stop,
@@ -5232,6 +5410,7 @@ impl<'de> serde::Deserialize<'de> for StopTokenFilterType {
 pub type StopWords = crate::types::common::StringOrStringArray;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SynonymFormat {
     #[doc = "`solr`"]
     Solr,
@@ -5273,6 +5452,7 @@ impl<'de> serde::Deserialize<'de> for SynonymFormat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SynonymGraphTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -5294,6 +5474,7 @@ pub struct SynonymGraphTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SynonymGraphTokenFilterType {
     #[doc = "`synonym_graph`"]
     SynonymGraph,
@@ -5331,6 +5512,7 @@ impl<'de> serde::Deserialize<'de> for SynonymGraphTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SynonymTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -5352,6 +5534,7 @@ pub struct SynonymTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SynonymTokenFilterType {
     #[doc = "`synonym`"]
     Synonym,
@@ -5389,6 +5572,7 @@ impl<'de> serde::Deserialize<'de> for SynonymTokenFilterType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TokenChar {
     #[doc = "`custom`"]
     Custom,
@@ -6143,6 +6327,7 @@ impl TokenizerDefinition {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TrimTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6150,6 +6335,7 @@ pub struct TrimTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TrimTokenFilterType {
     #[doc = "`trim`"]
     Trim,
@@ -6187,6 +6373,7 @@ impl<'de> serde::Deserialize<'de> for TrimTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TruncateTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6196,6 +6383,7 @@ pub struct TruncateTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TruncateTokenFilterType {
     #[doc = "`truncate`"]
     Truncate,
@@ -6233,6 +6421,7 @@ impl<'de> serde::Deserialize<'de> for TruncateTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UaxEmailUrlTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6242,6 +6431,7 @@ pub struct UaxEmailUrlTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UaxEmailUrlTokenizerType {
     #[doc = "`uax_url_email`"]
     UaxUrlEmail,
@@ -6279,6 +6469,7 @@ impl<'de> serde::Deserialize<'de> for UaxEmailUrlTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UniqueTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6288,6 +6479,7 @@ pub struct UniqueTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UniqueTokenFilterType {
     #[doc = "`unique`"]
     Unique,
@@ -6325,6 +6517,7 @@ impl<'de> serde::Deserialize<'de> for UniqueTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UppercaseTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6332,6 +6525,7 @@ pub struct UppercaseTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UppercaseTokenFilterType {
     #[doc = "`uppercase`"]
     Uppercase,
@@ -6369,6 +6563,7 @@ impl<'de> serde::Deserialize<'de> for UppercaseTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WhitespaceAnalyzer {
     pub r#type: crate::types::common_analysis::WhitespaceAnalyzerType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6376,6 +6571,7 @@ pub struct WhitespaceAnalyzer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WhitespaceAnalyzerType {
     #[doc = "`whitespace`"]
     Whitespace,
@@ -6413,6 +6609,7 @@ impl<'de> serde::Deserialize<'de> for WhitespaceAnalyzerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WhitespaceTokenizer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6422,6 +6619,7 @@ pub struct WhitespaceTokenizer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WhitespaceTokenizerType {
     #[doc = "`whitespace`"]
     Whitespace,
@@ -6459,6 +6657,7 @@ impl<'de> serde::Deserialize<'de> for WhitespaceTokenizerType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WordDelimiterGraphTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6496,6 +6695,7 @@ pub struct WordDelimiterGraphTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WordDelimiterGraphTokenFilterType {
     #[doc = "`word_delimiter_graph`"]
     WordDelimiterGraph,
@@ -6533,6 +6733,7 @@ impl<'de> serde::Deserialize<'de> for WordDelimiterGraphTokenFilterType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WordDelimiterTokenFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionString>,
@@ -6566,6 +6767,7 @@ pub struct WordDelimiterTokenFilter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WordDelimiterTokenFilterType {
     #[doc = "`word_delimiter`"]
     WordDelimiter,

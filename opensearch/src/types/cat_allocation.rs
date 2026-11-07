@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllocationRecord {
     #[doc = "Free disk space available to OpenSearch. OpenSearch retrieves this metric from the node's operating system. Disk-based shard allocation uses this metric to assign shards to nodes based on available disk space."]
     #[serde(rename = "disk.avail")]

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllocationExplainResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allocate_explanation: Option<String>,
@@ -82,6 +83,7 @@ pub struct AllocationExplainResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetComponentTemplateResponse {
     pub component_templates: Vec<crate::types::cluster_common::ComponentTemplate>,
 }
@@ -92,6 +94,7 @@ pub type GetDecommissionAwarenessResponse = std::collections::BTreeMap<
 >;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetSettingsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub defaults: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
@@ -100,6 +103,7 @@ pub struct GetSettingsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetWeightedRoutingResponse {
     #[serde(rename = "_version")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -111,11 +115,13 @@ pub struct GetWeightedRoutingResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PendingTasksResponse {
     pub tasks: Vec<crate::types::cluster_pending_tasks::PendingTask>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutSettingsResponse {
     pub acknowledged: bool,
     pub persistent: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
@@ -126,6 +132,7 @@ pub type RemoteInfoResponse =
     std::collections::BTreeMap<String, crate::types::cluster_remote_info::ClusterRemoteInfo>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerouteResponse {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -139,6 +146,7 @@ pub struct RerouteResponse {
 pub type StateResponse = Box<serde_json::value::RawValue>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]

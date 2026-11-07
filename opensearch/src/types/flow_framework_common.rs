@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlowFrameworkGetResponse {
     #[doc = "When the workflow was created."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -57,6 +58,7 @@ pub struct FlowFrameworkGetResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Hits {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hits: Option<Vec<crate::types::flow_framework_common::ItemsObject>>,
@@ -67,6 +69,7 @@ pub struct Hits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ItemsObject {
     #[doc = "The document ID."]
     #[serde(rename = "_id")]
@@ -98,6 +101,7 @@ pub struct ItemsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResourcesCreated {
     #[doc = "The unique identifier for the created resource."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -114,6 +118,7 @@ pub struct ResourcesCreated {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchStateResponse {
     #[doc = "When the provisioning operation completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -174,6 +179,7 @@ impl<'de> serde::Deserialize<'de> for SearchStateResponseResourcesCreated {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Shards {
     #[doc = "The number of shards where the deletion failed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -190,6 +196,7 @@ pub struct Shards {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StateHits {
     #[doc = "The list of search hits."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -201,6 +208,7 @@ pub struct StateHits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StateItems {
     #[doc = "The document ID."]
     #[serde(rename = "_id")]
@@ -232,6 +240,7 @@ pub struct StateItems {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Total {
     #[doc = "The relation of the total hits."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -242,6 +251,7 @@ pub struct Total {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct User {
     #[doc = "The list of backend roles assigned to the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -262,6 +272,7 @@ pub struct User {
 
 #[doc = "A key-value map with two fields, template, which identifies the template version, and compatibility, which identifies a list of minimum required OpenSearch versions."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Version {
     #[doc = "A list of minimum required OpenSearch versions."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -272,6 +283,7 @@ pub struct Version {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WorkFlowState {
     #[doc = "`COMPLETED`"]
     Completed,
@@ -321,6 +333,7 @@ impl<'de> serde::Deserialize<'de> for WorkFlowState {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkFlowStatusDefaultResponse {
     #[doc = "The error message if the workflow failed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -337,6 +350,7 @@ pub struct WorkFlowStatusDefaultResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkFlowStatusFullResponse {
     #[doc = "The error message if the workflow failed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -367,6 +381,7 @@ pub struct WorkFlowStatusFullResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkflowIDResponse {
     #[doc = "The ID of the workflow."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -374,6 +389,7 @@ pub struct WorkflowIDResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkflowSearchResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -389,6 +405,7 @@ pub struct WorkflowSearchResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkflowSearchStateResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -405,6 +422,7 @@ pub struct WorkflowSearchStateResponse {
 
 #[doc = "A map of workflow steps and their configurations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WorkflowStep {
     #[doc = "The list of required inputs for the workflow step."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

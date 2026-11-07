@@ -33,6 +33,7 @@ pub type GetMappingResponse = crate::types::indices::GetMappingResponse;
 
 #[doc = "The mapping configuration for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexMappingRecord {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item: Option<crate::types::common_mapping::TypeMapping>,

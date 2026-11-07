@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateObjectResponse {
     #[serde(rename = "objectId")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -36,6 +37,7 @@ pub struct CreateObjectResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteObjectResponse {
     #[doc = "The list of deletion response for each object."]
     #[serde(rename = "deleteResponseList")]
@@ -44,6 +46,7 @@ pub struct DeleteObjectResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteObjectsResponse {
     #[doc = "The list of deletion responses for each object."]
     #[serde(rename = "deleteResponseList")]
@@ -52,6 +55,7 @@ pub struct DeleteObjectsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateObjectResponse {
     #[doc = "The unique identifier of the updated observability object."]
     #[serde(rename = "objectId")]

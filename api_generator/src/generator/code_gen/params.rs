@@ -82,6 +82,7 @@ fn generate_param(tokens: &mut TokenStream, e: &ApiEnum) {
         #cfg_doc
         #cfg_attr
         #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+        #[non_exhaustive]
         pub enum #name {
             #(#[serde(rename = #renames)] #variants),*
         }

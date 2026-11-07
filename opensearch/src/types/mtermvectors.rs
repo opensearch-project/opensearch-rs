@@ -29,11 +29,13 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MtermvectorsResponse {
     pub docs: Vec<crate::types::mtermvectors::TermVectorsResult>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermVectorsResult {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

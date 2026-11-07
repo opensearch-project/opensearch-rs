@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldStatistics {
     pub doc_count: i32,
     pub sum_doc_freq: i64,
@@ -36,6 +37,7 @@ pub struct FieldStatistics {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Term {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub doc_freq: Option<i32>,
@@ -49,6 +51,7 @@ pub struct Term {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermVector {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field_statistics: Option<crate::types::termvectors::FieldStatistics>,
@@ -56,6 +59,7 @@ pub struct TermVector {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermvectorsResponse {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -75,6 +79,7 @@ pub struct TermvectorsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Token {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub end_offset: Option<i32>,

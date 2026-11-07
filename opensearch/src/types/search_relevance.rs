@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetNodeStatsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -45,6 +46,7 @@ pub struct GetNodeStatsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetStatsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]

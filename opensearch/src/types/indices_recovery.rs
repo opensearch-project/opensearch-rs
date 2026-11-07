@@ -30,6 +30,7 @@
 
 #[doc = "The details of a recovered file."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FileDetails {
     #[doc = "The length of the file in bytes."]
     pub length: i64,
@@ -41,6 +42,7 @@ pub struct FileDetails {
 
 #[doc = "The byte-level recovery statistics."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryBytes {
     pub percent: crate::types::common::PercentageString,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -60,6 +62,7 @@ pub struct RecoveryBytes {
 
 #[doc = "The file-level recovery statistics."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryFiles {
     #[doc = "The detailed information about recovered files."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -75,6 +78,7 @@ pub struct RecoveryFiles {
 
 #[doc = "The index recovery status."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryIndexStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bytes: Option<crate::types::indices_recovery::RecoveryBytes>,
@@ -93,6 +97,7 @@ pub struct RecoveryIndexStatus {
 
 #[doc = "The source or target of a recovery operation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryOrigin {
     #[doc = "Whether a new history UUID was bootstrapped."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -144,6 +149,7 @@ pub type RecoveryResponse = crate::types::indices::RecoveryResponse;
 
 #[doc = "The status at the start of recovery."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryStartStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub check_index_time: Option<crate::types::common::Duration>,
@@ -155,6 +161,7 @@ pub struct RecoveryStartStatus {
 
 #[doc = "The status of recovery operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryStatus {
     #[doc = "The list of shard recovery statuses."]
     pub shards: Vec<crate::types::indices_recovery::ShardRecovery>,
@@ -162,6 +169,7 @@ pub struct RecoveryStatus {
 
 #[doc = "The recovery status of a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardRecovery {
     #[doc = "The shard ID."]
     pub id: i32,
@@ -192,6 +200,7 @@ pub struct ShardRecovery {
 
 #[doc = "The transaction log recovery status."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TranslogStatus {
     pub percent: crate::types::common::PercentageString,
     #[doc = "The number of recovered transaction log operations."]
@@ -207,6 +216,7 @@ pub struct TranslogStatus {
 
 #[doc = "The index verification status."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct VerifyIndex {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub check_index_time: Option<crate::types::common::Duration>,

@@ -29,11 +29,13 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MgetResponse {
     pub docs: Vec<crate::types::mget::ResponseItem>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiGetError {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

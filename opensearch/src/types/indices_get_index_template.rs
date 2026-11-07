@@ -33,6 +33,7 @@ pub type GetIndexTemplateResponse = crate::types::indices::GetIndexTemplateRespo
 
 #[doc = "The configuration for an index template item."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexTemplateItem {
     pub index_template: crate::types::indices_common::IndexTemplate,
     pub name: crate::types::common::Name,

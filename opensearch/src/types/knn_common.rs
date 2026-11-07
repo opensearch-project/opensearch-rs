@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeletedModel {
     pub model_id: String,
     pub result: crate::types::knn_common::DeletionResult,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DeletionResult {
     #[doc = "`deleted`"]
     Deleted,
@@ -76,6 +78,7 @@ impl<'de> serde::Deserialize<'de> for DeletionResult {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GraphMergeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
@@ -94,6 +97,7 @@ pub struct GraphMergeStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GraphRefreshStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total: Option<i64>,
@@ -102,6 +106,7 @@ pub struct GraphRefreshStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GraphStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub merge: Option<crate::types::knn_common::GraphMergeStats>,
@@ -110,6 +115,7 @@ pub struct GraphStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cache_capacity_reached: Option<bool>,
@@ -184,6 +190,7 @@ pub struct NodeStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteVectorIndexBuildStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub build_stats: Option<crate::types::knn_common::RemoteVectorIndexBuildStatsDetails>,
@@ -194,6 +201,7 @@ pub struct RemoteVectorIndexBuildStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteVectorIndexBuildStatsDetails {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub remote_index_build_current_flush_operations: Option<i64>,
@@ -212,6 +220,7 @@ pub struct RemoteVectorIndexBuildStatsDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteVectorIndexClientStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub build_request_failure_count: Option<i64>,
@@ -230,6 +239,7 @@ pub struct RemoteVectorIndexClientStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteVectorIndexRepositoryStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub read_failure_count: Option<i64>,
@@ -246,6 +256,7 @@ pub struct RemoteVectorIndexRepositoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Stats {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]

@@ -32,6 +32,7 @@
 pub type UpdateResponse = crate::types::update::UpdateWriteResponseBase;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateWriteResponseBase {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

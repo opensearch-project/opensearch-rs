@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PersistentTaskStatus {
     pub state: String,
 }
@@ -36,6 +37,7 @@ pub struct PersistentTaskStatus {
 pub type RawTaskStatus = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReplicationTaskStatus {
     pub phase: String,
 }
@@ -95,6 +97,7 @@ impl Status {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskExecutingNode {
     #[doc = "The attributes of the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -112,6 +115,7 @@ pub struct TaskExecutingNode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskGroup {
     pub action: String,
     pub cancellable: bool,
@@ -140,6 +144,7 @@ pub struct TaskGroup {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskInfo {
     pub action: String,
     pub cancellable: bool,
@@ -199,6 +204,7 @@ impl<'de> serde::Deserialize<'de> for TaskInfos {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskListResponseBase {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_failures: Option<Vec<crate::types::common::ErrorCause>>,

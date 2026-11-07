@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AddAgenticMemoryResponse {
     #[doc = "Session ID associated with the memory."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -39,18 +40,21 @@ pub struct AddAgenticMemoryResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ChunkModelResponse {
     #[doc = "The status of the chunk upload operation."]
     pub status: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateConnectorResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub connector_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateControllerResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_id: Option<crate::types::common::Name>,
@@ -59,6 +63,7 @@ pub struct CreateControllerResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateMemoryContainerResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memory_container_id: Option<String>,
@@ -67,6 +72,7 @@ pub struct CreateMemoryContainerResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateMemoryContainerSessionResponse {
     #[doc = "The ID of the created session."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -77,28 +83,33 @@ pub struct CreateMemoryContainerSessionResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateMemoryResponse {
     pub memory_id: crate::types::common::Name,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateMessageResponse {
     pub message_id: crate::types::common::Name,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateModelMetaResponse {
     pub model_id: String,
     pub status: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteMemoryResponse {
     #[doc = "Whether the memory was deleted successfully."]
     pub success: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeployModelResponse {
     pub status: String,
     pub task_id: String,
@@ -107,6 +118,7 @@ pub struct DeployModelResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetAllMemoriesResponse {
     pub memories: Vec<crate::types::ml_common::Memory>,
     #[doc = "The index of the next memory after the last memory in the returned list."]
@@ -115,6 +127,7 @@ pub struct GetAllMemoriesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetAllMessagesResponse {
     pub messages: Vec<crate::types::ml_common::Message>,
     #[doc = "The index of the next message after the last message in the returned list."]
@@ -125,6 +138,7 @@ pub struct GetAllMessagesResponse {
 pub type GetAllToolsResponse = Vec<crate::types::ml_common::Tool>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetControllerResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_id: Option<crate::types::common::Name>,
@@ -134,6 +148,7 @@ pub struct GetControllerResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetMessageTracesResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub next_token: Option<i32>,
@@ -141,6 +156,7 @@ pub struct GetMessageTracesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LoadModelResponse {
     pub status: String,
     pub task_id: String,
@@ -148,18 +164,21 @@ pub struct LoadModelResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RegisterAgentsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agent_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RegisterModelMetaResponse {
     pub model_id: String,
     pub status: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RegisterModelResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_id: Option<String>,
@@ -168,12 +187,14 @@ pub struct RegisterModelResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UploadChunkResponse {
     #[doc = "The status of the chunk upload operation."]
     pub status: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UploadModelResponse {
     pub status: String,
     pub task_id: String,

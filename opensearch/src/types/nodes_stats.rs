@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AdaptiveSelection {
     #[doc = "The exponentially weighted moving average queue size of search requests on the keyed node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -52,6 +53,7 @@ pub struct AdaptiveSelection {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Breaker {
     #[doc = "Estimated memory used for the operation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -74,6 +76,7 @@ pub struct Breaker {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheIndicesStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evictions: Option<i64>,
@@ -90,6 +93,7 @@ pub struct CacheIndicesStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheShardStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evictions: Option<i64>,
@@ -106,6 +110,7 @@ pub struct CacheShardStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CacheStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evictions: Option<i64>,
@@ -132,6 +137,7 @@ pub struct CacheStats {
 pub type CachesStats = std::collections::BTreeMap<String, crate::types::nodes_stats::CacheStats>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CgroupCpuAcctStats {
     #[doc = "The `cpuacct` control group to which the OpenSearch process belongs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -141,6 +147,7 @@ pub struct CgroupCpuAcctStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CgroupCpuStat {
     #[doc = "The number of reporting periods (as specified by `cfs_period_micros`) that have elapsed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -153,6 +160,7 @@ pub struct CgroupCpuStat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CgroupCpuStats {
     #[doc = "The period of time, in microseconds, for how regularly all tasks in the same cgroup as the OpenSearch process should have their access to CPU resources reallocated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -168,6 +176,7 @@ pub struct CgroupCpuStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CgroupMemoryStats {
     #[doc = "The `memory` control group to which the OpenSearch process belongs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -181,6 +190,7 @@ pub struct CgroupMemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CgroupStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu: Option<crate::types::nodes_stats::CgroupCpuStats>,
@@ -191,6 +201,7 @@ pub struct CgroupStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterStateOverallStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub failed_count: Option<i64>,
@@ -201,6 +212,7 @@ pub struct ClusterStateOverallStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterStateQueue {
     #[doc = "Number of committed cluster states in queue."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -214,12 +226,14 @@ pub struct ClusterStateQueue {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterStateStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub overall: Option<crate::types::nodes_stats::ClusterStateOverallStats>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataPathStats {
     #[doc = "Total amount of disk space available to this Java virtual machine on this file store."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -257,6 +271,7 @@ pub struct DataPathStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Discovery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_state_queue: Option<crate::types::nodes_stats::ClusterStateQueue>,
@@ -267,6 +282,7 @@ pub struct Discovery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExtendedMemoryStats {
     #[doc = "Amount of free physical memory."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -295,6 +311,7 @@ pub struct ExtendedMemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FileSystem {
     #[doc = "List of all file stores."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -309,6 +326,7 @@ pub struct FileSystem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FileSystemTotal {
     #[doc = "Total disk space available to this Java virtual machine on all file stores. Depending on OS or process level restrictions, this might appear less than `free`. This is the actual amount of free disk space the OpenSearch node can utilize."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -337,6 +355,7 @@ pub struct FileSystemTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GarbageCollector {
     #[doc = "Contains statistics about JVM garbage collectors for the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -346,6 +365,7 @@ pub struct GarbageCollector {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GarbageCollectorTotal {
     #[doc = "Total number of JVM garbage collectors that collect objects."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -359,6 +379,7 @@ pub struct GarbageCollectorTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Http {
     #[doc = "Current number of open HTTP connections for the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -369,12 +390,14 @@ pub struct Http {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressure {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memory: Option<crate::types::nodes_stats::IndexingPressureMemory>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressureMemory {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current: Option<crate::types::nodes_stats::PressureMemory>,
@@ -388,6 +411,7 @@ pub struct IndexingPressureMemory {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Ingest {
     #[doc = "Contains statistics about ingest pipelines for the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -398,6 +422,7 @@ pub struct Ingest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestTotal {
     #[doc = "Total number of documents ingested during the lifetime of this node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -419,6 +444,7 @@ pub struct IngestTotal {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IoStatDevice {
     #[doc = "The Linux device name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -449,6 +475,7 @@ pub struct IoStatDevice {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IoStats {
     #[doc = "Array of disk metrics for each device that is backing an OpenSearch data path. These disk metrics are probed periodically and averages between the last probe and the current probe are computed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -458,6 +485,7 @@ pub struct IoStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Jvm {
     #[doc = "Contains statistics about JVM buffer pools for the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -483,6 +511,7 @@ pub struct Jvm {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JvmClasses {
     #[doc = "Number of classes currently loaded by JVM."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -496,6 +525,7 @@ pub struct JvmClasses {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JvmMemoryStats {
     #[doc = "Amount of memory available for use by the heap."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -536,6 +566,7 @@ pub struct JvmMemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JvmThreads {
     #[doc = "Number of active threads in use by JVM."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -546,6 +577,7 @@ pub struct JvmThreads {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeyedProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::nodes_stats::Processor>,
@@ -554,6 +586,7 @@ pub struct KeyedProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LastGcStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max: Option<crate::types::common::HumanReadableByteCount>,
@@ -568,6 +601,7 @@ pub struct LastGcStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MemoryStats {
     #[doc = "Amount of free physical memory."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -590,6 +624,7 @@ pub struct MemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeBufferPool {
     #[doc = "Number of buffer pools."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -609,6 +644,7 @@ pub struct NodeBufferPool {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeIndexShardStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completion: Option<crate::types::common::CompletionStats>,
@@ -655,6 +691,7 @@ pub struct NodeIndexShardStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeIndicesStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completion: Option<crate::types::common::CompletionStats>,
@@ -701,6 +738,7 @@ pub struct NodeIndicesStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OperatingSystem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cgroup: Option<crate::types::nodes_stats::CgroupStats>,
@@ -715,6 +753,7 @@ pub struct OperatingSystem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OperatingSystemCpuStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub load_average: Option<std::collections::BTreeMap<String, f64>>,
@@ -723,6 +762,7 @@ pub struct OperatingSystemCpuStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Pool {
     #[doc = "Most recent GC cycle stats for a particular memory pool."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -754,6 +794,7 @@ pub struct Pool {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PressureMemory {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub all: Option<crate::types::common::HumanReadableByteCount>,
@@ -792,6 +833,7 @@ pub struct PressureMemory {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Process {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu: Option<crate::types::nodes_stats::ProcessCpuStats>,
@@ -809,6 +851,7 @@ pub struct Process {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessCpuStats {
     pub percent: crate::types::common::PercentageNumber,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -817,6 +860,7 @@ pub struct ProcessCpuStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessMemoryStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_virtual: Option<crate::types::common::HumanReadableByteCount>,
@@ -825,6 +869,7 @@ pub struct ProcessMemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Processor {
     #[doc = "Number of documents transformed by the processor."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -842,6 +887,7 @@ pub struct Processor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PublishedClusterStates {
     #[doc = "Number of compatible differences between published cluster states."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -855,6 +901,7 @@ pub struct PublishedClusterStates {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreStats {
     #[doc = "Timestamp for the last successful fetch of pinned timestamps."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -864,6 +911,7 @@ pub struct RemoteStoreStats {
 
 #[doc = "Statistics snapshot about a repository."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RepositoryStatsSnapshot {
     #[doc = "The location configuration of the repository."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -892,6 +940,7 @@ pub struct RepositoryStatsSnapshot {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptCacheStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contexts: Option<Vec<crate::types::nodes_stats::ScriptContextStats>>,
@@ -899,6 +948,7 @@ pub struct ScriptCacheStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptContextStats {
     #[doc = "Total number of times the script cache has evicted old data."]
     pub cache_evictions: i64,
@@ -910,6 +960,7 @@ pub struct ScriptContextStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptStats {
     #[doc = "Total number of times the script cache has evicted old data."]
     pub cache_evictions: i64,
@@ -920,6 +971,7 @@ pub struct ScriptStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardAdmissionControlStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub global_cpu_usage: Option<crate::types::nodes_stats::UsageStats>,
@@ -928,18 +980,21 @@ pub struct ShardAdmissionControlStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardClusterManagerThrottlingStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::nodes_stats::ShardClusterManagerThrottlingStatsDetail>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardClusterManagerThrottlingStatsDetail {
     pub throttled_tasks_per_task_type: std::collections::BTreeMap<String, i64>,
     pub total_throttled_tasks: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardIndexingStats {
     pub coordinating_count: i64,
     pub coordinating_time_in_millis: crate::types::common::DurationValueUnitMillis,
@@ -950,6 +1005,7 @@ pub struct ShardIndexingPressurePerShardIndexingStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardLastSuccessfulTimestamp {
     pub coordinating_last_successful_request_timestamp_in_millis:
         crate::types::common::EpochTimeUnitMillis,
@@ -960,18 +1016,21 @@ pub struct ShardIndexingPressurePerShardLastSuccessfulTimestamp {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardMemoryAllocationCurrentStats {
     pub current_coordinating_and_primary_bytes: crate::types::common::ByteCount,
     pub current_replica_bytes: crate::types::common::ByteCount,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardMemoryAllocationLimitStats {
     pub current_coordinating_and_primary_limits_in_bytes: crate::types::common::ByteCount,
     pub current_replica_limits_in_bytes: crate::types::common::ByteCount,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardMemoryAllocationStats {
     pub current:
         crate::types::nodes_stats::ShardIndexingPressurePerShardMemoryAllocationCurrentStats,
@@ -979,12 +1038,14 @@ pub struct ShardIndexingPressurePerShardMemoryAllocationStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardMemoryStats {
     pub current: crate::types::nodes_stats::ShardIndexingPressurePerShardMemoryStatsDetails,
     pub total: crate::types::nodes_stats::ShardIndexingPressurePerShardMemoryStatsDetails,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardMemoryStatsDetails {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub coordinating: Option<crate::types::common::HumanReadableByteCount>,
@@ -998,6 +1059,7 @@ pub struct ShardIndexingPressurePerShardMemoryStatsDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardRejectionCoordinatingStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub breakup: Option<crate::types::nodes_stats::ShardIndexingPressureRejectionsBreakupStats>,
@@ -1008,6 +1070,7 @@ pub struct ShardIndexingPressurePerShardRejectionCoordinatingStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardRejectionPrimaryStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub breakup: Option<crate::types::nodes_stats::ShardIndexingPressureRejectionsBreakupStats>,
@@ -1018,6 +1081,7 @@ pub struct ShardIndexingPressurePerShardRejectionPrimaryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardRejectionReplicaStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub breakup: Option<crate::types::nodes_stats::ShardIndexingPressureRejectionsBreakupStats>,
@@ -1028,6 +1092,7 @@ pub struct ShardIndexingPressurePerShardRejectionReplicaStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardRejectionStats {
     pub coordinating:
         crate::types::nodes_stats::ShardIndexingPressurePerShardRejectionCoordinatingStats,
@@ -1036,6 +1101,7 @@ pub struct ShardIndexingPressurePerShardRejectionStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressurePerShardStats {
     pub indexing: crate::types::nodes_stats::ShardIndexingPressurePerShardIndexingStats,
     pub last_successful_timestamp:
@@ -1047,6 +1113,7 @@ pub struct ShardIndexingPressurePerShardStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressureRejectionsBreakupStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub no_successful_request_limits: Option<i64>,
@@ -1057,6 +1124,7 @@ pub struct ShardIndexingPressureRejectionsBreakupStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardIndexingPressureStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
@@ -1083,6 +1151,7 @@ pub type ShardResourceUsageStats =
     std::collections::BTreeMap<String, crate::types::nodes_stats::ShardResourceUsageStatsDetail>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardResourceUsageStatsDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu_utilization_percent: Option<crate::types::common::PercentageString>,
@@ -1095,12 +1164,14 @@ pub struct ShardResourceUsageStatsDetail {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardResourceUsageStatsIoUsageStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_io_utilization_percent: Option<crate::types::common::PercentageString>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShardSearchBackpressureMode {
     #[doc = "`disabled`"]
     Disabled,
@@ -1146,6 +1217,7 @@ impl<'de> serde::Deserialize<'de> for ShardSearchBackpressureMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mode: Option<crate::types::nodes_stats::ShardSearchBackpressureMode>,
@@ -1156,6 +1228,7 @@ pub struct ShardSearchBackpressureStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskCancellationStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancellation_count: Option<i64>,
@@ -1168,6 +1241,7 @@ pub struct ShardSearchBackpressureTaskCancellationStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskResourceTrackerCpuUsageTrackerStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancellation_count: Option<i64>,
@@ -1182,6 +1256,7 @@ pub struct ShardSearchBackpressureTaskResourceTrackerCpuUsageTrackerStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskResourceTrackerElapsedTimeTrackerStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancellation_count: Option<i64>,
@@ -1196,6 +1271,7 @@ pub struct ShardSearchBackpressureTaskResourceTrackerElapsedTimeTrackerStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskResourceTrackerHeapUsageTrackerStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancellation_count: Option<i64>,
@@ -1214,6 +1290,7 @@ pub struct ShardSearchBackpressureTaskResourceTrackerHeapUsageTrackerStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskResourceTrackerStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu_usage_tracker: Option<crate::types::nodes_stats::ShardSearchBackpressureTaskResourceTrackerCpuUsageTrackerStats>,
@@ -1224,6 +1301,7 @@ pub struct ShardSearchBackpressureTaskResourceTrackerStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchBackpressureTaskStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancellation_stats:
@@ -1236,6 +1314,7 @@ pub struct ShardSearchBackpressureTaskStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchPipelineOperationStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub count: Option<i64>,
@@ -1250,6 +1329,7 @@ pub struct ShardSearchPipelineOperationStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchPipelinePerPipelineProcessorStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
@@ -1258,6 +1338,7 @@ pub struct ShardSearchPipelinePerPipelineProcessorStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchPipelinePerPipelineStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
@@ -1278,6 +1359,7 @@ pub struct ShardSearchPipelinePerPipelineStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchPipelineStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pipelines: Option<
@@ -1293,12 +1375,14 @@ pub struct ShardSearchPipelineStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSegmentReplicationBackpressureStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_rejected_requests: Option<i64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardTaskCancellationStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_shard_task: Option<crate::types::nodes_stats::ShardTaskCancellationStatsDetail>,
@@ -1307,6 +1391,7 @@ pub struct ShardTaskCancellationStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardTaskCancellationStatsDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current_count_post_cancel: Option<i64>,
@@ -1315,18 +1400,21 @@ pub struct ShardTaskCancellationStatsDetail {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardWeightedRoutingStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::nodes_stats::ShardWeightedRoutingStatsDetail>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardWeightedRoutingStatsDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fail_open_count: Option<i32>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Stats {
     #[doc = "Statistics about adaptive replica selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1445,6 +1533,7 @@ impl<'de> serde::Deserialize<'de> for StatsIp {
 pub type StatsResponse = crate::types::nodes::StatsResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ThreadCount {
     #[doc = "Number of active threads in the thread pool."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1473,6 +1562,7 @@ pub struct ThreadCount {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Transport {
     #[doc = "Total number of RX (receive) packets received by the node during internal cluster communication."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1501,12 +1591,14 @@ pub struct Transport {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TransportUsageStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rejection_count: Option<std::collections::BTreeMap<String, i64>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UsageStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub transport: Option<crate::types::nodes_stats::TransportUsageStats>,

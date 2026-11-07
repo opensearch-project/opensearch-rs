@@ -30,6 +30,7 @@
 
 #[doc = "The response containing node information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InfoResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -42,6 +43,7 @@ pub struct InfoResponse {
 
 #[doc = "The response containing secure settings reload results."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReloadSecureSettingsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -57,6 +59,7 @@ pub struct ReloadSecureSettingsResponse {
 
 #[doc = "The response containing node statistics."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -70,6 +73,7 @@ pub struct StatsResponse {
 
 #[doc = "The response containing node usage information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UsageResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]

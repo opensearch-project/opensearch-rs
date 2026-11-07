@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AutoFollowStats {
     #[doc = "The list of indices that failed to replicate for this pattern."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -54,6 +55,7 @@ pub struct AutoFollowStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AutoFollowStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub autofollow_stats: Option<Vec<crate::types::replication_common::AutoFollowStats>>,
@@ -72,6 +74,7 @@ pub struct AutoFollowStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FollowerStatus {
     #[doc = "The number of failed read requests during replication."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -124,6 +127,7 @@ pub struct FollowerStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexFollowerStatus {
     #[doc = "The number of failed read requests for this index during replication."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -154,6 +158,7 @@ pub struct IndexFollowerStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bytes_read: Option<crate::types::common::ByteCount>,
@@ -176,6 +181,7 @@ pub struct IndexStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LeaderStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bytes_read: Option<crate::types::common::ByteCount>,
@@ -204,6 +210,7 @@ pub struct LeaderStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ReplicationStatus {
     #[doc = "`BOOTSTRAPPING`"]
     Bootstrapping,
@@ -257,6 +264,7 @@ impl<'de> serde::Deserialize<'de> for ReplicationStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Status {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub follower_index: Option<crate::types::common::IndexName>,
@@ -275,6 +283,7 @@ pub struct Status {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SyncingDetails {
     #[doc = "The checkpoint of the follower index in the replication process."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

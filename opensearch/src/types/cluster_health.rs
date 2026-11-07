@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AwarenessAttributeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active_shards: Option<i32>,
@@ -48,6 +49,7 @@ pub struct AwarenessAttributeStats {
 pub type HealthResponse = crate::types::cluster_health::HealthResponseBody;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HealthResponseBody {
     #[doc = "The number of active primary shards."]
     pub active_primary_shards: i32,
@@ -96,6 +98,7 @@ pub struct HealthResponseBody {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexHealthStats {
     pub active_primary_shards: i32,
     pub active_shards: i32,
@@ -111,6 +114,7 @@ pub struct IndexHealthStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardHealthStats {
     pub active_shards: i32,
     pub initializing_shards: i32,

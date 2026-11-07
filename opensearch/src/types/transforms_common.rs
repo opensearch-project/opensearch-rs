@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ContinuousStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub documents_behind: Option<std::collections::BTreeMap<String, f64>>,
@@ -37,6 +38,7 @@ pub struct ContinuousStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateHistogramGroup {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub calendar_interval: Option<String>,
@@ -51,6 +53,7 @@ pub struct DateHistogramGroup {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Explain {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata_id: Option<String>,
@@ -62,6 +65,7 @@ pub type ExplainResponse =
     std::collections::BTreeMap<String, crate::types::transforms_common::Explain>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub documents_indexed: Option<f64>,
@@ -76,6 +80,7 @@ pub struct ExplainStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GroupsConfigItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub date_histogram: Option<crate::types::transforms_common::DateHistogramGroup>,
@@ -86,6 +91,7 @@ pub struct GroupsConfigItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HistogramGroup {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub interval: Option<String>,
@@ -96,6 +102,7 @@ pub struct HistogramGroup {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Preview {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub documents:
@@ -103,11 +110,13 @@ pub struct Preview {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Schedule {
     pub interval: crate::types::transforms_common::ScheduleInterval,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScheduleInterval {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub period: Option<f64>,
@@ -118,6 +127,7 @@ pub struct ScheduleInterval {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermsGroup {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_field: Option<String>,
@@ -126,6 +136,7 @@ pub struct TermsGroup {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Transform {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub aggregations: Option<
@@ -164,6 +175,7 @@ pub struct Transform {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TransformMetadata {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub continuous_stats: Option<crate::types::transforms_common::ContinuousStats>,
@@ -180,6 +192,7 @@ pub struct TransformMetadata {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TransformResponse {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -198,6 +211,7 @@ pub struct TransformResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TransformsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_transforms: Option<f64>,

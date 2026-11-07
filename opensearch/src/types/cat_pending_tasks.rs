@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PendingTasksRecord {
     #[doc = "The task insertion order."]
     #[serde(rename = "insertOrder")]

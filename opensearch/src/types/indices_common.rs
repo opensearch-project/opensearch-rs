@@ -30,6 +30,7 @@
 
 #[doc = "The index alias configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Alias {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filter: Option<crate::types::common_query_dsl::QueryContainer>,
@@ -49,6 +50,7 @@ pub struct Alias {
 
 #[doc = "The configuration for an index alias."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AliasDefinition {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filter: Option<crate::types::common_query_dsl::QueryContainer>,
@@ -71,6 +73,7 @@ pub struct AliasDefinition {
 
 #[doc = "The type of storage implementation."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BuiltinStorageType {
     #[doc = "`fs`"]
     Fs,
@@ -120,6 +123,7 @@ impl<'de> serde::Deserialize<'de> for BuiltinStorageType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStream {
     #[serde(rename = "_meta")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -155,6 +159,7 @@ pub struct DataStream {
 
 #[doc = "The configuration for a data stream's backing index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStreamIndex {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ilm_policy: Option<crate::types::common::Name>,
@@ -169,6 +174,7 @@ pub struct DataStreamIndex {
 
 #[doc = "The statistics for a data stream."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStreamStats {
     #[doc = "Current number of backing indexes for the data stream."]
     pub backing_indices: i32,
@@ -182,12 +188,14 @@ pub struct DataStreamStats {
 
 #[doc = "The timestamp field configuration for a data stream."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStreamTimestampField {
     pub name: crate::types::common::Field,
 }
 
 #[doc = "The frequency filter configuration for field data."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FielddataFrequencyFilter {
     #[doc = "The maximum frequency threshold."]
     pub max: f64,
@@ -199,6 +207,7 @@ pub struct FielddataFrequencyFilter {
 
 #[doc = "The type of check to perform when starting an index."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexCheckOnStartup {
     #[doc = "`checksum`"]
     Checksum,
@@ -245,6 +254,7 @@ impl<'de> serde::Deserialize<'de> for IndexCheckOnStartup {
 
 #[doc = "The upgrade status information for indexes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexGetUpgradeStatus {
     #[doc = "The upgrade status for individual indexes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -260,6 +270,7 @@ pub struct IndexGetUpgradeStatus {
 
 #[doc = "The routing configuration for index operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRouting {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allocation: Option<crate::types::indices_common::IndexRoutingAllocation>,
@@ -269,6 +280,7 @@ pub struct IndexRouting {
 
 #[doc = "The configuration for shard allocation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRoutingAllocation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub disk: Option<crate::types::indices_common::IndexRoutingAllocationDisk>,
@@ -287,6 +299,7 @@ pub struct IndexRoutingAllocation {
 
 #[doc = "The disk-based allocation settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRoutingAllocationDisk {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub threshold_enabled: Option<crate::types::common::StringifiedBoolean>,
@@ -294,6 +307,7 @@ pub struct IndexRoutingAllocationDisk {
 
 #[doc = "The inclusion rules for shard allocation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRoutingAllocationInclude {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -306,6 +320,7 @@ pub struct IndexRoutingAllocationInclude {
 
 #[doc = "The configuration for initial shard recovery."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRoutingAllocationInitialRecovery {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -314,6 +329,7 @@ pub struct IndexRoutingAllocationInitialRecovery {
 
 #[doc = "The options for shard allocation control."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexRoutingAllocationOptions {
     #[doc = "`all`"]
     All,
@@ -364,12 +380,14 @@ impl<'de> serde::Deserialize<'de> for IndexRoutingAllocationOptions {
 
 #[doc = "The configuration for shard rebalancing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexRoutingRebalance {
     pub enable: crate::types::indices_common::IndexRoutingRebalanceOptions,
 }
 
 #[doc = "The options for shard rebalancing control."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexRoutingRebalanceOptions {
     #[doc = "`all`"]
     All,
@@ -420,6 +438,7 @@ impl<'de> serde::Deserialize<'de> for IndexRoutingRebalanceOptions {
 
 #[doc = "The configuration for segment sorting."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSegmentSort {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field: Option<crate::types::common::Fields>,
@@ -534,6 +553,7 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortOrder {
 
 #[doc = "The block settings that control index operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingBlocks {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<crate::types::common::StringifiedBoolean>,
@@ -552,6 +572,7 @@ pub struct IndexSettingBlocks {
 
 #[doc = "The configuration settings for an index."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct IndexSettings {
     pub analysis: Option<crate::types::indices_common::IndexSettingsAnalysis>,
     pub analyze: Option<crate::types::indices_common::IndexSettingsAnalyze>,
@@ -1799,6 +1820,7 @@ impl serde::Serialize for IndexSettings {
 
 #[doc = "The text analysis configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsAnalysis {
     #[doc = "The custom analyzer configurations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1824,6 +1846,7 @@ pub struct IndexSettingsAnalysis {
 
 #[doc = "The configuration for text analysis."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsAnalyze {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_token_count: Option<crate::types::common::StringifiedInteger>,
@@ -1831,6 +1854,7 @@ pub struct IndexSettingsAnalyze {
 
 #[doc = "The configuration for highlighting."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsHighlight {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_analyzed_offset: Option<crate::types::common::StringifiedInteger>,
@@ -1838,6 +1862,7 @@ pub struct IndexSettingsHighlight {
 
 #[doc = "The indexing-related settings for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsIndexing {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub slowlog: Option<crate::types::indices_common::IndexingSlowlog>,
@@ -1845,6 +1870,7 @@ pub struct IndexSettingsIndexing {
 
 #[doc = "The index lifecycle management configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsLifecycle {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indexing_complete: Option<crate::types::common::StringifiedBoolean>,
@@ -1864,6 +1890,7 @@ pub struct IndexSettingsLifecycle {
 
 #[doc = "The configuration for the lifecycle step execution."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsLifecycleStep {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wait_time_threshold: Option<crate::types::common::Duration>,
@@ -1871,6 +1898,7 @@ pub struct IndexSettingsLifecycleStep {
 
 #[doc = "The mapping configuration for the index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMapping {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub coerce: Option<crate::types::common::StringifiedBoolean>,
@@ -1894,6 +1922,7 @@ pub struct IndexSettingsMapping {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitDepth {
     #[doc = "The maximum depth for a field, which is measured as the number of inner objects. For instance, if all fields are defined at the root object level, then the depth is `1`. If there is one object mapping, then the depth is `2`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1901,6 +1930,7 @@ pub struct IndexSettingsMappingLimitDepth {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitDimensionFields {
     #[doc = "[preview] This functionality is in technical preview and may be changed or removed in a future release. OpenSearch will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1908,6 +1938,7 @@ pub struct IndexSettingsMappingLimitDimensionFields {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitFieldNameLength {
     #[doc = "Setting for the maximum length of a field name. This setting isn't really something that addresses mappings explosion but might still be useful if you want to limit the field length. It usually shouldn't be necessary to set this setting. The default is okay unless a user starts to add a huge number of fields with really long names. Default is `Long.MAX_VALUE` (no limit)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1915,6 +1946,7 @@ pub struct IndexSettingsMappingLimitFieldNameLength {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitNestedFields {
     #[doc = "The maximum number of distinct nested mappings in an index. The nested type should only be used in special cases, when arrays of objects need to be queried independently of each other. To safeguard against poorly designed mappings, this setting limits the number of unique nested types per index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1922,6 +1954,7 @@ pub struct IndexSettingsMappingLimitNestedFields {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitNestedObjects {
     #[doc = "The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1929,6 +1962,7 @@ pub struct IndexSettingsMappingLimitNestedObjects {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMappingLimitTotalFields {
     #[doc = "The maximum number of fields in an index. Field and object mappings, as well as field aliases count towards this limit. The limit is in place to prevent mappings and searches from becoming too large. Higher values can lead to performance degradations and memory issues, especially in clusters with a high load or few resources."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1937,6 +1971,7 @@ pub struct IndexSettingsMappingLimitTotalFields {
 
 #[doc = "The configuration for segment merging."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMerge {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub log_byte_size_policy:
@@ -1970,6 +2005,7 @@ pub struct IndexSettingsMerge {
 
 #[doc = "The configuration for log byte size merge policy."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMergeLogByteSizePolicy {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_merge_segment: Option<crate::types::common::HumanReadableByteCount>,
@@ -2023,6 +2059,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicy {
 
 #[doc = "The type of merge policy."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsMergePolicyName {
     #[doc = "`default`"]
     Default,
@@ -2069,6 +2106,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicyName {
 
 #[doc = "The configuration for merge scheduling."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMergeScheduler {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_throttle: Option<crate::types::common::StringifiedBoolean>,
@@ -2080,6 +2118,7 @@ pub struct IndexSettingsMergeScheduler {
 
 #[doc = "The configuration for tiered merge policy."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsMergeTieredPolicy {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deletes_pct_allowed: Option<crate::types::common::StringifiedDouble>,
@@ -2101,6 +2140,7 @@ pub struct IndexSettingsMergeTieredPolicy {
 
 #[doc = "The configuration for query caching."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsQueries {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cache: Option<crate::types::indices_common::IndexSettingsQueriesCache>,
@@ -2108,12 +2148,14 @@ pub struct IndexSettingsQueries {
 
 #[doc = "The query cache settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsQueriesCache {
     pub enabled: crate::types::common::StringifiedBoolean,
 }
 
 #[doc = "The configuration for query string parsing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsQueryString {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lenient: Option<crate::types::common::StringifiedBoolean>,
@@ -2121,6 +2163,7 @@ pub struct IndexSettingsQueryString {
 
 #[doc = "The configuration for search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub concurrent: Option<crate::types::indices_common::IndexSettingsSearchConcurrent>,
@@ -2142,6 +2185,7 @@ pub struct IndexSettingsSearch {
 
 #[doc = "The configuration for concurrent search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSearchConcurrent {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_slice_count: Option<crate::types::common::StringifiedInteger>,
@@ -2149,6 +2193,7 @@ pub struct IndexSettingsSearchConcurrent {
 
 #[doc = "The configuration for concurrent segment search."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSearchConcurrentSegmentSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<crate::types::common::StringifiedBoolean>,
@@ -2158,6 +2203,7 @@ pub struct IndexSettingsSearchConcurrentSegmentSearch {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSearchStarTreeIndex {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<crate::types::common::StringifiedBoolean>,
@@ -2165,6 +2211,7 @@ pub struct IndexSettingsSearchStarTreeIndex {
 
 #[doc = "The configuration for similarity algorithms."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarity {
     #[serde(rename = "bm25")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2185,6 +2232,7 @@ pub struct IndexSettingsSimilarity {
 
 #[doc = "The BM25 similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityBm25 {
     #[doc = "The length normalization parameter."]
     pub b: f64,
@@ -2199,6 +2247,7 @@ pub struct IndexSettingsSimilarityBm25 {
 
 #[doc = "The BM25 similarity algorithm."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityBm25Type {
     #[doc = "`BM25`"]
     Bm25,
@@ -2237,12 +2286,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityBm25Type {
 
 #[doc = "The divergence from independence (DFI) similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityDfi {
     pub independence_measure: crate::types::common::DFIIndependenceMeasure,
     pub r#type: crate::types::indices_common::IndexSettingsSimilarityDfiType,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityDfiType {
     #[doc = "`DFI`"]
     Dfi,
@@ -2281,6 +2332,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityDfiType {
 
 #[doc = "The divergence from randomness (DFR) similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityDfr {
     pub after_effect: crate::types::common::DFRAfterEffect,
     pub basic_model: crate::types::common::DFRBasicModel,
@@ -2289,6 +2341,7 @@ pub struct IndexSettingsSimilarityDfr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityDfrType {
     #[doc = "`DFR`"]
     Dfr,
@@ -2327,6 +2380,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityDfrType {
 
 #[doc = "The information-based similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityIb {
     pub distribution: crate::types::common::IBDistribution,
     pub lambda: crate::types::common::IBLambda,
@@ -2335,6 +2389,7 @@ pub struct IndexSettingsSimilarityIb {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityIbType {
     #[doc = "`IB`"]
     Ib,
@@ -2373,6 +2428,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityIbType {
 
 #[doc = "The LM Dirichlet similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityLmd {
     #[doc = "The smoothing parameter."]
     pub mu: f64,
@@ -2380,6 +2436,7 @@ pub struct IndexSettingsSimilarityLmd {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityLmdType {
     #[doc = "`LMDirichlet`"]
     Lmdirichlet,
@@ -2418,6 +2475,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityLmdType {
 
 #[doc = "The LM Jelinek-Mercer similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityLmj {
     #[doc = "The optimal mixture parameter."]
     pub lambda: f64,
@@ -2425,6 +2483,7 @@ pub struct IndexSettingsSimilarityLmj {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityLmjType {
     #[doc = "`LMJelinekMercer`"]
     LmjelinekMercer,
@@ -2463,12 +2522,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityLmjType {
 
 #[doc = "The scripted TF/IDF similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsSimilarityScriptedTfidf {
     pub script: crate::types::common::Script,
     pub r#type: crate::types::indices_common::IndexSettingsSimilarityScriptedTfidfType,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsSimilarityScriptedTfidfType {
     #[doc = "`scripted`"]
     Scripted,
@@ -2507,6 +2568,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityScriptedTfidfType {
 
 #[doc = "The star tree indexing configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStarTree {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default: Option<crate::types::indices_common::IndexSettingsStarTreeDefault>,
@@ -2518,6 +2580,7 @@ pub struct IndexSettingsStarTree {
 
 #[doc = "The default settings for star tree indexing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStarTreeDefault {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_leaf_docs: Option<crate::types::common::StringifiedInteger>,
@@ -2525,6 +2588,7 @@ pub struct IndexSettingsStarTreeDefault {
 
 #[doc = "The field-specific settings for star tree indexing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStarTreeField {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default: Option<crate::types::indices_common::IndexSettingsStarTreeFieldDefault>,
@@ -2538,6 +2602,7 @@ pub struct IndexSettingsStarTreeField {
 
 #[doc = "The field-specific settings for star tree indexing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStarTreeFieldDefault {
     #[doc = "The list of date intervals to use."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2548,6 +2613,7 @@ pub struct IndexSettingsStarTreeFieldDefault {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStore {
     #[doc = "Whether memory-mapping is allowed. You can restrict the use of the `mmapfs` and the related `hybridfs` store types with the setting `node.store.allow_mmap`. This setting is useful, for example, if you are in an environment where you can not control the ability to create a lot of memory maps so you need disable the ability to use memory-mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2566,6 +2632,7 @@ pub struct IndexSettingsStore {
 
 #[doc = "The filesystem storage configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStoreFs {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fs_lock: Option<crate::types::indices_common::IndexSettingsStoreFsLock>,
@@ -2573,6 +2640,7 @@ pub struct IndexSettingsStoreFs {
 
 #[doc = "The type of file system lock."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexSettingsStoreFsLock {
     #[doc = "`native`"]
     Native,
@@ -2615,6 +2683,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsStoreFsLock {
 
 #[doc = "The hybrid storage type configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStoreHybrid {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mmap: Option<crate::types::indices_common::IndexSettingsStoreHybridMmap>,
@@ -2624,6 +2693,7 @@ pub struct IndexSettingsStoreHybrid {
 
 #[doc = "The memory-mapped storage configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStoreHybridMmap {
     #[doc = "The file extensions to use memory-mapping for."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2632,6 +2702,7 @@ pub struct IndexSettingsStoreHybridMmap {
 
 #[doc = "The NIO storage configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSettingsStoreHybridNio {
     #[doc = "The file extensions to use NIO for."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2640,6 +2711,7 @@ pub struct IndexSettingsStoreHybridNio {
 
 #[doc = "The state configuration of an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexState {
     #[doc = "The aliases associated with the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2656,6 +2728,7 @@ pub struct IndexState {
 
 #[doc = "The configuration for an index template."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexTemplate {
     #[serde(rename = "_meta")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2680,6 +2753,7 @@ pub struct IndexTemplate {
 
 #[doc = "The data stream configuration for an index template."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexTemplateDataStreamConfiguration {
     #[doc = "When `true`, the data stream supports custom routing."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2693,6 +2767,7 @@ pub struct IndexTemplateDataStreamConfiguration {
 
 #[doc = "The summary configuration for an index template."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexTemplateSummary {
     #[doc = "The aliases to add. If the index template includes a `data_stream` object, these are data stream aliases. Otherwise, these are index aliases. Data stream aliases ignore the `index_routing`, `routing`, and `search_routing` options."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2705,6 +2780,7 @@ pub struct IndexTemplateSummary {
 
 #[doc = "The versioning information for the index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexVersioning {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub created: Option<crate::types::common::VersionString>,
@@ -2715,12 +2791,14 @@ pub struct IndexVersioning {
 
 #[doc = "The configuration for indexing backpressure."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressure {
     pub memory: crate::types::indices_common::IndexingPressureMemory,
 }
 
 #[doc = "The memory-related settings for indexing backpressure."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressureMemory {
     #[doc = "The number of outstanding bytes that may be consumed by indexing requests. When this limit is reached or exceeded, the node will reject new coordinating and primary operations. When replica operations consume 1.5x this limit, the node will reject new replica operations. Defaults to 10% of the heap."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2765,6 +2843,7 @@ impl<'de> serde::Deserialize<'de> for IndexingPressureMemoryLimit {
 
 #[doc = "The configuration for indexing slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingSlowlog {
     #[doc = "The log level for slow indexing operations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2779,6 +2858,7 @@ pub struct IndexingSlowlog {
 
 #[doc = "The threshold configuration for indexing slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingSlowlogThresholds {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::indices_common::SlowlogThresholdLevels>,
@@ -2786,6 +2866,7 @@ pub struct IndexingSlowlogThresholds {
 
 #[doc = "The pull-based ingestion settings controlling how data is read from streaming sources."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestionSource {
     #[doc = "Indicates if all-active ingestion is enabled for this index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2827,12 +2908,14 @@ pub struct IngestionSource {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestionSourcePointer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub init: Option<crate::types::indices_common::IngestionSourcePointerInit>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestionSourcePointerInit {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reset: Option<crate::types::indices_common::IngestionSourcePointerInitReset>,
@@ -2844,6 +2927,7 @@ pub struct IngestionSourcePointerInit {
 
 #[doc = "Determines where to start reading from the stream."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IngestionSourcePointerInitReset {
     #[doc = "`EARLIEST` (also accepted: `earliest`)"]
     Earliest,
@@ -2899,6 +2983,7 @@ impl<'de> serde::Deserialize<'de> for IngestionSourcePointerInitReset {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IngestionSourcePoll {
     #[doc = "The maximum number of records to retrieve in each poll operation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2909,6 +2994,7 @@ pub struct IngestionSourcePoll {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IngestionSourceType {
     #[doc = "`file`"]
     File,
@@ -2959,6 +3045,7 @@ impl<'de> serde::Deserialize<'de> for IngestionSourceType {
 
 #[doc = "The component managing the data stream or index."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ManagedBy {
     #[doc = "`Data stream lifecycle`"]
     DataStreamLifecycle,
@@ -3005,12 +3092,14 @@ impl<'de> serde::Deserialize<'de> for ManagedBy {
 
 #[doc = "The configuration for numeric field data."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NumericFielddata {
     pub format: crate::types::indices_common::NumericFielddataFormat,
 }
 
 #[doc = "The format for numeric field data."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NumericFielddataFormat {
     #[doc = "`array`"]
     Array,
@@ -3052,6 +3141,7 @@ impl<'de> serde::Deserialize<'de> for NumericFielddataFormat {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ReplicationType {
     #[doc = "`DOCUMENT`"]
     Document,
@@ -3094,12 +3184,14 @@ impl<'de> serde::Deserialize<'de> for ReplicationType {
 
 #[doc = "The retention lease configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RetentionLease {
     pub period: crate::types::common::Duration,
 }
 
 #[doc = "The configuration for search idle behavior."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchIdle {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after: Option<crate::types::common::Duration>,
@@ -3107,6 +3199,7 @@ pub struct SearchIdle {
 
 #[doc = "The configuration for search slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchSlowlog {
     #[doc = "The log level for slow searches."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3120,6 +3213,7 @@ pub struct SearchSlowlog {
 
 #[doc = "The threshold configuration for search slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchSlowlogThresholds {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fetch: Option<crate::types::indices_common::SlowlogThresholdLevels>,
@@ -3129,6 +3223,7 @@ pub struct SearchSlowlogThresholds {
 
 #[doc = "The handling of missing values in segment sorting."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SegmentSortMissing {
     #[doc = "`_first`"]
     First,
@@ -3171,6 +3266,7 @@ impl<'de> serde::Deserialize<'de> for SegmentSortMissing {
 
 #[doc = "The sort mode for segments."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SegmentSortMode {
     #[doc = "`max`"]
     Max,
@@ -3213,6 +3309,7 @@ impl<'de> serde::Deserialize<'de> for SegmentSortMode {
 
 #[doc = "The sort order for segments."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SegmentSortOrder {
     #[doc = "`asc`"]
     Asc,
@@ -3255,6 +3352,7 @@ impl<'de> serde::Deserialize<'de> for SegmentSortOrder {
 
 #[doc = "The threshold levels for slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SlowlogThresholdLevels {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub debug: Option<crate::types::common::Duration>,
@@ -3268,6 +3366,7 @@ pub struct SlowlogThresholdLevels {
 
 #[doc = "The configuration for soft deletes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SoftDeletes {
     #[doc = "Whether soft deletes are enabled on the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3280,6 +3379,7 @@ pub struct SoftDeletes {
 
 #[doc = "The retention configuration for soft deletes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SoftDeletesRetention {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub operations: Option<crate::types::common::StringifiedLong>,
@@ -3317,6 +3417,7 @@ impl StorageType {
 
 #[doc = "The mapping configuration for a template."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TemplateMapping {
     pub aliases: std::collections::BTreeMap<String, crate::types::indices_common::Alias>,
     pub index_patterns: Vec<crate::types::common::Name>,
@@ -3331,6 +3432,7 @@ pub struct TemplateMapping {
 
 #[doc = "The translog configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Translog {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub durability: Option<crate::types::indices_common::TranslogDurability>,
@@ -3346,6 +3448,7 @@ pub struct Translog {
 
 #[doc = "The durability settings for the translog."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TranslogDurability {
     #[doc = "`ASYNC` (also accepted: `async`)"]
     Async,
@@ -3388,6 +3491,7 @@ impl<'de> serde::Deserialize<'de> for TranslogDurability {
 
 #[doc = "The retention configuration for the translog."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TranslogRetention {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub age: Option<crate::types::common::Duration>,
@@ -3397,6 +3501,7 @@ pub struct TranslogRetention {
 
 #[doc = "The upgrade status details for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpgradeStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub size_in_bytes: Option<crate::types::common::ByteCount>,
@@ -3408,6 +3513,7 @@ pub struct UpgradeStatus {
 
 #[doc = "The version status for an upgrade operation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpgradeVersionStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub oldest_lucene_segment_version: Option<crate::types::common::VersionString>,

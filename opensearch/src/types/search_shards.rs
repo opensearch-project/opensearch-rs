@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchShardsResponse {
     pub indices: std::collections::BTreeMap<String, crate::types::search_shards::ShardStoreIndex>,
     pub nodes: std::collections::BTreeMap<String, crate::types::common::NodeAttributes>,
@@ -36,6 +37,7 @@ pub struct SearchShardsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardStoreIndex {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<crate::types::common::Name>>,

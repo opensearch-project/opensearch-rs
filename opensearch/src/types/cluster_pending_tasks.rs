@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PendingTask {
     #[doc = "Indicates whether the pending tasks are currently executing or not."]
     pub executing: bool,

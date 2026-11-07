@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indices: Option<Vec<crate::types::cat_indices::IndicesRecord>>,
@@ -37,6 +38,7 @@ pub struct IndicesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub next_token: Option<String>,

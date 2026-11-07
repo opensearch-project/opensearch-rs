@@ -30,6 +30,7 @@
 
 #[doc = "The validation results for an index query."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesValidationExplanation {
     #[doc = "The error message if validation failed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

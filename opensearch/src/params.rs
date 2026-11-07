@@ -39,6 +39,7 @@ use serde::{de, de::Visitor, Deserializer, Serializer};
 use serde::{Deserialize, Serialize};
 #[doc = "Used to filter by alert state. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum AlertState {
     #[serde(rename = "ACKNOWLEDGED")]
     Acknowledged,
@@ -53,6 +54,7 @@ pub enum AlertState {
 }
 #[doc = "The units used to display byte values."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Bytes {
     #[serde(rename = "b")]
     B,
@@ -79,6 +81,7 @@ pub enum Bytes {
 }
 #[doc = "Type of notification configuration."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum ConfigType {
     #[serde(rename = "chime")]
     Chime,
@@ -101,6 +104,7 @@ pub enum ConfigType {
 }
 #[doc = "What to do if delete by query hits version conflicts: `abort` or `proceed`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Conflicts {
     #[serde(rename = "abort")]
     Abort,
@@ -109,6 +113,7 @@ pub enum Conflicts {
 }
 #[doc = "The default operator for query string query: `AND` or `OR`.\nThis parameter can only be used when the `q` query string parameter is specified."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum DefaultOperator {
     #[serde(rename = "and")]
     And,
@@ -117,6 +122,7 @@ pub enum DefaultOperator {
 }
 #[doc = "The detection type that dictates the retrieval type for the findings. When the detection type is `threat`, it fetches threat intelligence feeds. When the detection type is `rule`, findings are fetched based on the detector’s rule. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum DetectionType {
     #[serde(rename = "rule")]
     Rule,
@@ -124,6 +130,7 @@ pub enum DetectionType {
     Threat,
 }
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum ExpandWildcards {
     #[serde(rename = "all")]
     All,
@@ -138,6 +145,7 @@ pub enum ExpandWildcards {
 }
 #[doc = "Groups tasks by parent/child relationships or nodes."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum GroupBy {
     #[serde(rename = "nodes")]
     Nodes,
@@ -148,6 +156,7 @@ pub enum GroupBy {
 }
 #[doc = "Limits indexes based on their health status. Supported values are `green`, `yellow`, and `red`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Health {
     #[serde(rename = "green")]
     Green,
@@ -157,6 +166,7 @@ pub enum Health {
     Red,
 }
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Level {
     #[serde(rename = "awareness_attributes")]
     AwarenessAttributes,
@@ -169,6 +179,7 @@ pub enum Level {
 }
 #[doc = "Limits the information returned to the specified metrics."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Metric {
     #[serde(rename = "_all")]
     All,
@@ -191,6 +202,7 @@ pub enum Metric {
 }
 #[doc = "Set to create to only index the document if it does not already exist (put if absent).\nIf a document with the specified `_id` already exists, the indexing operation will fail.\nSame as using the `&lt;index&gt;/_create` endpoint.\nValid values: `index`, `create`.\nIf document id is specified, it defaults to `index`.\nOtherwise, it defaults to `create`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum OpType {
     #[serde(rename = "create")]
     Create,
@@ -199,6 +211,7 @@ pub enum OpType {
 }
 #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Refresh {
     #[serde(rename = "false")]
     False,
@@ -209,6 +222,7 @@ pub enum Refresh {
 }
 #[doc = "The type of the search operation.\nAvailable options: `query_then_fetch`, `dfs_query_then_fetch`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum SearchType {
     #[serde(rename = "dfs_query_then_fetch")]
     DfsQueryThenFetch,
@@ -217,6 +231,7 @@ pub enum SearchType {
 }
 #[doc = "The rule severity for which retrieve findings. Severity can be `critical`, `high`, `medium`, or `low`. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Severity {
     #[serde(rename = "critical")]
     Critical,
@@ -229,6 +244,7 @@ pub enum Severity {
 }
 #[doc = "Defines order in which indexes will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created indexes would be displayed first."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Sort {
     #[serde(rename = "asc")]
     Asc,
@@ -237,6 +253,7 @@ pub enum Sort {
 }
 #[doc = "The order used to sort the list of findings. Possible values are `asc` or `desc`. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum SortOrder {
     #[serde(rename = "asc")]
     Asc,
@@ -245,6 +262,7 @@ pub enum SortOrder {
 }
 #[doc = "A list of shard health statuses used to limit the request."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Status {
     #[serde(rename = "all")]
     All,
@@ -257,6 +275,7 @@ pub enum Status {
 }
 #[doc = "Specify suggest mode."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum SuggestMode {
     #[serde(rename = "always")]
     Always,
@@ -267,6 +286,7 @@ pub enum SuggestMode {
 }
 #[doc = "The unit used to display time values."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Time {
     #[serde(rename = "nanos")]
     Nanos,
@@ -285,6 +305,7 @@ pub enum Time {
 }
 #[doc = "Get top n queries by a specific metric."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum Type {
     #[serde(rename = "cpu")]
     Cpu,
@@ -295,6 +316,7 @@ pub enum Type {
 }
 #[doc = "The specific version type: `external`, `external_gte`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum VersionType {
     #[serde(rename = "external")]
     External,
@@ -304,6 +326,7 @@ pub enum VersionType {
     Internal,
 }
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum WaitForEvents {
     #[serde(rename = "immediate")]
     Immediate,
@@ -320,6 +343,7 @@ pub enum WaitForEvents {
 }
 #[doc = "Waits until the cluster health reaches the specified status or better."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+#[non_exhaustive]
 pub enum WaitForStatus {
     #[serde(rename = "green")]
     Green,

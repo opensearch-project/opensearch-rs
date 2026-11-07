@@ -33,6 +33,7 @@ pub type GetFieldMappingResponse = crate::types::indices::GetFieldMappingRespons
 
 #[doc = "The field mapping configuration for a type."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TypeFieldMappings {
     #[doc = "The map of field names to their mapping definitions."]
     pub mappings: std::collections::BTreeMap<String, crate::types::common_mapping::FieldMapping>,

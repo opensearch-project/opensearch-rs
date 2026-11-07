@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldCapability {
     #[doc = "Whether this field can be aggregated on all indexes."]
     pub aggregatable: bool,
@@ -49,6 +50,7 @@ pub struct FieldCapability {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldCapsResponse {
     pub fields: std::collections::BTreeMap<
         String,

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateByQueryRethrottleNode {
     #[doc = "The attributes of the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -46,6 +47,7 @@ pub struct UpdateByQueryRethrottleNode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateByQueryRethrottleResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_failures: Option<Vec<crate::types::common::ErrorCause>>,

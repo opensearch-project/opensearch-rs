@@ -32,6 +32,7 @@
 pub type RestoreResponse = crate::types::snapshot::RestoreResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotRestore {
     #[doc = "The list of indexes that were restored."]
     pub indices: Vec<crate::types::common::IndexName>,

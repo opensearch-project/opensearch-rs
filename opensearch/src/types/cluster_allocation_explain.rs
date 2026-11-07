@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllocationDecision {
     pub decider: String,
     pub decision: crate::types::cluster_allocation_explain::AllocationExplainDecision,
@@ -36,6 +37,7 @@ pub struct AllocationDecision {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AllocationExplainDecision {
     #[doc = "`ALWAYS`"]
     Always,
@@ -88,6 +90,7 @@ impl<'de> serde::Deserialize<'de> for AllocationExplainDecision {
 pub type AllocationExplainResponse = crate::types::cluster::AllocationExplainResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllocationStore {
     pub allocation_id: String,
     pub found: bool,
@@ -98,6 +101,7 @@ pub struct AllocationStore {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterInfo {
     pub nodes:
         std::collections::BTreeMap<String, crate::types::cluster_allocation_explain::NodeDiskUsage>,
@@ -149,6 +153,7 @@ impl<'de> serde::Deserialize<'de> for ClusterInfoShardSizesValue {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CurrentNode {
     pub attributes: std::collections::BTreeMap<String, String>,
     pub id: crate::types::common::Id,
@@ -158,6 +163,7 @@ pub struct CurrentNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Decision {
     #[doc = "`allocation_delayed`"]
     AllocationDelayed,
@@ -223,6 +229,7 @@ impl<'de> serde::Deserialize<'de> for Decision {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DiskUsage {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub free: Option<crate::types::common::HumanReadableByteCount>,
@@ -239,6 +246,7 @@ pub struct DiskUsage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeAllocationExplanation {
     pub deciders: Vec<crate::types::cluster_allocation_explain::AllocationDecision>,
     pub node_attributes: std::collections::BTreeMap<String, String>,
@@ -253,6 +261,7 @@ pub struct NodeAllocationExplanation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeDiskUsage {
     pub least_available: crate::types::cluster_allocation_explain::DiskUsage,
     pub most_available: crate::types::cluster_allocation_explain::DiskUsage,
@@ -260,6 +269,7 @@ pub struct NodeDiskUsage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReservedSize {
     pub node_id: crate::types::common::Id,
     pub path: String,
@@ -268,6 +278,7 @@ pub struct ReservedSize {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnassignedInformation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allocation_status: Option<String>,
@@ -284,6 +295,7 @@ pub struct UnassignedInformation {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UnassignedInformationReason {
     #[doc = "`ALLOCATION_FAILED`"]
     AllocationFailed,

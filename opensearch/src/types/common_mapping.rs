@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AggregateMetricDoubleProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -48,6 +49,7 @@ pub struct AggregateMetricDoubleProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AggregateMetricDoublePropertyType {
     #[doc = "`aggregate_metric_double`"]
     AggregateMetricDouble,
@@ -85,6 +87,7 @@ impl<'de> serde::Deserialize<'de> for AggregateMetricDoublePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllField {
     pub analyzer: String,
     pub enabled: bool,
@@ -99,6 +102,7 @@ pub struct AllField {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BinaryProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -124,6 +128,7 @@ pub struct BinaryProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BinaryPropertyType {
     #[doc = "`binary`"]
     Binary,
@@ -161,6 +166,7 @@ impl<'de> serde::Deserialize<'de> for BinaryPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BooleanProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -194,6 +200,7 @@ pub struct BooleanProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BooleanPropertyType {
     #[doc = "`boolean`"]
     Boolean,
@@ -231,6 +238,7 @@ impl<'de> serde::Deserialize<'de> for BooleanPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ByteNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -266,6 +274,7 @@ pub struct ByteNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ByteNumberPropertyType {
     #[doc = "`byte`"]
     Byte,
@@ -303,6 +312,7 @@ impl<'de> serde::Deserialize<'de> for ByteNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompletionProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -340,6 +350,7 @@ pub struct CompletionProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CompletionPropertyType {
     #[doc = "`completion`"]
     Completion,
@@ -377,6 +388,7 @@ impl<'de> serde::Deserialize<'de> for CompletionPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ConstantKeywordProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -396,6 +408,7 @@ pub struct ConstantKeywordProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ConstantKeywordPropertyType {
     #[doc = "`constant_keyword`"]
     ConstantKeyword,
@@ -433,11 +446,13 @@ impl<'de> serde::Deserialize<'de> for ConstantKeywordPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataStreamTimestamp {
     pub enabled: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateNanosProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -475,6 +490,7 @@ pub struct DateNanosProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DateNanosPropertyType {
     #[doc = "`date_nanos`"]
     DateNanos,
@@ -512,6 +528,7 @@ impl<'de> serde::Deserialize<'de> for DateNanosPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -553,6 +570,7 @@ pub struct DateProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DatePropertyType {
     #[doc = "`date`"]
     Date,
@@ -590,6 +608,7 @@ impl<'de> serde::Deserialize<'de> for DatePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -623,6 +642,7 @@ pub struct DateRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DateRangePropertyType {
     #[doc = "`date_range`"]
     DateRange,
@@ -660,6 +680,7 @@ impl<'de> serde::Deserialize<'de> for DateRangePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DoubleNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -695,6 +716,7 @@ pub struct DoubleNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DoubleNumberPropertyType {
     #[doc = "`double`"]
     Double,
@@ -732,6 +754,7 @@ impl<'de> serde::Deserialize<'de> for DoubleNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DoubleRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -763,6 +786,7 @@ pub struct DoubleRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DoubleRangePropertyType {
     #[doc = "`double_range`"]
     DoubleRange,
@@ -833,6 +857,7 @@ impl<'de> serde::Deserialize<'de> for DynamicMapping {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DynamicMappingString {
     #[doc = "`false`"]
     False,
@@ -882,6 +907,7 @@ impl<'de> serde::Deserialize<'de> for DynamicMappingString {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DynamicTemplate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mapping: Option<crate::types::common_mapping::Property>,
@@ -900,6 +926,7 @@ pub struct DynamicTemplate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldAliasProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -919,6 +946,7 @@ pub struct FieldAliasProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FieldAliasPropertyType {
     #[doc = "`alias`"]
     Alias,
@@ -956,17 +984,20 @@ impl<'de> serde::Deserialize<'de> for FieldAliasPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldMapping {
     pub full_name: String,
     pub mapping: std::collections::BTreeMap<String, crate::types::common_mapping::Property>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldNamesField {
     pub enabled: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FieldType {
     #[doc = "`aggregate_metric_double`"]
     AggregateMetricDouble,
@@ -1188,6 +1219,7 @@ impl<'de> serde::Deserialize<'de> for FieldType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlatObjectProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1209,6 +1241,7 @@ pub struct FlatObjectProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FlatObjectPropertyType {
     #[doc = "`flat_object`"]
     FlatObject,
@@ -1246,6 +1279,7 @@ impl<'de> serde::Deserialize<'de> for FlatObjectPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FloatNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1281,6 +1315,7 @@ pub struct FloatNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FloatNumberPropertyType {
     #[doc = "`float`"]
     Float,
@@ -1318,6 +1353,7 @@ impl<'de> serde::Deserialize<'de> for FloatNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FloatRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1349,6 +1385,7 @@ pub struct FloatRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FloatRangePropertyType {
     #[doc = "`float_range`"]
     FloatRange,
@@ -1386,6 +1423,7 @@ impl<'de> serde::Deserialize<'de> for FloatRangePropertyType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoOrientation {
     #[doc = "`left` (also accepted: `LEFT`)"]
     Left,
@@ -1443,6 +1481,7 @@ impl<'de> serde::Deserialize<'de> for GeoOrientation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoPointProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1474,6 +1513,7 @@ pub struct GeoPointProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoPointPropertyType {
     #[doc = "`geo_point`"]
     GeoPoint,
@@ -1511,6 +1551,7 @@ impl<'de> serde::Deserialize<'de> for GeoPointPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoShapeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1548,6 +1589,7 @@ pub struct GeoShapeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoShapePropertyType {
     #[doc = "`geo_shape`"]
     GeoShape,
@@ -1585,6 +1627,7 @@ impl<'de> serde::Deserialize<'de> for GeoShapePropertyType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoStrategy {
     #[doc = "`recursive`"]
     Recursive,
@@ -1626,6 +1669,7 @@ impl<'de> serde::Deserialize<'de> for GeoStrategy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HalfFloatNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1661,6 +1705,7 @@ pub struct HalfFloatNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HalfFloatNumberPropertyType {
     #[doc = "`half_float`"]
     HalfFloat,
@@ -1698,6 +1743,7 @@ impl<'de> serde::Deserialize<'de> for HalfFloatNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HistogramProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1717,6 +1763,7 @@ pub struct HistogramProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HistogramPropertyType {
     #[doc = "`histogram`"]
     Histogram,
@@ -1754,6 +1801,7 @@ impl<'de> serde::Deserialize<'de> for HistogramPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IcuCollationKeywordProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1805,6 +1853,7 @@ pub struct IcuCollationKeywordProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IcuCollationKeywordPropertyType {
     #[doc = "`icu_collation_keyword`"]
     IcuCollationKeyword,
@@ -1842,11 +1891,13 @@ impl<'de> serde::Deserialize<'de> for IcuCollationKeywordPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexField {
     pub enabled: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IndexOptions {
     #[doc = "`docs`"]
     Docs,
@@ -1896,6 +1947,7 @@ impl<'de> serde::Deserialize<'de> for IndexOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntegerNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1931,6 +1983,7 @@ pub struct IntegerNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IntegerNumberPropertyType {
     #[doc = "`integer`"]
     Integer,
@@ -1968,6 +2021,7 @@ impl<'de> serde::Deserialize<'de> for IntegerNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntegerRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -1999,6 +2053,7 @@ pub struct IntegerRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IntegerRangePropertyType {
     #[doc = "`integer_range`"]
     IntegerRange,
@@ -2036,6 +2091,7 @@ impl<'de> serde::Deserialize<'de> for IntegerRangePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IpProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2069,6 +2125,7 @@ pub struct IpProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IpPropertyType {
     #[doc = "`ip`"]
     Ip,
@@ -2106,6 +2163,7 @@ impl<'de> serde::Deserialize<'de> for IpPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IpRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2137,6 +2195,7 @@ pub struct IpRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IpRangePropertyType {
     #[doc = "`ip_range`"]
     IpRange,
@@ -2174,6 +2233,7 @@ impl<'de> serde::Deserialize<'de> for IpRangePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JoinProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2233,6 +2293,7 @@ impl<'de> serde::Deserialize<'de> for JoinPropertyRelationsValue {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum JoinPropertyType {
     #[doc = "`join`"]
     Join,
@@ -2270,6 +2331,7 @@ impl<'de> serde::Deserialize<'de> for JoinPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeywordProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2311,6 +2373,7 @@ pub struct KeywordProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KeywordPropertyType {
     #[doc = "`keyword`"]
     Keyword,
@@ -2348,6 +2411,7 @@ impl<'de> serde::Deserialize<'de> for KeywordPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KnnVectorMethod {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub engine: Option<String>,
@@ -2359,6 +2423,7 @@ pub struct KnnVectorMethod {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KnnVectorProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2397,6 +2462,7 @@ pub struct KnnVectorProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum KnnVectorPropertyType {
     #[doc = "`knn_vector`"]
     KnnVector,
@@ -2434,6 +2500,7 @@ impl<'de> serde::Deserialize<'de> for KnnVectorPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LongNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2469,6 +2536,7 @@ pub struct LongNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LongNumberPropertyType {
     #[doc = "`long`"]
     Long,
@@ -2506,6 +2574,7 @@ impl<'de> serde::Deserialize<'de> for LongNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LongRangeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2537,6 +2606,7 @@ pub struct LongRangeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum LongRangePropertyType {
     #[doc = "`long_range`"]
     LongRange,
@@ -2574,6 +2644,7 @@ impl<'de> serde::Deserialize<'de> for LongRangePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchOnlyTextProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub copy_to: Option<crate::types::common::Fields>,
@@ -2587,6 +2658,7 @@ pub struct MatchOnlyTextProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MatchOnlyTextPropertyType {
     #[doc = "`match_only_text`"]
     MatchOnlyText,
@@ -2624,6 +2696,7 @@ impl<'de> serde::Deserialize<'de> for MatchOnlyTextPropertyType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MatchType {
     #[doc = "`regex`"]
     Regex,
@@ -2665,6 +2738,7 @@ impl<'de> serde::Deserialize<'de> for MatchType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Murmur3HashProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2690,6 +2764,7 @@ pub struct Murmur3HashProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Murmur3HashPropertyType {
     #[doc = "`murmur3`"]
     Murmur3,
@@ -2727,6 +2802,7 @@ impl<'de> serde::Deserialize<'de> for Murmur3HashPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2756,6 +2832,7 @@ pub struct NestedProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NestedPropertyType {
     #[doc = "`nested`"]
     Nested,
@@ -2793,6 +2870,7 @@ impl<'de> serde::Deserialize<'de> for NestedPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ObjectProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2819,6 +2897,7 @@ pub struct ObjectProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ObjectPropertyType {
     #[doc = "`object`"]
     Object,
@@ -2856,6 +2935,7 @@ impl<'de> serde::Deserialize<'de> for ObjectPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PercolatorProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -2873,6 +2953,7 @@ pub struct PercolatorProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PercolatorPropertyType {
     #[doc = "`percolator`"]
     Percolator,
@@ -3348,6 +3429,7 @@ impl Property {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeatureProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3367,6 +3449,7 @@ pub struct RankFeatureProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RankFeaturePropertyType {
     #[doc = "`rank_feature`"]
     RankFeature,
@@ -3404,6 +3487,7 @@ impl<'de> serde::Deserialize<'de> for RankFeaturePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeaturesProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3421,6 +3505,7 @@ pub struct RankFeaturesProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RankFeaturesPropertyType {
     #[doc = "`rank_features`"]
     RankFeatures,
@@ -3458,11 +3543,13 @@ impl<'de> serde::Deserialize<'de> for RankFeaturesPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RoutingField {
     pub required: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScaledFloatNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3500,6 +3587,7 @@ pub struct ScaledFloatNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ScaledFloatNumberPropertyType {
     #[doc = "`scaled_float`"]
     ScaledFloat,
@@ -3537,6 +3625,7 @@ impl<'de> serde::Deserialize<'de> for ScaledFloatNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchAsYouTypeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3576,6 +3665,7 @@ pub struct SearchAsYouTypeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SearchAsYouTypePropertyType {
     #[doc = "`search_as_you_type`"]
     SearchAsYouType,
@@ -3613,6 +3703,7 @@ impl<'de> serde::Deserialize<'de> for SearchAsYouTypePropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SemanticChunkingStrategy {
     pub algorithm: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3620,6 +3711,7 @@ pub struct SemanticChunkingStrategy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SemanticDenseEmbeddingConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compression_level: Option<String>,
@@ -3632,6 +3724,7 @@ pub struct SemanticDenseEmbeddingConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SemanticProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub chunking: Option<crate::types::common_mapping::SemanticPropertyChunking>,
@@ -3689,6 +3782,7 @@ impl<'de> serde::Deserialize<'de> for SemanticPropertyChunking {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SemanticPropertyType {
     #[doc = "`semantic`"]
     Semantic,
@@ -3726,6 +3820,7 @@ impl<'de> serde::Deserialize<'de> for SemanticPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SemanticSparseEncodingConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prune_ratio: Option<f64>,
@@ -3734,6 +3829,7 @@ pub struct SemanticSparseEncodingConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShortNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3769,6 +3865,7 @@ pub struct ShortNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShortNumberPropertyType {
     #[doc = "`short`"]
     Short,
@@ -3806,11 +3903,13 @@ impl<'de> serde::Deserialize<'de> for ShortNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SizeField {
     pub enabled: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SourceField {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compress: Option<bool>,
@@ -3825,6 +3924,7 @@ pub struct SourceField {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SuggestContext {
     pub name: crate::types::common::Name,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3870,6 +3970,7 @@ impl<'de> serde::Deserialize<'de> for SuggestContextPrecision {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TermVectorOption {
     #[doc = "`no`"]
     No,
@@ -3931,12 +4032,14 @@ impl<'de> serde::Deserialize<'de> for TermVectorOption {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TextIndexPrefixes {
     pub max_chars: i64,
     pub min_chars: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TextProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -3988,6 +4091,7 @@ pub struct TextProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TextPropertyType {
     #[doc = "`text`"]
     Text,
@@ -4025,6 +4129,7 @@ impl<'de> serde::Deserialize<'de> for TextPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TokenCountProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4060,6 +4165,7 @@ pub struct TokenCountProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TokenCountPropertyType {
     #[doc = "`token_count`"]
     TokenCount,
@@ -4097,6 +4203,7 @@ impl<'de> serde::Deserialize<'de> for TokenCountPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TypeMapping {
     #[serde(rename = "_data_stream_timestamp")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4140,6 +4247,7 @@ pub struct TypeMapping {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnsignedLongNumberProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4175,6 +4283,7 @@ pub struct UnsignedLongNumberProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UnsignedLongNumberPropertyType {
     #[doc = "`unsigned_long`"]
     UnsignedLong,
@@ -4212,6 +4321,7 @@ impl<'de> serde::Deserialize<'de> for UnsignedLongNumberPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct VersionProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4237,6 +4347,7 @@ pub struct VersionProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum VersionPropertyType {
     #[doc = "`version`"]
     Version,
@@ -4274,6 +4385,7 @@ impl<'de> serde::Deserialize<'de> for VersionPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WildcardProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4303,6 +4415,7 @@ pub struct WildcardProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum WildcardPropertyType {
     #[doc = "`wildcard`"]
     Wildcard,
@@ -4340,6 +4453,7 @@ impl<'de> serde::Deserialize<'de> for WildcardPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct XyPointProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4371,6 +4485,7 @@ pub struct XyPointProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum XyPointPropertyType {
     #[doc = "`xy_point`"]
     XyPoint,
@@ -4408,6 +4523,7 @@ impl<'de> serde::Deserialize<'de> for XyPointPropertyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct XyShapeProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::common_mapping::DynamicMapping>,
@@ -4441,6 +4557,7 @@ pub struct XyShapeProperty {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum XyShapePropertyType {
     #[doc = "`xy_shape`"]
     XyShape,

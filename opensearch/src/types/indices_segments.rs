@@ -30,6 +30,7 @@
 
 #[doc = "The segment information for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexSegment {
     #[doc = "The segment information for each shard."]
     pub shards:
@@ -71,6 +72,7 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentShardsValue {
 
 #[doc = "The detailed information about a segment."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Segment {
     #[doc = "The attributes of the segment."]
     pub attributes: std::collections::BTreeMap<String, String>,
@@ -101,6 +103,7 @@ pub type SegmentsResponse = crate::types::indices::SegmentsResponse;
 
 #[doc = "The routing information for a shard segment."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSegmentRouting {
     #[doc = "The node containing the segment."]
     pub node: String,
@@ -112,6 +115,7 @@ pub struct ShardSegmentRouting {
 
 #[doc = "The segment information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardsSegment {
     #[doc = "The number of committed segments."]
     pub num_committed_segments: i32,

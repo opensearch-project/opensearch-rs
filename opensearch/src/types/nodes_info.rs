@@ -32,6 +32,7 @@
 pub type InfoResponse = crate::types::nodes::InfoResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfo {
     #[doc = "Information about available aggregation types."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -93,6 +94,7 @@ pub struct NodeInfo {
 
 #[doc = "The action-related configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoAction {
     #[doc = "Whether destructive actions require explicit names."]
     pub destructive_requires_name: String,
@@ -100,6 +102,7 @@ pub struct NodeInfoAction {
 
 #[doc = "The aggregation configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoAggregation {
     #[doc = "The list of supported aggregation types."]
     pub types: Vec<String>,
@@ -107,6 +110,7 @@ pub struct NodeInfoAggregation {
 
 #[doc = "The bootstrap configuration settings for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoBootstrap {
     #[doc = "The memory lock setting for the bootstrap process."]
     pub memory_lock: String,
@@ -114,6 +118,7 @@ pub struct NodeInfoBootstrap {
 
 #[doc = "The client node configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoClient {
     #[doc = "The type of client node configuration."]
     pub r#type: String,
@@ -121,6 +126,7 @@ pub struct NodeInfoClient {
 
 #[doc = "The node discovery configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoDiscovery {
     #[doc = "The configured seed hosts for node discovery."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -132,6 +138,7 @@ pub struct NodeInfoDiscovery {
 
 #[doc = "Provides HTTP connection information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoHttp {
     #[doc = "The addresses the node is bound to for HTTP traffic."]
     pub bound_address: Vec<String>,
@@ -144,6 +151,7 @@ pub struct NodeInfoHttp {
 
 #[doc = "The ingest pipeline configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoIngest {
     #[doc = "The list of configured ingest processors."]
     pub processors: Vec<crate::types::nodes_info::NodeInfoIngestProcessor>,
@@ -151,6 +159,7 @@ pub struct NodeInfoIngest {
 
 #[doc = "The ingest processor download configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoIngestDownloader {
     #[doc = "Whether the downloader is enabled."]
     pub enabled: String,
@@ -158,12 +167,14 @@ pub struct NodeInfoIngestDownloader {
 
 #[doc = "The ingest processor configuration details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoIngestInfo {
     pub downloader: crate::types::nodes_info::NodeInfoIngestDownloader,
 }
 
 #[doc = "The ingest processor configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoIngestProcessor {
     #[doc = "The type of ingest processor."]
     pub r#type: String,
@@ -171,6 +182,7 @@ pub struct NodeInfoIngestProcessor {
 
 #[doc = "Provides JVM memory settings and statistics."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoJvmMemory {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub direct_max: Option<crate::types::common::HumanReadableByteCount>,
@@ -191,6 +203,7 @@ pub struct NodeInfoJvmMemory {
 
 #[doc = "Provides memory information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoMemory {
     pub total: crate::types::common::HumanReadableByteCount,
     pub total_in_bytes: crate::types::common::ByteCount,
@@ -198,6 +211,7 @@ pub struct NodeInfoMemory {
 
 #[doc = "Provides network-related information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoNetwork {
     pub primary_interface: crate::types::nodes_info::NodeInfoNetworkInterface,
     #[doc = "The interval for refreshing network information."]
@@ -206,6 +220,7 @@ pub struct NodeInfoNetwork {
 
 #[doc = "Describes a network interface on the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoNetworkInterface {
     #[doc = "The IP address of the interface."]
     pub address: String,
@@ -216,6 +231,7 @@ pub struct NodeInfoNetworkInterface {
 
 #[doc = "Provides CPU information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoOSCPU {
     pub cache_size: crate::types::common::HumanReadableByteCount,
     pub cache_size_in_bytes: crate::types::common::ByteCount,
@@ -235,6 +251,7 @@ pub struct NodeInfoOSCPU {
 
 #[doc = "The `filesystem` path configurations for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoPath {
     #[doc = "The paths configured for data storage."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -250,12 +267,14 @@ pub struct NodeInfoPath {
 
 #[doc = "The repository configuration information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoRepositories {
     pub url: crate::types::nodes_info::NodeInfoRepositoriesUrl,
 }
 
 #[doc = "Specifies allowed repository URLs."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoRepositoriesUrl {
     #[doc = "The pattern for allowed repository URLs."]
     pub allowed_urls: String,
@@ -263,6 +282,7 @@ pub struct NodeInfoRepositoriesUrl {
 
 #[doc = "The script execution configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoScript {
     #[doc = "The types of scripts allowed."]
     pub allowed_types: String,
@@ -272,12 +292,14 @@ pub struct NodeInfoScript {
 
 #[doc = "The search operation configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSearch {
     pub remote: crate::types::nodes_info::NodeInfoSearchRemote,
 }
 
 #[doc = "The search pipeline processor configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSearchPipelineProcessor {
     #[doc = "The type of search pipeline processor."]
     pub r#type: String,
@@ -285,6 +307,7 @@ pub struct NodeInfoSearchPipelineProcessor {
 
 #[doc = "The search pipeline configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSearchPipelines {
     #[doc = "The list of phase results processors in the pipeline."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -300,6 +323,7 @@ pub struct NodeInfoSearchPipelines {
 
 #[doc = "The remote search connection configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSearchRemote {
     #[doc = "The remote connection settings."]
     pub connect: String,
@@ -307,6 +331,7 @@ pub struct NodeInfoSearchRemote {
 
 #[doc = "The configuration settings for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettings {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub action: Option<crate::types::nodes_info::NodeInfoAction>,
@@ -338,6 +363,7 @@ pub struct NodeInfoSettings {
 
 #[doc = "Provides cluster-level settings information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsCluster {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deprecation_indexing: Option<crate::types::nodes_info::NodeInfoSettingsDeprecationIndexing>,
@@ -354,18 +380,21 @@ pub struct NodeInfoSettingsCluster {
 
 #[doc = "The cluster election strategy configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsClusterElection {
     pub strategy: crate::types::common::Name,
 }
 
 #[doc = "Controls deprecation notice indexing behavior."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsDeprecationIndexing {
     pub enabled: crate::types::common::StringifiedBoolean,
 }
 
 #[doc = "The HTTP server configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsHttp {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compression: Option<crate::types::common::StringifiedBoolean>,
@@ -414,6 +443,7 @@ impl<'de> serde::Deserialize<'de> for NodeInfoSettingsHttpType {
 
 #[doc = "The HTTP server type configuration details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsHttpTypeConfig {
     #[doc = "The default HTTP server implementation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -422,6 +452,7 @@ pub struct NodeInfoSettingsHttpTypeConfig {
 
 #[doc = "The index-level settings configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsIndex {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub store: Option<crate::types::nodes_info::NodeInfoSettingsIndexStore>,
@@ -429,6 +460,7 @@ pub struct NodeInfoSettingsIndex {
 
 #[doc = "The hybrid store configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsIndexHybrid {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mmap: Option<crate::types::nodes_info::NodeInfoSettingsIndexStoreMmap>,
@@ -436,6 +468,7 @@ pub struct NodeInfoSettingsIndexHybrid {
 
 #[doc = "The index store configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsIndexStore {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::nodes_info::NodeInfoSettingsIndexHybrid>,
@@ -443,6 +476,7 @@ pub struct NodeInfoSettingsIndexStore {
 
 #[doc = "The memory-mapped store configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsIndexStoreMmap {
     #[doc = "The file extensions configured for memory mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -451,6 +485,7 @@ pub struct NodeInfoSettingsIndexStoreMmap {
 
 #[doc = "The ingest processor configurations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsIngest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub append: Option<crate::types::nodes_info::NodeInfoIngestInfo>,
@@ -524,12 +559,14 @@ pub struct NodeInfoSettingsIngest {
 
 #[doc = "The network configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsNetwork {
     pub host: crate::types::common::Host,
 }
 
 #[doc = "The node-specific configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsNode {
     #[doc = "The custom attributes assigned to the node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -546,6 +583,7 @@ pub type NodeInfoSettingsPlugins =
 
 #[doc = "The transport layer configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsTransport {
     pub r#type: crate::types::nodes_info::NodeInfoSettingsTransportType,
     #[doc = "The default transport type."]
@@ -590,6 +628,7 @@ impl<'de> serde::Deserialize<'de> for NodeInfoSettingsTransportType {
 
 #[doc = "The detailed transport type configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoSettingsTransportTypeConfig {
     #[doc = "The default transport implementation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -672,6 +711,7 @@ impl<'de> serde::Deserialize<'de> for NodeInfoTotalIndexingBufferInBytes {
 
 #[doc = "The transport layer information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeInfoTransport {
     #[doc = "The addresses the node is bound to for transport traffic."]
     pub bound_address: Vec<String>,
@@ -683,6 +723,7 @@ pub struct NodeInfoTransport {
 
 #[doc = "Provides JVM-specific information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeJvmInfo {
     #[doc = "Whether the JDK is bundled with OpenSearch."]
     pub bundled_jdk: bool,
@@ -719,6 +760,7 @@ pub struct NodeJvmInfo {
 
 #[doc = "Provides operating system information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeOperatingSystemInfo {
     #[doc = "The number of processors actually used to calculate thread pool size. This number can be set with the `node.processors` setting of a node and defaults to the number of processors reported by the OS."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -747,6 +789,7 @@ pub struct NodeOperatingSystemInfo {
 
 #[doc = "Provides process-related information for the node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeProcessInfo {
     #[doc = "The process identifier (PID)"]
     pub id: i64,
@@ -759,6 +802,7 @@ pub struct NodeProcessInfo {
 
 #[doc = "The thread pool configuration details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeThreadPoolInfo {
     #[doc = "The core number of threads."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

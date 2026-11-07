@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AppendProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -54,6 +55,7 @@ pub struct AppendProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AttachmentProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -90,6 +92,7 @@ pub struct AttachmentProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BytesProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -115,6 +118,7 @@ pub struct BytesProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CircleProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -143,6 +147,7 @@ pub struct CircleProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ConvertProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -169,6 +174,7 @@ pub struct ConvertProcessor {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ConvertType {
     #[doc = "`auto`"]
     Auto,
@@ -230,6 +236,7 @@ impl<'de> serde::Deserialize<'de> for ConvertType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CsvProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -266,6 +273,7 @@ pub struct CsvProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateIndexNameProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -302,6 +310,7 @@ pub struct DateIndexNameProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -332,6 +341,7 @@ pub struct DateProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DissectProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -360,6 +370,7 @@ pub struct DissectProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DotExpanderProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -383,6 +394,7 @@ pub struct DotExpanderProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DropProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -402,6 +414,7 @@ pub struct DropProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FailProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -423,6 +436,7 @@ pub struct FailProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ForeachProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -447,6 +461,7 @@ pub struct ForeachProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoIpProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -481,6 +496,7 @@ pub struct GeoIpProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GrokProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -512,6 +528,7 @@ pub struct GrokProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GsubProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -541,6 +558,7 @@ pub struct GsubProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JoinProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -565,6 +583,7 @@ pub struct JoinProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct JsonProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -596,6 +615,7 @@ pub struct JsonProcessor {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum JsonProcessorConflictStrategy {
     #[doc = "`merge`"]
     Merge,
@@ -637,6 +657,7 @@ impl<'de> serde::Deserialize<'de> for JsonProcessorConflictStrategy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KeyValueProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -684,6 +705,7 @@ pub struct KeyValueProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LowercaseProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -709,6 +731,7 @@ pub struct LowercaseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Pipeline {
     #[serde(rename = "_meta")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -727,6 +750,7 @@ pub struct Pipeline {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PipelineProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -750,6 +774,7 @@ pub struct PipelineProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessorContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub append: Option<crate::types::ingest_common::AppendProcessor>,
@@ -820,6 +845,7 @@ pub struct ProcessorContainer {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoveProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -843,6 +869,7 @@ pub struct RemoveProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RenameProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -867,6 +894,7 @@ pub struct RenameProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SetProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -901,6 +929,7 @@ pub struct SetProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SetSecurityUserProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -924,6 +953,7 @@ pub struct SetSecurityUserProcessor {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShapeType {
     #[doc = "`geo_shape`"]
     GeoShape,
@@ -965,6 +995,7 @@ impl<'de> serde::Deserialize<'de> for ShapeType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SortProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -989,6 +1020,7 @@ pub struct SortProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SplitProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1019,6 +1051,7 @@ pub struct SplitProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TextEmbeddingProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1043,6 +1076,7 @@ pub struct TextEmbeddingProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TrimProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1068,6 +1102,7 @@ pub struct TrimProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UppercaseProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1093,6 +1128,7 @@ pub struct UppercaseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UrlDecodeProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1118,6 +1154,7 @@ pub struct UrlDecodeProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UserAgentProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1148,6 +1185,7 @@ pub struct UserAgentProcessor {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum UserAgentProperty {
     #[doc = "`BUILD`"]
     Build,

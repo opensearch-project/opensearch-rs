@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AccountDetails {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub backend_roles: Option<Vec<String>>,
@@ -51,6 +52,7 @@ pub struct AccountDetails {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionGroup {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_actions: Option<Vec<String>>,
@@ -70,6 +72,7 @@ pub type ActionGroupsMap =
     std::collections::BTreeMap<String, crate::types::security_common::ActionGroup>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllowListConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
@@ -79,6 +82,7 @@ pub struct AllowListConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AuditConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub audit: Option<crate::types::security_common::AuditLogsConfig>,
@@ -89,6 +93,7 @@ pub struct AuditConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AuditConfigWithReadOnly {
     #[serde(rename = "_readonly")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -98,6 +103,7 @@ pub struct AuditConfigWithReadOnly {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AuditLogsConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub disabled_rest_categories: Option<Vec<String>>,
@@ -126,6 +132,7 @@ pub struct AuditLogsConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AuthInfo {
     #[doc = "The backend roles associated with the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -208,6 +215,7 @@ impl<'de> serde::Deserialize<'de> for AuthInfoPeerCertificates {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CertificateTypes {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub http: Option<
@@ -220,6 +228,7 @@ pub struct CertificateTypes {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CertificatesDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub issuer_dn: Option<String>,
@@ -234,6 +243,7 @@ pub struct CertificatesDetail {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CertificatesPerNode {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub certificates:
@@ -244,6 +254,7 @@ pub struct CertificatesPerNode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ComplianceConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
@@ -268,6 +279,7 @@ pub struct ComplianceConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DashboardsInfo {
     #[doc = "The default tenant setting for the dashboard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -305,6 +317,7 @@ pub struct DashboardsInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DistinguishedNames {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nodes_dn: Option<Vec<String>>,
@@ -314,12 +327,14 @@ pub type DistinguishedNamesMap =
     std::collections::BTreeMap<String, crate::types::security_common::DistinguishedNames>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DynamicConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dynamic: Option<crate::types::security_common::DynamicOptions>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DynamicOptions {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auth_failure_listeners:
@@ -357,6 +372,7 @@ pub struct DynamicOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GenerateOBOToken {
     #[doc = "The generated OBO token."]
     #[serde(rename = "authenticationToken")]
@@ -372,6 +388,7 @@ pub struct GenerateOBOToken {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetCertificates {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub http_certificates_list: Option<Vec<crate::types::security_common::CertificatesDetail>>,
@@ -380,6 +397,7 @@ pub struct GetCertificates {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetCertificatesNew {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -396,6 +414,7 @@ pub struct GetCertificatesNew {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HealthInfo {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
@@ -408,6 +427,7 @@ pub struct HealthInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexPermission {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_actions: Option<Vec<String>>,
@@ -422,6 +442,7 @@ pub struct IndexPermission {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiTenancyConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_tenant: Option<String>,
@@ -434,6 +455,7 @@ pub struct MultiTenancyConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Ok {
     #[doc = "The message returned as part of an `OK` response."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -476,6 +498,7 @@ impl<'de> serde::Deserialize<'de> for OkStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PermissionsInfo {
     #[doc = "An object with disabled APIs as keys and an array of HTTP methods as values."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -489,6 +512,7 @@ pub struct PermissionsInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Role {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_permissions: Option<Vec<String>>,
@@ -507,6 +531,7 @@ pub struct Role {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RoleMapping {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub and_backend_roles: Option<Vec<String>>,
@@ -530,6 +555,7 @@ pub type RoleMappings =
 pub type RolesMap = std::collections::BTreeMap<String, crate::types::security_common::Role>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SSLInfo {
     #[doc = "A list of domain names from local certificates."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -648,12 +674,14 @@ impl<'de> serde::Deserialize<'de> for SSLInfoSslOpensslVersion {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SecurityConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config: Option<crate::types::security_common::DynamicConfig>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Tenant {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -668,6 +696,7 @@ pub struct Tenant {
 pub type TenantInfo = std::collections::BTreeMap<String, String>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TenantPermission {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_actions: Option<Vec<String>>,
@@ -678,6 +707,7 @@ pub struct TenantPermission {
 pub type TenantsMap = std::collections::BTreeMap<String, crate::types::security_common::Tenant>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpgradeCheck {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -691,6 +721,7 @@ pub struct UpgradeCheck {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpgradePerform {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -700,6 +731,7 @@ pub struct UpgradePerform {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attributes: Option<crate::types::security_common::UserAttributes>,
@@ -724,6 +756,7 @@ pub struct User {
 pub type UserAttributes = std::collections::BTreeMap<String, String>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UserTenants {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub admin: Option<bool>,
@@ -736,6 +769,7 @@ pub struct UserTenants {
 pub type UsersMap = std::collections::BTreeMap<String, crate::types::security_common::User>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WhoAmI {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dn: Option<String>,

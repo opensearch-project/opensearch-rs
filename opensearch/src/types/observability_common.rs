@@ -30,6 +30,7 @@
 
 #[doc = "The core observability object containing visualization and query data."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ObservabilityObject {
     #[doc = "When the object was created in milliseconds."]
     #[serde(rename = "createdTimeMs")]
@@ -58,6 +59,7 @@ pub struct ObservabilityObject {
 
 #[doc = "A list of observability objects with pagination details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ObservabilityObjectList {
     #[doc = "The list of observability objects."]
     #[serde(rename = "observabilityObjectList")]
@@ -75,6 +77,7 @@ pub struct ObservabilityObjectList {
 
 #[doc = "The panel configuration for operational visualizations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OperationalPanel {
     #[doc = "The identifier of the associated application."]
     #[serde(rename = "applicationId")]
@@ -91,6 +94,7 @@ pub struct OperationalPanel {
 
 #[doc = "The filter configuration for queries."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryFilter {
     #[doc = "The query language used."]
     pub language: String,
@@ -100,6 +104,7 @@ pub struct QueryFilter {
 
 #[doc = "The configuration for a saved query."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SavedQuery {
     #[doc = "The description of the saved query."]
     pub description: String,
@@ -114,6 +119,7 @@ pub struct SavedQuery {
 
 #[doc = "The configuration for a saved visualization."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SavedVisualization {
     #[doc = "The description of the saved visualization."]
     pub description: String,
@@ -130,6 +136,7 @@ pub struct SavedVisualization {
 
 #[doc = "The date range selection configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SelectedDateRange {
     #[doc = "The end date of the range."]
     pub end: String,
@@ -141,6 +148,7 @@ pub struct SelectedDateRange {
 
 #[doc = "The field selection configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SelectedFields {
     #[doc = "The text representation of selected fields."]
     pub text: String,
@@ -150,6 +158,7 @@ pub struct SelectedFields {
 
 #[doc = "The timestamp field selection configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SelectedTimestamp {
     #[doc = "The name of the selected timestamp field."]
     pub name: String,
@@ -159,6 +168,7 @@ pub struct SelectedTimestamp {
 
 #[doc = "The time range configuration for queries and visualizations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TimeRange {
     #[doc = "The start time of the range."]
     pub from: String,
@@ -168,6 +178,7 @@ pub struct TimeRange {
 
 #[doc = "The configuration for a field token."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Token {
     #[doc = "The name of the token."]
     pub name: String,
@@ -177,6 +188,7 @@ pub struct Token {
 
 #[doc = "The configuration for a single visualization."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Visualization {
     #[doc = "The height of the visualization."]
     pub h: i64,

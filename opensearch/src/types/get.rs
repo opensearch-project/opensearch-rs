@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetResponse {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
@@ -70,6 +71,7 @@ impl GetResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetResult {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

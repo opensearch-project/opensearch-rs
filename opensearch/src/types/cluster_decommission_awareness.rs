@@ -30,6 +30,7 @@
 
 #[doc = "An enumeration of the states during decommissioning."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DecommissionStatus {
     #[doc = "`INIT`"]
     Init,

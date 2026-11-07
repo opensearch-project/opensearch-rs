@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataSource {
     pub database: crate::types::geospatial_common::Database,
     #[doc = "URL endpoint for the data source."]
@@ -43,6 +44,7 @@ pub struct DataSource {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DataSourceState {
     #[doc = "`AVAILABLE`"]
     Available,
@@ -92,6 +94,7 @@ impl<'de> serde::Deserialize<'de> for DataSourceState {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Database {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fields: Option<Vec<String>>,
@@ -107,6 +110,7 @@ pub struct Database {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoSpatialGeojsonUploadResponse {
     #[doc = "Whether there were any errors."]
     pub errors: bool,
@@ -120,17 +124,20 @@ pub struct GeoSpatialGeojsonUploadResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoSpatialUploadStats {
     pub metrics: Vec<crate::types::geospatial_common::UploadStatsMetric>,
     pub total: crate::types::geospatial_common::UploadStatsTotal,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetDataSourceResponse {
     pub datasources: Vec<crate::types::geospatial_common::DataSource>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_processing_time_in_millis: Option<crate::types::common::EpochTimeUnitMillis>,
@@ -139,6 +146,7 @@ pub struct UpdateStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UploadStatsMetric {
     pub duration: crate::types::common::DurationValueUnitMillis,
     #[doc = "Number of failed features in this upload."]
@@ -154,6 +162,7 @@ pub struct UploadStatsMetric {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UploadStatsTotal {
     pub duration: crate::types::common::DurationValueUnitMillis,
     #[doc = "Total failed uploads."]

@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteQueryGroupResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub acknowledged: Option<bool>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetQueryGroupResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_groups: Option<Vec<crate::types::wlm_common::QueryGroupResponse>>,

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Credentials {
     #[doc = "The username for authentication."]
     pub password: String,
@@ -37,6 +38,7 @@ pub struct Credentials {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataSource {
     #[serde(rename = "allowedRoles")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -60,6 +62,7 @@ pub struct DataSource {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataSourceConfiguration {
     pub credentials: crate::types::query_common::Credentials,
     #[doc = "The connection endpoint for the data source."]
@@ -70,6 +73,7 @@ pub type DataSourceList = Vec<crate::types::query_common::DataSource>;
 
 #[doc = "Represents the fundamental reason for an error."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataSourceRetrieve {
     #[doc = "The roles allowed to access this data source."]
     #[serde(rename = "allowedRoles")]

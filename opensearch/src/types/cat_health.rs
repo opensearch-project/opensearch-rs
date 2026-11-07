@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HealthRecord {
     #[doc = "active number of shards in percent"]
     #[serde(default, skip_serializing_if = "Option::is_none")]

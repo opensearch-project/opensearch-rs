@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InfoResponse {
     pub cluster_name: crate::types::common::Name,
     pub cluster_uuid: crate::types::common::Uuid,

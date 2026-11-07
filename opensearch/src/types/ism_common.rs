@@ -30,6 +30,7 @@
 
 #[doc = "An action to perform."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Action {
     #[doc = "Adds or removes an index alias."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -91,6 +92,7 @@ pub struct Action {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionAlias {
     #[doc = "The alias actions to perform."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -98,6 +100,7 @@ pub struct ActionAlias {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionAllocation {
     #[doc = "The excluded allocation attributes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -123,6 +126,7 @@ pub type ActionCustom = std::collections::BTreeMap<String, Box<serde_json::value
 pub type ActionDelete = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionForceMerge {
     #[doc = "The maximum number of segments to merge to."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -130,6 +134,7 @@ pub struct ActionForceMerge {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionIndexPriority {
     #[doc = "The priority to set for the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -149,6 +154,7 @@ pub type ActionReadOnly = std::collections::BTreeMap<String, serde_json::Value>;
 pub type ActionReadWrite = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionReplicaCount {
     #[doc = "The number of replicas to set."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -156,6 +162,7 @@ pub struct ActionReplicaCount {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionRetry {
     #[doc = "The backoff strategy for retries."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -169,6 +176,7 @@ pub struct ActionRetry {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionRollover {
     #[doc = "Whether to copy the alias to the new index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -194,6 +202,7 @@ pub type ActionRollup = std::collections::BTreeMap<String, Box<serde_json::value
 pub type ActionShrink = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionSnapshot {
     #[doc = "Whether to include the global state in the snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -207,6 +216,7 @@ pub struct ActionSnapshot {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionTimeout {
     #[doc = "The timeout configuration for the action."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -221,6 +231,7 @@ pub type AddPolicyResponse = crate::types::ism_common::ChangePolicyResponse;
 pub type ChangePolicyResponse = crate::types::ism_common::ChangeResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ChangeResponse {
     #[doc = "The list of indices that failed to update."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -234,6 +245,7 @@ pub struct ChangeResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Channel {
     #[doc = "The ID of the notification channel."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -243,6 +255,7 @@ pub struct Channel {
 pub type DeletePolicyResponse = crate::types::common::WriteResponseBase;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ErrorNotification {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel: Option<crate::types::ism_common::Channel>,
@@ -255,6 +268,7 @@ pub struct ErrorNotification {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ErrorNotificationChime {
     #[doc = "The URL for the Chime webhook."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -262,6 +276,7 @@ pub struct ErrorNotificationChime {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ErrorNotificationDestination {
     #[doc = "When the notification destination was last updated."]
     pub last_update_time: Option<i64>,
@@ -386,6 +401,7 @@ impl ErrorNotificationDestinationAdditional {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ErrorNotificationSlack {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub custom_webhook: Option<crate::types::ism_common::SlackCustomWebhook>,
@@ -395,6 +411,7 @@ pub struct ErrorNotificationSlack {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ExplainIndexResponse {
     #[doc = "The total number of managed indices."]
     pub total_managed_indices: Option<f64>,
@@ -468,6 +485,7 @@ impl serde::Serialize for ExplainIndexResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainPolicy {
     #[doc = "Whether the policy is enabled for the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -483,6 +501,7 @@ pub struct ExplainPolicy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FailedIndex {
     #[doc = "The name of the failed index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -496,6 +515,7 @@ pub struct FailedIndex {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetPoliciesResponse {
     #[doc = "The list of policies."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -508,6 +528,7 @@ pub struct GetPoliciesResponse {
 pub type GetPolicyResponse = crate::types::ism_common::PolicyWithMetadata;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IsmTemplate {
     #[doc = "The index patterns for the ISM template."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -522,6 +543,7 @@ pub struct IsmTemplate {
 
 #[doc = "The policy defines how an index is managed throughout its lifetime."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Policy {
     #[doc = "The default state an index is in."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -550,6 +572,7 @@ pub struct Policy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PolicyEnvelope {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub policy: Option<crate::types::ism_common::Policy>,
@@ -593,6 +616,7 @@ impl<'de> serde::Deserialize<'de> for PolicyIsmTemplate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PolicyWithMetadata {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -612,6 +636,7 @@ pub struct PolicyWithMetadata {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutPolicyResponse {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -631,6 +656,7 @@ pub struct PutPolicyResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RefreshSearchAnalyzersResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -642,6 +668,7 @@ pub struct RefreshSearchAnalyzersResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RefreshSearchAnalyzersResponseDetails {
     #[doc = "The name of the index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -656,6 +683,7 @@ pub type RemovePolicyResponse = crate::types::ism_common::ChangePolicyResponse;
 pub type RetryIndexResponse = crate::types::ism_common::ChangeResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SlackCustomWebhook {
     #[doc = "The header parameters for the custom Slack webhook."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -688,6 +716,7 @@ pub struct SlackCustomWebhook {
 
 #[doc = "The list of actions to perform and transitions to enter a new state."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct States {
     #[doc = "The list of actions to perform."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -702,6 +731,7 @@ pub struct States {
 
 #[doc = "A transition into a new state."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Transition {
     #[doc = "The conditions for the transition."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

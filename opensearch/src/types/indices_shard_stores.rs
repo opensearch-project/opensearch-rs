@@ -30,6 +30,7 @@
 
 #[doc = "The shard store information for indices."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesShardStores {
     #[doc = "The store information for each shard."]
     pub shards:
@@ -38,6 +39,7 @@ pub struct IndicesShardStores {
 
 #[doc = "The store information for a shard."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ShardStore {
     pub allocation: crate::types::indices_shard_stores::ShardStoreAllocation,
     pub allocation_id: Option<crate::types::common::Id>,
@@ -139,6 +141,7 @@ impl serde::Serialize for ShardStore {
 
 #[doc = "The allocation type of the shard store."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShardStoreAllocation {
     #[doc = "`primary`"]
     Primary,
@@ -185,6 +188,7 @@ impl<'de> serde::Deserialize<'de> for ShardStoreAllocation {
 
 #[doc = "The exception information for a shard store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardStoreException {
     #[doc = "The reason for the store exception."]
     pub reason: String,
@@ -194,6 +198,7 @@ pub struct ShardStoreException {
 
 #[doc = "The wrapper containing store information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardStoreWrapper {
     #[doc = "The list of stores for the shard."]
     pub stores: Vec<crate::types::indices_shard_stores::ShardStore>,

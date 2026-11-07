@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PostQuerySetsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_set_id: Option<String>,
@@ -37,6 +38,7 @@ pub struct PostQuerySetsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PostScheduledExperimentsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub job_id: Option<String>,
@@ -45,6 +47,7 @@ pub struct PostScheduledExperimentsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutExperimentResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub experiment_id: Option<String>,
@@ -53,12 +56,14 @@ pub struct PutExperimentResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutJudgmentsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub judgment_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutQuerySetsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_set_id: Option<String>,
@@ -67,6 +72,7 @@ pub struct PutQuerySetsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutSearchConfigurationResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_configuration_id: Option<String>,

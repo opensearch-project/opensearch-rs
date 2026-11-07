@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AcknowledgedResponseBase {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ActionStatusOptions {
     #[doc = "`failure`"]
     Failure,
@@ -84,6 +86,7 @@ impl<'de> serde::Deserialize<'de> for ActionStatusOptions {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum BuiltinScriptLanguage {
     #[doc = "`expression`"]
     Expression,
@@ -168,6 +171,7 @@ impl BulkByScrollFailure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BulkByScrollResponseBase {
     #[doc = "The number of scroll responses pulled back by the reindex operation."]
     pub batches: i32,
@@ -212,6 +216,7 @@ pub struct BulkByScrollResponseBase {
 
 #[doc = "The status of a bulk by scroll task."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BulkByScrollTaskStatus {
     #[doc = "The number of scroll responses pulled back by the reindex operation."]
     pub batches: i32,
@@ -282,6 +287,7 @@ impl BulkByScrollTaskStatusOrException {
 
 #[doc = "The details of a bulk item operation failure."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BulkItemResponseFailure {
     pub cause: crate::types::common::ErrorCause,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -297,6 +303,7 @@ pub type Byte = f64;
 pub type ByteCount = i64;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterStatistics {
     pub skipped: i32,
     pub successful: i32,
@@ -304,6 +311,7 @@ pub struct ClusterStatistics {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompletionStats {
     #[doc = "The per-field completion statistics."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -317,6 +325,7 @@ pub struct CompletionStats {
 
 #[doc = "The geographical bounds specified using coordinate values."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CoordsGeoBounds {
     #[doc = "The bottom boundary latitude."]
     pub bottom: f64,
@@ -329,6 +338,7 @@ pub struct CoordsGeoBounds {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DFIIndependenceMeasure {
     #[doc = "`chisquared`"]
     Chisquared,
@@ -374,6 +384,7 @@ impl<'de> serde::Deserialize<'de> for DFIIndependenceMeasure {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DFRAfterEffect {
     #[doc = "`b`"]
     B,
@@ -419,6 +430,7 @@ impl<'de> serde::Deserialize<'de> for DFRAfterEffect {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DFRBasicModel {
     #[doc = "`be`"]
     Be,
@@ -525,6 +537,7 @@ impl<'de> serde::Deserialize<'de> for DateTime {
 pub type Distance = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum DistanceUnit {
     #[doc = "`cm`"]
     Cm,
@@ -595,6 +608,7 @@ impl<'de> serde::Deserialize<'de> for DistanceUnit {
 
 #[doc = "The document-level statistics."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DocStats {
     #[doc = "The total number of non-deleted documents across all primary shards assigned to the selected nodes. This number is based on documents in Lucene segments and may include documents from nested fields."]
     pub count: i64,
@@ -605,6 +619,7 @@ pub struct DocStats {
 
 #[doc = "The item level HTTP response status code during indexing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DocStatus {
     #[doc = "The number of informational responses."]
     #[serde(rename = "1xx")]
@@ -645,6 +660,7 @@ pub type EpochTimeUnitMillis = crate::types::common::UnitMillis;
 pub type EpochTimeUnitSeconds = crate::types::common::UnitSeconds;
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ErrorCause {
     pub caused_by: Option<Box<crate::types::common::ErrorCause>>,
     pub header:
@@ -810,6 +826,7 @@ impl serde::Serialize for ErrorCause {
 
 #[doc = "The base structure for error responses."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ErrorResponseBase {
     pub error: crate::types::common::ErrorCause,
     #[doc = "The HTTP status code."]
@@ -821,6 +838,7 @@ pub type Field = String;
 
 #[doc = "The memory usage statistics for a field."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldMemoryUsage {
     #[doc = "The human-readable amount of memory used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -831,6 +849,7 @@ pub struct FieldMemoryUsage {
 
 #[doc = "The memory usage statistics for a field."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldSizeUsage {
     #[doc = "The human-readable size of memory used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -841,6 +860,7 @@ pub struct FieldSizeUsage {
 
 #[doc = "The detailed field sort options."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldSort {
     #[doc = "The value to use when the field is missing."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -863,6 +883,7 @@ pub struct FieldSort {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FieldSortNumericType {
     #[doc = "`date`"]
     Date,
@@ -956,6 +977,7 @@ pub type FieldWithOrder = std::collections::BTreeMap<String, crate::types::commo
 
 #[doc = "The statistics about field data memory usage."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FielddataStats {
     #[doc = "The number of times field data was evicted from memory."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1005,6 +1027,7 @@ impl<'de> serde::Deserialize<'de> for Fields {
 
 #[doc = "The statistics about flush operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlushStats {
     #[doc = "The number of periodic flush operations."]
     pub periodic: i64,
@@ -1100,6 +1123,7 @@ impl GeoBounds {
 
 #[doc = "The options for sorting by geo distance."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoDistanceSort {
     #[doc = "The algorithm to use for distance calculation."]
     pub distance_type: Option<crate::types::common::GeoDistanceType>,
@@ -1265,6 +1289,7 @@ impl serde::Serialize for GeoDistanceSort {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoDistanceType {
     #[doc = "`arc`"]
     Arc,
@@ -1310,6 +1335,7 @@ pub type GeoHash = String;
 
 #[doc = "The geographical location specified using a geohash."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoHashLocation {
     pub geohash: crate::types::common::GeoHash,
 }
@@ -1391,6 +1417,7 @@ impl GeoLocation {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoShapeRelation {
     #[doc = "`contains`"]
     Contains,
@@ -1444,6 +1471,7 @@ pub type GeoTile = String;
 
 #[doc = "The statistics about get operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetStats {
     #[doc = "The number of current get operations."]
     pub current: i64,
@@ -1468,6 +1496,7 @@ pub struct GetStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HealthStatus {
     #[doc = "`green` (also accepted: `GREEN`)"]
     Green,
@@ -1523,6 +1552,7 @@ pub type HttpHeaders =
 pub type HumanReadableByteCount = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IBDistribution {
     #[doc = "`ll`"]
     Ll,
@@ -1564,6 +1594,7 @@ impl<'de> serde::Deserialize<'de> for IBDistribution {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IBLambda {
     #[doc = "`df`"]
     Df,
@@ -1647,6 +1678,7 @@ pub type IndexName = String;
 
 #[doc = "The statistics about indexing operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingStats {
     #[doc = "The number of current delete operations."]
     pub delete_current: i64,
@@ -1716,6 +1748,7 @@ impl<'de> serde::Deserialize<'de> for Indices {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesResponseBase {
     #[doc = "For a successful response, this value is always true. On failure, an exception is returned instead."]
     pub acknowledged: bool,
@@ -1726,6 +1759,7 @@ pub struct IndicesResponseBase {
 
 #[doc = "The result of an inline get operation."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct InlineGet {
     #[doc = "The primary term of the document."]
     pub primary_term: Option<i64>,
@@ -1889,6 +1923,7 @@ impl InlineGet {
 
 #[doc = "The inline get operation results for user-defined dictionaries."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct InlineGetDictUserDefined {
     #[doc = "The primary term of the document."]
     pub primary_term: Option<i64>,
@@ -2092,6 +2127,7 @@ impl<'de> serde::Deserialize<'de> for InlineScript {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InlineScriptObject {
     #[doc = "Specifies any named parameters that are passed into the script as variables. Use parameters instead of hard-coded values to decrease compilation time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2109,6 +2145,7 @@ pub type Ip = String;
 
 #[doc = "The geographical location specified using latitude and longitude."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LatLonGeoLocation {
     #[doc = "The latitude coordinate."]
     pub lat: f64,
@@ -2118,6 +2155,7 @@ pub struct LatLonGeoLocation {
 
 #[doc = "The statistics about merge operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MergesStats {
     #[doc = "The number of current merge operations."]
     pub current: i64,
@@ -2241,6 +2279,7 @@ impl<'de> serde::Deserialize<'de> for Names {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedSortValue {
     #[doc = "The filter to apply to nested objects."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2256,6 +2295,7 @@ pub struct NestedSortValue {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeAttributes {
     #[doc = "A list of node attributes."]
     pub attributes: std::collections::BTreeMap<String, String>,
@@ -2312,6 +2352,7 @@ impl<'de> serde::Deserialize<'de> for NodeIds {
 pub type NodeName = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum NodeRole {
     #[doc = "`client`"]
     Client,
@@ -2409,6 +2450,7 @@ pub type NodeRoles = Vec<crate::types::common::NodeRole>;
 
 #[doc = "The information about a shard on a node."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeShard {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allocation_id: Option<std::collections::BTreeMap<String, crate::types::common::Id>>,
@@ -2433,6 +2475,7 @@ pub struct NodeShard {
 
 #[doc = "The statistics about node operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeStatistics {
     #[doc = "The number of nodes that rejected the request or failed to respond. If this value is not 0, then a reason for the rejection or failure is included in the response."]
     pub failed: i64,
@@ -2446,6 +2489,7 @@ pub struct NodeStatistics {
 
 #[doc = "The version information for OpenSearch."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OpenSearchVersionInfo {
     #[doc = "When the version was built."]
     pub build_date: crate::types::common::DateTime,
@@ -2478,6 +2522,7 @@ pub type PercentageString = String;
 
 #[doc = "The time taken by different phases of the search."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhaseTook {
     #[doc = "The time taken for the `can_match` phase."]
     pub can_match: i64,
@@ -2496,6 +2541,7 @@ pub struct PhaseTook {
 pub type PipelineName = String;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PluginStats {
     pub classname: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2515,6 +2561,7 @@ pub struct PluginStats {
 
 #[doc = "The statistics about query cache usage."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryCacheStats {
     #[doc = "The total number of entries added to the query cache across all shards assigned to the selected nodes. This number includes all current and evicted entries."]
     pub cache_count: i64,
@@ -2537,6 +2584,7 @@ pub struct QueryCacheStats {
 
 #[doc = "The statistics about recovery operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RecoveryStats {
     #[doc = "The number of ongoing recoveries for which this node is the source."]
     pub current_as_source: i64,
@@ -2551,6 +2599,7 @@ pub struct RecoveryStats {
 
 #[doc = "The statistics about refresh operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RefreshStats {
     #[doc = "The total number of external refresh operations."]
     pub external_total: i64,
@@ -2575,6 +2624,7 @@ pub type RelationName = String;
 
 #[doc = "Any statistics related to downloads to the remote segment store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreDownloadStats {
     #[doc = "The total amount of data downloaded from the remote segment store."]
     pub total_download_size: crate::types::common::RemoteStoreUploadDownloadStats,
@@ -2587,6 +2637,7 @@ pub struct RemoteStoreDownloadStats {
 
 #[doc = "The statistics related to remote segment store operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreStats {
     pub download: crate::types::common::RemoteStoreDownloadStats,
     pub upload: crate::types::common::RemoteStoreUploadStats,
@@ -2594,12 +2645,14 @@ pub struct RemoteStoreStats {
 
 #[doc = "The statistics related to remote translog operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreTranslogStats {
     pub upload: crate::types::common::RemoteStoreTranslogUploadStats,
 }
 
 #[doc = "The statistics related to uploads to the remote translog store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreTranslogUploadStats {
     pub total_upload_size: crate::types::common::RemoteStoreTranslogUploadTotalUploadSizeStats,
     pub total_uploads: crate::types::common::RemoteStoreTranslogUploadTotalUploadsStats,
@@ -2607,6 +2660,7 @@ pub struct RemoteStoreTranslogUploadStats {
 
 #[doc = "The total amount of data uploaded to the remote translog store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreTranslogUploadTotalUploadSizeStats {
     #[doc = "The number of bytes that failed to upload to the remote translog store."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2627,6 +2681,7 @@ pub struct RemoteStoreTranslogUploadTotalUploadSizeStats {
 
 #[doc = "The number of syncs to the remote translog store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreTranslogUploadTotalUploadsStats {
     #[doc = "The number of failed upload syncs to the remote translog store."]
     pub failed: i64,
@@ -2638,6 +2693,7 @@ pub struct RemoteStoreTranslogUploadTotalUploadsStats {
 
 #[doc = "The amount of data, in bytes, uploaded or downloaded to/from the remote segment store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreUploadDownloadStats {
     #[doc = "The number of bytes that failed to upload to/from the remote segment store."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2658,6 +2714,7 @@ pub struct RemoteStoreUploadDownloadStats {
 
 #[doc = "Statistics related to segment store upload backpressure."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreUploadPressureStats {
     #[doc = "The total number of requests rejected due to segment store upload backpressure."]
     pub total_rejections: i64,
@@ -2665,6 +2722,7 @@ pub struct RemoteStoreUploadPressureStats {
 
 #[doc = "The amount of lag during upload between the remote segment store and the local store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreUploadRefreshSizeLagStats {
     #[doc = "The maximum amount of lag, in bytes, during the upload refresh between the remote segment store and the local store."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2680,6 +2738,7 @@ pub struct RemoteStoreUploadRefreshSizeLagStats {
 
 #[doc = "Any statistics related to uploads to the remote segment store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RemoteStoreUploadStats {
     #[doc = "The maximum duration that the remote refresh is behind the local refresh."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2699,6 +2758,7 @@ pub struct RemoteStoreUploadStats {
 
 #[doc = "The statistics about request cache operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestCacheStats {
     #[doc = "The number of request cache evictions."]
     pub evictions: i64,
@@ -2715,6 +2775,7 @@ pub struct RequestCacheStats {
 
 #[doc = "The statistics about request operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestStats {
     #[doc = "The number of current request operations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2732,6 +2793,7 @@ pub struct RequestStats {
 
 #[doc = "Any statistics about CPU and memory usage."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResourceStat {
     pub cpu_time_in_nanos: crate::types::common::DurationValueUnitNanos,
     pub memory_in_bytes: crate::types::common::ByteCount,
@@ -2739,6 +2801,7 @@ pub struct ResourceStat {
 
 #[doc = "The statistics about resource usage."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResourceStats {
     pub average: crate::types::common::ResourceStat,
     pub max: crate::types::common::ResourceStat,
@@ -2748,6 +2811,7 @@ pub struct ResourceStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Result {
     #[doc = "`created`"]
     Created,
@@ -2802,6 +2866,7 @@ impl<'de> serde::Deserialize<'de> for Result {
 
 #[doc = "The retry statistics for bulk and search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Retries {
     #[doc = "The number of bulk operation retries."]
     pub bulk: i64,
@@ -2813,6 +2878,7 @@ pub struct Retries {
 pub type Routing = String;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreSort {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub order: Option<crate::types::common::SortOrder>,
@@ -2851,6 +2917,7 @@ impl Script {
 
 #[doc = "The configuration for a script field."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptField {
     #[doc = "Whether to ignore failures during script execution."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2890,6 +2957,7 @@ impl ScriptLanguage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptSort {
     #[doc = "The mode for sorting on array or multi-valued fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2907,6 +2975,7 @@ pub struct ScriptSort {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ScriptSortType {
     #[doc = "`number`"]
     Number,
@@ -2955,6 +3024,7 @@ pub type ScrollId = String;
 
 #[doc = "The details of a search failure during scrolling."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScrollableHitSourceSearchFailure {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::common::IndexName>,
@@ -2968,6 +3038,7 @@ pub struct ScrollableHitSourceSearchFailure {
 
 #[doc = "The statistics about search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchStats {
     #[doc = "The average slice count of all search requests. This is computed as the total slice count divided by the total number of concurrent search requests."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3081,6 +3152,7 @@ impl SegmentReplicationStats {
 
 #[doc = "The segment replication statistics for versions 2.10.0 to 2.12.0."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SegmentReplicationStatsObject {
     #[doc = "The maximum number of bytes the replica is behind the primary."]
     pub max_bytes_behind: crate::types::common::HumanReadableByteCount,
@@ -3092,6 +3164,7 @@ pub struct SegmentReplicationStatsObject {
 
 #[doc = "The segment replication statistics for version 2.12.0 and later."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SegmentReplicationStatsObjectObject {
     #[doc = "The maximum number of bytes the replica is behind the primary."]
     pub max_bytes_behind: crate::types::common::ByteCount,
@@ -3103,6 +3176,7 @@ pub struct SegmentReplicationStatsObjectObject {
 
 #[doc = "The statistics about segments."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SegmentsStats {
     #[doc = "The total number of segments across all shards assigned to the selected nodes."]
     pub count: i32,
@@ -3173,6 +3247,7 @@ pub struct SegmentsStats {
 pub type SequenceNumber = i64;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardFailure {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::common::IndexName>,
@@ -3186,6 +3261,7 @@ pub struct ShardFailure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardInfo {
     pub failed: crate::types::common::Uint,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3196,6 +3272,7 @@ pub struct ShardInfo {
 
 #[doc = "Represents a failure to search on a specific shard. Used in search responses."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSearchFailure {
     #[doc = "The index name where the failure occurred."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3209,6 +3286,7 @@ pub struct ShardSearchFailure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardStatistics {
     pub failed: crate::types::common::Uint,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3221,6 +3299,7 @@ pub struct ShardStatistics {
 
 #[doc = "The base response for operations involving shards."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardsOperationResponseBase {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,
@@ -3231,6 +3310,7 @@ pub type Short = f64;
 
 #[doc = "The configuration for a sliced scroll request."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SlicedScroll {
     #[doc = "The field to slice on."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3319,6 +3399,7 @@ impl SortCombinations {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SortMode {
     #[doc = "`avg`"]
     Avg,
@@ -3372,6 +3453,7 @@ impl<'de> serde::Deserialize<'de> for SortMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SortOptions {
     #[serde(rename = "_geo_distance")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3386,6 +3468,7 @@ pub struct SortOptions {
 
 #[doc = "The direction of the sort order."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SortOrder {
     #[doc = "`asc`"]
     Asc,
@@ -3429,6 +3512,7 @@ impl<'de> serde::Deserialize<'de> for SortOrder {
 pub type SortResults = Vec<crate::types::common::FieldValue>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoreStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reserved: Option<crate::types::common::HumanReadableByteCount>,
@@ -3442,6 +3526,7 @@ pub struct StoreStats {
 
 #[doc = "The definition of a stored script."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoredScript {
     pub lang: crate::types::common::ScriptLanguage,
     #[doc = "The options for the script."]
@@ -3452,6 +3537,7 @@ pub struct StoredScript {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StoredScriptId {
     #[doc = "Specifies any named parameters that are passed into the script as variables. Use parameters instead of hard-coded values to decrease compilation time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3740,6 +3826,7 @@ impl<'de> serde::Deserialize<'de> for StringifiedVersionNumber {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SuggestMode {
     #[doc = "`always`"]
     Always,
@@ -3788,6 +3875,7 @@ pub type TDocument = Box<serde_json::value::RawValue>;
 
 #[doc = "The details of a task failure."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TaskFailure {
     pub node_id: crate::types::common::NodeId,
     pub reason: crate::types::common::ErrorCause,
@@ -3801,6 +3889,7 @@ pub struct TaskFailure {
 pub type TaskId = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TermFrequencyNormalization {
     #[doc = "`h1`"]
     H1,
@@ -3855,6 +3944,7 @@ impl<'de> serde::Deserialize<'de> for TermFrequencyNormalization {
 
 #[doc = "The information about thread usage."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ThreadInfo {
     #[doc = "The number of currently active threads."]
     pub active_threads: f64,
@@ -3870,6 +3960,7 @@ pub type TimeZone = String;
 
 #[doc = "The geographical bounds specified using upper-left and lower-right points."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TopLeftBottomRightGeoBounds {
     #[doc = "The lower-right corner coordinates."]
     pub bottom_right: crate::types::common::GeoLocation,
@@ -3879,6 +3970,7 @@ pub struct TopLeftBottomRightGeoBounds {
 
 #[doc = "The geographical bounds specified using upper-right and lower-left points."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TopRightBottomLeftGeoBounds {
     #[doc = "The lower-left corner coordinates."]
     pub bottom_left: crate::types::common::GeoLocation,
@@ -3888,6 +3980,7 @@ pub struct TopRightBottomLeftGeoBounds {
 
 #[doc = "The statistics about translog operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TranslogStats {
     #[doc = "The age of the oldest translog entry."]
     pub earliest_last_modified_age: i64,
@@ -3940,6 +4033,7 @@ pub type VersionNumber = i64;
 pub type VersionString = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum VersionType {
     #[doc = "`external`"]
     External,
@@ -3989,6 +4083,7 @@ pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[doc = "The statistics about index warmer operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WarmerStats {
     #[doc = "The number of current warmer operations."]
     pub current: i64,
@@ -4003,6 +4098,7 @@ pub struct WarmerStats {
 
 #[doc = "The geographical bounds specified using Well-Known Text (WKT) format."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WktGeoBounds {
     #[doc = "The WKT string representation of the geographical bounds."]
     pub wkt: String,
@@ -4010,6 +4106,7 @@ pub struct WktGeoBounds {
 
 #[doc = "The base response for write operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WriteResponseBase {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
@@ -4034,6 +4131,7 @@ pub struct WriteResponseBase {
 
 #[doc = "The Cartesian coordinates specified using x and y values."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct XyCartesianCoordinates {
     #[doc = "The x coordinate."]
     pub x: f64,

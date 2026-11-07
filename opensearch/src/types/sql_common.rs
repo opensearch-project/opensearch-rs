@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Cursor {
     #[doc = "The time to keep cursors alive."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -36,6 +37,7 @@ pub struct Cursor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainBody {
     #[doc = "The child steps in the execution plan."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -49,12 +51,14 @@ pub struct ExplainBody {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub root: Option<crate::types::sql_common::ExplainBody>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Plugins {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ppl: Option<crate::types::sql_common::Ppl>,
@@ -65,6 +69,7 @@ pub struct Plugins {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PluginsQuery {
     #[doc = "The maximum memory allowed for queries."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -111,6 +116,7 @@ impl<'de> serde::Deserialize<'de> for PluginsQuerySizeLimit {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Ppl {
     #[doc = "Whether the PPL plugin is enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -152,6 +158,7 @@ impl<'de> serde::Deserialize<'de> for PplEnabled {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryResponse {
     #[doc = "The cursor identifier for pagination."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -174,6 +181,7 @@ pub struct QueryResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Sql {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cursor: Option<crate::types::sql_common::Cursor>,
@@ -186,6 +194,7 @@ pub struct Sql {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SqlCloseResponse {
     #[doc = "Whether the cursor was closed successfully."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -227,6 +236,7 @@ impl<'de> serde::Deserialize<'de> for SqlEnabled {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SqlSettingsResponse {
     #[doc = "Whether the settings were acknowledged."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -273,6 +283,7 @@ impl<'de> serde::Deserialize<'de> for SqlSlowlog {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Transient {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plugins: Option<crate::types::sql_common::Plugins>,

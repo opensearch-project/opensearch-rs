@@ -438,17 +438,17 @@ impl<'de> serde::Deserialize<'de> for FieldCollapseInnerHits {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldSuggester {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prefix: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub regex: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub text: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completion: Option<crate::types::search::CompletionSuggester>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phrase: Option<crate::types::search::PhraseSuggester>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub regex: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub term: Option<crate::types::search::TermSuggester>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

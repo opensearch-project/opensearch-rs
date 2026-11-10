@@ -50,6 +50,7 @@ pub struct ExplainResponseGet {
     pub primary_term: Option<i64>,
     pub routing: Option<crate::types::common::Routing>,
     pub seq_no: Option<crate::types::common::SequenceNumber>,
+    #[doc = "The source of the document."]
     pub source: Option<Box<serde_json::value::RawValue>>,
     #[doc = "The fields retrieved from the document."]
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,

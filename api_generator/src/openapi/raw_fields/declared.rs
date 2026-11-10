@@ -26,9 +26,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("_common.mapping:ConstantKeywordProperty/value", NoType, "constant_keyword value as set in the mapping: user-supplied"),
     // map<bare>
-    raw("_common.mapping:KnnVectorMethod/parameters", NoType, "engine/method-specific parameters: the set depends on the chosen method"),
+    raw("_common.mapping:KnnVectorMethod/parameters", OpenObject, "engine/method-specific parameters: the set depends on the chosen method"),
     // map<bare>
-    raw("_common.mapping:SemanticChunkingStrategy/parameters", NoType, "engine/method-specific parameters: the set depends on the chosen method"),
+    raw("_common.mapping:SemanticChunkingStrategy/parameters", OpenObject, "engine/method-specific parameters: the set depends on the chosen method"),
     // --- _common.query_dsl ---
     // list<bare>
     raw("_common.query_dsl:GeoShape/coordinates", UntypedItems, "GeoJSON coordinates: nesting depth depends on the geometry type (point, polygon, ...)"),
@@ -39,14 +39,14 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("_common.query_dsl:PercolateQuery/document", NoType, "query input document: user-defined shape"),
     // list<bare>
-    raw("_common.query_dsl:PercolateQuery/documents", NoType, "query input document: user-defined shape"),
+    raw("_common.query_dsl:PercolateQuery/documents", UntypedItems, "query input document: user-defined shape"),
     // map<bare>
     raw("_common.query_dsl:QueryContainer/template", OpenObject, "template query: placeholders resolved by search request processors, arbitrary query DSL"),
     // list<bare>
     raw("_common.query_dsl:XyShape/coordinates", UntypedItems, "GeoJSON coordinates: nesting depth depends on the geometry type (point, polygon, ...)"),
     // --- _common ---
     // bare
-    raw("_common:ErrorCause/[additional]", NoType, "error-specific extra properties: each exception type adds its own keys"),
+    raw("_common:ErrorCause/[additional]", OpenObject, "error-specific extra properties: each exception type adds its own keys"),
     // bare
     raw("_common:InlineGet/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
@@ -85,7 +85,7 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("_core.get:GetResult/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // --- _core.msearch ---
     // bare
-    raw("_core.msearch:MultiSearchItemHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.msearch:MultiSearchItemHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
     raw("_core.msearch:MultiSearchItemHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
@@ -107,15 +107,15 @@ pub const RAW_FIELDS: &[RawField] = &[
     // map<map<bare>>
     raw("_core.search:HighlightField/options", OpenObject, "highlighter-specific options: open set per highlighter implementation"),
     // bare
-    raw("_core.search:HitsMetadataHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.search:HitsMetadataHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
     raw("_core.search:HitsMetadataHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("_core.search:HitsMetadataHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
-    raw("_core.search:HitsMetadataJsonValueHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.search:HitsMetadataJsonValueHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
-    raw("_core.search:HitsMetadataJsonValueHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    raw("_core.search:HitsMetadataJsonValueHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("_core.search:HitsMetadataJsonValueHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // map<bare>
@@ -125,13 +125,13 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("_core.search:ProcessorExecutionDetail/output_data", NoType, "search pipeline processor input/output: request, response or document fragments depending on the processor"),
     // bare
-    raw("_core.search:SearchResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.search:SearchResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
     raw("_core.search:SearchResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("_core.search:SearchResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
-    raw("_core.search:SearchResultHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.search:SearchResultHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
     raw("_core.search:SearchResultHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
@@ -146,7 +146,7 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("_core.search:SuggestCompletionOptionsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // --- _core.search_template ---
     // bare
-    raw("_core.search_template:SearchTemplateResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("_core.search_template:SearchTemplateResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
     raw("_core.search_template:SearchTemplateResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
@@ -159,9 +159,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     // map<bare>
     raw("cluster:GetSettingsResponse/transient", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
     // map<bare>
-    raw("cluster:PutSettingsResponse/persistent", NoType, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
+    raw("cluster:PutSettingsResponse/persistent", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
     // map<bare>
-    raw("cluster:PutSettingsResponse/transient", NoType, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
+    raw("cluster:PutSettingsResponse/transient", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
     // bare
     raw("cluster:RerouteResponse/state", NoType, "cluster state: internal, version- and plugin-dependent structure (spec: may differ from the external representation)"),
     // bare
@@ -171,14 +171,14 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("flow_framework.common:FlowFrameworkGetResponse/workflows", OpenObject, "SPEC GAP: workflow name -> workflow definition, value schema missing"),
     // --- indices._common ---
     // bare
-    raw("indices._common:IndexSettings/[additional]", NoType, "custom index settings (plugin and user-defined `index.*` keys)"),
+    raw("indices._common:IndexSettings/[additional]", OpenObject, "custom index settings (plugin and user-defined `index.*` keys)"),
     // map<bare>
     raw("indices._common:IngestionSource/param", OpenObject, "ingestion-source-specific parameters (kafka, kinesis, ...)"),
     // map<bare>
     raw("indices._common:TemplateMapping/settings", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
     // --- ingest._common ---
     // list<bare>
-    raw("ingest._common:AppendProcessor/value", NoType, "user-supplied value of any JSON type (supports template snippets)"),
+    raw("ingest._common:AppendProcessor/value", UntypedItems, "user-supplied value of any JSON type (supports template snippets)"),
     // bare
     raw("ingest._common:CsvProcessor/empty_value", NoType, "user-supplied value of any JSON type"),
     // bare
@@ -229,9 +229,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("knn._common:NodeStats/indices_in_cache", OpenObject, "SPEC GAP: index name -> per-index cache stats, value schema missing"),
     // --- knn ---
     // bare
-    raw("knn:SearchModelsResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("knn:SearchModelsResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
-    raw("knn:SearchModelsResponseHitsHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    raw("knn:SearchModelsResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("knn:SearchModelsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
@@ -251,9 +251,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("ltr:GetModelResponse/[additional]", OpenObject, "SPEC GAP: LTR get responses are declared as untyped objects (they are document-get shaped)"),
     // bare
-    raw("ltr:SearchFeaturesResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("ltr:SearchFeaturesResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
-    raw("ltr:SearchFeaturesResponseHitsHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    raw("ltr:SearchFeaturesResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("ltr:SearchFeaturesResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
@@ -261,9 +261,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("ltr:SearchFeaturesResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // bare
-    raw("ltr:SearchFeaturesetsResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("ltr:SearchFeaturesetsResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
-    raw("ltr:SearchFeaturesetsResponseHitsHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    raw("ltr:SearchFeaturesetsResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("ltr:SearchFeaturesetsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
@@ -271,9 +271,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("ltr:SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // bare
-    raw("ltr:SearchModelsResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    raw("ltr:SearchModelsResponseHitsHitsItem/[additional]", OpenObject, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
-    raw("ltr:SearchModelsResponseHitsHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    raw("ltr:SearchModelsResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("ltr:SearchModelsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
@@ -306,7 +306,7 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("ml._common:Source/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
     // bare
-    raw("ml._common:ToolAttributes/[additional]", NoType, "ML tool attributes: tool-specific open set of keys"),
+    raw("ml._common:ToolAttributes/[additional]", OpenObject, "ML tool attributes: tool-specific open set of keys"),
     // bare
     raw("ml._common:ToolItems/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
     // bare
@@ -382,7 +382,7 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("sql._common:SqlSettingsResponse/persistent", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
     // --- tasks._common ---
     // bare
-    raw("tasks._common:RawTaskStatus/[additional]", NoType, "task status is defined by each task type (reindex, update_by_query, plugin tasks)"),
+    raw("tasks._common:RawTaskStatus/[additional]", OpenObject, "task status is defined by each task type (reindex, update_by_query, plugin tasks)"),
     // --- transforms._common ---
     // list<map<bare>>
     raw("transforms._common:Preview/documents", OpenObject, "transform preview: target index documents, shape defined by the transform"),

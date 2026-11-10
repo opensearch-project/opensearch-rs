@@ -465,6 +465,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortMissing {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::SegmentSortMissing> for IndexSegmentSortMissing {
+    fn from(value: crate::types::indices_common::SegmentSortMissing) -> Self {
+        IndexSegmentSortMissing::SegmentSortMissing(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortMissing>> for IndexSegmentSortMissing {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortMissing>) -> Self {
+        IndexSegmentSortMissing::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -498,6 +508,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortMode {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::SegmentSortMode> for IndexSegmentSortMode {
+    fn from(value: crate::types::indices_common::SegmentSortMode) -> Self {
+        IndexSegmentSortMode::SegmentSortMode(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortMode>> for IndexSegmentSortMode {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortMode>) -> Self {
+        IndexSegmentSortMode::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -529,6 +549,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortOrder {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::indices_common::SegmentSortOrder> for IndexSegmentSortOrder {
+    fn from(value: crate::types::indices_common::SegmentSortOrder) -> Self {
+        IndexSegmentSortOrder::SegmentSortOrder(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortOrder>> for IndexSegmentSortOrder {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortOrder>) -> Self {
+        IndexSegmentSortOrder::Array(value)
     }
 }
 
@@ -2020,6 +2050,18 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicy {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::IndexSettingsMergePolicyName> for IndexSettingsMergePolicy {
+    fn from(value: crate::types::indices_common::IndexSettingsMergePolicyName) -> Self {
+        IndexSettingsMergePolicy::Name(value)
+    }
+}
+impl From<crate::types::indices_common::IndexSettingsMergeTieredPolicy>
+    for IndexSettingsMergePolicy
+{
+    fn from(value: crate::types::indices_common::IndexSettingsMergeTieredPolicy) -> Self {
+        IndexSettingsMergePolicy::TieredPolicyConfig(value)
+    }
+}
 
 #[doc = "The type of merge policy."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2760,6 +2802,21 @@ impl<'de> serde::Deserialize<'de> for IndexingPressureMemoryLimit {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for IndexingPressureMemoryLimit {
+    fn from(value: String) -> Self {
+        IndexingPressureMemoryLimit::String(value)
+    }
+}
+impl From<&str> for IndexingPressureMemoryLimit {
+    fn from(value: &str) -> Self {
+        IndexingPressureMemoryLimit::String(value.to_string())
+    }
+}
+impl From<i64> for IndexingPressureMemoryLimit {
+    fn from(value: i64) -> Self {
+        IndexingPressureMemoryLimit::Integer(value)
     }
 }
 

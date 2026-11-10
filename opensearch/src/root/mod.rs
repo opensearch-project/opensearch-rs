@@ -1785,7 +1785,7 @@ pub struct DeleteByQuery<'a, 'b, B> {
     search_timeout: Option<&'b str>,
     search_type: Option<SearchType>,
     size: Option<i64>,
-    slices: Option<&'b str>,
+    slices: Option<crate::types::common::Slices>,
     sort: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stats: Option<&'b [&'b str]>,
@@ -2055,8 +2055,8 @@ where
         self
     }
     #[doc = "The number of slices this task should be divided into."]
-    pub fn slices(mut self, slices: &'b str) -> Self {
-        self.slices = Some(slices);
+    pub fn slices<T: Into<crate::types::common::Slices>>(mut self, slices: T) -> Self {
+        self.slices = Some(slices.into());
         self
     }
     #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs."]
@@ -2143,7 +2143,7 @@ where
                 search_timeout: Option<&'b str>,
                 search_type: Option<SearchType>,
                 size: Option<i64>,
-                slices: Option<&'b str>,
+                slices: Option<crate::types::common::Slices>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 sort: Option<&'b [&'b str]>,
                 source: Option<&'b str>,
@@ -6273,7 +6273,7 @@ pub struct Reindex<'a, 'b, B> {
     requests_per_second: Option<f32>,
     require_alias: Option<bool>,
     scroll: Option<&'b str>,
-    slices: Option<&'b str>,
+    slices: Option<crate::types::common::Slices>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
     wait_for_active_shards: Option<&'b str>,
@@ -6390,8 +6390,8 @@ where
         self
     }
     #[doc = "The number of slices this task should be divided into.\nDefaults to 1 slice, meaning the task isn't sliced into subtasks."]
-    pub fn slices(mut self, slices: &'b str) -> Self {
-        self.slices = Some(slices);
+    pub fn slices<T: Into<crate::types::common::Slices>>(mut self, slices: T) -> Self {
+        self.slices = Some(slices.into());
         self
     }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
@@ -6434,7 +6434,7 @@ where
                 requests_per_second: Option<f32>,
                 require_alias: Option<bool>,
                 scroll: Option<&'b str>,
-                slices: Option<&'b str>,
+                slices: Option<crate::types::common::Slices>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
                 wait_for_active_shards: Option<&'b str>,
@@ -8835,7 +8835,7 @@ pub struct UpdateByQuery<'a, 'b, B> {
     search_timeout: Option<&'b str>,
     search_type: Option<SearchType>,
     size: Option<i64>,
-    slices: Option<&'b str>,
+    slices: Option<crate::types::common::Slices>,
     sort: Option<&'b [&'b str]>,
     source: Option<&'b str>,
     stats: Option<&'b [&'b str]>,
@@ -9112,8 +9112,8 @@ where
         self
     }
     #[doc = "The number of slices this task should be divided into."]
-    pub fn slices(mut self, slices: &'b str) -> Self {
-        self.slices = Some(slices);
+    pub fn slices<T: Into<crate::types::common::Slices>>(mut self, slices: T) -> Self {
+        self.slices = Some(slices.into());
         self
     }
     #[doc = "A comma-separated list of &lt;field&gt;:&lt;direction&gt; pairs."]
@@ -9201,7 +9201,7 @@ where
                 search_timeout: Option<&'b str>,
                 search_type: Option<SearchType>,
                 size: Option<i64>,
-                slices: Option<&'b str>,
+                slices: Option<crate::types::common::Slices>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 sort: Option<&'b [&'b str]>,
                 source: Option<&'b str>,

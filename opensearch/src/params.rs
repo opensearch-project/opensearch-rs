@@ -578,3 +578,15 @@ mod tests {
         assert_eq!(Slices::Count(100), slices);
     }
 }
+
+/// The 2.x form of the `slices` parameter, which now takes the type generated
+/// from the specification ([`crate::types::common::Slices`]): converts into
+/// it, so that `.slices(Slices::Auto)` keeps working
+impl From<Slices> for crate::types::common::Slices {
+    fn from(slices: Slices) -> Self {
+        match slices {
+            Slices::Auto => crate::types::common::SlicesCalculation::Auto.into(),
+            Slices::Count(count) => count.into(),
+        }
+    }
+}

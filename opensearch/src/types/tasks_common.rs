@@ -197,6 +197,18 @@ impl<'de> serde::Deserialize<'de> for TaskInfos {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<crate::types::tasks_common::TaskInfo>> for TaskInfos {
+    fn from(value: Vec<crate::types::tasks_common::TaskInfo>) -> Self {
+        TaskInfos::GroupedByNone(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, crate::types::tasks_common::TaskGroup>> for TaskInfos {
+    fn from(
+        value: std::collections::BTreeMap<String, crate::types::tasks_common::TaskGroup>,
+    ) -> Self {
+        TaskInfos::GroupedByParents(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TaskListResponseBase {
@@ -240,5 +252,10 @@ impl<'de> serde::Deserialize<'de> for TaskResponse {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::BulkByScrollResponseBase> for TaskResponse {
+    fn from(value: crate::types::common::BulkByScrollResponseBase) -> Self {
+        TaskResponse::BulkByScrollResponseBase(value)
     }
 }

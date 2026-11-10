@@ -2210,7 +2210,7 @@ pub struct CatNodes<'a, 'b> {
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     format: Option<&'b str>,
-    full_id: Option<&'b str>,
+    full_id: Option<bool>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
@@ -2279,7 +2279,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self
     }
     #[doc = "When `true`, returns the full node ID. When `false`, returns the shortened node ID."]
-    pub fn full_id(mut self, full_id: &'b str) -> Self {
+    pub fn full_id(mut self, full_id: bool) -> Self {
         self.full_id = Some(full_id);
         self
     }
@@ -2361,7 +2361,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 format: Option<&'b str>,
-                full_id: Option<&'b str>,
+                full_id: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,

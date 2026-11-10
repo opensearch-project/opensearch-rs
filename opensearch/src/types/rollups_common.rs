@@ -156,6 +156,16 @@ impl<'de> serde::Deserialize<'de> for IntervalCron {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<crate::types::rollups_common::Cron>> for IntervalCron {
+    fn from(value: Vec<crate::types::rollups_common::Cron>) -> Self {
+        IntervalCron::Array(value)
+    }
+}
+impl From<crate::types::rollups_common::Cron> for IntervalCron {
+    fn from(value: crate::types::rollups_common::Cron) -> Self {
+        IntervalCron::Cron(value)
+    }
+}
 
 #[doc = "Defines metric aggregations for a field in a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

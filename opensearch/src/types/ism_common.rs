@@ -591,6 +591,16 @@ impl<'de> serde::Deserialize<'de> for PolicyIsmTemplate {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::ism_common::IsmTemplate> for PolicyIsmTemplate {
+    fn from(value: crate::types::ism_common::IsmTemplate) -> Self {
+        PolicyIsmTemplate::IsmTemplate(value)
+    }
+}
+impl From<Vec<crate::types::ism_common::IsmTemplate>> for PolicyIsmTemplate {
+    fn from(value: Vec<crate::types::ism_common::IsmTemplate>) -> Self {
+        PolicyIsmTemplate::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PolicyWithMetadata {

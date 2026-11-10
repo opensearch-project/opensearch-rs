@@ -68,6 +68,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentShardsValue {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<crate::types::indices_segments::ShardsSegment>> for IndexSegmentShardsValue {
+    fn from(value: Vec<crate::types::indices_segments::ShardsSegment>) -> Self {
+        IndexSegmentShardsValue::Array(value)
+    }
+}
+impl From<crate::types::indices_segments::ShardsSegment> for IndexSegmentShardsValue {
+    fn from(value: crate::types::indices_segments::ShardsSegment) -> Self {
+        IndexSegmentShardsValue::ShardsSegment(value)
+    }
+}
 
 #[doc = "The detailed information about a segment."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

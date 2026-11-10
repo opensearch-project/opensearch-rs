@@ -831,6 +831,16 @@ impl<'de> serde::Deserialize<'de> for DynamicMapping {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common_mapping::DynamicMappingString> for DynamicMapping {
+    fn from(value: crate::types::common_mapping::DynamicMappingString) -> Self {
+        DynamicMapping::String(value)
+    }
+}
+impl From<bool> for DynamicMapping {
+    fn from(value: bool) -> Self {
+        DynamicMapping::Boolean(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicMappingString {
@@ -2229,6 +2239,16 @@ impl<'de> serde::Deserialize<'de> for JoinPropertyRelationsValue {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::RelationName> for JoinPropertyRelationsValue {
+    fn from(value: crate::types::common::RelationName) -> Self {
+        JoinPropertyRelationsValue::RelationName(value)
+    }
+}
+impl From<Vec<crate::types::common::RelationName>> for JoinPropertyRelationsValue {
+    fn from(value: Vec<crate::types::common::RelationName>) -> Self {
+        JoinPropertyRelationsValue::Array(value)
     }
 }
 
@@ -3687,6 +3707,18 @@ impl<'de> serde::Deserialize<'de> for SemanticPropertyChunking {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<bool> for SemanticPropertyChunking {
+    fn from(value: bool) -> Self {
+        SemanticPropertyChunking::Boolean(value)
+    }
+}
+impl From<Vec<crate::types::common_mapping::SemanticChunkingStrategy>>
+    for SemanticPropertyChunking
+{
+    fn from(value: Vec<crate::types::common_mapping::SemanticChunkingStrategy>) -> Self {
+        SemanticPropertyChunking::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SemanticPropertyType {
@@ -3866,6 +3898,21 @@ impl<'de> serde::Deserialize<'de> for SuggestContextPrecision {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<f64> for SuggestContextPrecision {
+    fn from(value: f64) -> Self {
+        SuggestContextPrecision::Number(value)
+    }
+}
+impl From<String> for SuggestContextPrecision {
+    fn from(value: String) -> Self {
+        SuggestContextPrecision::String(value)
+    }
+}
+impl From<&str> for SuggestContextPrecision {
+    fn from(value: &str) -> Self {
+        SuggestContextPrecision::String(value.to_string())
     }
 }
 

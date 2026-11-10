@@ -493,6 +493,18 @@ impl<'de> serde::Deserialize<'de> for SearchTemplateResponseHitsHitsItemMatchedQ
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for SearchTemplateResponseHitsHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        SearchTemplateResponseHitsHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>>
+    for SearchTemplateResponseHitsHitsItemMatchedQueries
+{
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        SearchTemplateResponseHitsHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -529,6 +541,16 @@ impl<'de> serde::Deserialize<'de> for SearchTemplateResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for SearchTemplateResponseHitsTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        SearchTemplateResponseHitsTotal::TotalHits(value)
+    }
+}
+impl From<i64> for SearchTemplateResponseHitsTotal {
+    fn from(value: i64) -> Self {
+        SearchTemplateResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchTemplateResponseHitsTotal {

@@ -3288,6 +3288,21 @@ impl<'de> serde::Deserialize<'de> for SourceCreateTime {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for SourceCreateTime {
+    fn from(value: String) -> Self {
+        SourceCreateTime::String(value)
+    }
+}
+impl From<&str> for SourceCreateTime {
+    fn from(value: &str) -> Self {
+        SourceCreateTime::String(value.to_string())
+    }
+}
+impl From<i64> for SourceCreateTime {
+    fn from(value: i64) -> Self {
+        SourceCreateTime::Integer(value)
+    }
+}
 
 #[doc = "The status."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

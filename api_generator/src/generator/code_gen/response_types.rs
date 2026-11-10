@@ -116,7 +116,7 @@ pub fn module_name(ns: &str) -> String {
 }
 
 /// The Rust type name of a type key
-fn rust_type_name(type_key: &str) -> String {
+pub fn rust_type_name(type_key: &str) -> String {
     let name = type_name(type_key);
     if name.chars().next().is_some_and(|c| c.is_lowercase()) {
         name.to_pascal_case()
@@ -820,6 +820,36 @@ fn render_dispatch_union(
         name = rust_name,
         arms = arms
     );
+
+    // a value of each variant converts into the union, so that callers
+    // building one (e.g. a query parameter taking `impl Into<..>`) can pass
+    // the variant's value directly. The variants have pairwise distinct JSON
+    // kinds, hence distinct payload types, and the impls do not overlap.
+    for (ident, payload) in &variant_idents {
+        let (from_ty, wrap) = match payload
+            .strip_prefix("Box<")
+            .and_then(|p| p.strip_suffix('>'))
+        {
+            Some(inner) => (inner.to_string(), "Box::new(value)"),
+            None => (payload.clone(), "value"),
+        };
+        let _ = writeln!(
+            out,
+            "impl From<{from}> for {name} {{\n    fn from(value: {from}) -> Self {{\n        {name}::{ident}({wrap})\n    }}\n}}",
+            from = from_ty,
+            name = rust_name,
+            ident = ident,
+            wrap = wrap
+        );
+        if from_ty == "String" {
+            let _ = writeln!(
+                out,
+                "impl From<&str> for {name} {{\n    fn from(value: &str) -> Self {{\n        {name}::{ident}(value.to_string())\n    }}\n}}",
+                name = rust_name,
+                ident = ident
+            );
+        }
+    }
     out
 }
 
@@ -948,6 +978,47 @@ mod tests {
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
         read_response_model(&spec, &refs).unwrap()
+    }
+
+    #[test]
+    fn dispatch_unions_convert_from_each_variant() {
+        use crate::openapi::responses::{JsonKind, Scalar, UnionModel, VariantModel};
+        let union = UnionModel {
+            description: None,
+            nullable: false,
+            variants: vec![
+                VariantModel {
+                    name: "count".to_string(),
+                    ty: TypeRef::Scalar(Scalar::I32),
+                    kind: Some(JsonKind::Number),
+                },
+                VariantModel {
+                    name: "comparison".to_string(),
+                    ty: TypeRef::Scalar(Scalar::String),
+                    kind: Some(JsonKind::String),
+                },
+                VariantModel {
+                    name: "nested".to_string(),
+                    ty: TypeRef::Named("ns___Nested".to_string()),
+                    kind: Some(JsonKind::Object),
+                },
+            ],
+        };
+        let boxed: BTreeSet<(String, String)> =
+            std::iter::once(("ns___T".to_string(), "ns___Nested".to_string())).collect();
+        let out = render_dispatch_union("ns___T", "T", &union, &boxed);
+        assert!(out.contains("impl From<i32> for T"), "{}", out);
+        assert!(out.contains("impl From<String> for T"), "{}", out);
+        // string literals convert too, e.g. `.wait_for_nodes(">=3")`
+        assert!(out.contains("impl From<&str> for T"), "{}", out);
+        assert!(out.contains("T::Comparison(value.to_string())"), "{}", out);
+        // a boxed variant converts from its unboxed value
+        assert!(
+            out.contains("impl From<crate::types::ns::Nested> for T"),
+            "{}",
+            out
+        );
+        assert!(out.contains("T::Nested(Box::new(value))"), "{}", out);
     }
 
     #[test]

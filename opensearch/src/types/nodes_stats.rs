@@ -1440,6 +1440,16 @@ impl<'de> serde::Deserialize<'de> for StatsIp {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::Ip> for StatsIp {
+    fn from(value: crate::types::common::Ip) -> Self {
+        StatsIp::Ip(value)
+    }
+}
+impl From<Vec<crate::types::common::Ip>> for StatsIp {
+    fn from(value: Vec<crate::types::common::Ip>) -> Self {
+        StatsIp::Array(value)
+    }
+}
 
 #[doc = "The response of the `nodes.stats` API"]
 pub type StatsResponse = crate::types::nodes::StatsResponse;

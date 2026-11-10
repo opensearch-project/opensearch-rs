@@ -109,6 +109,21 @@ impl<'de> serde::Deserialize<'de> for PluginsQuerySizeLimit {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for PluginsQuerySizeLimit {
+    fn from(value: String) -> Self {
+        PluginsQuerySizeLimit::String(value)
+    }
+}
+impl From<&str> for PluginsQuerySizeLimit {
+    fn from(value: &str) -> Self {
+        PluginsQuerySizeLimit::String(value.to_string())
+    }
+}
+impl From<i64> for PluginsQuerySizeLimit {
+    fn from(value: i64) -> Self {
+        PluginsQuerySizeLimit::Integer(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Ppl {
@@ -148,6 +163,21 @@ impl<'de> serde::Deserialize<'de> for PplEnabled {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<bool> for PplEnabled {
+    fn from(value: bool) -> Self {
+        PplEnabled::Boolean(value)
+    }
+}
+impl From<String> for PplEnabled {
+    fn from(value: String) -> Self {
+        PplEnabled::String(value)
+    }
+}
+impl From<&str> for PplEnabled {
+    fn from(value: &str) -> Self {
+        PplEnabled::String(value.to_string())
     }
 }
 
@@ -225,6 +255,21 @@ impl<'de> serde::Deserialize<'de> for SqlEnabled {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<bool> for SqlEnabled {
+    fn from(value: bool) -> Self {
+        SqlEnabled::Boolean(value)
+    }
+}
+impl From<String> for SqlEnabled {
+    fn from(value: String) -> Self {
+        SqlEnabled::String(value)
+    }
+}
+impl From<&str> for SqlEnabled {
+    fn from(value: &str) -> Self {
+        SqlEnabled::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SqlSettingsResponse {
@@ -269,6 +314,21 @@ impl<'de> serde::Deserialize<'de> for SqlSlowlog {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i64> for SqlSlowlog {
+    fn from(value: i64) -> Self {
+        SqlSlowlog::Integer(value)
+    }
+}
+impl From<String> for SqlSlowlog {
+    fn from(value: String) -> Self {
+        SqlSlowlog::String(value)
+    }
+}
+impl From<&str> for SqlSlowlog {
+    fn from(value: &str) -> Self {
+        SqlSlowlog::String(value.to_string())
     }
 }
 

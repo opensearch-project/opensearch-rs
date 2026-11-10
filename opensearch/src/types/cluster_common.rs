@@ -60,3 +60,52 @@ pub struct ComponentTemplateSummary {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version: Option<crate::types::common::VersionNumber>,
 }
+
+#[doc = "Waits until the specified number of nodes (`N`) is available. Accepts `>=N`, `<=N`, `>N`, and `<N`. You can also use `ge(N)`, `le(N)`, `gt(N)`, and `lt(N)` notation."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum WaitForNodes {
+    Count(i32),
+    Comparison(String),
+}
+impl<'de> serde::Deserialize<'de> for WaitForNodes {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(WaitForNodes::Count),
+            Some(b'"') => serde_json::from_str(text).map(WaitForNodes::Comparison),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "WaitForNodes"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for WaitForNodes {
+    fn from(value: i32) -> Self {
+        WaitForNodes::Count(value)
+    }
+}
+impl From<String> for WaitForNodes {
+    fn from(value: String) -> Self {
+        WaitForNodes::Comparison(value)
+    }
+}
+impl From<&str> for WaitForNodes {
+    fn from(value: &str) -> Self {
+        WaitForNodes::Comparison(value.to_string())
+    }
+}

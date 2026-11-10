@@ -133,6 +133,14 @@ pub struct Type {
     pub default: Option<Value>,
     #[serde(default)]
     pub deprecated: Option<Deprecated>,
+    /// The OpenAPI schema of a union parameter the legacy types cannot
+    /// express (they fall back to a string), e.g. `_common___Slices`
+    #[serde(default)]
+    pub schema: Option<String>,
+    /// The Rust path of the type generated from [Type::schema], e.g.
+    /// `types::common::Slices`, used instead of the string fallback
+    #[serde(skip)]
+    pub model_ty: Option<String>,
 }
 
 /// The type of the param or part

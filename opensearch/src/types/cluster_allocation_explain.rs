@@ -147,6 +147,16 @@ impl<'de> serde::Deserialize<'de> for ClusterInfoShardSizesValue {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::ByteCount> for ClusterInfoShardSizesValue {
+    fn from(value: crate::types::common::ByteCount) -> Self {
+        ClusterInfoShardSizesValue::ByteCount(value)
+    }
+}
+impl From<crate::types::common::HumanReadableByteCount> for ClusterInfoShardSizesValue {
+    fn from(value: crate::types::common::HumanReadableByteCount) -> Self {
+        ClusterInfoShardSizesValue::HumanReadableByteCount(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CurrentNode {

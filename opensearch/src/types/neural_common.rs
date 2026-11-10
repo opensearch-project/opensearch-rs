@@ -307,6 +307,16 @@ impl<'de> serde::Deserialize<'de> for InfoCounterStat {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<i64> for InfoCounterStat {
+    fn from(value: i64) -> Self {
+        InfoCounterStat::Integer(value)
+    }
+}
+impl From<crate::types::neural_common::InfoCounterStatObject> for InfoCounterStat {
+    fn from(value: crate::types::neural_common::InfoCounterStatObject) -> Self {
+        InfoCounterStat::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct InfoCounterStatObject {
@@ -385,6 +395,21 @@ impl<'de> serde::Deserialize<'de> for InfoCounterStatObjectValue {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<i64> for InfoCounterStatObjectValue {
+    fn from(value: i64) -> Self {
+        InfoCounterStatObjectValue::Integer(value)
+    }
+}
+impl From<String> for InfoCounterStatObjectValue {
+    fn from(value: String) -> Self {
+        InfoCounterStatObjectValue::String(value)
+    }
+}
+impl From<&str> for InfoCounterStatObjectValue {
+    fn from(value: &str) -> Self {
+        InfoCounterStatObjectValue::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -416,6 +441,21 @@ impl<'de> serde::Deserialize<'de> for InfoStringStat {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for InfoStringStat {
+    fn from(value: String) -> Self {
+        InfoStringStat::String(value)
+    }
+}
+impl From<&str> for InfoStringStat {
+    fn from(value: &str) -> Self {
+        InfoStringStat::String(value.to_string())
+    }
+}
+impl From<crate::types::neural_common::InfoStringStatObject> for InfoStringStat {
+    fn from(value: crate::types::neural_common::InfoStringStatObject) -> Self {
+        InfoStringStat::Object(value)
     }
 }
 
@@ -494,6 +534,21 @@ impl<'de> serde::Deserialize<'de> for InfoStringStatObjectValue {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i64> for InfoStringStatObjectValue {
+    fn from(value: i64) -> Self {
+        InfoStringStatObjectValue::Integer(value)
+    }
+}
+impl From<String> for InfoStringStatObjectValue {
+    fn from(value: String) -> Self {
+        InfoStringStatObjectValue::String(value)
+    }
+}
+impl From<&str> for InfoStringStatObjectValue {
+    fn from(value: &str) -> Self {
+        InfoStringStatObjectValue::String(value.to_string())
     }
 }
 
@@ -807,6 +862,18 @@ impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStat {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<i64> for TimestampedEventCounterStat {
+    fn from(value: i64) -> Self {
+        TimestampedEventCounterStat::Integer(value)
+    }
+}
+impl From<crate::types::neural_common::TimestampedEventCounterStatObject>
+    for TimestampedEventCounterStat
+{
+    fn from(value: crate::types::neural_common::TimestampedEventCounterStatObject) -> Self {
+        TimestampedEventCounterStat::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TimestampedEventCounterStatObject {
@@ -893,5 +960,20 @@ impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStatObjectValue {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i64> for TimestampedEventCounterStatObjectValue {
+    fn from(value: i64) -> Self {
+        TimestampedEventCounterStatObjectValue::Integer(value)
+    }
+}
+impl From<String> for TimestampedEventCounterStatObjectValue {
+    fn from(value: String) -> Self {
+        TimestampedEventCounterStatObjectValue::String(value)
+    }
+}
+impl From<&str> for TimestampedEventCounterStatObjectValue {
+    fn from(value: &str) -> Self {
+        TimestampedEventCounterStatObjectValue::String(value.to_string())
     }
 }

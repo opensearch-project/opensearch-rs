@@ -206,6 +206,21 @@ impl<'de> serde::Deserialize<'de> for AuthInfoPeerCertificates {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<f64> for AuthInfoPeerCertificates {
+    fn from(value: f64) -> Self {
+        AuthInfoPeerCertificates::Number(value)
+    }
+}
+impl From<String> for AuthInfoPeerCertificates {
+    fn from(value: String) -> Self {
+        AuthInfoPeerCertificates::String(value)
+    }
+}
+impl From<&str> for AuthInfoPeerCertificates {
+    fn from(value: &str) -> Self {
+        AuthInfoPeerCertificates::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CertificateTypes {
@@ -474,6 +489,21 @@ impl<'de> serde::Deserialize<'de> for OkStatus {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<f64> for OkStatus {
+    fn from(value: f64) -> Self {
+        OkStatus::Number(value)
+    }
+}
+impl From<String> for OkStatus {
+    fn from(value: String) -> Self {
+        OkStatus::String(value)
+    }
+}
+impl From<&str> for OkStatus {
+    fn from(value: &str) -> Self {
+        OkStatus::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PermissionsInfo {
@@ -610,6 +640,21 @@ impl<'de> serde::Deserialize<'de> for SSLInfoPeerCertificates {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<f64> for SSLInfoPeerCertificates {
+    fn from(value: f64) -> Self {
+        SSLInfoPeerCertificates::Number(value)
+    }
+}
+impl From<String> for SSLInfoPeerCertificates {
+    fn from(value: String) -> Self {
+        SSLInfoPeerCertificates::String(value)
+    }
+}
+impl From<&str> for SSLInfoPeerCertificates {
+    fn from(value: &str) -> Self {
+        SSLInfoPeerCertificates::String(value.to_string())
+    }
+}
 
 #[doc = "Version of OpenSSL."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -644,6 +689,21 @@ impl<'de> serde::Deserialize<'de> for SSLInfoSslOpensslVersion {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<f64> for SSLInfoSslOpensslVersion {
+    fn from(value: f64) -> Self {
+        SSLInfoSslOpensslVersion::Number(value)
+    }
+}
+impl From<String> for SSLInfoSslOpensslVersion {
+    fn from(value: String) -> Self {
+        SSLInfoSslOpensslVersion::String(value)
+    }
+}
+impl From<&str> for SSLInfoSslOpensslVersion {
+    fn from(value: &str) -> Self {
+        SSLInfoSslOpensslVersion::String(value.to_string())
     }
 }
 

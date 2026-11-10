@@ -499,6 +499,18 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseHitsHitsItemMatchedQue
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for SearchModelsResponseHitsHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        SearchModelsResponseHitsHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>>
+    for SearchModelsResponseHitsHitsItemMatchedQueries
+{
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        SearchModelsResponseHitsHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -533,6 +545,16 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for SearchModelsResponseHitsTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        SearchModelsResponseHitsTotal::TotalHits(value)
+    }
+}
+impl From<i64> for SearchModelsResponseHitsTotal {
+    fn from(value: i64) -> Self {
+        SearchModelsResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchModelsResponseHitsTotal {
@@ -646,6 +668,26 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseSuggestValueItemComple
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptionsObject>
+    for SearchModelsResponseSuggestValueItemCompletionOptions
+{
+    fn from(
+        value: crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptionsObject,
+    ) -> Self {
+        SearchModelsResponseSuggestValueItemCompletionOptions::Object(value)
+    }
+}
+impl From<Vec<crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem>>
+    for SearchModelsResponseSuggestValueItemCompletionOptions
+{
+    fn from(
+        value: Vec<
+            crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem,
+        >,
+    ) -> Self {
+        SearchModelsResponseSuggestValueItemCompletionOptions::Array(value)
     }
 }
 

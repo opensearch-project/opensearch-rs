@@ -83,6 +83,9 @@ pub struct ResponseModel {
     /// as the response type rather than reporting an error. Every other non-2xx
     /// status is an error response.
     pub typed_statuses: BTreeMap<String, Vec<u16>>,
+    /// type keys of the union query parameter schemas whose generated type
+    /// replaces the string fallback (see [param_type_path])
+    pub param_types: BTreeSet<String>,
 }
 
 /// The success status codes whose response schema is taken as the response
@@ -130,10 +133,29 @@ pub fn all_operation_groups(spec: &Value) -> Vec<String> {
 }
 
 /// Reads the response model of every operation group of the document
+/// Reads the response model of every operation group of the document,
+/// together with the types of its union query parameters
+/// ([super::param_union_schemas])
 pub fn read_all_response_models(spec: &Value) -> anyhow::Result<ResponseModel> {
     let groups = all_operation_groups(spec);
     let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-    read_response_model(spec, &refs)
+    let params = super::param_union_schemas(spec)?;
+    read_model(spec, &refs, &params)
+}
+
+/// The Rust path of the type generated for the schema of a union query
+/// parameter, e.g. `types::common::Slices` for `_common___Slices`. Returns
+/// `None` when no such type is generated: the schema is not a parameter
+/// root of the model, or its type cannot be built by callers (only
+/// unions dispatched on the JSON kind can be).
+pub fn param_type_path(model: &ResponseModel, schema: &str) -> Option<String> {
+    model.param_types.contains(schema).then(|| {
+        format!(
+            "types::{}::{}",
+            crate::generator::code_gen::response_types::module_name(namespace(schema)),
+            crate::generator::code_gen::response_types::rust_type_name(schema)
+        )
+    })
 }
 
 /// A type in the response model, keyed by its type key
@@ -285,6 +307,16 @@ pub fn read_response_model(
     spec: &Value,
     operation_groups: &[&str],
 ) -> anyhow::Result<ResponseModel> {
+    read_model(spec, operation_groups, &BTreeSet::new())
+}
+
+/// Reads the response model of the given operation groups, plus the types of
+/// the given union query parameter schemas
+fn read_model(
+    spec: &Value,
+    operation_groups: &[&str],
+    param_schemas: &BTreeSet<String>,
+) -> anyhow::Result<ResponseModel> {
     let schemas = spec["components"]["schemas"]
         .as_object()
         .ok_or_else(|| anyhow!("OpenAPI document has no components/schemas"))?;
@@ -375,6 +407,10 @@ pub fn read_response_model(
         builder.model.endpoints.insert(group.to_string(), root);
     }
 
+    for name in param_schemas {
+        builder.enqueue(name);
+    }
+
     // drain the worklist of referenced schemas
     while let Some(name) = builder.queue.pop_front() {
         let schema = builder
@@ -387,6 +423,18 @@ pub fn read_response_model(
     }
 
     resolve_union_strategies(&mut builder.model);
+    // a parameter value is built by the caller: only a union dispatched on
+    // the JSON kind can be (a lazy union only wraps JSON it received)
+    builder.model.param_types = param_schemas
+        .iter()
+        .filter(|name| {
+            matches!(
+                builder.model.types.get(name.as_str()),
+                Some(TypeModel::DispatchUnion(_))
+            )
+        })
+        .cloned()
+        .collect();
     prune_unreachable(&mut builder.model);
 
     Ok(builder.model)
@@ -491,7 +539,7 @@ fn prune_unreachable(model: &mut ResponseModel) {
     }
 
     let mut reachable = BTreeSet::new();
-    for root in model.endpoints.values() {
+    for root in model.endpoints.values().chain(&model.param_types) {
         mark(&TypeRef::Named(root.clone()), model, &mut reachable);
     }
     model.types.retain(|name, _| reachable.contains(name));

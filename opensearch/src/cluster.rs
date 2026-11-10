@@ -1467,7 +1467,7 @@ pub struct ClusterHealth<'a, 'b> {
     wait_for_events: Option<WaitForEvents>,
     wait_for_no_initializing_shards: Option<bool>,
     wait_for_no_relocating_shards: Option<bool>,
-    wait_for_nodes: Option<&'b str>,
+    wait_for_nodes: Option<crate::types::cluster_common::WaitForNodes>,
     wait_for_status: Option<WaitForStatus>,
 }
 impl<'a, 'b> ClusterHealth<'a, 'b> {
@@ -1589,8 +1589,11 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self
     }
     #[doc = "Waits until the specified number of nodes (`N`) is available. Accepts `&gt;=N`, `&lt;=N`, `&gt;N`, and `&lt;N`. You can also use `ge(N)`, `le(N)`, `gt(N)`, and `lt(N)` notation."]
-    pub fn wait_for_nodes(mut self, wait_for_nodes: &'b str) -> Self {
-        self.wait_for_nodes = Some(wait_for_nodes);
+    pub fn wait_for_nodes<T: Into<crate::types::cluster_common::WaitForNodes>>(
+        mut self,
+        wait_for_nodes: T,
+    ) -> Self {
+        self.wait_for_nodes = Some(wait_for_nodes.into());
         self
     }
     #[doc = "Waits until the cluster health reaches the specified status or better."]
@@ -1626,7 +1629,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
                 wait_for_events: Option<WaitForEvents>,
                 wait_for_no_initializing_shards: Option<bool>,
                 wait_for_no_relocating_shards: Option<bool>,
-                wait_for_nodes: Option<&'b str>,
+                wait_for_nodes: Option<crate::types::cluster_common::WaitForNodes>,
                 wait_for_status: Option<WaitForStatus>,
             }
             let query_params = QueryParams {

@@ -158,7 +158,8 @@ fn generate_from_openapi(file: Option<&str>) -> anyhow::Result<()> {
     // typed response types for every operation group; groups without a
     // JSON success response are reported and skipped
     let spec: serde_json::Value = serde_yaml::from_reader(fs::File::open(&spec_file)?)?;
-    let response_model = openapi::responses::read_all_response_models(&spec)?;
+    let client_model = openapi::client_model::ClientModel::for_spec(&spec_file, &spec)?;
+    let response_model = openapi::responses::read_all_response_models(&spec, &client_model)?;
     log::info!(
         "typed response types: {} operation groups typed, {} without a JSON success response",
         response_model.endpoints.len(),

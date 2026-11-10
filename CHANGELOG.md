@@ -57,6 +57,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Generated the types of the union query parameters from the specification: `slices` takes `types::common::Slices`, `wait_for_active_shards` takes `types::common::WaitForActiveShards` and `wait_for_nodes` takes `types::cluster_common::WaitForNodes`, through `impl Into<..>` so that numbers, typed values and strings are accepted; `full_id` and `show_dn` are `bool` again ([#514](https://github.com/opensearch-project/opensearch-rs/pull/514))
+- The API generator reads the response types from the specification's resolved client model (`api_generator/opensearch-client-model.json`) instead of interpreting `allOf`/`oneOf`/`anyOf` itself; the generated types are unchanged apart from the order of two structs' fields and one added doc comment
 - Changed the supported (CI-tested) OpenSearch versions to 2.19.x and 3.x: every release of the current major plus the latest release of the previous major, re-evaluated at each release. The 2.x client remains the documented fallback for older OpenSearch lines
 
 ### Deprecated

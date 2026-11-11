@@ -15,8 +15,11 @@ use common::server::MockServer;
 use opensearch::{
     cluster::ClusterHealthParts,
     params::Slices as LegacySlices,
-    types::common::{Slices, SlicesCalculation},
-    DeleteByQueryParts,
+    types::{
+        cluster_common::WaitForNodes,
+        common::{Slices, SlicesCalculation, WaitForActiveShardOptions, WaitForActiveShards},
+    },
+    DeleteByQueryParts, IndexParts,
 };
 
 async fn query_of(
@@ -120,6 +123,83 @@ async fn stringified_booleans_are_booleans() -> anyhow::Result<()> {
     .await?;
     assert_eq!(query, "full_id=true");
     Ok(())
+}
+
+#[tokio::test]
+async fn union_params_also_take_their_query_string_form() -> anyhow::Result<()> {
+    let auto = query_of(|c| {
+        Box::pin(async move {
+            let _ = c
+                .delete_by_query(DeleteByQueryParts::Index(&["movies"]))
+                .slices("auto")
+                .send()
+                .await;
+        })
+    })
+    .await?;
+    assert_eq!(auto, "slices=auto");
+
+    let count = query_of(|c| {
+        Box::pin(async move {
+            let _ = c
+                .delete_by_query(DeleteByQueryParts::Index(&["movies"]))
+                .slices("5")
+                .send()
+                .await;
+        })
+    })
+    .await?;
+    assert_eq!(count, "slices=5");
+    Ok(())
+}
+
+#[tokio::test]
+async fn wait_for_active_shards_takes_a_count_or_all() -> anyhow::Result<()> {
+    for (expected, value) in [
+        ("wait_for_active_shards=2", WaitForActiveShards::from(2)),
+        ("wait_for_active_shards=2", WaitForActiveShards::from("2")),
+        (
+            "wait_for_active_shards=all",
+            WaitForActiveShards::from("all"),
+        ),
+        (
+            "wait_for_active_shards=all",
+            WaitForActiveShardOptions::All.into(),
+        ),
+    ] {
+        let query = query_of(|c| {
+            Box::pin(async move {
+                let _ = c
+                    .index(IndexParts::Index("movies"))
+                    .wait_for_active_shards(value)
+                    .body(serde_json::json!({}))
+                    .send()
+                    .await;
+            })
+        })
+        .await?;
+        assert_eq!(query, expected);
+    }
+    Ok(())
+}
+
+#[test]
+fn strings_are_read_as_the_matching_variant() {
+    assert!(matches!(Slices::from("7"), Slices::Count(7)));
+    assert!(matches!(
+        Slices::from("auto"),
+        Slices::Calculation(SlicesCalculation::Auto)
+    ));
+    // a value the specification does not know is still sent as is
+    match Slices::from("max") {
+        Slices::Calculation(SlicesCalculation::Unknown(s)) => assert_eq!(s, "max"),
+        other => panic!("unexpected {:?}", other),
+    }
+    assert!(matches!(WaitForNodes::from("3"), WaitForNodes::Count(3)));
+    match WaitForNodes::from(">=3") {
+        WaitForNodes::Comparison(s) => assert_eq!(s, ">=3"),
+        other => panic!("unexpected {:?}", other),
+    }
 }
 
 #[test]

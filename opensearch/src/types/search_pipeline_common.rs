@@ -530,6 +530,16 @@ impl<'de> serde::Deserialize<'de> for ScoreCombinationTechnique {
         })
     }
 }
+impl From<&str> for ScoreCombinationTechnique {
+    fn from(s: &str) -> Self {
+        match s {
+            "arithmetic_mean" => ScoreCombinationTechnique::ArithmeticMean,
+            "geometric_mean" => ScoreCombinationTechnique::GeometricMean,
+            "harmonic_mean" => ScoreCombinationTechnique::HarmonicMean,
+            _ => ScoreCombinationTechnique::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ScoreNormalization {
@@ -577,6 +587,15 @@ impl<'de> serde::Deserialize<'de> for ScoreNormalizationTechnique {
         })
     }
 }
+impl From<&str> for ScoreNormalizationTechnique {
+    fn from(s: &str) -> Self {
+        match s {
+            "l2" => ScoreNormalizationTechnique::L2,
+            "min_max" => ScoreNormalizationTechnique::MinMax,
+            _ => ScoreNormalizationTechnique::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ScoreRankerCombination {
@@ -619,6 +638,14 @@ impl<'de> serde::Deserialize<'de> for ScoreRankerCombinationTechnique {
             "rrf" => ScoreRankerCombinationTechnique::Rrf,
             _ => ScoreRankerCombinationTechnique::Unknown(s),
         })
+    }
+}
+impl From<&str> for ScoreRankerCombinationTechnique {
+    fn from(s: &str) -> Self {
+        match s {
+            "rrf" => ScoreRankerCombinationTechnique::Rrf,
+            _ => ScoreRankerCombinationTechnique::Unknown(s.to_string()),
+        }
     }
 }
 

@@ -82,6 +82,17 @@ impl<'de> serde::Deserialize<'de> for ActionStatusOptions {
         })
     }
 }
+impl From<&str> for ActionStatusOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "failure" => ActionStatusOptions::Failure,
+            "simulated" => ActionStatusOptions::Simulated,
+            "success" => ActionStatusOptions::Success,
+            "throttled" => ActionStatusOptions::Throttled,
+            _ => ActionStatusOptions::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BuiltinScriptLanguage {
@@ -129,6 +140,17 @@ impl<'de> serde::Deserialize<'de> for BuiltinScriptLanguage {
             "painless" => BuiltinScriptLanguage::Painless,
             _ => BuiltinScriptLanguage::Unknown(s),
         })
+    }
+}
+impl From<&str> for BuiltinScriptLanguage {
+    fn from(s: &str) -> Self {
+        match s {
+            "expression" => BuiltinScriptLanguage::Expression,
+            "java" => BuiltinScriptLanguage::Java,
+            "mustache" => BuiltinScriptLanguage::Mustache,
+            "painless" => BuiltinScriptLanguage::Painless,
+            _ => BuiltinScriptLanguage::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -372,6 +394,16 @@ impl<'de> serde::Deserialize<'de> for DFIIndependenceMeasure {
         })
     }
 }
+impl From<&str> for DFIIndependenceMeasure {
+    fn from(s: &str) -> Self {
+        match s {
+            "chisquared" => DFIIndependenceMeasure::Chisquared,
+            "saturated" => DFIIndependenceMeasure::Saturated,
+            "standardized" => DFIIndependenceMeasure::Standardized,
+            _ => DFIIndependenceMeasure::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DFRAfterEffect {
@@ -415,6 +447,16 @@ impl<'de> serde::Deserialize<'de> for DFRAfterEffect {
             "no" => DFRAfterEffect::No,
             _ => DFRAfterEffect::Unknown(s),
         })
+    }
+}
+impl From<&str> for DFRAfterEffect {
+    fn from(s: &str) -> Self {
+        match s {
+            "b" => DFRAfterEffect::B,
+            "l" => DFRAfterEffect::L,
+            "no" => DFRAfterEffect::No,
+            _ => DFRAfterEffect::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -476,6 +518,20 @@ impl<'de> serde::Deserialize<'de> for DFRBasicModel {
             "p" => DFRBasicModel::P,
             _ => DFRBasicModel::Unknown(s),
         })
+    }
+}
+impl From<&str> for DFRBasicModel {
+    fn from(s: &str) -> Self {
+        match s {
+            "be" => DFRBasicModel::Be,
+            "d" => DFRBasicModel::D,
+            "g" => DFRBasicModel::G,
+            "if" => DFRBasicModel::If,
+            "in" => DFRBasicModel::In,
+            "ine" => DFRBasicModel::Ine,
+            "p" => DFRBasicModel::P,
+            _ => DFRBasicModel::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -605,6 +661,22 @@ impl<'de> serde::Deserialize<'de> for DistanceUnit {
             "yd" => DistanceUnit::Yd,
             _ => DistanceUnit::Unknown(s),
         })
+    }
+}
+impl From<&str> for DistanceUnit {
+    fn from(s: &str) -> Self {
+        match s {
+            "cm" => DistanceUnit::Cm,
+            "ft" => DistanceUnit::Ft,
+            "in" => DistanceUnit::In,
+            "km" => DistanceUnit::Km,
+            "m" => DistanceUnit::M,
+            "mi" => DistanceUnit::Mi,
+            "mm" => DistanceUnit::Mm,
+            "nmi" => DistanceUnit::Nmi,
+            "yd" => DistanceUnit::Yd,
+            _ => DistanceUnit::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -923,6 +995,17 @@ impl<'de> serde::Deserialize<'de> for FieldSortNumericType {
             "long" => FieldSortNumericType::Long,
             _ => FieldSortNumericType::Unknown(s),
         })
+    }
+}
+impl From<&str> for FieldSortNumericType {
+    fn from(s: &str) -> Self {
+        match s {
+            "date" => FieldSortNumericType::Date,
+            "date_nanos" => FieldSortNumericType::DateNanos,
+            "double" => FieldSortNumericType::Double,
+            "long" => FieldSortNumericType::Long,
+            _ => FieldSortNumericType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1364,6 +1447,15 @@ impl<'de> serde::Deserialize<'de> for GeoDistanceType {
         })
     }
 }
+impl From<&str> for GeoDistanceType {
+    fn from(s: &str) -> Self {
+        match s {
+            "arc" => GeoDistanceType::Arc,
+            "plane" => GeoDistanceType::Plane,
+            _ => GeoDistanceType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The geohash string representation of a geographical location."]
 pub type GeoHash = String;
@@ -1513,6 +1605,17 @@ impl<'de> serde::Deserialize<'de> for GeoShapeRelation {
         })
     }
 }
+impl From<&str> for GeoShapeRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "contains" => GeoShapeRelation::Contains,
+            "disjoint" => GeoShapeRelation::Disjoint,
+            "intersects" => GeoShapeRelation::Intersects,
+            "within" => GeoShapeRelation::Within,
+            _ => GeoShapeRelation::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "A map tile reference, represented as `{zoom}/{x}/{y}`."]
 pub type GeoTile = String;
@@ -1586,6 +1689,16 @@ impl<'de> serde::Deserialize<'de> for HealthStatus {
         })
     }
 }
+impl From<&str> for HealthStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "green" | "GREEN" => HealthStatus::Green,
+            "yellow" | "YELLOW" => HealthStatus::Yellow,
+            "red" | "RED" => HealthStatus::Red,
+            _ => HealthStatus::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The hostname or IP address."]
 pub type Host = String;
@@ -1637,6 +1750,15 @@ impl<'de> serde::Deserialize<'de> for IBDistribution {
         })
     }
 }
+impl From<&str> for IBDistribution {
+    fn from(s: &str) -> Self {
+        match s {
+            "ll" => IBDistribution::Ll,
+            "spl" => IBDistribution::Spl,
+            _ => IBDistribution::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IBLambda {
@@ -1676,6 +1798,15 @@ impl<'de> serde::Deserialize<'de> for IBLambda {
             "ttf" => IBLambda::Ttf,
             _ => IBLambda::Unknown(s),
         })
+    }
+}
+impl From<&str> for IBLambda {
+    fn from(s: &str) -> Self {
+        match s {
+            "df" => IBLambda::Df,
+            "ttf" => IBLambda::Ttf,
+            _ => IBLambda::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2548,6 +2679,28 @@ impl<'de> serde::Deserialize<'de> for NodeRole {
         })
     }
 }
+impl From<&str> for NodeRole {
+    fn from(s: &str) -> Self {
+        match s {
+            "client" => NodeRole::Client,
+            "coordinating_only" => NodeRole::CoordinatingOnly,
+            "data" => NodeRole::Data,
+            "data_cold" => NodeRole::DataCold,
+            "data_content" => NodeRole::DataContent,
+            "data_frozen" => NodeRole::DataFrozen,
+            "data_hot" => NodeRole::DataHot,
+            "data_warm" => NodeRole::DataWarm,
+            "ingest" => NodeRole::Ingest,
+            "ml" => NodeRole::Ml,
+            "remote_cluster_client" => NodeRole::RemoteClusterClient,
+            "transform" => NodeRole::Transform,
+            "voting_only" => NodeRole::VotingOnly,
+            "master" => NodeRole::Master,
+            "cluster_manager" => NodeRole::ClusterManager,
+            _ => NodeRole::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The role assigned to the node."]
 pub type NodeRoles = Vec<crate::types::common::NodeRole>;
@@ -2944,6 +3097,18 @@ impl<'de> serde::Deserialize<'de> for Result {
         })
     }
 }
+impl From<&str> for Result {
+    fn from(s: &str) -> Self {
+        match s {
+            "created" => Result::Created,
+            "deleted" => Result::Deleted,
+            "noop" => Result::Noop,
+            "not_found" => Result::NotFound,
+            "updated" => Result::Updated,
+            _ => Result::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The retry statistics for bulk and search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -3093,6 +3258,16 @@ impl<'de> serde::Deserialize<'de> for ScriptSortType {
             "version" => ScriptSortType::Version,
             _ => ScriptSortType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ScriptSortType {
+    fn from(s: &str) -> Self {
+        match s {
+            "number" => ScriptSortType::Number,
+            "string" => ScriptSortType::String,
+            "version" => ScriptSortType::Version,
+            _ => ScriptSortType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3429,6 +3604,15 @@ impl From<crate::types::common::SlicesCalculation> for Slices {
         Slices::Calculation(value)
     }
 }
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for Slices {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return Slices::Count(value);
+        }
+        Slices::Calculation(crate::types::common::SlicesCalculation::from(s))
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SlicesCalculation {
@@ -3464,6 +3648,14 @@ impl<'de> serde::Deserialize<'de> for SlicesCalculation {
             "auto" => SlicesCalculation::Auto,
             _ => SlicesCalculation::Unknown(s),
         })
+    }
+}
+impl From<&str> for SlicesCalculation {
+    fn from(s: &str) -> Self {
+        match s {
+            "auto" => SlicesCalculation::Auto,
+            _ => SlicesCalculation::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3596,6 +3788,18 @@ impl<'de> serde::Deserialize<'de> for SortMode {
         })
     }
 }
+impl From<&str> for SortMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => SortMode::Avg,
+            "max" => SortMode::Max,
+            "median" => SortMode::Median,
+            "min" => SortMode::Min,
+            "sum" => SortMode::Sum,
+            _ => SortMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SortOptions {
@@ -3649,6 +3853,15 @@ impl<'de> serde::Deserialize<'de> for SortOrder {
             "desc" => SortOrder::Desc,
             _ => SortOrder::Unknown(s),
         })
+    }
+}
+impl From<&str> for SortOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "asc" => SortOrder::Asc,
+            "desc" => SortOrder::Desc,
+            _ => SortOrder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4129,6 +4342,16 @@ impl<'de> serde::Deserialize<'de> for SuggestMode {
         })
     }
 }
+impl From<&str> for SuggestMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "always" => SuggestMode::Always,
+            "missing" => SuggestMode::Missing,
+            "popular" => SuggestMode::Popular,
+            _ => SuggestMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 pub type TDocument = Box<serde_json::value::RawValue>;
 
@@ -4196,6 +4419,18 @@ impl<'de> serde::Deserialize<'de> for TermFrequencyNormalization {
             "z" => TermFrequencyNormalization::Z,
             _ => TermFrequencyNormalization::Unknown(s),
         })
+    }
+}
+impl From<&str> for TermFrequencyNormalization {
+    fn from(s: &str) -> Self {
+        match s {
+            "h1" => TermFrequencyNormalization::H1,
+            "h2" => TermFrequencyNormalization::H2,
+            "h3" => TermFrequencyNormalization::H3,
+            "no" => TermFrequencyNormalization::No,
+            "z" => TermFrequencyNormalization::Z,
+            _ => TermFrequencyNormalization::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4329,9 +4564,119 @@ impl<'de> serde::Deserialize<'de> for VersionType {
         })
     }
 }
+impl From<&str> for VersionType {
+    fn from(s: &str) -> Self {
+        match s {
+            "external" => VersionType::External,
+            "external_gte" => VersionType::ExternalGte,
+            "internal" => VersionType::Internal,
+            _ => VersionType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The absence of any type. This is commonly used in APIs that don't return a body.  Although \"void\" is generally used for a unit type that has only one value, this is interpreted as the bottom type, which has no value. Most languages have a unit type, but few have a bottom type.  See https://en.m.wikipedia.org/wiki/Unit_type and https://en.m.wikipedia.org/wiki/Bottom_type."]
 pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WaitForActiveShardOptions {
+    #[doc = "`all`"]
+    All,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl WaitForActiveShardOptions {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            WaitForActiveShardOptions::All => "all",
+            WaitForActiveShardOptions::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for WaitForActiveShardOptions {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShardOptions {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s),
+        })
+    }
+}
+impl From<&str> for WaitForActiveShardOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s.to_string()),
+        }
+    }
+}
+
+#[doc = "Waits until the specified number of shards is active before returning a response. Use `all` for all shards."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum WaitForActiveShards {
+    Count(i32),
+    Option(crate::types::common::WaitForActiveShardOptions),
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShards {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => {
+                serde_json::from_str(text).map(WaitForActiveShards::Count)
+            }
+            Some(b'"') => serde_json::from_str(text).map(WaitForActiveShards::Option),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "WaitForActiveShards"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for WaitForActiveShards {
+    fn from(value: i32) -> Self {
+        WaitForActiveShards::Count(value)
+    }
+}
+impl From<crate::types::common::WaitForActiveShardOptions> for WaitForActiveShards {
+    fn from(value: crate::types::common::WaitForActiveShardOptions) -> Self {
+        WaitForActiveShards::Option(value)
+    }
+}
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for WaitForActiveShards {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return WaitForActiveShards::Count(value);
+        }
+        WaitForActiveShards::Option(crate::types::common::WaitForActiveShardOptions::from(s))
+    }
+}
 
 #[doc = "The statistics about index warmer operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

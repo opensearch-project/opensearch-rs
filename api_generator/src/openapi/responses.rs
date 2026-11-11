@@ -332,6 +332,8 @@ fn read_model(
         model: ResponseModel::default(),
         queue: VecDeque::new(),
         queued: BTreeSet::new(),
+        param_only: BTreeSet::new(),
+        param_mode: false,
     };
 
     for group in operation_groups {
@@ -407,20 +409,21 @@ fn read_model(
         builder.model.endpoints.insert(group.to_string(), root);
     }
 
-    for name in param_schemas {
-        builder.enqueue(name);
-    }
+    // the response types first: what they reach is shared with responses
+    builder.drain()?;
 
-    // drain the worklist of referenced schemas
-    while let Some(name) = builder.queue.pop_front() {
-        let schema = builder
-            .schemas
-            .get(&name)
-            .ok_or_else(|| anyhow!("unresolved schema reference: {}", name))?
-            .clone();
-        let ty = builder.convert_schema(&schema, &name)?;
-        builder.model.types.insert(name, ty);
+    // then the parameter types. A schema the responses reach keeps its
+    // response type, as one type cannot serve both forms: it is a
+    // parameter type only if that type can be built by callers (below).
+    // The others are parameter-only and converted for sending (see
+    // [ModelBuilder::param_mode]).
+    for name in param_schemas {
+        if !builder.queued.contains(name) {
+            builder.param_only.insert(name.clone());
+            builder.enqueue(name);
+        }
     }
+    builder.drain()?;
 
     resolve_union_strategies(&mut builder.model);
     // a parameter value is built by the caller: only a union dispatched on
@@ -565,9 +568,39 @@ struct ModelBuilder<'a> {
     model: ResponseModel,
     queue: VecDeque<String>,
     queued: BTreeSet<String>,
+    /// Schemas reached only from query parameters, converted in
+    /// [param_mode](Self::param_mode)
+    param_only: BTreeSet<String>,
+    /// Converting a type that is only ever sent as a query parameter, never
+    /// received: `Stringified*` references take their typed form (the
+    /// string form only matters when decoding what a server wrote), and
+    /// `null` variants are dropped (a query parameter cannot be null)
+    param_mode: bool,
 }
 
 impl ModelBuilder<'_> {
+    /// Converts the queued schemas, each in [param_mode](Self::param_mode)
+    /// when it is reached only from query parameters
+    fn drain(&mut self) -> anyhow::Result<()> {
+        while let Some(name) = self.queue.pop_front() {
+            let schema = self
+                .schemas
+                .get(&name)
+                .ok_or_else(|| anyhow!("unresolved schema reference: {}", name))?
+                .clone();
+            self.param_mode = self.param_only.contains(&name);
+            let schema = if self.param_mode {
+                without_null_variants(&schema, self.schemas)?
+            } else {
+                schema
+            };
+            let ty = self.convert_schema(&schema, &name);
+            self.param_mode = false;
+            self.model.types.insert(name, ty?);
+        }
+        Ok(())
+    }
+
     /// Adds a named schema to the conversion worklist
     fn enqueue(&mut self, name: &str) {
         if self.queued.insert(name.to_string()) {
@@ -911,6 +944,15 @@ impl ModelBuilder<'_> {
             {
                 return Ok((TypeRef::Raw(RawCause::GenericParameter), false));
             }
+            if self.param_mode {
+                if let Some(scalar) = stringified_scalar(name, target, self.schemas)? {
+                    return Ok((scalar, false));
+                }
+                // a dependency not reached from responses is sent only too
+                if !self.queued.contains(name) {
+                    self.param_only.insert(name.to_string());
+                }
+            }
             self.enqueue(name);
             return Ok((TypeRef::Named(name.to_string()), false));
         }
@@ -1015,6 +1057,86 @@ impl ModelBuilder<'_> {
             _ => (TypeRef::Raw(RawCause::NoType), false),
         })
     }
+}
+
+/// Whether a schema is one of the `Stringified*` schemas (e.g.
+/// `_common___StringifiedBoolean`: a boolean, or the same as a string),
+/// which describe a value a server may also write as a string
+pub(crate) fn is_stringified(name: &str) -> bool {
+    name.starts_with("_common___Stringified")
+}
+
+/// The typed form of a `Stringified*` schema, its variant that is not a
+/// string, e.g. `i32` for `_common___StringifiedInteger`. An integer
+/// without a format takes the width of `x-protobuf-data-type` (`int32`).
+/// `None` for any other schema.
+fn stringified_scalar(
+    name: &str,
+    schema: &Value,
+    schemas: &Map<String, Value>,
+) -> anyhow::Result<Option<TypeRef>> {
+    if !is_stringified(name) {
+        return Ok(None);
+    }
+    let variants = match schema["oneOf"].as_array() {
+        Some(v) => v,
+        None => return Ok(None),
+    };
+    for variant in variants {
+        let mut resolved = variant;
+        let mut depth = 0;
+        while let Some(r) = resolved["$ref"].as_str() {
+            depth += 1;
+            if depth > 8 {
+                return Ok(None);
+            }
+            let target = schema_ref_name(r)?;
+            resolved = schemas
+                .get(target)
+                .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?;
+        }
+        let scalar = match resolved["type"].as_str() {
+            Some("string") | None => continue,
+            Some("boolean") => Scalar::Bool,
+            Some("number") => Scalar::F64,
+            Some("integer") => match resolved["format"]
+                .as_str()
+                .or_else(|| schema["x-protobuf-data-type"].as_str())
+            {
+                Some("int32") => Scalar::I32,
+                Some("uint64") => Scalar::U64,
+                _ => Scalar::I64,
+            },
+            Some(_) => return Ok(None),
+        };
+        return Ok(Some(TypeRef::Scalar(scalar)));
+    }
+    Ok(None)
+}
+
+/// The schema without its `null` variants (`oneOf [const "all", null]`
+/// becomes `oneOf [const "all"]`), for a type sent as a query parameter,
+/// which cannot be null
+fn without_null_variants(schema: &Value, schemas: &Map<String, Value>) -> anyhow::Result<Value> {
+    let mut schema = schema.clone();
+    for key in ["oneOf", "anyOf"] {
+        if let Some(variants) = schema[key].as_array() {
+            let mut kept = Vec::with_capacity(variants.len());
+            for variant in variants {
+                let resolved = match variant["$ref"].as_str() {
+                    Some(r) => schemas
+                        .get(schema_ref_name(r)?)
+                        .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?,
+                    None => variant,
+                };
+                if resolved["type"].as_str() != Some("null") {
+                    kept.push(variant.clone());
+                }
+            }
+            schema[key] = Value::Array(kept);
+        }
+    }
+    Ok(schema)
 }
 
 /// The `oneOf`/`anyOf` variant list of a schema, if it is a union
@@ -1561,6 +1683,82 @@ mod tests {
 
     /// The model of a single `t` operation group whose 200 response is the
     /// `t___Root` schema, with the given schemas
+    /// The model of a fixture whose `t` response is `t___Root`, plus the
+    /// given union parameter schemas
+    fn fixture_model_with_params(schemas: Value, params: &[&str]) -> ResponseModel {
+        let spec = serde_json::json!({
+            "components": {
+                "schemas": schemas,
+                "responses": {
+                    "t___200": { "content": { "application/json": { "schema": {
+                        "$ref": "#/components/schemas/t___Root"
+                    } } } }
+                }
+            }
+        });
+        let params: BTreeSet<String> = params.iter().map(|p| p.to_string()).collect();
+        read_model(&spec, &["t"], &params).unwrap()
+    }
+
+    fn stringified_fixture() -> Value {
+        serde_json::json!({
+            "t___Root": { "type": "object", "properties": { "n": { "type": "integer" } } },
+            "_common___StringifiedInteger": {
+                "oneOf": [ { "type": "integer" }, { "type": "string" } ],
+                "x-protobuf-data-type": "int32"
+            },
+            "t___Options": {
+                "oneOf": [ { "type": "string", "const": "all" }, { "type": "null" } ]
+            },
+            "t___Shards": {
+                "oneOf": [
+                    { "title": "count", "$ref": "#/components/schemas/_common___StringifiedInteger" },
+                    { "title": "option", "$ref": "#/components/schemas/t___Options" }
+                ]
+            }
+        })
+    }
+
+    #[test]
+    fn parameter_only_unions_take_the_typed_form_of_stringified_schemas() {
+        let model = fixture_model_with_params(stringified_fixture(), &["t___Shards"]);
+        // both variants resolve to distinct JSON kinds: a parameter type
+        assert!(model.param_types.contains("t___Shards"));
+        let union = match &model.types["t___Shards"] {
+            TypeModel::DispatchUnion(u) => u,
+            other => panic!("expected a dispatch union, got {:?}", other),
+        };
+        // StringifiedInteger is its typed form, at the width of
+        // x-protobuf-data-type
+        assert_eq!(union.variants[0].ty, TypeRef::Scalar(Scalar::I32));
+        // the null variant is dropped: a query parameter cannot be null
+        assert!(!union.nullable);
+        assert!(matches!(
+            &model.types["t___Options"],
+            TypeModel::StrEnum(e) if e.values.len() == 1 && e.values[0].value == "all"
+        ));
+        // the union of the Stringified schema itself is not generated
+        assert!(!model.types.contains_key("_common___StringifiedInteger"));
+    }
+
+    #[test]
+    fn a_union_responses_also_reach_keeps_its_response_type() {
+        // the same union, now also a response field
+        let mut schemas = stringified_fixture();
+        schemas["t___Root"]["properties"]["shards"] =
+            serde_json::json!({ "$ref": "#/components/schemas/t___Shards" });
+        let model = fixture_model_with_params(schemas, &["t___Shards"]);
+        // decoded from responses, the string forms overlap: it stays lazy,
+        // so it is no parameter type and the parameter keeps a string
+        assert!(matches!(
+            &model.types["t___Shards"],
+            TypeModel::LazyUnion(_)
+        ));
+        assert!(!model.param_types.contains("t___Shards"));
+        // and the response sees the Stringified union, not an i32
+        assert!(model.types.contains_key("_common___StringifiedInteger"));
+    }
+
     fn fixture_model(schemas: Value) -> ResponseModel {
         let spec = serde_json::json!({
             "components": {

@@ -91,6 +91,16 @@ impl<'de> serde::Deserialize<'de> for ActionType {
         })
     }
 }
+impl From<&str> for ActionType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ADD" => ActionType::Add,
+            "DELETE" => ActionType::Delete,
+            "UPDATE" => ActionType::Update,
+            _ => ActionType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AdditionalConfig {
@@ -145,6 +155,16 @@ impl<'de> serde::Deserialize<'de> for AgentType {
             "flow" => AgentType::Flow,
             _ => AgentType::Unknown(s),
         })
+    }
+}
+impl From<&str> for AgentType {
+    fn from(s: &str) -> Self {
+        match s {
+            "conversational" => AgentType::Conversational,
+            "conversational_flow" => AgentType::ConversationalFlow,
+            "flow" => AgentType::Flow,
+            _ => AgentType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -234,6 +254,15 @@ impl<'de> serde::Deserialize<'de> for ByteOrder {
         })
     }
 }
+impl From<&str> for ByteOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "BIG_ENDIAN" => ByteOrder::BigEndian,
+            "LITTLE_ENDIAN" => ByteOrder::LittleEndian,
+            _ => ByteOrder::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ColumnMeta {
@@ -292,6 +321,17 @@ impl<'de> serde::Deserialize<'de> for ColumnType {
         })
     }
 }
+impl From<&str> for ColumnType {
+    fn from(s: &str) -> Self {
+        match s {
+            "BOOLEAN" => ColumnType::Boolean,
+            "DOUBLE" => ColumnType::Double,
+            "INTEGER" => ColumnType::Integer,
+            "STRING" => ColumnType::String,
+            _ => ColumnType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The connector protocol."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -332,6 +372,15 @@ impl<'de> serde::Deserialize<'de> for ConnectorProtocol {
             "http" => ConnectorProtocol::Http,
             _ => ConnectorProtocol::Unknown(s),
         })
+    }
+}
+impl From<&str> for ConnectorProtocol {
+    fn from(s: &str) -> Self {
+        match s {
+            "aws_sigv4" => ConnectorProtocol::AwsSigv4,
+            "http" => ConnectorProtocol::Http,
+            _ => ConnectorProtocol::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -663,6 +712,34 @@ impl<'de> serde::Deserialize<'de> for FunctionName {
             "TEXT_SIMILARITY" | "text_similarity" => FunctionName::TextSimilarity,
             _ => FunctionName::Unknown(s),
         })
+    }
+}
+impl From<&str> for FunctionName {
+    fn from(s: &str) -> Self {
+        match s {
+            "AD_LIBSVM" | "ad_libsvm" => FunctionName::AdLibsvm,
+            "AGENT" | "agent" => FunctionName::Agent,
+            "ANOMALY_LOCALIZATION" | "anomaly_localization" => FunctionName::AnomalyLocalization,
+            "BATCH_RCF" | "batch_rcf" => FunctionName::BatchRcf,
+            "CONNECTOR" | "connector" => FunctionName::Connector,
+            "FIT_RCF" | "fit_rcf" => FunctionName::FitRcf,
+            "KMEANS" | "kmeans" => FunctionName::Kmeans,
+            "LINEAR_REGRESSION" | "linear_regression" => FunctionName::LinearRegression,
+            "LOCAL_SAMPLE_CALCULATOR" | "local_sample_calculator" => {
+                FunctionName::LocalSampleCalculator
+            }
+            "LOGISTIC_REGRESSION" | "logistic_regression" => FunctionName::LogisticRegression,
+            "METRICS_CORRELATION" | "metrics_correlation" => FunctionName::MetricsCorrelation,
+            "QUESTION_ANSWERING" | "question_answering" => FunctionName::QuestionAnswering,
+            "RCF_SUMMARIZE" | "rcf_summarize" => FunctionName::RcfSummarize,
+            "REMOTE" | "remote" => FunctionName::Remote,
+            "SAMPLE_ALGO" | "sample_algo" => FunctionName::SampleAlgo,
+            "SPARSE_ENCODING" | "sparse_encoding" => FunctionName::SparseEncoding,
+            "SPARSE_TOKENIZE" | "sparse_tokenize" => FunctionName::SparseTokenize,
+            "TEXT_EMBEDDING" | "text_embedding" => FunctionName::TextEmbedding,
+            "TEXT_SIMILARITY" | "text_similarity" => FunctionName::TextSimilarity,
+            _ => FunctionName::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1279,6 +1356,17 @@ impl<'de> serde::Deserialize<'de> for MlIndexStatus {
         })
     }
 }
+impl From<&str> for MlIndexStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "green" => MlIndexStatus::Green,
+            "non-existent" => MlIndexStatus::NonExistent,
+            "red" => MlIndexStatus::Red,
+            "yellow" => MlIndexStatus::Yellow,
+            _ => MlIndexStatus::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The input type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1335,6 +1423,19 @@ impl<'de> serde::Deserialize<'de> for MlInputDataType {
             "TEXT_SIMILARITY" => MlInputDataType::TextSimilarity,
             _ => MlInputDataType::Unknown(s),
         })
+    }
+}
+impl From<&str> for MlInputDataType {
+    fn from(s: &str) -> Self {
+        match s {
+            "DATA_FRAME" => MlInputDataType::DataFrame,
+            "QUESTION_ANSWERING" => MlInputDataType::QuestionAnswering,
+            "REMOTE" => MlInputDataType::Remote,
+            "SEARCH_QUERY" => MlInputDataType::SearchQuery,
+            "TEXT_DOCS" => MlInputDataType::TextDocs,
+            "TEXT_SIMILARITY" => MlInputDataType::TextSimilarity,
+            _ => MlInputDataType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1411,6 +1512,23 @@ impl<'de> serde::Deserialize<'de> for MlResultDataType {
         })
     }
 }
+impl From<&str> for MlResultDataType {
+    fn from(s: &str) -> Self {
+        match s {
+            "BOOLEAN" => MlResultDataType::Boolean,
+            "FLOAT16" => MlResultDataType::Float16,
+            "FLOAT32" => MlResultDataType::Float32,
+            "FLOAT64" => MlResultDataType::Float64,
+            "INT32" => MlResultDataType::Int32,
+            "INT64" => MlResultDataType::Int64,
+            "INT8" => MlResultDataType::Int8,
+            "STRING" => MlResultDataType::String,
+            "UINT8" => MlResultDataType::Uint8,
+            "UNKNOWN" => MlResultDataType::Value10,
+            _ => MlResultDataType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "Task type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1475,6 +1593,21 @@ impl<'de> serde::Deserialize<'de> for MlTaskType {
             "TRAINING_AND_PREDICTION" => MlTaskType::TrainingAndPrediction,
             _ => MlTaskType::Unknown(s),
         })
+    }
+}
+impl From<&str> for MlTaskType {
+    fn from(s: &str) -> Self {
+        match s {
+            "BATCH_INGEST" => MlTaskType::BatchIngest,
+            "BATCH_PREDICTION" => MlTaskType::BatchPrediction,
+            "DEPLOY_MODEL" => MlTaskType::DeployModel,
+            "EXECUTION" => MlTaskType::Execution,
+            "PREDICTION" => MlTaskType::Prediction,
+            "REGISTER_MODEL" => MlTaskType::RegisterModel,
+            "TRAINING" => MlTaskType::Training,
+            "TRAINING_AND_PREDICTION" => MlTaskType::TrainingAndPrediction,
+            _ => MlTaskType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1578,6 +1711,15 @@ impl<'de> serde::Deserialize<'de> for ModelFormat {
         })
     }
 }
+impl From<&str> for ModelFormat {
+    fn from(s: &str) -> Self {
+        match s {
+            "ONNX" => ModelFormat::Onnx,
+            "TORCH_SCRIPT" => ModelFormat::TorchScript,
+            _ => ModelFormat::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ModelGroup {
@@ -1639,6 +1781,16 @@ impl<'de> serde::Deserialize<'de> for ModelGroupAccessMode {
             "restricted" => ModelGroupAccessMode::Restricted,
             _ => ModelGroupAccessMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for ModelGroupAccessMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "private" => ModelGroupAccessMode::Private,
+            "public" => ModelGroupAccessMode::Public,
+            "restricted" => ModelGroupAccessMode::Restricted,
+            _ => ModelGroupAccessMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1744,6 +1896,20 @@ impl<'de> serde::Deserialize<'de> for ModelState {
             "UNDEPLOYED" => ModelState::Undeployed,
             _ => ModelState::Unknown(s),
         })
+    }
+}
+impl From<&str> for ModelState {
+    fn from(s: &str) -> Self {
+        match s {
+            "DEPLOYED" => ModelState::Deployed,
+            "DEPLOYING" => ModelState::Deploying,
+            "DEPLOY_FAILED" => ModelState::DeployFailed,
+            "PARTIALLY_DEPLOYED" => ModelState::PartiallyDeployed,
+            "REGISTERED" => ModelState::Registered,
+            "REGISTERING" => ModelState::Registering,
+            "UNDEPLOYED" => ModelState::Undeployed,
+            _ => ModelState::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1997,6 +2163,15 @@ impl<'de> serde::Deserialize<'de> for PayloadType {
         })
     }
 }
+impl From<&str> for PayloadType {
+    fn from(s: &str) -> Self {
+        match s {
+            "conversational" => PayloadType::Conversational,
+            "data" => PayloadType::Data,
+            _ => PayloadType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PredictModelOutput {
@@ -2136,6 +2311,20 @@ impl<'de> serde::Deserialize<'de> for RateLimiterUnit {
             "SECONDS" => RateLimiterUnit::Seconds,
             _ => RateLimiterUnit::Unknown(s),
         })
+    }
+}
+impl From<&str> for RateLimiterUnit {
+    fn from(s: &str) -> Self {
+        match s {
+            "DAYS" => RateLimiterUnit::Days,
+            "HOURS" => RateLimiterUnit::Hours,
+            "MICROSECONDS" => RateLimiterUnit::Microseconds,
+            "MILLISECONDS" => RateLimiterUnit::Milliseconds,
+            "MINUTES" => RateLimiterUnit::Minutes,
+            "NANOSECONDS" => RateLimiterUnit::Nanoseconds,
+            "SECONDS" => RateLimiterUnit::Seconds,
+            _ => RateLimiterUnit::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3361,6 +3550,19 @@ impl<'de> serde::Deserialize<'de> for Status {
         })
     }
 }
+impl From<&str> for Status {
+    fn from(s: &str) -> Self {
+        match s {
+            "CANCELLED" => Status::Cancelled,
+            "COMPLETED" => Status::Completed,
+            "COMPLETED_WITH_ERROR" => Status::CompletedWithError,
+            "CREATED" => Status::Created,
+            "FAILED" => Status::Failed,
+            "RUNNING" => Status::Running,
+            _ => Status::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Strategy {
@@ -3435,6 +3637,16 @@ impl<'de> serde::Deserialize<'de> for StrategyType {
             "USER_PREFERENCE" => StrategyType::UserPreference,
             _ => StrategyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for StrategyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "SEMANTIC" => StrategyType::Semantic,
+            "SUMMARY" => StrategyType::Summary,
+            "USER_PREFERENCE" => StrategyType::UserPreference,
+            _ => StrategyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3523,6 +3735,21 @@ impl<'de> serde::Deserialize<'de> for TaskState {
             "RUNNING" => TaskState::Running,
             _ => TaskState::Unknown(s),
         })
+    }
+}
+impl From<&str> for TaskState {
+    fn from(s: &str) -> Self {
+        match s {
+            "CANCELLED" => TaskState::Cancelled,
+            "CANCELLING" => TaskState::Cancelling,
+            "COMPLETED" => TaskState::Completed,
+            "COMPLETED_WITH_ERROR" => TaskState::CompletedWithError,
+            "CREATED" => TaskState::Created,
+            "EXPIRED" => TaskState::Expired,
+            "FAILED" => TaskState::Failed,
+            "RUNNING" => TaskState::Running,
+            _ => TaskState::Unknown(s.to_string()),
+        }
     }
 }
 

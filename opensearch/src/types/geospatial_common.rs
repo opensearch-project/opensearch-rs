@@ -90,6 +90,17 @@ impl<'de> serde::Deserialize<'de> for DataSourceState {
         })
     }
 }
+impl From<&str> for DataSourceState {
+    fn from(s: &str) -> Self {
+        match s {
+            "AVAILABLE" => DataSourceState::Available,
+            "CREATE_FAILED" => DataSourceState::CreateFailed,
+            "CREATING" => DataSourceState::Creating,
+            "DELETING" => DataSourceState::Deleting,
+            _ => DataSourceState::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Database {

@@ -68,6 +68,15 @@ impl<'de> serde::Deserialize<'de> for GroupingType {
         })
     }
 }
+impl From<&str> for GroupingType {
+    fn from(s: &str) -> Self {
+        match s {
+            "NONE" | "none" => GroupingType::None,
+            "SIMILARITY" | "similarity" => GroupingType::Similarity,
+            _ => GroupingType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Measurement {

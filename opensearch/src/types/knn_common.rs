@@ -74,6 +74,15 @@ impl<'de> serde::Deserialize<'de> for DeletionResult {
         })
     }
 }
+impl From<&str> for DeletionResult {
+    fn from(s: &str) -> Self {
+        match s {
+            "deleted" => DeletionResult::Deleted,
+            "error" => DeletionResult::Error,
+            _ => DeletionResult::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GraphMergeStats {

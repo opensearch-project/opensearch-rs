@@ -68,6 +68,15 @@ impl<'de> serde::Deserialize<'de> for ErrorPolicy {
         })
     }
 }
+impl From<&str> for ErrorPolicy {
+    fn from(s: &str) -> Self {
+        match s {
+            "BLOCK" => ErrorPolicy::Block,
+            "DROP" => ErrorPolicy::Drop,
+            _ => ErrorPolicy::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GetIngestionStateResponse {
@@ -157,6 +166,18 @@ impl<'de> serde::Deserialize<'de> for PollerState {
             "PROCESSING" => PollerState::Processing,
             _ => PollerState::Unknown(s),
         })
+    }
+}
+impl From<&str> for PollerState {
+    fn from(s: &str) -> Self {
+        match s {
+            "CLOSED" => PollerState::Closed,
+            "NONE" => PollerState::None,
+            "PAUSED" => PollerState::Paused,
+            "POLLING" => PollerState::Polling,
+            "PROCESSING" => PollerState::Processing,
+            _ => PollerState::Unknown(s.to_string()),
+        }
     }
 }
 

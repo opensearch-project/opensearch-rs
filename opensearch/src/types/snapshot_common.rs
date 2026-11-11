@@ -244,6 +244,18 @@ impl<'de> serde::Deserialize<'de> for SnapshotShardsStatsStage {
         })
     }
 }
+impl From<&str> for SnapshotShardsStatsStage {
+    fn from(s: &str) -> Self {
+        match s {
+            "DONE" => SnapshotShardsStatsStage::Done,
+            "FAILURE" => SnapshotShardsStatsStage::Failure,
+            "FINALIZE" => SnapshotShardsStatsStage::Finalize,
+            "INIT" => SnapshotShardsStatsStage::Init,
+            "STARTED" => SnapshotShardsStatsStage::Started,
+            _ => SnapshotShardsStatsStage::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SnapshotShardsStatsSummary {

@@ -315,6 +315,18 @@ impl<'de> serde::Deserialize<'de> for ChildScoreMode {
         })
     }
 }
+impl From<&str> for ChildScoreMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => ChildScoreMode::Avg,
+            "max" => ChildScoreMode::Max,
+            "min" => ChildScoreMode::Min,
+            "none" => ChildScoreMode::None,
+            "sum" => ChildScoreMode::Sum,
+            _ => ChildScoreMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CombinedFieldsOperator {
@@ -354,6 +366,15 @@ impl<'de> serde::Deserialize<'de> for CombinedFieldsOperator {
             "or" => CombinedFieldsOperator::Or,
             _ => CombinedFieldsOperator::Unknown(s),
         })
+    }
+}
+impl From<&str> for CombinedFieldsOperator {
+    fn from(s: &str) -> Self {
+        match s {
+            "and" => CombinedFieldsOperator::And,
+            "or" => CombinedFieldsOperator::Or,
+            _ => CombinedFieldsOperator::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -418,6 +439,15 @@ impl<'de> serde::Deserialize<'de> for CombinedFieldsZeroTerms {
             "none" => CombinedFieldsZeroTerms::None,
             _ => CombinedFieldsZeroTerms::Unknown(s),
         })
+    }
+}
+impl From<&str> for CombinedFieldsZeroTerms {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => CombinedFieldsZeroTerms::All,
+            "none" => CombinedFieldsZeroTerms::None,
+            _ => CombinedFieldsZeroTerms::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -883,6 +913,23 @@ impl<'de> serde::Deserialize<'de> for FieldValueFactorModifier {
         })
     }
 }
+impl From<&str> for FieldValueFactorModifier {
+    fn from(s: &str) -> Self {
+        match s {
+            "ln" => FieldValueFactorModifier::Ln,
+            "ln1p" => FieldValueFactorModifier::Ln1P,
+            "ln2p" => FieldValueFactorModifier::Ln2P,
+            "log" => FieldValueFactorModifier::Log,
+            "log1p" => FieldValueFactorModifier::Log1P,
+            "log2p" => FieldValueFactorModifier::Log2P,
+            "none" => FieldValueFactorModifier::None,
+            "reciprocal" => FieldValueFactorModifier::Reciprocal,
+            "sqrt" => FieldValueFactorModifier::Sqrt,
+            "square" => FieldValueFactorModifier::Square,
+            _ => FieldValueFactorModifier::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldValueFactorScoreFunction {
@@ -951,6 +998,19 @@ impl<'de> serde::Deserialize<'de> for FunctionBoostMode {
             "sum" => FunctionBoostMode::Sum,
             _ => FunctionBoostMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for FunctionBoostMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => FunctionBoostMode::Avg,
+            "max" => FunctionBoostMode::Max,
+            "min" => FunctionBoostMode::Min,
+            "multiply" => FunctionBoostMode::Multiply,
+            "replace" => FunctionBoostMode::Replace,
+            "sum" => FunctionBoostMode::Sum,
+            _ => FunctionBoostMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1028,6 +1088,19 @@ impl<'de> serde::Deserialize<'de> for FunctionScoreMode {
             "sum" => FunctionScoreMode::Sum,
             _ => FunctionScoreMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for FunctionScoreMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => FunctionScoreMode::Avg,
+            "first" => FunctionScoreMode::First,
+            "max" => FunctionScoreMode::Max,
+            "min" => FunctionScoreMode::Min,
+            "multiply" => FunctionScoreMode::Multiply,
+            "sum" => FunctionScoreMode::Sum,
+            _ => FunctionScoreMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1453,6 +1526,15 @@ impl<'de> serde::Deserialize<'de> for GeoExecution {
         })
     }
 }
+impl From<&str> for GeoExecution {
+    fn from(s: &str) -> Self {
+        match s {
+            "indexed" => GeoExecution::Indexed,
+            "memory" => GeoExecution::Memory,
+            _ => GeoExecution::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeoPolygonPoints {
@@ -1736,6 +1818,16 @@ impl<'de> serde::Deserialize<'de> for GeoValidationMethod {
             "strict" => GeoValidationMethod::Strict,
             _ => GeoValidationMethod::Unknown(s),
         })
+    }
+}
+impl From<&str> for GeoValidationMethod {
+    fn from(s: &str) -> Self {
+        match s {
+            "coerce" => GeoValidationMethod::Coerce,
+            "ignore_malformed" => GeoValidationMethod::IgnoreMalformed,
+            "strict" => GeoValidationMethod::Strict,
+            _ => GeoValidationMethod::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2647,6 +2739,17 @@ impl<'de> serde::Deserialize<'de> for MultiValueMode {
         })
     }
 }
+impl From<&str> for MultiValueMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => MultiValueMode::Avg,
+            "max" => MultiValueMode::Max,
+            "min" => MultiValueMode::Min,
+            "sum" => MultiValueMode::Sum,
+            _ => MultiValueMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedQuery {
@@ -2879,6 +2982,15 @@ impl<'de> serde::Deserialize<'de> for Operator {
             "or" | "OR" => Operator::Or,
             _ => Operator::Unknown(s),
         })
+    }
+}
+impl From<&str> for Operator {
+    fn from(s: &str) -> Self {
+        match s {
+            "and" | "AND" => Operator::And,
+            "or" | "OR" => Operator::Or,
+            _ => Operator::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3342,6 +3454,16 @@ impl<'de> serde::Deserialize<'de> for RangeRelation {
         })
     }
 }
+impl From<&str> for RangeRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "contains" => RangeRelation::Contains,
+            "intersects" => RangeRelation::Intersects,
+            "within" => RangeRelation::Within,
+            _ => RangeRelation::Unknown(s.to_string()),
+        }
+    }
+}
 
 pub type RankFeatureFunctionLinear = std::collections::BTreeMap<String, serde_json::Value>;
 
@@ -3575,6 +3697,26 @@ impl<'de> serde::Deserialize<'de> for SimpleQueryStringFlag {
             "WHITESPACE" => SimpleQueryStringFlag::Whitespace,
             _ => SimpleQueryStringFlag::Unknown(s),
         })
+    }
+}
+impl From<&str> for SimpleQueryStringFlag {
+    fn from(s: &str) -> Self {
+        match s {
+            "ALL" => SimpleQueryStringFlag::All,
+            "AND" => SimpleQueryStringFlag::And,
+            "ESCAPE" => SimpleQueryStringFlag::Escape,
+            "FUZZY" => SimpleQueryStringFlag::Fuzzy,
+            "NEAR" => SimpleQueryStringFlag::Near,
+            "NONE" => SimpleQueryStringFlag::None,
+            "NOT" => SimpleQueryStringFlag::Not,
+            "OR" => SimpleQueryStringFlag::Or,
+            "PHRASE" => SimpleQueryStringFlag::Phrase,
+            "PRECEDENCE" => SimpleQueryStringFlag::Precedence,
+            "PREFIX" => SimpleQueryStringFlag::Prefix,
+            "SLOP" => SimpleQueryStringFlag::Slop,
+            "WHITESPACE" => SimpleQueryStringFlag::Whitespace,
+            _ => SimpleQueryStringFlag::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4094,6 +4236,15 @@ impl<'de> serde::Deserialize<'de> for TermsQueryValueType {
         })
     }
 }
+impl From<&str> for TermsQueryValueType {
+    fn from(s: &str) -> Self {
+        match s {
+            "bitmap" => TermsQueryValueType::Bitmap,
+            "default" => TermsQueryValueType::Default,
+            _ => TermsQueryValueType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TermsSetQuery {
@@ -4164,6 +4315,19 @@ impl<'de> serde::Deserialize<'de> for TextQueryType {
             "phrase_prefix" => TextQueryType::PhrasePrefix,
             _ => TextQueryType::Unknown(s),
         })
+    }
+}
+impl From<&str> for TextQueryType {
+    fn from(s: &str) -> Self {
+        match s {
+            "best_fields" => TextQueryType::BestFields,
+            "bool_prefix" => TextQueryType::BoolPrefix,
+            "cross_fields" => TextQueryType::CrossFields,
+            "most_fields" => TextQueryType::MostFields,
+            "phrase" => TextQueryType::Phrase,
+            "phrase_prefix" => TextQueryType::PhrasePrefix,
+            _ => TextQueryType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4414,5 +4578,14 @@ impl<'de> serde::Deserialize<'de> for ZeroTermsQuery {
             "none" | "NONE" => ZeroTermsQuery::None,
             _ => ZeroTermsQuery::Unknown(s),
         })
+    }
+}
+impl From<&str> for ZeroTermsQuery {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" | "ALL" => ZeroTermsQuery::All,
+            "none" | "NONE" => ZeroTermsQuery::None,
+            _ => ZeroTermsQuery::Unknown(s.to_string()),
+        }
     }
 }

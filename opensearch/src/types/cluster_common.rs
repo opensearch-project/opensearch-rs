@@ -104,8 +104,12 @@ impl From<String> for WaitForNodes {
         WaitForNodes::Comparison(value)
     }
 }
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
 impl From<&str> for WaitForNodes {
-    fn from(value: &str) -> Self {
-        WaitForNodes::Comparison(value.to_string())
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return WaitForNodes::Count(value);
+        }
+        WaitForNodes::Comparison(s.to_string())
     }
 }

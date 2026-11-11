@@ -228,6 +228,20 @@ impl<'de> serde::Deserialize<'de> for ConvertType {
         })
     }
 }
+impl From<&str> for ConvertType {
+    fn from(s: &str) -> Self {
+        match s {
+            "auto" => ConvertType::Auto,
+            "boolean" => ConvertType::Boolean,
+            "double" => ConvertType::Double,
+            "float" => ConvertType::Float,
+            "integer" => ConvertType::Integer,
+            "long" => ConvertType::Long,
+            "string" => ConvertType::String,
+            _ => ConvertType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CsvProcessor {
@@ -635,6 +649,15 @@ impl<'de> serde::Deserialize<'de> for JsonProcessorConflictStrategy {
         })
     }
 }
+impl From<&str> for JsonProcessorConflictStrategy {
+    fn from(s: &str) -> Self {
+        match s {
+            "merge" => JsonProcessorConflictStrategy::Merge,
+            "replace" => JsonProcessorConflictStrategy::Replace,
+            _ => JsonProcessorConflictStrategy::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KeyValueProcessor {
@@ -963,6 +986,15 @@ impl<'de> serde::Deserialize<'de> for ShapeType {
         })
     }
 }
+impl From<&str> for ShapeType {
+    fn from(s: &str) -> Self {
+        match s {
+            "geo_shape" => ShapeType::GeoShape,
+            "xy_shape" => ShapeType::XyShape,
+            _ => ShapeType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SortProcessor {
@@ -1217,5 +1249,22 @@ impl<'de> serde::Deserialize<'de> for UserAgentProperty {
             "PATCH" => UserAgentProperty::Patch,
             _ => UserAgentProperty::Unknown(s),
         })
+    }
+}
+impl From<&str> for UserAgentProperty {
+    fn from(s: &str) -> Self {
+        match s {
+            "BUILD" => UserAgentProperty::Build,
+            "DEVICE" => UserAgentProperty::Device,
+            "MAJOR" => UserAgentProperty::Major,
+            "MINOR" => UserAgentProperty::Minor,
+            "NAME" => UserAgentProperty::Name,
+            "OS" => UserAgentProperty::Os,
+            "OS_MAJOR" => UserAgentProperty::OsMajor,
+            "OS_MINOR" => UserAgentProperty::OsMinor,
+            "OS_NAME" => UserAgentProperty::OsName,
+            "PATCH" => UserAgentProperty::Patch,
+            _ => UserAgentProperty::Unknown(s.to_string()),
+        }
     }
 }

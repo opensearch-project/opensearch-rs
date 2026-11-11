@@ -253,6 +253,17 @@ impl<'de> serde::Deserialize<'de> for ShardRoutingState {
         })
     }
 }
+impl From<&str> for ShardRoutingState {
+    fn from(s: &str) -> Self {
+        match s {
+            "INITIALIZING" => ShardRoutingState::Initializing,
+            "RELOCATING" => ShardRoutingState::Relocating,
+            "STARTED" => ShardRoutingState::Started,
+            "UNASSIGNED" => ShardRoutingState::Unassigned,
+            _ => ShardRoutingState::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The sequence number information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

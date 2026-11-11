@@ -696,7 +696,7 @@ pub struct IndicesClone<'a, 'b, B> {
     source: Option<&'b str>,
     task_execution_timeout: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
     wait_for_completion: Option<bool>,
 }
 impl<'a, 'b, B> IndicesClone<'a, 'b, B>
@@ -806,8 +806,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Should this request wait until the operation has completed before returning."]
@@ -835,7 +838,7 @@ where
                 source: Option<&'b str>,
                 task_execution_timeout: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
                 wait_for_completion: Option<bool>,
             }
             let query_params = QueryParams {
@@ -903,7 +906,7 @@ pub struct IndicesClose<'a, 'b, B> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
 }
 impl<'a, 'b, B> IndicesClose<'a, 'b, B>
 where
@@ -1024,8 +1027,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Creates an asynchronous call to the Indices Close API that can be awaited"]
@@ -1051,7 +1057,7 @@ where
                 pretty: Option<bool>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
             }
             let query_params = QueryParams {
                 allow_no_indices: self.allow_no_indices,
@@ -1114,7 +1120,7 @@ pub struct IndicesCreate<'a, 'b, B> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
 }
 impl<'a, 'b, B> IndicesCreate<'a, 'b, B>
 where
@@ -1214,8 +1220,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation. \nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Creates an asynchronous call to the Indices Create API that can be awaited"]
@@ -1237,7 +1246,7 @@ where
                 pretty: Option<bool>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
             }
             let query_params = QueryParams {
                 cluster_manager_timeout: self.cluster_manager_timeout,
@@ -4984,7 +4993,7 @@ pub struct IndicesOpen<'a, 'b, B> {
     source: Option<&'b str>,
     task_execution_timeout: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
     wait_for_completion: Option<bool>,
 }
 impl<'a, 'b, B> IndicesOpen<'a, 'b, B>
@@ -5115,8 +5124,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Should this request wait until the operation has completed before returning."]
@@ -5148,7 +5160,7 @@ where
                 source: Option<&'b str>,
                 task_execution_timeout: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
                 wait_for_completion: Option<bool>,
             }
             let query_params = QueryParams {
@@ -6695,7 +6707,7 @@ pub struct IndicesRollover<'a, 'b, B> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
 }
 impl<'a, 'b, B> IndicesRollover<'a, 'b, B>
 where
@@ -6802,8 +6814,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Creates an asynchronous call to the Indices Rollover API that can be awaited"]
@@ -6826,7 +6841,7 @@ where
                 pretty: Option<bool>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
             }
             let query_params = QueryParams {
                 cluster_manager_timeout: self.cluster_manager_timeout,
@@ -7216,7 +7231,7 @@ pub struct IndicesShrink<'a, 'b, B> {
     source: Option<&'b str>,
     task_execution_timeout: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
     wait_for_completion: Option<bool>,
 }
 impl<'a, 'b, B> IndicesShrink<'a, 'b, B>
@@ -7333,8 +7348,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Should this request wait until the operation has completed before returning."]
@@ -7363,7 +7381,7 @@ where
                 source: Option<&'b str>,
                 task_execution_timeout: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
                 wait_for_completion: Option<bool>,
             }
             let query_params = QueryParams {
@@ -7781,7 +7799,7 @@ pub struct IndicesSplit<'a, 'b, B> {
     source: Option<&'b str>,
     task_execution_timeout: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
     wait_for_completion: Option<bool>,
 }
 impl<'a, 'b, B> IndicesSplit<'a, 'b, B>
@@ -7898,8 +7916,11 @@ where
         self
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     #[doc = "Should this request wait until the operation has completed before returning."]
@@ -7928,7 +7949,7 @@ where
                 source: Option<&'b str>,
                 task_execution_timeout: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
                 wait_for_completion: Option<bool>,
             }
             let query_params = QueryParams {

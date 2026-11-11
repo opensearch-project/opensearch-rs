@@ -333,6 +333,17 @@ impl<'de> serde::Deserialize<'de> for WorkFlowState {
         })
     }
 }
+impl From<&str> for WorkFlowState {
+    fn from(s: &str) -> Self {
+        match s {
+            "COMPLETED" => WorkFlowState::Completed,
+            "FAILED" => WorkFlowState::Failed,
+            "NOT_STARTED" => WorkFlowState::NotStarted,
+            "PROVISIONING" => WorkFlowState::Provisioning,
+            _ => WorkFlowState::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WorkFlowStatusDefaultResponse {

@@ -360,6 +360,14 @@ impl<'de> serde::Deserialize<'de> for InfoCounterStatObjectStatType {
         })
     }
 }
+impl From<&str> for InfoCounterStatObjectStatType {
+    fn from(s: &str) -> Self {
+        match s {
+            "info_counter" => InfoCounterStatObjectStatType::InfoCounter,
+            _ => InfoCounterStatObjectStatType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -499,6 +507,14 @@ impl<'de> serde::Deserialize<'de> for InfoStringStatObjectStatType {
             "info_string" => InfoStringStatObjectStatType::InfoString,
             _ => InfoStringStatObjectStatType::Unknown(s),
         })
+    }
+}
+impl From<&str> for InfoStringStatObjectStatType {
+    fn from(s: &str) -> Self {
+        match s {
+            "info_string" => InfoStringStatObjectStatType::InfoString,
+            _ => InfoStringStatObjectStatType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -923,6 +939,16 @@ impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStatObjectStatType 
             }
             _ => TimestampedEventCounterStatObjectStatType::Unknown(s),
         })
+    }
+}
+impl From<&str> for TimestampedEventCounterStatObjectStatType {
+    fn from(s: &str) -> Self {
+        match s {
+            "timestamped_event_counter" => {
+                TimestampedEventCounterStatObjectStatType::TimestampedEventCounter
+            }
+            _ => TimestampedEventCounterStatObjectStatType::Unknown(s.to_string()),
+        }
     }
 }
 

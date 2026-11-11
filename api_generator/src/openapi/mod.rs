@@ -483,7 +483,7 @@ fn to_legacy_type_kind(
     // string) describe a value the server may also write as a string; the
     // specification lets generators drop the union and use the typed form,
     // as opensearch-java does
-    if ref_name.is_some_and(|name| name.starts_with("_common___Stringified")) {
+    if ref_name.is_some_and(responses::is_stringified) {
         if let Some(one_of) = schema["oneOf"].as_array() {
             for variant in one_of {
                 let (resolved, name) = resolver.schema(variant)?;
@@ -936,10 +936,16 @@ components:
                 .as_deref(),
             Some("types::cluster_common::WaitForNodes")
         );
+        // a parameter-only union whose Stringified variant takes its typed
+        // form: kinds no longer overlap
+        assert_eq!(
+            param("bulk", "wait_for_active_shards").model_ty.as_deref(),
+            Some("types::common::WaitForActiveShards")
+        );
         // a union decoded lazily cannot be built by callers: string fallback
-        let shards = param("bulk", "wait_for_active_shards");
-        assert_eq!(shards.ty, TypeKind::String);
-        assert_eq!(shards.model_ty, None);
+        let source = param("bulk", "_source");
+        assert_eq!(source.ty, TypeKind::String);
+        assert_eq!(source.model_ty, None);
         // Stringified* take the type of their non-string variant
         assert_eq!(param("cat.nodes", "full_id").ty, TypeKind::Boolean);
         assert_eq!(param("cat.nodes", "full_id").schema, None);

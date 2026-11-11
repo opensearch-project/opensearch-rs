@@ -83,6 +83,17 @@ impl<'de> serde::Deserialize<'de> for AllocationExplainDecision {
         })
     }
 }
+impl From<&str> for AllocationExplainDecision {
+    fn from(s: &str) -> Self {
+        match s {
+            "ALWAYS" => AllocationExplainDecision::Always,
+            "NO" => AllocationExplainDecision::No,
+            "THROTTLE" => AllocationExplainDecision::Throttle,
+            "YES" => AllocationExplainDecision::Yes,
+            _ => AllocationExplainDecision::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The response of the `cluster.allocation_explain` API"]
 pub type AllocationExplainResponse = crate::types::cluster::AllocationExplainResponse;
@@ -229,6 +240,21 @@ impl<'de> serde::Deserialize<'de> for Decision {
             "yes" => Decision::Yes,
             _ => Decision::Unknown(s),
         })
+    }
+}
+impl From<&str> for Decision {
+    fn from(s: &str) -> Self {
+        match s {
+            "allocation_delayed" => Decision::AllocationDelayed,
+            "awaiting_info" => Decision::AwaitingInfo,
+            "no" => Decision::No,
+            "no_attempt" => Decision::NoAttempt,
+            "no_valid_shard_copy" => Decision::NoValidShardCopy,
+            "throttled" => Decision::Throttled,
+            "worse_balance" => Decision::WorseBalance,
+            "yes" => Decision::Yes,
+            _ => Decision::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -383,5 +409,27 @@ impl<'de> serde::Deserialize<'de> for UnassignedInformationReason {
             "REROUTE_CANCELLED" => UnassignedInformationReason::RerouteCancelled,
             _ => UnassignedInformationReason::Unknown(s),
         })
+    }
+}
+impl From<&str> for UnassignedInformationReason {
+    fn from(s: &str) -> Self {
+        match s {
+            "ALLOCATION_FAILED" => UnassignedInformationReason::AllocationFailed,
+            "CLUSTER_RECOVERED" => UnassignedInformationReason::ClusterRecovered,
+            "DANGLING_INDEX_IMPORTED" => UnassignedInformationReason::DanglingIndexImported,
+            "EXISTING_INDEX_RESTORED" => UnassignedInformationReason::ExistingIndexRestored,
+            "FORCED_EMPTY_PRIMARY" => UnassignedInformationReason::ForcedEmptyPrimary,
+            "INDEX_CREATED" => UnassignedInformationReason::IndexCreated,
+            "INDEX_REOPENED" => UnassignedInformationReason::IndexReopened,
+            "MANUAL_ALLOCATION" => UnassignedInformationReason::ManualAllocation,
+            "NEW_INDEX_RESTORED" => UnassignedInformationReason::NewIndexRestored,
+            "NODE_LEFT" => UnassignedInformationReason::NodeLeft,
+            "PRIMARY_FAILED" => UnassignedInformationReason::PrimaryFailed,
+            "REALLOCATED_REPLICA" => UnassignedInformationReason::ReallocatedReplica,
+            "REINITIALIZED" => UnassignedInformationReason::Reinitialized,
+            "REPLICA_ADDED" => UnassignedInformationReason::ReplicaAdded,
+            "REROUTE_CANCELLED" => UnassignedInformationReason::RerouteCancelled,
+            _ => UnassignedInformationReason::Unknown(s.to_string()),
+        }
     }
 }

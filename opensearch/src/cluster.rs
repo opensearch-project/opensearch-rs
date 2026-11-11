@@ -1463,7 +1463,7 @@ pub struct ClusterHealth<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
     timeout: Option<&'b str>,
-    wait_for_active_shards: Option<&'b str>,
+    wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
     wait_for_events: Option<WaitForEvents>,
     wait_for_no_initializing_shards: Option<bool>,
     wait_for_no_relocating_shards: Option<bool>,
@@ -1567,8 +1567,11 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self.timeout = Some(timeout);
         self
     }
-    pub fn wait_for_active_shards(mut self, wait_for_active_shards: &'b str) -> Self {
-        self.wait_for_active_shards = Some(wait_for_active_shards);
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        mut self,
+        wait_for_active_shards: T,
+    ) -> Self {
+        self.wait_for_active_shards = Some(wait_for_active_shards.into());
         self
     }
     pub fn wait_for_events(mut self, wait_for_events: WaitForEvents) -> Self {
@@ -1625,7 +1628,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
                 pretty: Option<bool>,
                 source: Option<&'b str>,
                 timeout: Option<&'b str>,
-                wait_for_active_shards: Option<&'b str>,
+                wait_for_active_shards: Option<crate::types::common::WaitForActiveShards>,
                 wait_for_events: Option<WaitForEvents>,
                 wait_for_no_initializing_shards: Option<bool>,
                 wait_for_no_relocating_shards: Option<bool>,

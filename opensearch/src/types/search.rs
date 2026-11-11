@@ -178,6 +178,16 @@ impl<'de> serde::Deserialize<'de> for BoundaryScanner {
         })
     }
 }
+impl From<&str> for BoundaryScanner {
+    fn from(s: &str) -> Self {
+        match s {
+            "chars" => BoundaryScanner::Chars,
+            "sentence" => BoundaryScanner::Sentence,
+            "word" => BoundaryScanner::Word,
+            _ => BoundaryScanner::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BuiltinHighlighterType {
@@ -221,6 +231,16 @@ impl<'de> serde::Deserialize<'de> for BuiltinHighlighterType {
             "unified" => BuiltinHighlighterType::Unified,
             _ => BuiltinHighlighterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for BuiltinHighlighterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "plain" => BuiltinHighlighterType::Plain,
+            "fvh" => BuiltinHighlighterType::Fvh,
+            "unified" => BuiltinHighlighterType::Unified,
+            _ => BuiltinHighlighterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -685,6 +705,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterEncoder {
         })
     }
 }
+impl From<&str> for HighlighterEncoder {
+    fn from(s: &str) -> Self {
+        match s {
+            "default" => HighlighterEncoder::Default,
+            "html" => HighlighterEncoder::Html,
+            _ => HighlighterEncoder::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HighlighterFragmenter {
@@ -726,6 +755,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterFragmenter {
         })
     }
 }
+impl From<&str> for HighlighterFragmenter {
+    fn from(s: &str) -> Self {
+        match s {
+            "simple" => HighlighterFragmenter::Simple,
+            "span" => HighlighterFragmenter::Span,
+            _ => HighlighterFragmenter::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HighlighterOrder {
@@ -761,6 +799,14 @@ impl<'de> serde::Deserialize<'de> for HighlighterOrder {
             "score" => HighlighterOrder::Score,
             _ => HighlighterOrder::Unknown(s),
         })
+    }
+}
+impl From<&str> for HighlighterOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "score" => HighlighterOrder::Score,
+            _ => HighlighterOrder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -802,6 +848,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterTagsSchema {
             "styled" => HighlighterTagsSchema::Styled,
             _ => HighlighterTagsSchema::Unknown(s),
         })
+    }
+}
+impl From<&str> for HighlighterTagsSchema {
+    fn from(s: &str) -> Self {
+        match s {
+            "default" => HighlighterTagsSchema::Default,
+            "styled" => HighlighterTagsSchema::Styled,
+            _ => HighlighterTagsSchema::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3381,6 +3436,18 @@ impl<'de> serde::Deserialize<'de> for StringDistance {
         })
     }
 }
+impl From<&str> for StringDistance {
+    fn from(s: &str) -> Self {
+        match s {
+            "damerau_levenshtein" => StringDistance::DamerauLevenshtein,
+            "internal" => StringDistance::Internal,
+            "jaro_winkler" => StringDistance::JaroWinkler,
+            "levenshtein" => StringDistance::Levenshtein,
+            "ngram" => StringDistance::Ngram,
+            _ => StringDistance::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StupidBackoffSmoothingModel {
@@ -3609,6 +3676,15 @@ impl<'de> serde::Deserialize<'de> for SuggestSort {
         })
     }
 }
+impl From<&str> for SuggestSort {
+    fn from(s: &str) -> Self {
+        match s {
+            "frequency" => SuggestSort::Frequency,
+            "score" => SuggestSort::Score,
+            _ => SuggestSort::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Suggester {
@@ -3821,6 +3897,15 @@ impl<'de> serde::Deserialize<'de> for TotalHitsRelation {
             "gte" => TotalHitsRelation::Gte,
             _ => TotalHitsRelation::Unknown(s),
         })
+    }
+}
+impl From<&str> for TotalHitsRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "eq" => TotalHitsRelation::Eq,
+            "gte" => TotalHitsRelation::Gte,
+            _ => TotalHitsRelation::Unknown(s.to_string()),
+        }
     }
 }
 

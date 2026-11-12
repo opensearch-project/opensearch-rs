@@ -7,7 +7,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#391](https://github.com/opensearch-project/opensearch-rs/pull/391))
 - Regenerated the client from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document, removing APIs that no longer exist in OpenSearch: `cat.master`, `indices.unfreeze`, `indices.reload_search_analyzers`, `indices.migrate_to_data_stream`, `indices.promote_data_stream`, `snapshot.get_features` and the `text_structure` namespace
 - Some URL part and query parameter types changed to match the OpenAPI specification (e.g. `IndicesGetIndexTemplateParts::Name` now takes a single `&str`)
-- Marked `http::Method`, `auth::Credentials`, `auth::ClientCertificate` and `cert::CertificateValidation` as `#[non_exhaustive]`, so that variants can be added without a breaking change; a `match` on them outside the crate needs a wildcard arm
+- Marked `auth::Credentials`, `auth::ClientCertificate` and `cert::CertificateValidation` as `#[non_exhaustive]`, so that variants can be added without a breaking change; a `match` on them outside the crate needs a wildcard arm
 
 ### Added
 - Added middleware types to allow intercepting construction and handling of the underlying `reqwest` client & requests ([#232](https://github.com/opensearch-project/opensearch-rs/pull/232)) 

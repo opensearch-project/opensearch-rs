@@ -32,6 +32,7 @@
 
 /// Credentials for authentication
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub enum Credentials {
     /// A username and password to use for Basic authentication
     Basic(String, String),
@@ -59,6 +60,7 @@ pub enum Credentials {
 
 #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub enum ClientCertificate {
     /// Bytes of a DER-formatted PKCS#12 archive and optional passphrase.
     ///

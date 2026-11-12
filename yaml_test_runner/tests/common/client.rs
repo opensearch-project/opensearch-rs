@@ -60,7 +60,7 @@ fn cluster_addr() -> String {
 
 /// Determines if Fiddler.exe proxy process is running
 fn running_proxy() -> bool {
-    let mut system = sysinfo::System::new();
+    let mut system = sysinfo::System::new().expect("Unabled to create System instance");
     system.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
     let running = system
         .processes_by_name(OsStr::new("Fiddler"))

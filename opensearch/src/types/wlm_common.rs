@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryGroupResponse {
     #[doc = "The ID of the query group, which can be used to associate query requests with the group and enforce the group's resource limits."]
     #[serde(rename = "_id")]
@@ -80,6 +81,7 @@ impl QueryGroupResponseResourceLimits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryGroupResponseResourceLimitsObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu: Option<f64>,
@@ -87,6 +89,7 @@ pub struct QueryGroupResponseResourceLimitsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryGroupResponseResourceLimitsObjectObject {
     pub cpu: f64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -94,6 +97,7 @@ pub struct QueryGroupResponseResourceLimitsObjectObject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ResiliencyMode {
     #[doc = "`enforced`"]
     Enforced,

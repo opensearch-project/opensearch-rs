@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankEvalHit {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
@@ -42,6 +43,7 @@ pub struct RankEvalHit {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankEvalHitItem {
     pub hit: crate::types::rank_eval::RankEvalHit,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -49,6 +51,7 @@ pub struct RankEvalHitItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankEvalMetricDetail {
     #[doc = "The `hits` section provides a grouping of the search results with their supplied ratings."]
     pub hits: Vec<crate::types::rank_eval::RankEvalHitItem>,
@@ -64,6 +67,7 @@ pub struct RankEvalMetricDetail {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankEvalResponse {
     #[doc = "The details section contains one entry for every query in the original requests section, keyed by the search request id"]
     pub details: std::collections::BTreeMap<String, crate::types::rank_eval::RankEvalMetricDetail>,
@@ -73,6 +77,7 @@ pub struct RankEvalResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnratedDocument {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

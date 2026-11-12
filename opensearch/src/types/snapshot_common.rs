@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FileCountSnapshotStats {
     #[doc = "The number of files in the snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -40,6 +41,7 @@ pub struct FileCountSnapshotStats {
 
 #[doc = "The name of the repository to store the snapshot."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Repository {
     #[doc = "The configuration settings for the repository."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -54,6 +56,7 @@ pub struct Repository {
 
 #[doc = "The settings for the snapshot repository."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RepositorySettings {
     #[doc = "The chunk size for the repository."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -73,6 +76,7 @@ pub struct RepositorySettings {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotIndexStats {
     #[doc = "The status of individual shards in the snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -88,6 +92,7 @@ pub struct SnapshotIndexStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotInfo {
     #[doc = "The list of data streams included in the snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -152,6 +157,7 @@ pub struct SnapshotInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotShardFailure {
     #[doc = "The name of the index containing the failed shard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -171,6 +177,7 @@ pub struct SnapshotShardFailure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotShardsStats {
     #[doc = "The number of completed shard snapshots."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -193,6 +200,7 @@ pub struct SnapshotShardsStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SnapshotShardsStatsStage {
     #[doc = "`DONE`"]
     Done,
@@ -246,6 +254,7 @@ impl<'de> serde::Deserialize<'de> for SnapshotShardsStatsStage {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotShardsStatsSummary {
     #[doc = "The incremental statistics for the shard snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -268,6 +277,7 @@ pub struct SnapshotShardsStatsSummary {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotShardsStatsSummaryItem {
     #[doc = "The number of files in the shard snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -278,6 +288,7 @@ pub struct SnapshotShardsStatsSummaryItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotShardsStatus {
     #[doc = "The ID of the node containing the shard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -292,6 +303,7 @@ pub struct SnapshotShardsStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotStats {
     #[doc = "The incremental statistics for the snapshot."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -314,6 +326,7 @@ pub struct SnapshotStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotStatus {
     #[doc = "Whether the snapshot includes the cluster state."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

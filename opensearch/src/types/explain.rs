@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainResponse {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
@@ -45,6 +46,7 @@ pub struct ExplainResponse {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ExplainResponseGet {
     #[doc = "The primary term of the document."]
     pub primary_term: Option<i64>,
@@ -206,6 +208,7 @@ impl ExplainResponseGet {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Explanation {
     pub description: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Context {
     pub methods: Vec<crate::types::get_script_context::ContextMethod>,
     pub name: crate::types::common::Name,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ContextMethod {
     pub name: crate::types::common::Name,
     pub params: Vec<crate::types::get_script_context::ContextMethodParam>,
@@ -42,12 +44,14 @@ pub struct ContextMethod {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ContextMethodParam {
     pub name: crate::types::common::Name,
     pub r#type: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetScriptContextResponse {
     pub contexts: Vec<crate::types::get_script_context::Context>,
 }

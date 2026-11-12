@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub acknowledged: Option<bool>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PutResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub acknowledged: Option<bool>,

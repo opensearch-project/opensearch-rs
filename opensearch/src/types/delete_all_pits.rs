@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteAllPitsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pits: Option<Vec<crate::types::pit::DeletedPit>>,

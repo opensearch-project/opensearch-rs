@@ -36,6 +36,7 @@ pub type GetFeaturesetResponse =
 pub type GetModelResponse = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -73,6 +74,7 @@ pub struct SearchFeaturesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponseHits {
     pub hits: Vec<crate::types::ltr::SearchFeaturesResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -91,6 +93,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -617,6 +620,7 @@ impl SearchFeaturesResponseSuggestValueItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponseSuggestValueItemCompletion {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub options: Option<crate::types::ltr::SearchFeaturesResponseSuggestValueItemCompletionOptions>,
@@ -658,6 +662,7 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesResponseSuggestValueItemComp
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -677,6 +682,7 @@ impl SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesResponseSuggestValueItemCompletionOptionsObject {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -696,6 +702,7 @@ impl SearchFeaturesResponseSuggestValueItemCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -733,6 +740,7 @@ pub struct SearchFeaturesetsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponseHits {
     pub hits: Vec<crate::types::ltr::SearchFeaturesetsResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -751,6 +759,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -1275,6 +1284,7 @@ impl SearchFeaturesetsResponseSuggestValueItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponseSuggestValueItemCompletion {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub options:
@@ -1319,6 +1329,7 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesetsResponseSuggestValueItemC
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1338,6 +1349,7 @@ impl SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1357,6 +1369,7 @@ impl SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1394,6 +1407,7 @@ pub struct SearchModelsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseHits {
     pub hits: Vec<crate::types::ltr::SearchModelsResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1412,6 +1426,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchModelsResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,
@@ -1935,6 +1950,7 @@ impl SearchModelsResponseSuggestValueItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletion {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub options: Option<crate::types::ltr::SearchModelsResponseSuggestValueItemCompletionOptions>,
@@ -1976,6 +1992,7 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseSuggestValueItemComple
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1995,6 +2012,7 @@ impl SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsObject {
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]

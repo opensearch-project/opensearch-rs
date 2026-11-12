@@ -30,6 +30,7 @@
 
 #[doc = "The result of a close index operation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CloseIndexResult {
     #[doc = "Whether the index was successfully closed."]
     pub closed: bool,
@@ -44,6 +45,7 @@ pub type CloseResponse = crate::types::indices::CloseResponse;
 
 #[doc = "The result of closing shards in an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CloseShardResult {
     #[doc = "The list of failures that occurred while closing shards."]
     pub failures: Vec<crate::types::common::ShardFailure>,

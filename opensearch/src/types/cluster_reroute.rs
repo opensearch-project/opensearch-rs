@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerouteDecision {
     pub decider: String,
     pub decision: String,
@@ -36,6 +37,7 @@ pub struct RerouteDecision {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerouteExplanation {
     pub command: String,
     pub decisions: Vec<crate::types::cluster_reroute::RerouteDecision>,
@@ -43,6 +45,7 @@ pub struct RerouteExplanation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerouteParameters {
     pub allow_primary: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RenderSearchTemplateResponse {
     pub template_output: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
 }

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesRecord {
     #[doc = "size of completion"]
     #[serde(rename = "completion.size")]

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompactNodeInfo {
     #[doc = "The name of the node that verified the repository."]
     pub name: crate::types::common::Name,

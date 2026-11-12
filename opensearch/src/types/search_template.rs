@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchTemplateResponse {
     #[serde(rename = "_clusters")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -63,6 +64,7 @@ pub struct SearchTemplateResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchTemplateResponseHits {
     pub hits: Vec<crate::types::search_template::SearchTemplateResponseHitsHitsItem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -81,6 +83,7 @@ The number may be a lower bound: by default the count is only tracked accurately
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SearchTemplateResponseHitsHitsItem {
     pub explanation: Option<crate::types::explain::Explanation>,
     pub id: Option<crate::types::common::Id>,

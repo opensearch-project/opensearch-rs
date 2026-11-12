@@ -30,6 +30,7 @@
 
 #[doc = "The detailed analysis results."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AnalyzeDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analyzer: Option<crate::types::indices_analyze::AnalyzerDetail>,
@@ -50,6 +51,7 @@ pub type AnalyzeResponse = crate::types::indices::AnalyzeResponse;
 
 #[doc = "The basic token information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AnalyzeToken {
     #[doc = "The ending character offset of the token."]
     pub end_offset: i32,
@@ -69,6 +71,7 @@ pub struct AnalyzeToken {
 
 #[doc = "The analyzer results."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AnalyzerDetail {
     #[doc = "The name of the analyzer."]
     pub name: String,
@@ -78,6 +81,7 @@ pub struct AnalyzerDetail {
 
 #[doc = "The character filter results."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CharFilterDetail {
     #[doc = "The text after character filtering."]
     pub filtered_text: Vec<String>,
@@ -87,6 +91,7 @@ pub struct CharFilterDetail {
 
 #[doc = "The detailed token information."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainAnalyzeToken {
     #[doc = "The bytes representation of the token."]
     pub bytes: String,
@@ -113,6 +118,7 @@ pub struct ExplainAnalyzeToken {
 
 #[doc = "The token filter or tokenizer results."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TokenDetail {
     #[doc = "The name of the token filter or tokenizer."]
     pub name: String,

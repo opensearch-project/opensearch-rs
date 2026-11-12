@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SegmentsRecord {
     #[doc = "If `true`, the segment is synced to disk. Segments that are synced can survive a hard reboot. If `false`, the data from uncommitted segments is also stored in the transaction log so that OpenSearch is able to replay changes on the next start."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -64,6 +64,7 @@ impl DeleteByQueryResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteByQueryResponseObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task: Option<crate::types::common::TaskId>,

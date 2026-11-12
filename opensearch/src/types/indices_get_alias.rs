@@ -33,6 +33,7 @@ pub type GetAliasResponse = crate::types::indices::GetAliasResponse;
 
 #[doc = "The alias configuration for an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexAliases {
     #[doc = "The map of alias names to their definitions."]
     pub aliases: std::collections::BTreeMap<String, crate::types::indices_common::AliasDefinition>,

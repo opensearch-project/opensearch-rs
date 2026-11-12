@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CharFilterTypes {
     #[doc = "Contains statistics about analyzer types used in selected nodes."]
     pub analyzer_types: Vec<crate::types::cluster_stats::FieldTypes>,
@@ -49,6 +50,7 @@ pub struct CharFilterTypes {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterFileSystem {
     #[doc = "Total number of bytes available to JVM in file stores across all selected nodes. Depending on operating system or process-level restrictions, this number may be less than `nodes.fs.free_in_byes`. This is the actual amount of free disk space the selected OpenSearch nodes can use."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -74,6 +76,7 @@ pub struct ClusterFileSystem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterIndices {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analysis: Option<crate::types::cluster_stats::CharFilterTypes>,
@@ -102,6 +105,7 @@ pub struct ClusterIndices {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterIndicesShards {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::cluster_stats::ClusterIndicesShardsIndex>,
@@ -117,6 +121,7 @@ pub struct ClusterIndicesShards {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterIndicesShardsIndex {
     #[doc = "Contains statistics about the number of primary shards assigned to selected nodes."]
     pub primaries: crate::types::cluster_stats::ClusterShardMetrics,
@@ -127,6 +132,7 @@ pub struct ClusterIndicesShardsIndex {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterIngest {
     pub number_of_pipelines: i32,
     pub processor_stats:
@@ -134,6 +140,7 @@ pub struct ClusterIngest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterJvm {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_uptime: Option<crate::types::common::Duration>,
@@ -147,6 +154,7 @@ pub struct ClusterJvm {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterJvmMemory {
     #[doc = "Maximum amount of memory available for use by the heap across all selected nodes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -161,6 +169,7 @@ pub struct ClusterJvmMemory {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterJvmVersion {
     #[doc = "Always `true`. All distributions come with a bundled Java Development Kit (JDK)."]
     pub bundled_jdk: bool,
@@ -177,6 +186,7 @@ pub struct ClusterJvmVersion {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterNetworkTypes {
     #[doc = "Contains statistics about the HTTP network types used by selected nodes."]
     pub http_types: std::collections::BTreeMap<String, i32>,
@@ -185,6 +195,7 @@ pub struct ClusterNetworkTypes {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterNodeCount {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_manager: Option<i32>,
@@ -217,6 +228,7 @@ pub struct ClusterNodeCount {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterNodes {
     #[doc = "Contains counts for nodes selected by the request's node filters."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -255,6 +267,7 @@ pub struct ClusterNodes {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterOperatingSystem {
     #[doc = "Number of processors used to calculate thread pool size across all selected nodes. This number can be set with the processors setting of a node and defaults to the number of processors reported by the operating system. In both cases, this number will never be larger than 32."]
     pub allocated_processors: i32,
@@ -271,6 +284,7 @@ pub struct ClusterOperatingSystem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterOperatingSystemArchitecture {
     #[doc = "Name of an architecture used by one or more selected nodes."]
     pub arch: String,
@@ -279,6 +293,7 @@ pub struct ClusterOperatingSystemArchitecture {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterOperatingSystemName {
     #[doc = "Number of selected nodes using the operating system."]
     pub count: i32,
@@ -287,6 +302,7 @@ pub struct ClusterOperatingSystemName {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterOperatingSystemPrettyName {
     #[doc = "Number of selected nodes using the operating system."]
     pub count: i32,
@@ -295,18 +311,21 @@ pub struct ClusterOperatingSystemPrettyName {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterProcess {
     pub cpu: crate::types::cluster_stats::ClusterProcessCpu,
     pub open_file_descriptors: crate::types::cluster_stats::ClusterProcessOpenFileDescriptors,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterProcessCpu {
     #[doc = "Percentage of CPU used across all selected nodes. Returns `-1` if not supported."]
     pub percent: crate::types::common::PercentageNumber,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterProcessOpenFileDescriptors {
     #[doc = "Average number of concurrently open file descriptors. Returns `-1` if not supported."]
     pub avg: i64,
@@ -317,6 +336,7 @@ pub struct ClusterProcessOpenFileDescriptors {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterProcessor {
     pub count: i64,
     pub current: i64,
@@ -327,6 +347,7 @@ pub struct ClusterProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterShardMetrics {
     #[doc = "Mean number of shards in an index, counting only shards assigned to selected nodes."]
     pub avg: f64,
@@ -337,6 +358,7 @@ pub struct ClusterShardMetrics {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldTypes {
     #[doc = "The number of occurrences of the field type in selected nodes."]
     pub count: i32,
@@ -346,17 +368,20 @@ pub struct FieldTypes {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldTypesMappings {
     #[doc = "Contains statistics about field data types used in selected nodes."]
     pub field_types: Vec<crate::types::cluster_stats::FieldTypes>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressure {
     pub memory: crate::types::cluster_stats::IndexingPressureMemory,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressureMemory {
     pub current: crate::types::cluster_stats::IndexingPressureMemorySummary,
     pub limit_in_bytes: crate::types::common::ByteCount,
@@ -364,6 +389,7 @@ pub struct IndexingPressureMemory {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexingPressureMemorySummary {
     pub all_in_bytes: crate::types::common::ByteCount,
     pub combined_coordinating_and_primary_in_bytes: crate::types::common::ByteCount,
@@ -379,6 +405,7 @@ pub struct IndexingPressureMemorySummary {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesVersions {
     pub index_count: i32,
     pub primary_shard_count: i32,
@@ -387,6 +414,7 @@ pub struct IndicesVersions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodePackagingType {
     #[doc = "Number of selected nodes using the distribution flavor and file type."]
     pub count: i32,
@@ -398,6 +426,7 @@ pub struct NodePackagingType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OperatingSystemMemoryInfo {
     #[doc = "Total amount, in bytes, of memory across all selected nodes, but using the value specified using the `es.total_memory_bytes` system property instead of measured total memory for those nodes where that system property was set."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

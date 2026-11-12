@@ -30,6 +30,7 @@
 
 #[doc = "Defines a cron schedule for the rollup job execution."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Cron {
     #[doc = "The cron expression that defines the schedule."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -41,6 +42,7 @@ pub struct Cron {
 
 #[doc = "Configures a date histogram dimension for rollup aggregation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateHistogramDimension {
     #[doc = "The calendar interval for the date histogram."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -64,6 +66,7 @@ pub struct DateHistogramDimension {
 
 #[doc = "Defines a dimension for aggregating data in a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DimensionsConfigItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub date_histogram: Option<crate::types::rollups_common::DateHistogramDimension>,
@@ -75,6 +78,7 @@ pub struct DimensionsConfigItem {
 
 #[doc = "Provides explanation details for a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Explain {
     #[doc = "The metadata ID for the rollup job."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -91,6 +95,7 @@ pub type ExplainEntities =
 
 #[doc = "Configures a numeric histogram dimension for rollup aggregation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HistogramDimension {
     #[doc = "The interval for the histogram buckets."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -105,6 +110,7 @@ pub struct HistogramDimension {
 
 #[doc = "Specifies the timing details for rollup job execution."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Interval {
     #[doc = "The cron schedule configuration for the rollup job."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -159,6 +165,7 @@ impl<'de> serde::Deserialize<'de> for IntervalCron {
 
 #[doc = "Defines metric aggregations for a field in a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MetricsConfigItem {
     #[doc = "The list of metrics to calculate for the field."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -173,6 +180,7 @@ pub struct MetricsConfigItem {
 
 #[doc = "Specifies a metric aggregation type to calculate."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MetricsConfigMetrics {
     #[doc = "Calculates the average value of a field."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -193,6 +201,7 @@ pub struct MetricsConfigMetrics {
 
 #[doc = "Defines the configuration for a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Rollup {
     #[doc = "Whether the rollup job runs continuously."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -247,6 +256,7 @@ pub struct Rollup {
 
 #[doc = "A rollup job entity with metadata."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RollupEntity {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -267,6 +277,7 @@ pub struct RollupEntity {
 
 #[doc = "Defines the execution schedule for a rollup job."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Schedule {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub interval: Option<crate::types::rollups_common::Interval>,
@@ -274,6 +285,7 @@ pub struct Schedule {
 
 #[doc = "Configures a terms dimension for rollup aggregation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermsDimension {
     #[doc = "The field from the source documents to use for terms aggregation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

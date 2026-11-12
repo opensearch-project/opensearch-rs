@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ComponentTemplate {
     pub component_template: crate::types::cluster_common::ComponentTemplateNode,
     pub name: crate::types::common::Name,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ComponentTemplateNode {
     #[serde(rename = "_meta")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -45,6 +47,7 @@ pub struct ComponentTemplateNode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ComponentTemplateSummary {
     #[serde(rename = "_meta")]
     #[serde(default, skip_serializing_if = "Option::is_none")]

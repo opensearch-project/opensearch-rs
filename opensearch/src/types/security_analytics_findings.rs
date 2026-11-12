@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Document {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub document: Option<String>,
@@ -41,6 +42,7 @@ pub struct Document {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Finding {
     #[serde(rename = "detectorId")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -60,6 +62,7 @@ pub struct Finding {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FindingWithScore {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detector_type: Option<String>,
@@ -74,12 +77,14 @@ pub struct FindingWithScore {
 pub type Findings = Vec<crate::types::security_analytics_findings::Finding>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetFindingsResponse {
     pub findings: crate::types::security_analytics_findings::Findings,
     pub total_findings: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Query {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fields: Option<Vec<String>>,
@@ -96,6 +101,7 @@ pub struct Query {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchFindingCorrelationsResponse {
     pub findings: Vec<crate::types::security_analytics_findings::FindingWithScore>,
 }

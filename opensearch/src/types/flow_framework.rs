@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateResponse {
     #[doc = "The ID of the workflow."]
     pub workflow_id: String,
@@ -70,6 +71,7 @@ impl GetStatusResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateResponse {
     #[doc = "The ID of the workflow to be updated. Required for the PUT method."]
     pub workflow_id: String,

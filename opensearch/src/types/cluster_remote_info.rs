@@ -64,6 +64,7 @@ impl ClusterRemoteInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterRemoteProxyInfo {
     pub connected: bool,
     pub initial_connect_timeout: crate::types::common::Duration,
@@ -76,6 +77,7 @@ pub struct ClusterRemoteProxyInfo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ClusterRemoteProxyInfoMode {
     #[doc = "`proxy`"]
     Proxy,
@@ -113,6 +115,7 @@ impl<'de> serde::Deserialize<'de> for ClusterRemoteProxyInfoMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ClusterRemoteSniffInfo {
     pub connected: bool,
     pub initial_connect_timeout: crate::types::common::Duration,
@@ -124,6 +127,7 @@ pub struct ClusterRemoteSniffInfo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ClusterRemoteSniffInfoMode {
     #[doc = "`sniff`"]
     Sniff,

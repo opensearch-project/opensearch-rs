@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ActionExecutionResult {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub action_id: Option<String>,
@@ -39,6 +40,7 @@ pub struct ActionExecutionResult {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Alert {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub acknowledged_time: Option<String>,
@@ -78,6 +80,7 @@ pub struct Alert {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AlertError {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
@@ -86,6 +89,7 @@ pub struct AlertError {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AlertState {
     #[doc = "`ACKNOWLEDGED`"]
     Acknowledged,
@@ -141,6 +145,7 @@ impl<'de> serde::Deserialize<'de> for AlertState {
 pub type Alerts = Vec<crate::types::security_analytics_alerts::Alert>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetAlertsResponse {
     pub alerts: crate::types::security_analytics_alerts::Alerts,
     pub total_alerts: i64,

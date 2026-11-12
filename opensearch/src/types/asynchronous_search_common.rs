@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AsynchronousSearchStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cancelled: Option<i64>,
@@ -51,6 +52,7 @@ pub struct AsynchronousSearchStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodesStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub asynchronous_search_stats:
@@ -58,6 +60,7 @@ pub struct NodesStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseBody {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expiration_time_in_millis: Option<f64>,
@@ -74,6 +77,7 @@ pub struct ResponseBody {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsResponse {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]

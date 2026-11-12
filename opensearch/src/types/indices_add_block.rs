@@ -33,6 +33,7 @@ pub type AddBlockResponse = crate::types::indices::AddBlockResponse;
 
 #[doc = "The status of a block operation on an index."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesBlockStatus {
     #[doc = "Whether the block operation was successful."]
     pub blocked: bool,

@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BulkResponse {
     pub errors: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -38,6 +39,7 @@ pub struct BulkResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Item {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub create: Option<crate::types::bulk::ResponseItem>,
@@ -50,6 +52,7 @@ pub struct Item {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseItem {
     #[doc = "The document ID associated with the operation."]
     #[serde(rename = "_id")]

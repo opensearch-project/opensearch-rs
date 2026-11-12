@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AdjacencyMatrixAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -74,6 +75,7 @@ impl<'de> serde::Deserialize<'de> for AdjacencyMatrixAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct AdjacencyMatrixBucket {
     pub doc_count: i64,
     pub key: String,
@@ -727,6 +729,7 @@ impl Aggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ArrayPercentilesItem {
     pub key: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -736,6 +739,7 @@ pub struct ArrayPercentilesItem {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AutoDateHistogramAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -779,6 +783,7 @@ impl<'de> serde::Deserialize<'de> for AutoDateHistogramAggregateBuckets {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AvgAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -790,6 +795,7 @@ pub struct AvgAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BoxPlotAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -823,6 +829,7 @@ pub struct BoxPlotAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BucketMetricValueAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -835,6 +842,7 @@ pub struct BucketMetricValueAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CardinalityAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -842,6 +850,7 @@ pub struct CardinalityAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ChildrenAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -849,6 +858,7 @@ pub struct ChildrenAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CompositeAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -894,6 +904,7 @@ pub type CompositeAggregateKey =
     std::collections::BTreeMap<String, crate::types::common::FieldValue>;
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct CompositeBucket {
     pub doc_count: i64,
     pub key: crate::types::common_aggregations::CompositeAggregateKey,
@@ -973,6 +984,7 @@ impl serde::Serialize for CompositeBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CumulativeCardinalityAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -982,6 +994,7 @@ pub struct CumulativeCardinalityAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateHistogramAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1024,6 +1037,7 @@ impl<'de> serde::Deserialize<'de> for DateHistogramAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct DateHistogramBucket {
     pub doc_count: i64,
     pub key: crate::types::common::EpochTimeUnitMillis,
@@ -1118,6 +1132,7 @@ impl serde::Serialize for DateHistogramBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateRangeAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1158,6 +1173,7 @@ impl<'de> serde::Deserialize<'de> for DateRangeAggregateBuckets {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DerivativeAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1174,6 +1190,7 @@ pub struct DerivativeAggregate {
 
 #[doc = "Result of a `terms` aggregation when the field is some kind of decimal number like a float, double, or distance."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DoubleTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1185,6 +1202,7 @@ pub struct DoubleTermsAggregate {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct DoubleTermsBucket {
     pub doc_count: i64,
     #[doc = "Upper bound of the document count error. Only present when `show_term_doc_count_error` is true."]
@@ -1294,6 +1312,7 @@ impl serde::Serialize for DoubleTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExtendedStatsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1345,6 +1364,7 @@ pub struct ExtendedStatsAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExtendedStatsBucketAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1396,6 +1416,7 @@ pub struct ExtendedStatsBucketAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FilterAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1403,6 +1424,7 @@ pub struct FilterAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FiltersAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1443,6 +1465,7 @@ impl<'de> serde::Deserialize<'de> for FiltersAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct FiltersBucket {
     pub doc_count: i64,
     pub aggregations:
@@ -1511,6 +1534,7 @@ impl serde::Serialize for FiltersBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoBoundsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1519,6 +1543,7 @@ pub struct GeoBoundsAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoCentroidAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1528,6 +1553,7 @@ pub struct GeoCentroidAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoDistanceAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1568,6 +1594,7 @@ impl<'de> serde::Deserialize<'de> for GeoDistanceAggregateBuckets {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoHashGridAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1608,6 +1635,7 @@ impl<'de> serde::Deserialize<'de> for GeoHashGridAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoHashGridBucket {
     pub doc_count: i64,
     pub key: crate::types::common::GeoHash,
@@ -1686,6 +1714,7 @@ impl serde::Serialize for GeoHashGridBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoTileGridAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1726,6 +1755,7 @@ impl<'de> serde::Deserialize<'de> for GeoTileGridAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoTileGridBucket {
     pub doc_count: i64,
     pub key: crate::types::common::GeoTile,
@@ -1804,6 +1834,7 @@ impl serde::Serialize for GeoTileGridBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GlobalAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1811,6 +1842,7 @@ pub struct GlobalAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HdrPercentileRanksAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1818,6 +1850,7 @@ pub struct HdrPercentileRanksAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HdrPercentilesAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1825,6 +1858,7 @@ pub struct HdrPercentilesAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HistogramAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1865,6 +1899,7 @@ impl<'de> serde::Deserialize<'de> for HistogramAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct HistogramBucket {
     pub doc_count: i64,
     pub key: f64,
@@ -1957,6 +1992,7 @@ impl serde::Serialize for HistogramBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IpRangeAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -1997,6 +2033,7 @@ impl<'de> serde::Deserialize<'de> for IpRangeAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct IpRangeBucket {
     pub doc_count: i64,
     pub from: Option<String>,
@@ -2151,6 +2188,7 @@ impl<'de> serde::Deserialize<'de> for KeyedPercentilesAdditional {
 
 #[doc = "Result of the `rare_terms` aggregation when the field is some kind of whole number like a integer, long, or a date."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LongRareTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2193,6 +2231,7 @@ impl<'de> serde::Deserialize<'de> for LongRareTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct LongRareTermsBucket {
     pub doc_count: i64,
     pub key: i64,
@@ -2286,6 +2325,7 @@ impl serde::Serialize for LongRareTermsBucket {
 
 #[doc = "Result of a `terms` aggregation when the field is some kind of whole number like a integer, long, or a date."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LongTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2297,6 +2337,7 @@ pub struct LongTermsAggregate {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct LongTermsBucket {
     pub doc_count: i64,
     #[doc = "Upper bound of the document count error. Only present when `show_term_doc_count_error` is true."]
@@ -2441,6 +2482,7 @@ impl<'de> serde::Deserialize<'de> for LongTermsBucketKey {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatrixStatsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2450,6 +2492,7 @@ pub struct MatrixStatsAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatrixStatsFields {
     pub correlation: std::collections::BTreeMap<String, f64>,
     pub count: i64,
@@ -2462,6 +2505,7 @@ pub struct MatrixStatsFields {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MaxAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2473,6 +2517,7 @@ pub struct MaxAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MedianAbsoluteDeviationAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2484,6 +2529,7 @@ pub struct MedianAbsoluteDeviationAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MinAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2495,6 +2541,7 @@ pub struct MinAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MissingAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2502,6 +2549,7 @@ pub struct MissingAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2546,6 +2594,7 @@ impl<'de> serde::Deserialize<'de> for MultiTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct MultiTermsBucket {
     pub doc_count: i64,
     pub doc_count_error_upper_bound: Option<i64>,
@@ -2655,6 +2704,7 @@ impl serde::Serialize for MultiTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2662,6 +2712,7 @@ pub struct NestedAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ParentAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2702,6 +2753,7 @@ impl<'de> serde::Deserialize<'de> for Percentiles {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PercentilesBucketAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2709,6 +2761,7 @@ pub struct PercentilesBucketAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RangeAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2749,6 +2802,7 @@ impl<'de> serde::Deserialize<'de> for RangeAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct RangeBucket {
     pub doc_count: i64,
     pub from: Option<f64>,
@@ -2888,6 +2942,7 @@ impl serde::Serialize for RangeBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RateAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2897,6 +2952,7 @@ pub struct RateAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ReverseNestedAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2904,6 +2960,7 @@ pub struct ReverseNestedAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SamplerAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2911,6 +2968,7 @@ pub struct SamplerAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptedMetricAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2918,6 +2976,7 @@ pub struct ScriptedMetricAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SignificantLongTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -2971,6 +3030,7 @@ impl<'de> serde::Deserialize<'de> for SignificantLongTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SignificantLongTermsBucket {
     pub doc_count: i64,
     pub bg_count: i64,
@@ -3084,6 +3144,7 @@ impl serde::Serialize for SignificantLongTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SignificantStringTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3137,6 +3198,7 @@ impl<'de> serde::Deserialize<'de> for SignificantStringTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct SignificantStringTermsBucket {
     pub doc_count: i64,
     pub bg_count: i64,
@@ -3236,6 +3298,7 @@ impl serde::Serialize for SignificantStringTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimpleValueAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3247,6 +3310,7 @@ pub struct SimpleValueAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StandardDeviationBounds {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lower: Option<f64>,
@@ -3263,6 +3327,7 @@ pub struct StandardDeviationBounds {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StandardDeviationBoundsAsString {
     pub lower: String,
     pub lower_population: String,
@@ -3273,6 +3338,7 @@ pub struct StandardDeviationBoundsAsString {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3295,6 +3361,7 @@ pub struct StatsAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatsBucketAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3318,6 +3385,7 @@ pub struct StatsBucketAggregate {
 
 #[doc = "Result of the `rare_terms` aggregation when the field is a string."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StringRareTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3363,6 +3431,7 @@ impl<'de> serde::Deserialize<'de> for StringRareTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct StringRareTermsBucket {
     pub doc_count: i64,
     pub key: String,
@@ -3442,6 +3511,7 @@ impl serde::Serialize for StringRareTermsBucket {
 
 #[doc = "Result of a `terms` aggregation when the field is a string."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StringTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3453,6 +3523,7 @@ pub struct StringTermsAggregate {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct StringTermsBucket {
     pub doc_count: i64,
     #[doc = "Upper bound of the document count error. Only present when `show_term_doc_count_error` is true."]
@@ -3548,6 +3619,7 @@ impl serde::Serialize for StringTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SumAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3559,6 +3631,7 @@ pub struct SumAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TDigestPercentileRanksAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3566,6 +3639,7 @@ pub struct TDigestPercentileRanksAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TDigestPercentilesAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3573,6 +3647,7 @@ pub struct TDigestPercentilesAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TTestAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3583,6 +3658,7 @@ pub struct TTestAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TopHitsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3591,6 +3667,7 @@ pub struct TopHitsAggregate {
 
 #[doc = "Result of a `rare_terms` aggregation when the field is unmapped. `buckets` is always empty."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnmappedRareTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3631,6 +3708,7 @@ impl<'de> serde::Deserialize<'de> for UnmappedRareTermsAggregateBuckets {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnmappedSignificantTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3680,6 +3758,7 @@ impl<'de> serde::Deserialize<'de> for UnmappedSignificantTermsAggregateBuckets {
 
 #[doc = "Result of a `terms` aggregation when the field is unmapped. `buckets` is always empty."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnmappedTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3692,6 +3771,7 @@ pub struct UnmappedTermsAggregate {
 
 #[doc = "Result of a `terms` aggregation when the field is an `unsigned_long` (64-bit unsigned integer). OpenSearch stores `unsigned_long` values as Long or BigInteger internally. In JSON responses, bucket keys are represented as numbers, which may lose precision for values larger than 2^53--1 due to IEEE 754 double precision limitations. In protocol buffer representations, keys are manually defined as uint64 to preserve the full 64-bit unsigned range. Use `key_as_string` in buckets for exact string representation of large unsigned long values."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnsignedLongTermsAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3704,6 +3784,7 @@ pub struct UnsignedLongTermsAggregate {
 
 #[doc = "Terms bucket for `unsigned_long` field type. The server returns 64-bit unsigned integer values as Long or BigInteger types. Due to JSON specification limitations (IEEE 754 double precision provides only 53 bits of integer precision), the key is represented as `type: number` in the OpenAPI spec. For protocol buffer definitions, this is manually overridden to `uint64` to preserve the full 64-bit unsigned integer range in binary encoding."]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct UnsignedLongTermsBucket {
     pub doc_count: i64,
     #[doc = "Upper bound of the document count error. Only present when `show_term_doc_count_error` is true."]
@@ -3815,6 +3896,7 @@ impl serde::Serialize for UnsignedLongTermsBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ValueCountAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3826,6 +3908,7 @@ pub struct ValueCountAggregate {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct VariableWidthHistogramAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,
@@ -3875,6 +3958,7 @@ impl<'de> serde::Deserialize<'de> for VariableWidthHistogramAggregateBuckets {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct VariableWidthHistogramBucket {
     pub doc_count: i64,
     pub key: f64,
@@ -4015,6 +4099,7 @@ impl serde::Serialize for VariableWidthHistogramBucket {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WeightedAvgAggregate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<crate::types::common::Metadata>,

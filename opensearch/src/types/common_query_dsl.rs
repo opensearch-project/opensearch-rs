@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AgenticQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -47,6 +48,7 @@ pub struct AgenticQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BoolQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -210,6 +212,7 @@ impl<'de> serde::Deserialize<'de> for BoolQueryShould {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct BoostingQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -224,6 +227,7 @@ pub struct BoostingQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ChildScoreMode {
     #[doc = "`avg`"]
     Avg,
@@ -277,6 +281,7 @@ impl<'de> serde::Deserialize<'de> for ChildScoreMode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CombinedFieldsOperator {
     #[doc = "`and`"]
     And,
@@ -318,6 +323,7 @@ impl<'de> serde::Deserialize<'de> for CombinedFieldsOperator {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CombinedFieldsQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -341,6 +347,7 @@ pub struct CombinedFieldsQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum CombinedFieldsZeroTerms {
     #[doc = "`all`"]
     All,
@@ -415,6 +422,7 @@ impl<'de> serde::Deserialize<'de> for CommonTermsQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CommonTermsQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -436,6 +444,7 @@ pub struct CommonTermsQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ConstantScoreQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -447,6 +456,7 @@ pub struct ConstantScoreQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateDecayPlacement {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub decay: Option<f64>,
@@ -458,6 +468,7 @@ pub struct DateDecayPlacement {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DateRangeQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -492,6 +503,7 @@ pub struct DateRangeQuery {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct DecayFunction {
     pub multi_value_mode: Option<crate::types::common_query_dsl::MultiValueMode>,
     pub additional:
@@ -608,6 +620,7 @@ impl DecayPlacement {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DisMaxQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -658,6 +671,7 @@ impl DistanceFeatureQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DistanceFeatureQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -671,6 +685,7 @@ pub struct DistanceFeatureQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DistanceFeatureQueryObjectObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -684,6 +699,7 @@ pub struct DistanceFeatureQueryObjectObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExistsQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -728,6 +744,7 @@ impl<'de> serde::Deserialize<'de> for FieldAndFormat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldAndFormatObject {
     pub field: crate::types::common::Field,
     #[doc = "Format in which the values are returned."]
@@ -736,6 +753,7 @@ pub struct FieldAndFormatObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldLookup {
     pub id: crate::types::common::Id,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -747,6 +765,7 @@ pub struct FieldLookup {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FieldValueFactorModifier {
     #[doc = "`ln`"]
     Ln,
@@ -820,6 +839,7 @@ impl<'de> serde::Deserialize<'de> for FieldValueFactorModifier {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FieldValueFactorScoreFunction {
     #[doc = "Optional factor to multiply the field value with."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -833,6 +853,7 @@ pub struct FieldValueFactorScoreFunction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FunctionBoostMode {
     #[doc = "`avg`"]
     Avg,
@@ -890,6 +911,7 @@ impl<'de> serde::Deserialize<'de> for FunctionBoostMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FunctionScoreContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filter: Option<crate::types::common_query_dsl::QueryContainer>,
@@ -910,6 +932,7 @@ pub struct FunctionScoreContainer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FunctionScoreMode {
     #[doc = "`avg`"]
     Avg,
@@ -967,6 +990,7 @@ impl<'de> serde::Deserialize<'de> for FunctionScoreMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FunctionScoreQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1024,6 +1048,7 @@ impl FuzzyQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FuzzyQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1049,6 +1074,7 @@ pub struct FuzzyQueryObject {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoBoundingBoxQuery {
     pub name: Option<String>,
     #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
@@ -1181,6 +1207,7 @@ impl serde::Serialize for GeoBoundingBoxQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoDecayPlacement {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub decay: Option<f64>,
@@ -1191,6 +1218,7 @@ pub struct GeoDecayPlacement {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoDistanceQuery {
     pub name: Option<String>,
     #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
@@ -1349,6 +1377,7 @@ impl serde::Serialize for GeoDistanceQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoExecution {
     #[doc = "`indexed`"]
     Indexed,
@@ -1390,11 +1419,13 @@ impl<'de> serde::Deserialize<'de> for GeoExecution {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoPolygonPoints {
     pub points: Vec<crate::types::common::GeoLocation>,
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoPolygonQuery {
     pub name: Option<String>,
     #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
@@ -1512,6 +1543,7 @@ impl serde::Serialize for GeoPolygonQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoShape {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub coordinates: Option<Vec<Box<serde_json::value::RawValue>>>,
@@ -1520,6 +1552,7 @@ pub struct GeoShape {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct GeoShapeQuery {
     pub name: Option<String>,
     #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
@@ -1621,6 +1654,7 @@ impl serde::Serialize for GeoShapeQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GeoShapeQueryField {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indexed_shape: Option<crate::types::common_query_dsl::FieldLookup>,
@@ -1630,6 +1664,7 @@ pub struct GeoShapeQueryField {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum GeoValidationMethod {
     #[doc = "`coerce`"]
     Coerce,
@@ -1675,6 +1710,7 @@ impl<'de> serde::Deserialize<'de> for GeoValidationMethod {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HasChildQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1700,6 +1736,7 @@ pub struct HasChildQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HasParentQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1720,6 +1757,7 @@ pub struct HasParentQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HybridQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1736,6 +1774,7 @@ pub struct HybridQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IdsQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1751,6 +1790,7 @@ pub struct IdsQuery {
 pub type IgnoreUnmapped = bool;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsAllOf {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Box<crate::types::common_query_dsl::IntervalsFilter>>,
@@ -1765,6 +1805,7 @@ pub struct IntervalsAllOf {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsAnyOf {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub filter: Option<Box<crate::types::common_query_dsl::IntervalsFilter>>,
@@ -1773,6 +1814,7 @@ pub struct IntervalsAnyOf {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub all_of: Option<Box<crate::types::common_query_dsl::IntervalsAllOf>>,
@@ -1789,6 +1831,7 @@ pub struct IntervalsContainer {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsFilter {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after: Option<Box<crate::types::common_query_dsl::IntervalsContainer>>,
@@ -1811,6 +1854,7 @@ pub struct IntervalsFilter {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsFuzzy {
     #[doc = "Analyzer used to normalize the term."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1830,6 +1874,7 @@ pub struct IntervalsFuzzy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsMatch {
     #[doc = "Analyzer used to analyze terms in the query."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1849,6 +1894,7 @@ pub struct IntervalsMatch {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsPrefix {
     #[doc = "Analyzer used to analyze the `prefix`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1860,6 +1906,7 @@ pub struct IntervalsPrefix {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1882,6 +1929,7 @@ pub struct IntervalsQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalsWildcard {
     #[doc = "Analyzer used to analyze the `pattern`. Defaults to the top-level field's analyzer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1893,6 +1941,7 @@ pub struct IntervalsWildcard {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct KnnQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1990,6 +2039,7 @@ impl<'de> serde::Deserialize<'de> for Like {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LikeDocument {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2016,6 +2066,7 @@ pub struct LikeDocument {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchAllQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2059,6 +2110,7 @@ impl<'de> serde::Deserialize<'de> for MatchBoolPrefixQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchBoolPrefixQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2091,6 +2143,7 @@ pub struct MatchBoolPrefixQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchNoneQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2134,6 +2187,7 @@ impl<'de> serde::Deserialize<'de> for MatchPhrasePrefixQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchPhrasePrefixQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2190,6 +2244,7 @@ impl<'de> serde::Deserialize<'de> for MatchPhraseQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchPhraseQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2242,6 +2297,7 @@ impl MatchQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MatchQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2284,6 +2340,7 @@ pub struct MatchQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MoreLikeThisQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2413,6 +2470,7 @@ impl MoreLikeThisQueryUnlike {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MultiMatchQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2465,6 +2523,7 @@ pub struct MultiMatchQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MultiValueMode {
     #[doc = "`avg`"]
     Avg,
@@ -2514,6 +2573,7 @@ impl<'de> serde::Deserialize<'de> for MultiValueMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2533,6 +2593,7 @@ pub struct NestedQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NeuralQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2557,6 +2618,7 @@ pub struct NeuralQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NumberRangeQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2667,6 +2729,7 @@ impl<'de> serde::Deserialize<'de> for NumberRangeQueryTo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NumericDecayPlacement {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub decay: Option<f64>,
@@ -2677,6 +2740,7 @@ pub struct NumericDecayPlacement {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Operator {
     #[doc = "`and` (also accepted: `AND`)"]
     And,
@@ -2718,6 +2782,7 @@ impl<'de> serde::Deserialize<'de> for Operator {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ParentIdQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2735,6 +2800,7 @@ pub struct ParentIdQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PercolateQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2800,6 +2866,7 @@ impl<'de> serde::Deserialize<'de> for PrefixQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PrefixQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2817,6 +2884,7 @@ pub struct PrefixQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agentic: Option<crate::types::common_query_dsl::AgenticQuery>,
@@ -2970,6 +3038,7 @@ pub struct QueryContainer {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryStringQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3047,6 +3116,7 @@ pub struct QueryStringQuery {
 pub type QueryVector = Vec<f64>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RandomScoreFunction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field: Option<crate::types::common::Field>,
@@ -3119,6 +3189,7 @@ impl RangeQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RangeRelation {
     #[doc = "`contains`"]
     Contains,
@@ -3166,12 +3237,14 @@ impl<'de> serde::Deserialize<'de> for RangeRelation {
 pub type RankFeatureFunctionLinear = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeatureFunctionLogarithm {
     #[doc = "Configurable scaling factor."]
     pub scaling_factor: f64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeatureFunctionSaturation {
     #[doc = "Configurable pivot value so that the result will be less than 0.5."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3179,6 +3252,7 @@ pub struct RankFeatureFunctionSaturation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeatureFunctionSigmoid {
     #[doc = "Configurable Exponent."]
     pub exponent: f64,
@@ -3187,6 +3261,7 @@ pub struct RankFeatureFunctionSigmoid {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RankFeatureQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3239,6 +3314,7 @@ impl<'de> serde::Deserialize<'de> for RegexpQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RegexpQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3262,12 +3338,14 @@ pub struct RegexpQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RescoreContext {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub oversample_factor: Option<f64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3279,11 +3357,13 @@ pub struct ScriptQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptScoreFunction {
     pub script: crate::types::common::Script,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScriptScoreQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3299,6 +3379,7 @@ pub struct ScriptScoreQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SimpleQueryStringFlag {
     #[doc = "`ALL`"]
     All,
@@ -3415,6 +3496,7 @@ impl SimpleQueryStringFlags {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SimpleQueryStringQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3460,6 +3542,7 @@ pub struct SimpleQueryStringQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanContainingQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3472,6 +3555,7 @@ pub struct SpanContainingQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanFieldMaskingQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3484,6 +3568,7 @@ pub struct SpanFieldMaskingQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanFirstQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3500,6 +3585,7 @@ pub struct SpanFirstQuery {
 pub type SpanGapQuery = std::collections::BTreeMap<String, i32>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanMultiTermQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3511,6 +3597,7 @@ pub struct SpanMultiTermQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanNearQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3529,6 +3616,7 @@ pub struct SpanNearQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanNotQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3550,6 +3638,7 @@ pub struct SpanNotQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanOrQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3562,6 +3651,7 @@ pub struct SpanOrQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field_masking_span: Option<Box<crate::types::common_query_dsl::SpanFieldMaskingQuery>>,
@@ -3621,6 +3711,7 @@ impl<'de> serde::Deserialize<'de> for SpanTermQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanTermQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3632,6 +3723,7 @@ pub struct SpanTermQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanWithinQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3676,6 +3768,7 @@ impl TermQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3690,6 +3783,7 @@ pub struct TermQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermsLookup {
     pub id: crate::types::common::Id,
     pub index: crate::types::common::IndexName,
@@ -3701,6 +3795,7 @@ pub struct TermsLookup {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct TermsQuery {
     pub name: Option<String>,
     pub boost: Option<f64>,
@@ -3835,6 +3930,7 @@ impl<'de> serde::Deserialize<'de> for TermsQueryField {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TermsQueryValueType {
     #[doc = "`bitmap`"]
     Bitmap,
@@ -3876,6 +3972,7 @@ impl<'de> serde::Deserialize<'de> for TermsQueryValueType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TermsSetQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3891,6 +3988,7 @@ pub struct TermsSetQuery {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TextQueryType {
     #[doc = "`best_fields`"]
     BestFields,
@@ -3948,6 +4046,7 @@ impl<'de> serde::Deserialize<'de> for TextQueryType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TypeQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3992,6 +4091,7 @@ impl<'de> serde::Deserialize<'de> for WildcardQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WildcardQueryObject {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4013,6 +4113,7 @@ pub struct WildcardQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct WrapperQuery {
     #[serde(rename = "_name")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4025,6 +4126,7 @@ pub struct WrapperQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct XyShape {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub coordinates: Option<Vec<Box<serde_json::value::RawValue>>>,
@@ -4033,6 +4135,7 @@ pub struct XyShape {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct XyShapeQuery {
     pub name: Option<String>,
     #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
@@ -4133,6 +4236,7 @@ impl serde::Serialize for XyShapeQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct XyShapeQueryField {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indexed_shape: Option<crate::types::common_query_dsl::FieldLookup>,
@@ -4142,6 +4246,7 @@ pub struct XyShapeQueryField {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ZeroTermsQuery {
     #[doc = "`all` (also accepted: `ALL`)"]
     All,

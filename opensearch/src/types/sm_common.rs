@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreationConfig {
     pub schedule: crate::types::sm_common::CronSchedule,
     #[doc = "The maximum amount of time for allowed snapshot creation."]
@@ -37,6 +38,7 @@ pub struct CreationConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CronExpression {
     #[doc = "The cron expression that defines the schedule."]
     pub expression: String,
@@ -45,12 +47,14 @@ pub struct CronExpression {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CronSchedule {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cron: Option<crate::types::sm_common::CronExpression>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeletionCondition {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_age: Option<String>,
@@ -61,6 +65,7 @@ pub struct DeletionCondition {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeletionConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub condition: Option<crate::types::sm_common::DeletionCondition>,
@@ -72,6 +77,7 @@ pub struct DeletionConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecutionInfo {
     #[doc = "The reason policy execution failed, if applicable."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -82,12 +88,14 @@ pub struct ExecutionInfo {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecutionMetadata {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub info: Option<crate::types::sm_common::ExecutionInfo>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExplainedPolicy {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub creation: Option<crate::types::sm_common::StateMetadata>,
@@ -104,6 +112,7 @@ pub struct ExplainedPolicy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetPoliciesResponse {
     #[doc = "A list of snapshot management policies."]
     pub policies: Vec<crate::types::sm_common::ListedPolicy>,
@@ -112,6 +121,7 @@ pub struct GetPoliciesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalConfig {
     #[doc = "The number of time units between executions."]
     pub period: i64,
@@ -122,12 +132,14 @@ pub struct IntervalConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IntervalSchedule {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub interval: Option<crate::types::sm_common::IntervalConfig>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum IntervalUnit {
     #[doc = "`Days`"]
     Days,
@@ -173,6 +185,7 @@ impl<'de> serde::Deserialize<'de> for IntervalUnit {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ListedPolicy {
     #[doc = "The policy ID."]
     #[serde(rename = "_id")]
@@ -190,11 +203,13 @@ pub struct ListedPolicy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationChannel {
     pub id: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationConditions {
     #[doc = "Whether to send notifications for a successful snapshot creation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -211,6 +226,7 @@ pub struct NotificationConditions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NotificationConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel: Option<crate::types::sm_common::NotificationChannel>,
@@ -219,12 +235,14 @@ pub struct NotificationConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PolicyExplanation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub policies: Option<Vec<crate::types::sm_common::ExplainedPolicy>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PolicyResponse {
     #[doc = "The policy ID."]
     #[serde(rename = "_id")]
@@ -243,6 +261,7 @@ pub struct PolicyResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RetryMetadata {
     #[doc = "The number of retry attempts made."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -250,6 +269,7 @@ pub struct RetryMetadata {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SMPolicy {
     pub creation: crate::types::sm_common::CreationConfig,
     #[doc = "The configuration for snapshot deletion."]
@@ -278,6 +298,7 @@ pub struct SMPolicy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SnapshotConfig {
     #[doc = "Default \"yyyy-MM-dd'T'HH:mm:ss\""]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -303,6 +324,7 @@ pub struct SnapshotConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StateMetadata {
     #[doc = "The current state of the policy execution."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -319,6 +341,7 @@ pub struct StateMetadata {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TriggerMetadata {
     #[doc = "When the policy was triggered."]
     #[serde(default, skip_serializing_if = "Option::is_none")]

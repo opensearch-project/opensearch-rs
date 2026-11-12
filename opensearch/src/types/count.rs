@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CountResponse {
     #[serde(rename = "_shards")]
     pub shards: crate::types::common::ShardStatistics,

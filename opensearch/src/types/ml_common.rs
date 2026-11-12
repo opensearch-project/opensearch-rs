@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Action {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub action_type: Option<String>,
@@ -48,6 +49,7 @@ pub struct Action {
 
 #[doc = "The type of operation."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ActionType {
     #[doc = "`ADD`"]
     Add,
@@ -93,6 +95,7 @@ impl<'de> serde::Deserialize<'de> for ActionType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AdditionalConfig {
     #[doc = "The distance metric for k-NN search."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -104,6 +107,7 @@ pub type AdditionalInfo = std::collections::BTreeMap<String, Box<serde_json::val
 
 #[doc = "The agent type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AgentType {
     #[doc = "`conversational`"]
     Conversational,
@@ -149,6 +153,7 @@ impl<'de> serde::Deserialize<'de> for AgentType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AlgorithmOperations {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deploy: Option<crate::types::ml_common::ModelStats>,
@@ -170,6 +175,7 @@ pub type Algorithms =
     std::collections::BTreeMap<String, crate::types::ml_common::AlgorithmOperations>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Buckets {
     #[doc = "The end time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -185,6 +191,7 @@ pub struct Buckets {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ByteBuffer {
     #[doc = "The byte buffer array."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -195,6 +202,7 @@ pub struct ByteBuffer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ByteOrder {
     #[doc = "`BIG_ENDIAN`"]
     BigEndian,
@@ -236,6 +244,7 @@ impl<'de> serde::Deserialize<'de> for ByteOrder {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ColumnMeta {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub column_type: Option<crate::types::ml_common::ColumnType>,
@@ -245,6 +254,7 @@ pub struct ColumnMeta {
 
 #[doc = "The column type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ColumnType {
     #[doc = "`BOOLEAN`"]
     Boolean,
@@ -295,6 +305,7 @@ impl<'de> serde::Deserialize<'de> for ColumnType {
 
 #[doc = "The connector protocol."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ConnectorProtocol {
     #[doc = "`aws_sigv4`"]
     AwsSigv4,
@@ -336,6 +347,7 @@ impl<'de> serde::Deserialize<'de> for ConnectorProtocol {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Content {
     pub text: Option<String>,
     pub r#type: Option<String>,
@@ -420,6 +432,7 @@ impl serde::Serialize for Content {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DataAsMap {
     #[doc = "The streaming content chunk."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -430,6 +443,7 @@ pub struct DataAsMap {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DeleteAgenticMemoryResponse {
     #[doc = "Number of batches processed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -478,6 +492,7 @@ pub struct DeleteAgenticMemoryResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Entity {
     #[doc = "The base value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -528,12 +543,14 @@ impl ExecuteAlgorithmResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecuteAlgorithmResponseObject {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub results: Option<Vec<crate::types::ml_common::ExecuteAnomalyLocalizationResponse>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecuteAnomalyLocalizationResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -542,6 +559,7 @@ pub struct ExecuteAnomalyLocalizationResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecuteLocalSampleCalculatorResponse {
     #[doc = "The result."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -549,6 +567,7 @@ pub struct ExecuteLocalSampleCalculatorResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ExecuteToolResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub inference_results: Option<Vec<crate::types::ml_common::InferenceResults>>,
@@ -556,6 +575,7 @@ pub struct ExecuteToolResponse {
 
 #[doc = "The function name."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FunctionName {
     #[doc = "`AD_LIBSVM` (also accepted: `ad_libsvm`)"]
     AdLibsvm,
@@ -667,6 +687,7 @@ impl<'de> serde::Deserialize<'de> for FunctionName {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetAgentResponse {
     #[doc = "The created time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -689,6 +710,7 @@ pub struct GetAgentResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetAgenticMemoryResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub action: Option<crate::types::ml_common::ActionType>,
@@ -740,6 +762,7 @@ pub struct GetAgenticMemoryResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetConnectorResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub actions: Option<Vec<crate::types::ml_common::Action>>,
@@ -763,6 +786,7 @@ pub struct GetConnectorResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetMemoryContainerResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub configuration: Option<crate::types::ml_common::MemoryContainerConfiguration>,
@@ -782,12 +806,14 @@ pub struct GetMemoryContainerResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetProfileResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nodes: Option<crate::types::ml_common::Nodes>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetStatsResponse {
     #[doc = "The config index status."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -815,6 +841,7 @@ pub struct GetStatsResponse {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Headers {
     pub content_type: Option<String>,
     pub additional: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
@@ -885,6 +912,7 @@ impl serde::Serialize for Headers {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct HitsTotal {
     #[doc = "The relation."]
     pub relation: String,
@@ -893,6 +921,7 @@ pub struct HitsTotal {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Index {
     #[doc = "The number of replicas."]
     pub number_of_replicas: Option<String>,
@@ -981,6 +1010,7 @@ impl serde::Serialize for Index {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct IndexSettings {
     pub long_term_memory_history_index: Option<crate::types::ml_common::MemoryIndexSettings>,
     pub long_term_memory_index: Option<crate::types::ml_common::MemoryIndexSettings>,
@@ -1114,12 +1144,14 @@ impl serde::Serialize for IndexSettings {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InferenceResults {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<Vec<crate::types::ml_common::Output>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Memory {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub additional_info: Option<crate::types::ml_common::AdditionalInfo>,
@@ -1141,6 +1173,7 @@ pub struct Memory {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MemoryContainerConfiguration {
     #[doc = "Whether history will be persisted."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1178,12 +1211,14 @@ pub struct MemoryContainerConfiguration {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MemoryIndexSettings {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::ml_common::Index>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Message {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub additional_info: Option<crate::types::ml_common::AdditionalInfo>,
@@ -1220,6 +1255,7 @@ pub struct Message {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Messages {
     #[doc = "The content of the message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1232,6 +1268,7 @@ pub struct Messages {
 pub type Metadata = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MlIndexStatus {
     #[doc = "`green`"]
     Green,
@@ -1282,6 +1319,7 @@ impl<'de> serde::Deserialize<'de> for MlIndexStatus {
 
 #[doc = "The input type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MlInputDataType {
     #[doc = "`DATA_FRAME`"]
     DataFrame,
@@ -1340,6 +1378,7 @@ impl<'de> serde::Deserialize<'de> for MlInputDataType {
 
 #[doc = "The result data type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MlResultDataType {
     #[doc = "`BOOLEAN`"]
     Boolean,
@@ -1414,6 +1453,7 @@ impl<'de> serde::Deserialize<'de> for MlResultDataType {
 
 #[doc = "Task type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum MlTaskType {
     #[doc = "`BATCH_INGEST`"]
     BatchIngest,
@@ -1479,6 +1519,7 @@ impl<'de> serde::Deserialize<'de> for MlTaskType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Model {
     #[doc = "The algorithm."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1521,6 +1562,7 @@ pub struct Model {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ModelConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub additional_config: Option<crate::types::ml_common::AdditionalConfig>,
@@ -1539,6 +1581,7 @@ pub struct ModelConfig {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ModelFormat {
     #[doc = "`ONNX`"]
     Onnx,
@@ -1580,6 +1623,7 @@ impl<'de> serde::Deserialize<'de> for ModelFormat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ModelGroup {
     pub access: crate::types::ml_common::ModelGroupAccessMode,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1598,6 +1642,7 @@ pub struct ModelGroup {
 
 #[doc = "The model group access mode."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ModelGroupAccessMode {
     #[doc = "`private`"]
     Private,
@@ -1643,6 +1688,7 @@ impl<'de> serde::Deserialize<'de> for ModelGroupAccessMode {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ModelGroupRegistration {
     #[doc = "The model group ID."]
     pub model_group_id: String,
@@ -1651,6 +1697,7 @@ pub struct ModelGroupRegistration {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ModelProfile {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deploy: Option<crate::types::ml_common::ModelStats>,
@@ -1687,6 +1734,7 @@ pub struct ModelProfile {
 
 #[doc = "The model state."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ModelState {
     #[doc = "`DEPLOYED`"]
     Deployed,
@@ -1748,6 +1796,7 @@ impl<'de> serde::Deserialize<'de> for ModelState {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ModelStats {
     #[doc = "The failure count."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1765,6 +1814,7 @@ pub type Models = std::collections::BTreeMap<String, crate::types::ml_common::Mo
 pub type Namespace = std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Node {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub models: Option<crate::types::ml_common::Models>,
@@ -1775,6 +1825,7 @@ pub struct Node {
 pub type NodeStats = std::collections::BTreeMap<String, crate::types::ml_common::NodeStatsDetails>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NodeStatsDetails {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub algorithms: Option<crate::types::ml_common::Algorithms>,
@@ -1803,6 +1854,7 @@ pub struct NodeStatsDetails {
 pub type Nodes = std::collections::BTreeMap<String, crate::types::ml_common::Node>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Output {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub byte_buffer: Option<crate::types::ml_common::ByteBuffer>,
@@ -1824,6 +1876,7 @@ pub struct Output {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Owner {
     #[doc = "The backend roles."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1844,6 +1897,7 @@ pub struct Owner {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Parameters {
     pub llm_interface: Option<String>,
     pub inputs: Option<String>,
@@ -1958,6 +2012,7 @@ impl serde::Serialize for Parameters {
 
 #[doc = "The type of payload."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PayloadType {
     #[doc = "`conversational`"]
     Conversational,
@@ -1999,6 +2054,7 @@ impl<'de> serde::Deserialize<'de> for PayloadType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictModelOutput {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub byte_buffer: Option<crate::types::ml_common::ByteBuffer>,
@@ -2013,18 +2069,21 @@ pub struct PredictModelOutput {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictModelResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub inference_results: Option<Vec<crate::types::ml_common::PredictModelResult>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictModelResult {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<Vec<crate::types::ml_common::PredictModelOutput>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictRequestStats {
     #[doc = "The average latency in milliseconds."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2053,6 +2112,7 @@ pub struct PredictRequestStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub inference_results: Option<Vec<crate::types::ml_common::InferenceResults>>,
@@ -2063,6 +2123,7 @@ pub struct PredictResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PredictionResult {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub column_metas: Option<Vec<crate::types::ml_common::ColumnMeta>>,
@@ -2071,6 +2132,7 @@ pub struct PredictionResult {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RateLimiter {
     #[doc = "The maximum limit."]
     pub limit: crate::types::common::StringifiedDouble,
@@ -2079,6 +2141,7 @@ pub struct RateLimiter {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum RateLimiterUnit {
     #[doc = "`DAYS`"]
     Days,
@@ -2140,12 +2203,14 @@ impl<'de> serde::Deserialize<'de> for RateLimiterUnit {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Result {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub buckets: Option<Vec<crate::types::ml_common::Buckets>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Rows {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub values: Option<Vec<crate::types::ml_common::Values>>,
@@ -2156,6 +2221,7 @@ pub type SearchAgentsResponse = crate::types::ml_common::SearchResponse;
 pub type SearchConnectorsResponse = crate::types::ml_common::SearchResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchHits {
     pub hits: Vec<crate::types::ml_common::SearchHitsHit>,
     #[doc = "The maximum score."]
@@ -2165,6 +2231,7 @@ pub struct SearchHits {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchHitsHit {
     #[serde(rename = "_id")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2205,6 +2272,7 @@ pub type SearchModelGroupsResponse = crate::types::ml_common::SearchResponse;
 pub type SearchModelsResponse = crate::types::ml_common::SearchResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchResponse {
     #[serde(rename = "_shards")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2221,6 +2289,7 @@ pub struct SearchResponse {
 pub type SearchTasksResponse = crate::types::ml_common::SearchResponse;
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Source {
     pub access: Option<crate::types::ml_common::ModelGroupAccessMode>,
     pub actions: Option<Vec<crate::types::ml_common::Action>>,
@@ -3291,6 +3360,7 @@ impl<'de> serde::Deserialize<'de> for SourceCreateTime {
 
 #[doc = "The status."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Status {
     #[doc = "`CANCELLED`"]
     Cancelled,
@@ -3348,6 +3418,7 @@ impl<'de> serde::Deserialize<'de> for Status {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Strategy {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub configuration: Option<crate::types::ml_common::StrategyConfiguration>,
@@ -3365,6 +3436,7 @@ pub struct Strategy {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StrategyConfiguration {
     #[doc = "The LLM ID for strategy."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3379,6 +3451,7 @@ pub struct StrategyConfiguration {
 
 #[doc = "The strategy type."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StrategyType {
     #[doc = "`SEMANTIC`"]
     Semantic,
@@ -3424,6 +3497,7 @@ impl<'de> serde::Deserialize<'de> for StrategyType {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Task {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub create_time: Option<i64>,
@@ -3447,6 +3521,7 @@ pub struct Task {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TaskState {
     #[doc = "`CANCELLED`"]
     Cancelled,
@@ -3514,6 +3589,7 @@ impl<'de> serde::Deserialize<'de> for TaskState {
 pub type Tasks = std::collections::BTreeMap<String, crate::types::ml_common::Task>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Tool {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attributes: Option<crate::types::ml_common::ToolAttributes>,
@@ -3530,6 +3606,7 @@ pub struct Tool {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ToolAttributes {
     pub input_schema: Option<String>,
     pub strict: Option<bool>,
@@ -3614,6 +3691,7 @@ impl serde::Serialize for ToolAttributes {
 }
 
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct ToolItems {
     pub attributes: Option<crate::types::ml_common::ToolAttributes>,
     pub description: Option<String>,
@@ -3759,6 +3837,7 @@ impl serde::Serialize for ToolItems {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TrainPredictResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prediction_result: Option<crate::types::ml_common::PredictionResult>,
@@ -3766,6 +3845,7 @@ pub struct TrainPredictResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TrainResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_id: Option<crate::types::common::Name>,
@@ -3773,6 +3853,7 @@ pub struct TrainResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UndeployModelNode {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::ml_common::UndeployModelNodeStats>,
@@ -3785,6 +3866,7 @@ pub type UndeployModelResponse =
     std::collections::BTreeMap<String, crate::types::ml_common::UndeployModelNode>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UnloadModelNode {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<crate::types::ml_common::UnloadModelNodeStats>,
@@ -3797,6 +3879,7 @@ pub type UnloadModelResponse =
     std::collections::BTreeMap<String, crate::types::ml_common::UnloadModelNode>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateModelGroupResponse {
     #[doc = "The status."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3804,6 +3887,7 @@ pub struct UpdateModelGroupResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Values {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub column_type: Option<crate::types::ml_common::ColumnType>,

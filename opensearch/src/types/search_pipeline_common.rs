@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AgenticContextResponseProcessor {
     #[doc = "Whether to include the agent's execution step summary in the response. Available for conversational agents only."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -45,6 +46,7 @@ pub struct AgenticContextResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AgenticQueryTranslatorRequestProcessor {
     #[doc = "The ID of the agent to use for query translation."]
     pub agent_id: String,
@@ -57,6 +59,7 @@ pub struct AgenticQueryTranslatorRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CollapseResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub context_prefix: Option<String>,
@@ -70,6 +73,7 @@ pub struct CollapseResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FilterQueryRequestProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -82,6 +86,7 @@ pub struct FilterQueryRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct MLOpenSearchReranker {
     pub model_id: String,
 }
@@ -89,6 +94,7 @@ pub struct MLOpenSearchReranker {
 pub type NeuralFieldMap = std::collections::BTreeMap<String, String>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NeuralQueryEnricherRequestProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_model_id: Option<String>,
@@ -101,6 +107,7 @@ pub struct NeuralQueryEnricherRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NormalizationPhaseResultsProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub combination: Option<crate::types::search_pipeline_common::ScoreCombination>,
@@ -115,6 +122,7 @@ pub struct NormalizationPhaseResultsProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct OversampleRequestProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content_prefix: Option<String>,
@@ -128,6 +136,7 @@ pub struct OversampleRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PersonalizeSearchRankingResponseProcessor {
     pub campaign_arn: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -180,6 +189,7 @@ impl PhaseResultsProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhaseResultsProcessorNormalizationProcessor {
     #[serde(rename = "normalization-processor")]
     pub normalization_processor:
@@ -187,6 +197,7 @@ pub struct PhaseResultsProcessorNormalizationProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PhaseResultsProcessorScoreRankerProcessor {
     #[serde(rename = "score-ranker-processor")]
     pub score_ranker_processor:
@@ -194,6 +205,7 @@ pub struct PhaseResultsProcessorScoreRankerProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RenameFieldResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -268,38 +280,45 @@ impl RequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestProcessorAgenticQueryTranslator {
     pub agentic_query_translator:
         crate::types::search_pipeline_common::AgenticQueryTranslatorRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestProcessorFilterQuery {
     pub filter_query: crate::types::search_pipeline_common::FilterQueryRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestProcessorNeuralQueryEnricher {
     pub neural_query_enricher:
         crate::types::search_pipeline_common::NeuralQueryEnricherRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestProcessorOversample {
     pub oversample: crate::types::search_pipeline_common::OversampleRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RequestProcessorScript {
     pub script: crate::types::search_pipeline_common::SearchScriptRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerankContext {
     pub document_fields: Vec<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RerankResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub context: Option<crate::types::search_pipeline_common::RerankContext>,
@@ -412,53 +431,63 @@ impl ResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorAgenticContext {
     pub agentic_context: crate::types::search_pipeline_common::AgenticContextResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorCollapse {
     pub collapse: crate::types::search_pipeline_common::CollapseResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorPersonalizeSearchRanking {
     pub personalize_search_ranking:
         crate::types::search_pipeline_common::PersonalizeSearchRankingResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorRenameField {
     pub rename_field: crate::types::search_pipeline_common::RenameFieldResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorRerank {
     pub rerank: crate::types::search_pipeline_common::RerankResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorRetrievalAugmentedGeneration {
     pub retrieval_augmented_generation:
         crate::types::search_pipeline_common::RetrievalAugmentedGenerationResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorSort {
     pub sort: crate::types::search_pipeline_common::SortResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorSplit {
     pub split: crate::types::search_pipeline_common::SplitResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ResponseProcessorTruncateHits {
     pub truncate_hits: crate::types::search_pipeline_common::TruncateHitsResponseProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RetrievalAugmentedGenerationResponseProcessor {
     pub context_field_list: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -473,6 +502,7 @@ pub struct RetrievalAugmentedGenerationResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreCombination {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parameters: Option<crate::types::search_pipeline_common::ScoreCombinationParameters>,
@@ -481,12 +511,14 @@ pub struct ScoreCombination {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreCombinationParameters {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub weights: Option<Vec<f64>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ScoreCombinationTechnique {
     #[doc = "`arithmetic_mean`"]
     ArithmeticMean,
@@ -532,12 +564,14 @@ impl<'de> serde::Deserialize<'de> for ScoreCombinationTechnique {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreNormalization {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub technique: Option<crate::types::search_pipeline_common::ScoreNormalizationTechnique>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ScoreNormalizationTechnique {
     #[doc = "`l2`"]
     L2,
@@ -579,6 +613,7 @@ impl<'de> serde::Deserialize<'de> for ScoreNormalizationTechnique {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreRankerCombination {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rank_constant: Option<i32>,
@@ -586,6 +621,7 @@ pub struct ScoreRankerCombination {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ScoreRankerCombinationTechnique {
     #[doc = "`rrf`"]
     Rrf,
@@ -623,6 +659,7 @@ impl<'de> serde::Deserialize<'de> for ScoreRankerCombinationTechnique {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ScoreRankerPhaseResultsProcessor {
     pub combination: crate::types::search_pipeline_common::ScoreRankerCombination,
 }
@@ -633,6 +670,7 @@ pub type SearchPipelineMap = std::collections::BTreeMap<
 >;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchPipelineStructure {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -648,6 +686,7 @@ pub struct SearchPipelineStructure {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SearchScriptRequestProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -661,6 +700,7 @@ pub struct SearchScriptRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SortResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -676,6 +716,7 @@ pub struct SortResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SplitResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -692,6 +733,7 @@ pub struct SplitResponseProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TruncateHitsResponseProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub context_prefix: Option<String>,

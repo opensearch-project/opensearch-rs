@@ -30,6 +30,7 @@
 
 #[doc = "The configuration for overlapping index templates."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Overlapping {
     #[doc = "The list of index patterns that may overlap with other templates."]
     pub index_patterns: Vec<String>,
@@ -41,6 +42,7 @@ pub type SimulateTemplateResponse = crate::types::indices::SimulateTemplateRespo
 
 #[doc = "The configuration for an index template simulation."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Template {
     #[doc = "The map of alias names to their configurations."]
     pub aliases: std::collections::BTreeMap<String, crate::types::indices_common::Alias>,

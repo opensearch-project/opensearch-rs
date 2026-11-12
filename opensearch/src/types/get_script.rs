@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetScriptResponse {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,

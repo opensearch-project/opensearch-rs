@@ -30,12 +30,14 @@
 
 #[doc = "The statistics for all indexes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct AllIndicesStats {
     pub primaries: crate::types::indices_stats::IndexStats,
     pub total: crate::types::indices_stats::IndexStats,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexShardStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completion: Option<crate::types::common::CompletionStats>,
@@ -82,6 +84,7 @@ pub struct IndexShardStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndexStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completion: Option<crate::types::common::CompletionStats>,
@@ -119,6 +122,7 @@ pub struct IndexStats {
 
 #[doc = "The statistics for specific indexes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct IndicesStats {
     pub primaries: crate::types::indices_stats::IndexStats,
     #[doc = "The statistics for individual shards."]
@@ -132,6 +136,7 @@ pub struct IndicesStats {
 
 #[doc = "The commit information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardCommit {
     #[doc = "The generation number of the commit."]
     pub generation: i32,
@@ -144,6 +149,7 @@ pub struct ShardCommit {
 
 #[doc = "The size information for shard files."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardFileSizeInfo {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub average_size_in_bytes: Option<crate::types::common::ByteCount>,
@@ -163,6 +169,7 @@ pub struct ShardFileSizeInfo {
 
 #[doc = "The retention lease details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardLease {
     pub id: crate::types::common::Id,
     pub retaining_seq_no: crate::types::common::SequenceNumber,
@@ -172,6 +179,7 @@ pub struct ShardLease {
 
 #[doc = "The path information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardPath {
     #[doc = "The path to the shard's data."]
     pub data_path: String,
@@ -183,6 +191,7 @@ pub struct ShardPath {
 
 #[doc = "The retention lease information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardRetentionLeases {
     #[doc = "The list of retention leases."]
     pub leases: Vec<crate::types::indices_stats::ShardLease>,
@@ -193,6 +202,7 @@ pub struct ShardRetentionLeases {
 
 #[doc = "The routing information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardRouting {
     #[doc = "The node containing the shard."]
     pub node: String,
@@ -206,6 +216,7 @@ pub struct ShardRouting {
 
 #[doc = "The state of shard routing."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ShardRoutingState {
     #[doc = "`INITIALIZING`"]
     Initializing,
@@ -256,6 +267,7 @@ impl<'de> serde::Deserialize<'de> for ShardRoutingState {
 
 #[doc = "The sequence number information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardSequenceNumber {
     #[doc = "The global checkpoint for the shard."]
     pub global_checkpoint: i64,

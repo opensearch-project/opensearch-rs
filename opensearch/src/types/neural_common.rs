@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlatNeuralInfoStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_version: Option<crate::types::neural_common::InfoStringStat>,
@@ -119,6 +120,7 @@ pub struct FlatNeuralInfoStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlatNeuralNodeStats {
     #[serde(rename = "processors.ingest.semantic_field_chunking_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -255,6 +257,7 @@ pub struct FlatNeuralNodeStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct FlatNeuralStats {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -309,12 +312,14 @@ impl<'de> serde::Deserialize<'de> for InfoCounterStat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InfoCounterStatObject {
     pub stat_type: crate::types::neural_common::InfoCounterStatObjectStatType,
     pub value: crate::types::neural_common::InfoCounterStatObjectValue,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum InfoCounterStatObjectStatType {
     #[doc = "`info_counter`"]
     InfoCounter,
@@ -420,12 +425,14 @@ impl<'de> serde::Deserialize<'de> for InfoStringStat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct InfoStringStatObject {
     pub stat_type: crate::types::neural_common::InfoStringStatObjectStatType,
     pub value: crate::types::neural_common::InfoStringStatObjectValue,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum InfoStringStatObjectStatType {
     #[doc = "`info_string`"]
     InfoString,
@@ -498,6 +505,7 @@ impl<'de> serde::Deserialize<'de> for InfoStringStatObjectValue {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralInfoStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_version: Option<crate::types::neural_common::InfoStringStat>,
@@ -506,6 +514,7 @@ pub struct NestedNeuralInfoStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralInfoStatsProcessors {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ingest: Option<crate::types::neural_common::NestedNeuralInfoStatsProcessorsIngest>,
@@ -514,6 +523,7 @@ pub struct NestedNeuralInfoStatsProcessors {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralInfoStatsProcessorsIngest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub skip_existing_processors: Option<crate::types::neural_common::InfoCounterStat>,
@@ -537,6 +547,7 @@ pub struct NestedNeuralInfoStatsProcessorsIngest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralInfoStatsProcessorsSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralInfoStatsProcessorsSearchHybrid>,
@@ -551,6 +562,7 @@ pub struct NestedNeuralInfoStatsProcessorsSearch {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralInfoStatsProcessorsSearchHybrid {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub comb_arithmetic_processors: Option<crate::types::neural_common::InfoCounterStat>,
@@ -574,6 +586,7 @@ pub struct NestedNeuralInfoStatsProcessorsSearchHybrid {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessors>,
@@ -585,6 +598,7 @@ pub struct NestedNeuralNodeStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsProcessors {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ingest: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessorsIngest>,
@@ -593,6 +607,7 @@ pub struct NestedNeuralNodeStatsProcessors {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsProcessorsIngest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_field_chunking_executions:
@@ -623,6 +638,7 @@ pub struct NestedNeuralNodeStatsProcessorsIngest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsProcessorsSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessorsSearchHybrid>,
@@ -640,6 +656,7 @@ pub struct NestedNeuralNodeStatsProcessorsSearch {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsProcessorsSearchHybrid {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub comb_arithmetic_executions:
@@ -666,6 +683,7 @@ pub struct NestedNeuralNodeStatsProcessorsSearchHybrid {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralNodeStatsQueryHybrid>,
@@ -676,6 +694,7 @@ pub struct NestedNeuralNodeStatsQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsQueryHybrid {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid_query_requests: Option<crate::types::neural_common::TimestampedEventCounterStat>,
@@ -691,6 +710,7 @@ pub struct NestedNeuralNodeStatsQueryHybrid {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsQueryNeural {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_query_against_knn_requests:
@@ -706,6 +726,7 @@ pub struct NestedNeuralNodeStatsQueryNeural {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsQueryNeuralSparse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_sparse_query_requests:
@@ -713,6 +734,7 @@ pub struct NestedNeuralNodeStatsQueryNeuralSparse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralNodeStatsSemanticHighlighting {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_highlighting_request_count:
@@ -720,6 +742,7 @@ pub struct NestedNeuralNodeStatsSemanticHighlighting {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct NestedNeuralStats {
     #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
@@ -809,6 +832,7 @@ impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStat {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct TimestampedEventCounterStatObject {
     pub stat_type: crate::types::neural_common::TimestampedEventCounterStatObjectStatType,
     pub value: crate::types::neural_common::TimestampedEventCounterStatObjectValue,
@@ -819,6 +843,7 @@ pub struct TimestampedEventCounterStatObject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum TimestampedEventCounterStatObjectStatType {
     #[doc = "`timestamped_event_counter`"]
     TimestampedEventCounter,

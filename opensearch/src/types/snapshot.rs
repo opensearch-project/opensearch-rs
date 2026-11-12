@@ -29,11 +29,13 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CleanupRepositoryResponse {
     pub results: crate::types::snapshot_cleanup_repository::CleanupRepositoryResults,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateResponse {
     #[doc = "Returns `true` if the snapshot was accepted. Present when the request had `wait_for_completion` set to `false`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +48,13 @@ pub type GetRepositoryResponse =
     std::collections::BTreeMap<String, crate::types::snapshot_common::Repository>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetResponse {
     pub snapshots: Vec<crate::types::snapshot_common::SnapshotInfo>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct RestoreResponse {
     #[doc = "Returns `true` if the restore was accepted. Present when the request had `wait_for_completion` set to `false`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -60,11 +64,13 @@ pub struct RestoreResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct StatusResponse {
     pub snapshots: Vec<crate::types::snapshot_common::SnapshotStatus>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct VerifyRepositoryResponse {
     pub nodes: std::collections::BTreeMap<
         String,

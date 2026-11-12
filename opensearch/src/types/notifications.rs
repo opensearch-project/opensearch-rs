@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CreateConfigResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ListChannelsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel_list: Option<Vec<crate::types::notifications_common::NotificationChannel>>,
@@ -47,6 +49,7 @@ pub struct ListChannelsResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ListFeaturesResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_config_type_list:
@@ -56,6 +59,7 @@ pub struct ListFeaturesResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SendTestResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub event_source: Option<crate::types::notifications_common::EventSource>,
@@ -64,6 +68,7 @@ pub struct SendTestResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct UpdateConfigResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_id: Option<String>,

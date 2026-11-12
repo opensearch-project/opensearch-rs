@@ -32,6 +32,7 @@
 pub type CleanupRepositoryResponse = crate::types::snapshot::CleanupRepositoryResponse;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct CleanupRepositoryResults {
     #[doc = "The number of binary large objects (blobs) removed during cleanup."]
     pub deleted_blobs: i64,

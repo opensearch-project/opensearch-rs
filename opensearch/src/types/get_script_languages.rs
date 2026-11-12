@@ -29,12 +29,14 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct GetScriptLanguagesResponse {
     pub language_contexts: Vec<crate::types::get_script_languages::LanguageContext>,
     pub types_allowed: Vec<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct LanguageContext {
     pub contexts: Vec<String>,
     pub language: crate::types::common::ScriptLanguage,

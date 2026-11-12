@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct DocumentSimulation {
     #[serde(rename = "_id")]
     pub id: crate::types::common::Id,
@@ -52,6 +53,7 @@ pub struct DocumentSimulation {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct Ingest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pipeline: Option<crate::types::common::Name>,
@@ -59,6 +61,7 @@ pub struct Ingest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct PipelineSimulation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub doc: Option<crate::types::ingest_simulate::DocumentSimulation>,

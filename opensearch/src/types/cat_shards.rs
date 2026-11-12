@@ -29,6 +29,7 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ShardsRecord {
     #[doc = "The average size in bytes of shard bulk operations."]
     #[serde(rename = "bulk.avg_size_in_bytes")]

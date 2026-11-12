@@ -228,7 +228,7 @@ fn typekind_to_ty(name: &str, ty: &Type, required: bool, fn_arg: bool) -> syn::T
                 v.push_str(str_type);
                 v.push(']');
             }
-            TypeKind::Enum => v.push_str(name.to_pascal_case().as_str()),
+            TypeKind::Enum => v.push_str(ty.enum_type_name(name).to_pascal_case().as_str()),
             TypeKind::String => v.push_str(str_type),
             TypeKind::Text => v.push_str(str_type),
             TypeKind::Boolean => v.push_str("bool"),

@@ -1456,7 +1456,7 @@ pub struct ClusterHealth<'a, 'b> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    level: Option<Level>,
+    level: Option<ClusterHealthLevel>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -1533,7 +1533,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self.human = Some(human);
         self
     }
-    pub fn level(mut self, level: Level) -> Self {
+    pub fn level(mut self, level: ClusterHealthLevel) -> Self {
         self.level = Some(level);
         self
     }
@@ -1622,7 +1622,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                level: Option<Level>,
+                level: Option<ClusterHealthLevel>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,

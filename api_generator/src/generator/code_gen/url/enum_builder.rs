@@ -312,6 +312,8 @@ mod tests {
                                     deprecated: None,
                                     schema: None,
                                     model_ty: None,
+                                    enum_schema: None,
+                                    enum_type: None,
                                 });
                                 map
                             },
@@ -330,6 +332,8 @@ mod tests {
                                     deprecated: None,
                                     schema: None,
                                     model_ty: None,
+                                    enum_schema: None,
+                                    enum_type: None,
                                 });
                                 map.insert("type".to_string(), Type {
                                     ty: TypeKind::List,
@@ -339,6 +343,8 @@ mod tests {
                                     deprecated: None,
                                     schema: None,
                                     model_ty: None,
+                                    enum_schema: None,
+                                    enum_type: None,
                                 });
                                 map
                             },

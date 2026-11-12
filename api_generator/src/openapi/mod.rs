@@ -418,6 +418,11 @@ fn to_legacy_type(param: &Value, resolver: &Resolver) -> anyhow::Result<Value> {
     }
     if let Some(options) = options {
         ty["options"] = Value::Array(options);
+        // names the `params` enum when parameters with the same name take
+        // different values (see generator::enum_type_names)
+        if let Some(ref_name) = ref_name {
+            ty["enum_schema"] = json!(ref_name);
+        }
     }
     if let Some(default) = schema.get("default") {
         ty["default"] = default.clone();
@@ -1225,5 +1230,177 @@ components:
         let api = read_fixture(&spec).unwrap();
         let broken = &api.root.endpoints()["broken"];
         assert_eq!(broken.params["p"].ty, TypeKind::Boolean);
+    }
+
+    /// `type` and `level` parameters taking different values in different
+    /// APIs, as in the specification
+    fn enum_names_fixture(extra_paths: &str, extra_params: &str) -> String {
+        let op = |path: &str, group: &str, params: &[&str]| {
+            let params: String = params
+                .iter()
+                .map(|p| format!("        - $ref: '#/components/parameters/{}'\n", p))
+                .collect();
+            format!(
+                "  {path}:\n    get:\n      operationId: {group}.0\n      x-operation-group: {group}\n      \
+                 description: {group}\n      parameters:\n{params}      responses: {{}}\n"
+            )
+        };
+        let param = |key: &str, name: &str, schema: &str| {
+            format!(
+                "    {key}:\n      name: {name}\n      in: query\n      description: {name}\n      \
+                 schema:\n        $ref: '#/components/schemas/{schema}'\n"
+            )
+        };
+        let mut spec =
+            String::from("openapi: 3.1.0\ninfo:\n  title: Test\n  version: 0.0.0\npaths:\n");
+        // the client needs a root API
+        spec += &op("/_search", "search", &[]).replace("      parameters:\n", "");
+        spec += &op(
+            "/_nodes/hot_threads",
+            "nodes.hot_threads",
+            &["nodes.hot_threads___query.type"],
+        );
+        spec += &op(
+            "/_insights/top_queries",
+            "insights.top_queries",
+            &["insights.top_queries___query.type"],
+        );
+        spec += &op(
+            "/_cluster/health",
+            "cluster.health",
+            &["cluster.health___query.level"],
+        );
+        spec += &op(
+            "/_nodes/stats",
+            "nodes.stats",
+            &["nodes.stats___query.level"],
+        );
+        spec += &op("/_stats", "indices.stats", &["indices.stats___query.level"]);
+        spec += extra_paths;
+        spec += "components:\n  parameters:\n";
+        spec += &param(
+            "nodes.hot_threads___query.type",
+            "type",
+            "nodes._common___SampleType",
+        );
+        spec += &param(
+            "insights.top_queries___query.type",
+            "type",
+            "insights._common___MetricType",
+        );
+        spec += &param(
+            "cluster.health___query.level",
+            "level",
+            "cluster.health___Level",
+        );
+        spec += &param("nodes.stats___query.level", "level", "_common___Level");
+        spec += &param("indices.stats___query.level", "level", "_common___Level");
+        spec += extra_params;
+        spec += "  schemas:\n";
+        spec +=
+            "    nodes._common___SampleType:\n      type: string\n      enum: [block, cpu, wait]\n";
+        spec += "    insights._common___MetricType:\n      type: string\n      enum: [cpu, latency, memory]\n";
+        spec += "    cluster.health___Level:\n      type: string\n      enum: [awareness_attributes, cluster, indices, shards]\n";
+        spec +=
+            "    _common___Level:\n      type: string\n      enum: [cluster, indices, shards]\n";
+        spec
+    }
+
+    fn enum_type<'a>(api: &'a Api, call: &str, param: &str) -> &'a str {
+        let endpoint = api.endpoint_for_api_call(call).unwrap();
+        endpoint.params[param].enum_type.as_deref().unwrap()
+    }
+
+    #[test]
+    fn enums_of_parameters_with_one_set_of_values_are_named_after_the_parameter() {
+        let api = fixture_api();
+        assert_eq!(
+            enum_type(&api, "search", "expand_wildcards"),
+            "expand_wildcards"
+        );
+        assert_eq!(
+            api.enums
+                .iter()
+                .filter(|e| e.name == "expand_wildcards")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn enums_of_parameters_sharing_a_name_with_other_values_are_named_after_their_schema() {
+        let api = read_fixture(&enum_names_fixture("", "")).unwrap();
+
+        // distinct schema names: the schema name alone
+        assert_eq!(enum_type(&api, "nodes.hot_threads", "type"), "SampleType");
+        assert_eq!(
+            enum_type(&api, "insights.top_queries", "type"),
+            "MetricType"
+        );
+        // both schemas are named Level: the namespace qualifies them
+        assert_eq!(
+            enum_type(&api, "cluster.health", "level"),
+            "ClusterHealthLevel"
+        );
+        assert_eq!(enum_type(&api, "nodes.stats", "level"), "Level");
+        assert_eq!(enum_type(&api, "indices.stats", "level"), "Level");
+
+        // each API keeps its own values
+        let enums: Vec<(&str, Vec<&str>)> = api
+            .enums
+            .iter()
+            .map(|e| {
+                (
+                    e.name.as_str(),
+                    e.values.iter().map(String::as_str).collect(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            enums,
+            vec![
+                (
+                    "ClusterHealthLevel",
+                    vec!["awareness_attributes", "cluster", "indices", "shards"]
+                ),
+                ("Level", vec!["cluster", "indices", "shards"]),
+                ("MetricType", vec!["cpu", "latency", "memory"]),
+                ("SampleType", vec!["block", "cpu", "wait"]),
+            ]
+        );
+    }
+
+    #[test]
+    fn parameters_sharing_a_name_with_other_inline_values_fail_generation() {
+        let paths = "  /_a:\n    get:\n      operationId: a.0\n      x-operation-group: a\n      \
+                     description: a\n      parameters:\n        - name: mode\n          in: query\n          \
+                     schema:\n            type: string\n            enum: [fast, slow]\n      responses: {}\n  \
+                     /_b:\n    get:\n      operationId: b.0\n      x-operation-group: b\n      \
+                     description: b\n      parameters:\n        - name: mode\n          in: query\n          \
+                     schema:\n            type: string\n            enum: [on, off]\n      responses: {}\n";
+        let err = read_fixture_err(&enum_names_fixture(paths, ""));
+        assert!(err.contains("parameter `mode`"), "{}", err);
+        assert!(err.contains("no single specification schema"), "{}", err);
+    }
+
+    #[test]
+    fn hot_threads_and_top_queries_keep_their_own_type_values_in_the_vendored_spec() {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
+        let api = read_api("test", Path::new(path)).unwrap();
+        let values = |name: &str| -> Vec<String> {
+            api.enums
+                .iter()
+                .find(|e| e.name == name)
+                .unwrap()
+                .values
+                .clone()
+        };
+        assert_eq!(enum_type(&api, "nodes.hot_threads", "type"), "SampleType");
+        assert_eq!(values("SampleType"), ["block", "cpu", "wait"]);
+        assert_eq!(
+            enum_type(&api, "insights.top_queries", "type"),
+            "MetricType"
+        );
+        assert_eq!(values("MetricType"), ["cpu", "latency", "memory"]);
     }
 }

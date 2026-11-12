@@ -37,6 +37,47 @@ use serde::{de, de::Visitor, Deserializer, Serializer};
 // Generated code - do not edit until the next GENERATED-END marker
 
 use serde::{Deserialize, Serialize};
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum ClusterHealthLevel {
+    #[serde(rename = "awareness_attributes")]
+    AwarenessAttributes,
+    #[serde(rename = "cluster")]
+    Cluster,
+    #[serde(rename = "indices")]
+    Indices,
+    #[serde(rename = "shards")]
+    Shards,
+}
+#[doc = "Indicates whether statistics are aggregated at the cluster, index, or shard level."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum Level {
+    #[serde(rename = "cluster")]
+    Cluster,
+    #[serde(rename = "indices")]
+    Indices,
+    #[serde(rename = "shards")]
+    Shards,
+}
+#[doc = "Get top n queries by a specific metric."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum MetricType {
+    #[serde(rename = "cpu")]
+    Cpu,
+    #[serde(rename = "latency")]
+    Latency,
+    #[serde(rename = "memory")]
+    Memory,
+}
+#[doc = "The type to sample."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum SampleType {
+    #[serde(rename = "block")]
+    Block,
+    #[serde(rename = "cpu")]
+    Cpu,
+    #[serde(rename = "wait")]
+    Wait,
+}
 #[doc = "Used to filter by alert state. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
 pub enum AlertState {
@@ -156,17 +197,6 @@ pub enum Health {
     #[serde(rename = "red")]
     Red,
 }
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
-pub enum Level {
-    #[serde(rename = "awareness_attributes")]
-    AwarenessAttributes,
-    #[serde(rename = "cluster")]
-    Cluster,
-    #[serde(rename = "indices")]
-    Indices,
-    #[serde(rename = "shards")]
-    Shards,
-}
 #[doc = "Limits the information returned to the specified metrics."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
 pub enum Metric {
@@ -282,16 +312,6 @@ pub enum Time {
     H,
     #[serde(rename = "d")]
     D,
-}
-#[doc = "Get top n queries by a specific metric."]
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
-pub enum Type {
-    #[serde(rename = "cpu")]
-    Cpu,
-    #[serde(rename = "latency")]
-    Latency,
-    #[serde(rename = "memory")]
-    Memory,
 }
 #[doc = "The specific version type: `external`, `external_gte`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]

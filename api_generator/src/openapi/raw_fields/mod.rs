@@ -420,7 +420,15 @@ mod tests {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
         let spec: serde_json::Value =
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
-        let model = crate::openapi::responses::read_all_response_models(&spec).unwrap();
+        let model = crate::openapi::responses::read_all_response_models(
+            &spec,
+            &crate::openapi::client_model::ClientModel::read(std::path::Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/opensearch-client-model.json"
+            )))
+            .unwrap(),
+        )
+        .unwrap();
         enforce(&model).unwrap();
     }
 
@@ -433,7 +441,16 @@ mod tests {
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
         let groups = crate::openapi::responses::all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        let model = crate::openapi::responses::read_response_model(&spec, &refs).unwrap();
+        let model = crate::openapi::responses::read_response_model(
+            &spec,
+            &crate::openapi::client_model::ClientModel::read(std::path::Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/opensearch-client-model.json"
+            )))
+            .unwrap(),
+            &refs,
+        )
+        .unwrap();
         let uses = collect_raw_uses(&model);
         let keys: BTreeSet<&str> = uses.iter().map(|u| u.key.as_str()).collect();
         assert_eq!(keys.len(), uses.len(), "duplicate keys");

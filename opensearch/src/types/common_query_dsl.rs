@@ -892,13 +892,11 @@ impl<'de> serde::Deserialize<'de> for FunctionBoostMode {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FunctionScoreContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub filter: Option<crate::types::common_query_dsl::QueryContainer>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub weight: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub exp: Option<crate::types::common_query_dsl::DecayFunction>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field_value_factor: Option<crate::types::common_query_dsl::FieldValueFactorScoreFunction>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub filter: Option<crate::types::common_query_dsl::QueryContainer>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gauss: Option<crate::types::common_query_dsl::DecayFunction>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -907,6 +905,8 @@ pub struct FunctionScoreContainer {
     pub random_score: Option<crate::types::common_query_dsl::RandomScoreFunction>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub script_score: Option<crate::types::common_query_dsl::ScriptScoreFunction>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weight: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

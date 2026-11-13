@@ -103,6 +103,19 @@ The `OpenSearch` category of steps are specifically defined for this project and
   cargo make generate-api
   ```
 
+- Generate client from the OpenAPI specification
+
+  ```sh
+  cargo run -p api_generator -- --openapi api_generator/opensearch-openapi.yaml
+  ```
+
+  The response types are read from the specification's resolved client model, `api_generator/opensearch-client-model.json`, vendored next to `opensearch-openapi.yaml` (see "Client Model" in the specification's `CLIENT_GENERATOR_GUIDE.md`). When updating the vendored specification, rebuild the model from it with the specification repository's tooling:
+
+  ```sh
+  # in a checkout of opensearch-api-specification
+  npm run model -- --label -i <opensearch-rs>/api_generator/opensearch-openapi.yaml -o <opensearch-rs>/api_generator/opensearch-client-model.json
+  ```
+
 - Run OpenSearch package tests
 
   Optionally pass

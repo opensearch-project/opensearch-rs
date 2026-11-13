@@ -947,7 +947,16 @@ mod tests {
             serde_yaml::from_reader(std::fs::File::open(path).unwrap()).unwrap();
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        read_response_model(&spec, &refs).unwrap()
+        read_response_model(
+            &spec,
+            &crate::openapi::client_model::ClientModel::read(std::path::Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/opensearch-client-model.json"
+            )))
+            .unwrap(),
+            &refs,
+        )
+        .unwrap()
     }
 
     #[test]

@@ -6,13 +6,16 @@
  * compatible open source license.
  */
 
-//! Builds a model of typed response types
-//! from the `components/responses` section of the OpenAPI specification.
+//! Builds a model of typed response types.
 //!
-//! For each requested operation group, the 200 response schema is resolved
-//! and its transitive schema closure is converted into [TypeModel]s, from
-//! which the `response_types` code generation backend renders Rust types
-//! into `opensearch/src/types/`.
+//! For each requested operation group, the success response body is taken
+//! from the resolved client model of the specification
+//! ([ClientModel](super::client_model::ClientModel), whose `$ref`s, `allOf`s
+//! and unions are already resolved), and its transitive type closure is
+//! converted into [TypeModel]s by [read_response_model], from which the
+//! `response_types` code generation backend renders Rust types into
+//! `opensearch/src/types/`. Operation groups and status codes come from the
+//! OpenAPI document.
 //!
 //! # Union strategies
 //!
@@ -31,10 +34,10 @@
 //!   unparsed and only decoded when a branch accessor is called by the
 //!   caller, who knows which branch to expect having written the request.
 
-use anyhow::{anyhow, bail};
+use super::client_model::ClientModel;
 use inflector::Inflector;
 use serde_json::{Map, Value};
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet};
 
 /// The Rust path, relative to the `opensearch` crate root, of the typed
 /// response type of an operation group in the given model: e.g.
@@ -88,10 +91,10 @@ pub struct ResponseModel {
 /// The success status codes whose response schema is taken as the response
 /// response type of an operation group, in order of preference. `create` for
 /// instance only declares `201`, the dangling-indices APIs only `202`.
-const SUCCESS_STATUS_CODES: &[&str] = &["200", "201", "202"];
+pub(crate) const SUCCESS_STATUS_CODES: &[&str] = &["200", "201", "202"];
 
 /// Whether every operation of a group uses the HEAD method
-fn is_head_only(spec: &Value, group: &str) -> bool {
+pub(crate) fn is_head_only(spec: &Value, group: &str) -> bool {
     let mut methods = BTreeSet::new();
     if let Some(paths) = spec["paths"].as_object() {
         for operations in paths.values() {
@@ -129,11 +132,15 @@ pub fn all_operation_groups(spec: &Value) -> Vec<String> {
     groups.into_iter().collect()
 }
 
-/// Reads the response model of every operation group of the document
-pub fn read_all_response_models(spec: &Value) -> anyhow::Result<ResponseModel> {
+/// Reads the response model of every operation group of the document, with
+/// the types of its client model
+pub fn read_all_response_models(
+    spec: &Value,
+    model: &ClientModel,
+) -> anyhow::Result<ResponseModel> {
     let groups = all_operation_groups(spec);
     let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-    read_response_model(spec, &refs)
+    super::model_reader::read_response_model(spec, model, &refs)
 }
 
 /// A type in the response model, keyed by its type key
@@ -279,118 +286,10 @@ pub enum JsonKind {
     Bool,
 }
 
-/// Reads the response model for the given operation groups from a parsed
-/// OpenAPI document
-pub fn read_response_model(
-    spec: &Value,
-    operation_groups: &[&str],
-) -> anyhow::Result<ResponseModel> {
-    let schemas = spec["components"]["schemas"]
-        .as_object()
-        .ok_or_else(|| anyhow!("OpenAPI document has no components/schemas"))?;
-    // a document without response components (minimal fixtures) simply has
-    // no response types: every requested group is untyped
-    let empty = Map::new();
-    let responses = spec["components"]["responses"]
-        .as_object()
-        .unwrap_or(&empty);
-
-    let mut builder = ModelBuilder {
-        schemas,
-        model: ResponseModel::default(),
-        queue: VecDeque::new(),
-        queued: BTreeSet::new(),
-    };
-
-    for group in operation_groups {
-        // HEAD responses carry no body by definition (RFC 9110 §9.3.2), even
-        // where the specification declares one (e.g. ism.exists_policy)
-        if is_head_only(spec, group) {
-            builder.model.untyped_groups.insert(
-                group.to_string(),
-                "HEAD-only endpoint: responses have no body".to_string(),
-            );
-            continue;
-        }
-        // the first declared success response with a JSON body is the response type
-        let declared: Vec<&str> = SUCCESS_STATUS_CODES
-            .iter()
-            .copied()
-            .filter(|code| responses.contains_key(&format!("{}___{}", group, code)))
-            .collect();
-        if declared.is_empty() {
-            builder.model.untyped_groups.insert(
-                group.to_string(),
-                "no success response declared".to_string(),
-            );
-            continue;
-        }
-        let schema = declared
-            .iter()
-            .map(|code| {
-                &responses[&format!("{}___{}", group, code)]["content"]["application/json"]
-                    ["schema"]
-            })
-            .find(|schema| !schema.is_null());
-        let schema = match schema {
-            Some(s) => s,
-            None => {
-                builder.model.untyped_groups.insert(
-                    group.to_string(),
-                    format!(
-                        "success response ({}) has no application/json body",
-                        declared.join(", ")
-                    ),
-                );
-                continue;
-            }
-        };
-
-        let root = match schema["$ref"].as_str() {
-            // a plain reference: the referenced schema is the root type
-            Some(r) => {
-                let name = schema_ref_name(r)?;
-                builder.enqueue(name);
-                name.to_string()
-            }
-            // an inline schema: synthesize a root type named after the group
-            None => {
-                let name = format!(
-                    "{}___{}Response",
-                    root_namespace(group),
-                    group.split('.').next_back().unwrap().to_pascal_case()
-                );
-                let ty = builder.convert_schema(schema, &name)?;
-                builder.model.types.insert(name.clone(), ty);
-                name
-            }
-        };
-        let statuses = typed_statuses(schemas, responses, group, schema);
-        if !statuses.is_empty() {
-            builder
-                .model
-                .typed_statuses
-                .insert(group.to_string(), statuses);
-        }
-        builder.model.endpoints.insert(group.to_string(), root);
-    }
-
-    // drain the worklist of referenced schemas
-    while let Some(name) = builder.queue.pop_front() {
-        let schema = builder
-            .schemas
-            .get(&name)
-            .ok_or_else(|| anyhow!("unresolved schema reference: {}", name))?
-            .clone();
-        let ty = builder.convert_schema(&schema, &name)?;
-        builder.model.types.insert(name, ty);
-    }
-
-    resolve_union_strategies(&mut builder.model);
-    prune_unreachable(&mut builder.model);
-
-    Ok(builder.model)
-}
+/// Reads the response model for the given operation groups: bodies and
+/// types from the client model, groups and status codes from the OpenAPI
+/// document
+pub use super::model_reader::read_response_model;
 
 /// Non-2xx statuses the server answers with the success body although the
 /// specification does not declare them, as `(operation group, status)`.
@@ -405,7 +304,7 @@ const UNDECLARED_TYPED_STATUSES: &[(&str, u16)] = &[
 /// The non-2xx status codes of a group whose declared JSON body is the
 /// success schema `success` (after following plain `$ref`s on both sides),
 /// plus its [UNDECLARED_TYPED_STATUSES]
-fn typed_statuses(
+pub(crate) fn typed_statuses(
     schemas: &Map<String, Value>,
     responses: &Map<String, Value>,
     group: &str,
@@ -456,7 +355,7 @@ fn typed_statuses(
 /// Drops types not reachable from any endpoint root: merging specialized
 /// property declarations with their generic bases can leave intermediate
 /// synthesized types without references
-fn prune_unreachable(model: &mut ResponseModel) {
+pub(crate) fn prune_unreachable(model: &mut ResponseModel) {
     fn mark(ty: &TypeRef, model: &ResponseModel, reachable: &mut BTreeSet<String>) {
         match ty {
             TypeRef::Named(n) => {
@@ -499,534 +398,10 @@ fn prune_unreachable(model: &mut ResponseModel) {
 
 /// The namespace used for a synthesized root response type of an operation
 /// group, e.g. `get` -> `_core.get`
-fn root_namespace(group: &str) -> String {
+pub(crate) fn root_namespace(group: &str) -> String {
     match group.split_once('.') {
         Some((ns, _)) => ns.to_string(),
         None => format!("_core.{}", group),
-    }
-}
-
-/// Extracts the schema name from a `#/components/schemas/` reference
-fn schema_ref_name(r: &str) -> anyhow::Result<&str> {
-    r.strip_prefix("#/components/schemas/")
-        .ok_or_else(|| anyhow!("unsupported schema $ref: {}", r))
-}
-
-struct ModelBuilder<'a> {
-    schemas: &'a Map<String, Value>,
-    model: ResponseModel,
-    queue: VecDeque<String>,
-    queued: BTreeSet<String>,
-}
-
-impl ModelBuilder<'_> {
-    /// Adds a named schema to the conversion worklist
-    fn enqueue(&mut self, name: &str) {
-        if self.queued.insert(name.to_string()) {
-            self.queue.push_back(name.to_string());
-        }
-    }
-
-    /// The variant list a schema effectively is, unwrapping the
-    /// `allOf [generic union $ref, specialized oneOf]` pattern used to
-    /// specialize generic containers (e.g. `Buckets` of a concrete bucket
-    /// type). Returns `None` when any part contributes fields, in which
-    /// case the schema is a struct.
-    ///
-    /// Variant titles of a superseded generic union are inherited
-    /// positionally by untitled variants of the specialization.
-    fn effective_union(&self, schema: &Value, depth: usize) -> anyhow::Result<Option<Vec<Value>>> {
-        if depth > 8 {
-            return Ok(None);
-        }
-        if let Some(variants) = union_variants(schema) {
-            return Ok(Some(variants));
-        }
-        let parts = match schema["allOf"].as_array() {
-            Some(parts) => parts,
-            None => return Ok(None),
-        };
-        let mut last_union: Option<Vec<Value>> = None;
-        for part in parts {
-            let resolved;
-            let part = match part["$ref"].as_str() {
-                Some(r) => {
-                    let name = schema_ref_name(r)?;
-                    resolved = self
-                        .schemas
-                        .get(name)
-                        .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?;
-                    resolved
-                }
-                None => part,
-            };
-            // any part with fields makes this a struct, not a union
-            if part["properties"].is_object() || part["additionalProperties"].is_object() {
-                return Ok(None);
-            }
-            if let Some(mut variants) = self.effective_union(part, depth + 1)? {
-                // inherit titles positionally from the superseded union
-                if let Some(previous) = &last_union {
-                    if previous.len() == variants.len() {
-                        for (variant, prev) in variants.iter_mut().zip(previous) {
-                            if variant["title"].is_null() && prev["title"].is_string() {
-                                variant["title"] = prev["title"].clone();
-                            }
-                        }
-                    }
-                }
-                // the most specialized (last) union wins
-                last_union = Some(variants);
-            }
-        }
-        Ok(last_union)
-    }
-
-    /// Converts a schema into a [TypeModel]. `name` is the type key the type
-    /// will be registered under, also used to derive names for synthesized
-    /// inline types.
-    fn convert_schema(&mut self, schema: &Value, name: &str) -> anyhow::Result<TypeModel> {
-        let description = schema_description(schema);
-
-        // a generic type parameter reached as a named type itself (e.g. the
-        // whole get_source response is a TDocument): the caller decides
-        if schema["x-is-generic-type-parameter"]
-            .as_bool()
-            .unwrap_or(false)
-        {
-            return Ok(TypeModel::Alias(AliasModel {
-                description,
-                ty: TypeRef::Raw(RawCause::GenericParameter),
-            }));
-        }
-
-        // unions of fixed string values become open string enums
-        if let Some(values) = collect_const_values(schema, self.schemas)? {
-            return Ok(TypeModel::StrEnum(StrEnumModel {
-                description,
-                values,
-            }));
-        }
-
-        if let Some(variants) = self.effective_union(schema, 0)? {
-            let union = self.convert_union(&variants, name, description)?;
-            // strategy is resolved globally once the closure is complete;
-            // start as lazy, resolve_union_strategies may upgrade
-            return Ok(TypeModel::LazyUnion(union));
-        }
-
-        if is_object_like(schema) {
-            return Ok(TypeModel::Struct(self.expand_object(schema, name)?));
-        }
-
-        // named scalar / list / map aliases, and unshaped schemas (Raw)
-        let (ty, _nullable) = self.convert_ref(schema, name)?;
-        Ok(TypeModel::Alias(AliasModel { description, ty }))
-    }
-
-    /// Converts a `oneOf`/`anyOf` into a [UnionModel], synthesizing types for
-    /// inline object variants
-    fn convert_union(
-        &mut self,
-        variants: &[Value],
-        name: &str,
-        description: Option<String>,
-    ) -> anyhow::Result<UnionModel> {
-        let mut variant_models: Vec<VariantModel> = Vec::new();
-        let mut nullable = false;
-
-        for variant in variants {
-            if variant["type"].as_str() == Some("null") {
-                nullable = true;
-                continue;
-            }
-            let mut variant_name = match variant["title"].as_str() {
-                Some(t) => t.to_snake_case(),
-                None => match variant["$ref"].as_str() {
-                    Some(r) => type_name(schema_ref_name(r)?).to_snake_case(),
-                    None => variant_kind_name(variant),
-                },
-            };
-            // a title shared by a variant and an inline object variant
-            // (e.g. `value: string` next to an object with a `value` field)
-            // yields the same name: disambiguate by JSON kind, then by index
-            if variant_models.iter().any(|v| v.name == variant_name) {
-                let by_kind = format!("{}_{}", variant_name, variant_kind_name(variant));
-                variant_name = if variant_models.iter().any(|v| v.name == by_kind) {
-                    format!("{}_{}", variant_name, variant_models.len())
-                } else {
-                    by_kind
-                };
-            }
-            let ctx = format!("{}{}", name, variant_name.to_pascal_case());
-            let (ty, _) = self.convert_ref(variant, &ctx)?;
-            variant_models.push(VariantModel {
-                name: variant_name,
-                ty,
-                kind: None,
-            });
-        }
-
-        Ok(UnionModel {
-            description,
-            variants: variant_models,
-            nullable,
-        })
-    }
-
-    /// Expands an object schema — including its transitive `allOf` parts —
-    /// into a flat list of fields (physical expansion; no flatten and no
-    /// embedded base struct)
-    fn expand_object(&mut self, schema: &Value, name: &str) -> anyhow::Result<StructModel> {
-        let mut props: Vec<(String, Vec<Value>)> = Vec::new();
-        let mut required: BTreeSet<String> = BTreeSet::new();
-        let mut residual: Option<Value> = None;
-
-        self.collect_object_parts(schema, name, &mut props, &mut required, &mut residual, 0)?;
-
-        let mut fields = Vec::new();
-        for (prop_name, schemas) in props {
-            let ctx = format!("{}{}", name, prop_name.to_pascal_case());
-            let merged = self.merge_property_schemas(schemas)?;
-            let (ty, nullable) = self.convert_ref(&merged, &ctx)?;
-            fields.push(FieldModel {
-                json_name: prop_name.clone(),
-                ty,
-                required: required.contains(&prop_name),
-                nullable,
-                description: schema_description(&merged),
-            });
-        }
-
-        let residual = match residual {
-            None => None,
-            Some(Value::Bool(true)) => {
-                Some(("additional".to_string(), TypeRef::Raw(RawCause::OpenObject)))
-            }
-            Some(ap) => {
-                let ctx = format!("{}Additional", name);
-                let (ty, _) = self.convert_ref(&ap, &ctx)?;
-                // sub-aggregations keep their conventional field name
-                let field_name = match &ty {
-                    TypeRef::Named(n) if n.ends_with("___Aggregate") => "aggregations",
-                    _ => "additional",
-                };
-                Some((field_name.to_string(), ty))
-            }
-        };
-
-        Ok(StructModel {
-            description: schema_description(schema),
-            fields,
-            residual,
-        })
-    }
-
-    /// Merges the schemas a property was declared with across `allOf`
-    /// parts:
-    ///
-    /// - arrays merge element-wise (a re-declared item field specializes
-    ///   the item type)
-    /// - object shapes merge field-wise via `allOf` (partial overlays such
-    ///   as an added `_source` field)
-    /// - anything else is a specialization: the most derived declaration —
-    ///   the last one — replaces the base entirely (e.g. a concrete bucket
-    ///   array replacing the generic `Buckets` union)
-    fn merge_property_schemas(&self, mut schemas: Vec<Value>) -> anyhow::Result<Value> {
-        schemas.dedup();
-        if schemas.len() == 1 {
-            return Ok(schemas.pop().unwrap());
-        }
-
-        let resolved: Vec<Value> = schemas
-            .iter()
-            .map(|s| self.resolve_shallow(s).cloned())
-            .collect::<anyhow::Result<_>>()?;
-
-        if resolved.iter().all(|s| s["type"].as_str() == Some("array")) {
-            let items: Vec<Value> = resolved.iter().map(|s| s["items"].clone()).collect();
-            let merged_items = self.merge_property_schemas(items)?;
-            return Ok(serde_json::json!({ "type": "array", "items": merged_items }));
-        }
-
-        let object_like = |s: &Value| s["properties"].is_object() || s["allOf"].is_array();
-        if resolved.iter().all(object_like) {
-            return Ok(serde_json::json!({ "allOf": schemas }));
-        }
-
-        Ok(schemas.pop().unwrap())
-    }
-
-    /// Resolves a `$ref` chain one level deep enough to inspect the kind
-    /// of a schema
-    fn resolve_shallow<'a>(&'a self, schema: &'a Value) -> anyhow::Result<&'a Value> {
-        let mut current = schema;
-        for _ in 0..8 {
-            match current["$ref"].as_str() {
-                Some(r) => {
-                    let name = schema_ref_name(r)?;
-                    current = self
-                        .schemas
-                        .get(name)
-                        .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?;
-                }
-                None => return Ok(current),
-            }
-        }
-        bail!("schema $ref chain too deep or cyclic");
-    }
-
-    /// Recursively collects property declarations, required sets and
-    /// `additionalProperties` from a schema and its `allOf` parts. Every
-    /// declaration of a property is kept, in declaration order, so that
-    /// redefinitions can be merged with their base definitions.
-    fn collect_object_parts(
-        &mut self,
-        schema: &Value,
-        name: &str,
-        props: &mut Vec<(String, Vec<Value>)>,
-        required: &mut BTreeSet<String>,
-        residual: &mut Option<Value>,
-        depth: usize,
-    ) -> anyhow::Result<()> {
-        if depth > 16 {
-            bail!("allOf expansion too deep (cycle?) in {}", name);
-        }
-
-        // a $ref part: resolve and recurse
-        if let Some(r) = schema["$ref"].as_str() {
-            let ref_name = schema_ref_name(r)?;
-            let resolved = self
-                .schemas
-                .get(ref_name)
-                .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?
-                .clone();
-            return self.collect_object_parts(
-                &resolved,
-                name,
-                props,
-                required,
-                residual,
-                depth + 1,
-            );
-        }
-
-        if let Some(parts) = schema["allOf"].as_array() {
-            for part in parts.clone() {
-                self.collect_object_parts(&part, name, props, required, residual, depth + 1)?;
-            }
-        }
-
-        if let Some(properties) = schema["properties"].as_object() {
-            for (prop_name, prop_schema) in properties.clone() {
-                match props.iter_mut().find(|(n, _)| *n == prop_name) {
-                    Some((_, schemas)) => schemas.push(prop_schema),
-                    None => props.push((prop_name, vec![prop_schema])),
-                }
-            }
-        }
-
-        if let Some(req) = schema["required"].as_array() {
-            for r in req {
-                if let Some(r) = r.as_str() {
-                    required.insert(r.to_string());
-                }
-            }
-        }
-
-        match &schema["additionalProperties"] {
-            Value::Null | Value::Bool(false) => {}
-            ap => {
-                residual.get_or_insert(ap.clone());
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Converts a schema in a field / item / variant position into an
-    /// [TypeRef], synthesizing named types for inline objects, unions and
-    /// enums. Returns the reference and whether `null` is allowed.
-    fn convert_ref(&mut self, schema: &Value, ctx: &str) -> anyhow::Result<(TypeRef, bool)> {
-        // a reference to a named schema
-        if let Some(r) = schema["$ref"].as_str() {
-            let name = schema_ref_name(r)?;
-            let target = self
-                .schemas
-                .get(name)
-                .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?;
-            // generic type parameters (e.g. TDocument) have no schema; the
-            // caller decides the type, so hold raw JSON
-            if target["x-is-generic-type-parameter"]
-                .as_bool()
-                .unwrap_or(false)
-            {
-                return Ok((TypeRef::Raw(RawCause::GenericParameter), false));
-            }
-            self.enqueue(name);
-            return Ok((TypeRef::Named(name.to_string()), false));
-        }
-
-        // inline unions, including allOf-specialized generic unions
-        if let Some(variants) = self.effective_union(schema, 0)? {
-            let mut nullable = false;
-            let mut non_null: Vec<Value> = Vec::new();
-            for v in &variants {
-                if v["type"].as_str() == Some("null") {
-                    nullable = true;
-                } else {
-                    non_null.push(v.clone());
-                }
-            }
-            // [null, X] is just a nullable X
-            if non_null.len() == 1 {
-                let (ty, _) = self.convert_ref(&non_null[0], ctx)?;
-                return Ok((ty, true));
-            }
-            // a union of fixed strings is an open string enum
-            if let Some(values) = collect_const_values(schema, self.schemas)? {
-                let ty = TypeModel::StrEnum(StrEnumModel {
-                    description: schema_description(schema),
-                    values,
-                });
-                self.model.types.insert(ctx.to_string(), ty);
-                return Ok((TypeRef::Named(ctx.to_string()), nullable));
-            }
-            // otherwise synthesize a named union
-            let union = self.convert_union(&variants, ctx, schema_description(schema))?;
-            self.model
-                .types
-                .insert(ctx.to_string(), TypeModel::LazyUnion(union));
-            return Ok((TypeRef::Named(ctx.to_string()), nullable));
-        }
-
-        // inline string enums
-        if schema["enum"].is_array() || schema["const"].is_string() {
-            if let Some(values) = collect_const_values(schema, self.schemas)? {
-                let ty = TypeModel::StrEnum(StrEnumModel {
-                    description: schema_description(schema),
-                    values,
-                });
-                self.model.types.insert(ctx.to_string(), ty);
-                return Ok((TypeRef::Named(ctx.to_string()), false));
-            }
-        }
-
-        // inline objects with fixed fields (also allOf compositions)
-        if is_object_like(schema) {
-            let has_props = schema["properties"]
-                .as_object()
-                .map(|p| !p.is_empty())
-                .unwrap_or(false)
-                || schema["allOf"].is_array();
-            if has_props {
-                let ty = TypeModel::Struct(self.expand_object(schema, ctx)?);
-                self.model.types.insert(ctx.to_string(), ty);
-                return Ok((TypeRef::Named(ctx.to_string()), false));
-            }
-            // pure map: additionalProperties without fixed fields
-            return match &schema["additionalProperties"] {
-                Value::Null | Value::Bool(_) => Ok((
-                    TypeRef::Map(Box::new(TypeRef::Raw(RawCause::OpenObject))),
-                    false,
-                )),
-                ap => {
-                    let (value, _) = self.convert_ref(ap, &format!("{}Value", ctx))?;
-                    Ok((TypeRef::Map(Box::new(value)), false))
-                }
-            };
-        }
-
-        Ok(match schema["type"].as_str() {
-            Some("boolean") => (TypeRef::Scalar(Scalar::Bool), false),
-            Some("integer") => match schema["format"].as_str() {
-                // only an explicit int32 is narrowed: an integer without a
-                // format is any JSON integer, and real responses carry epoch
-                // milliseconds and byte counts in such fields (e.g. ISM
-                // `last_updated_time`), which overflow i32
-                Some("int32") => (TypeRef::Scalar(Scalar::I32), false),
-                Some("uint64") => (TypeRef::Scalar(Scalar::U64), false),
-                _ => (TypeRef::Scalar(Scalar::I64), false),
-            },
-            Some("number") => (TypeRef::Scalar(Scalar::F64), false),
-            Some("string") => (TypeRef::Scalar(Scalar::String), false),
-            Some("array") => {
-                let items = &schema["items"];
-                if items.is_null() {
-                    (
-                        TypeRef::List(Box::new(TypeRef::Raw(RawCause::UntypedItems))),
-                        false,
-                    )
-                } else {
-                    let (item, _) = self.convert_ref(items, &format!("{}Item", ctx))?;
-                    (TypeRef::List(Box::new(item)), false)
-                }
-            }
-            Some("null") => (TypeRef::Raw(RawCause::NullOnly), true),
-            // no type at all: untyped JSON
-            _ => (TypeRef::Raw(RawCause::NoType), false),
-        })
-    }
-}
-
-/// The `oneOf`/`anyOf` variant list of a schema, if it is a union
-fn union_variants(schema: &Value) -> Option<Vec<Value>> {
-    if let Some(v) = schema["oneOf"]
-        .as_array()
-        .or_else(|| schema["anyOf"].as_array())
-    {
-        return Some(v.clone());
-    }
-    type_array_variants(schema)
-}
-
-/// Expands an OpenAPI 3.1 type array (`type: [null, string]`) into the
-/// equivalent `oneOf` variant list, one variant per type, so that it takes
-/// the regular union path: `[null, X]` collapses to a nullable `X`, and
-/// several non-null types (`[number, string]`) become a kind-dispatched
-/// union. Every keyword other than `type` (`items`, `properties`, ...) is
-/// kept on each non-null variant, where it applies to its own type only.
-/// Returns `None` when `type` is not an array.
-fn type_array_variants(schema: &Value) -> Option<Vec<Value>> {
-    let types = schema["type"].as_array()?;
-    let mut variants = Vec::with_capacity(types.len());
-    for t in types {
-        let t = t.as_str()?;
-        if t == "null" {
-            variants.push(serde_json::json!({ "type": "null" }));
-            continue;
-        }
-        let mut variant = schema.clone();
-        let obj = variant.as_object_mut()?;
-        obj.insert("type".to_string(), Value::String(t.to_string()));
-        // documentation stays on the enclosing schema
-        obj.remove("description");
-        obj.remove("title");
-        variants.push(variant);
-    }
-    Some(variants)
-}
-
-/// Whether a schema describes an object (fixed fields, an allOf
-/// composition, or a map)
-fn is_object_like(schema: &Value) -> bool {
-    schema["type"].as_str() == Some("object")
-        || schema["properties"].is_object()
-        || schema["allOf"].is_array()
-        || schema["additionalProperties"].is_object()
-}
-
-fn schema_description(schema: &Value) -> Option<String> {
-    schema["description"].as_str().map(str::to_string)
-}
-
-/// A placeholder variant name derived from the JSON kind of an untitled
-/// inline variant
-fn variant_kind_name(schema: &Value) -> String {
-    match schema["type"].as_str() {
-        Some(t) => t.to_string(),
-        None if is_object_like(schema) => "object".to_string(),
-        None => "value".to_string(),
     }
 }
 
@@ -1046,106 +421,10 @@ pub fn namespace(type_key: &str) -> &str {
     }
 }
 
-/// Collects the fixed string values of a schema whose variants are all
-/// consts / string enums, following `$ref`s. Returns `None` when any
-/// variant allows other values.
-///
-/// Spellings differing only in letter case (`ASYNC` / `async`) are one
-/// value with aliases, unless the specification puts them in differently
-/// titled `oneOf` variants: case can carry meaning (`1m` is a minute, `1M`
-/// a month, titled `minute` and `month`).
-fn collect_const_values(
-    schema: &Value,
-    schemas: &Map<String, Value>,
-) -> anyhow::Result<Option<Vec<StrEnumValue>>> {
-    /// Collects `(value, enclosing oneOf variant title)` pairs
-    fn collect<'a>(
-        schema: &'a Value,
-        schemas: &'a Map<String, Value>,
-        group: Option<&'a str>,
-        depth: usize,
-        out: &mut Vec<(String, Option<&'a str>)>,
-    ) -> anyhow::Result<bool> {
-        if depth > 4 {
-            return Ok(false);
-        }
-        let schema = match schema["$ref"].as_str() {
-            Some(r) => {
-                let name = schema_ref_name(r)?;
-                schemas
-                    .get(name)
-                    .ok_or_else(|| anyhow!("unresolved schema $ref: {}", r))?
-            }
-            None => schema,
-        };
-
-        if let Some(values) = schema["enum"].as_array() {
-            if values.is_empty() || !values.iter().all(|v| v.is_string()) {
-                return Ok(false);
-            }
-            out.extend(
-                values
-                    .iter()
-                    .map(|v| (v.as_str().unwrap().to_string(), group)),
-            );
-            return Ok(true);
-        }
-        match &schema["const"] {
-            Value::String(s) => {
-                out.push((s.clone(), group));
-                return Ok(true);
-            }
-            Value::Null => {}
-            _ => return Ok(false),
-        }
-        if let Some(variants) = schema["oneOf"]
-            .as_array()
-            .or_else(|| schema["anyOf"].as_array())
-        {
-            for variant in variants {
-                let variant_group = variant["title"].as_str().or(group);
-                if !collect(variant, schemas, variant_group, depth + 1, out)? {
-                    return Ok(false);
-                }
-            }
-            return Ok(true);
-        }
-        Ok(false)
-    }
-
-    let mut raw = Vec::new();
-    if !collect(schema, schemas, None, 0, &mut raw)? || raw.is_empty() {
-        return Ok(None);
-    }
-    let mut values: Vec<(StrEnumValue, Option<&str>)> = Vec::new();
-    for (value, group) in raw {
-        let known = values.iter_mut().find(|(v, g)| {
-            *g == group
-                && (v.value.eq_ignore_ascii_case(&value)
-                    || v.aliases.iter().any(|a| a.eq_ignore_ascii_case(&value)))
-        });
-        match known {
-            Some((v, _)) => {
-                if v.value != value && !v.aliases.contains(&value) {
-                    v.aliases.push(value);
-                }
-            }
-            None => values.push((
-                StrEnumValue {
-                    value,
-                    aliases: Vec::new(),
-                },
-                group,
-            )),
-        }
-    }
-    Ok(Some(values.into_iter().map(|(v, _)| v).collect()))
-}
-
 /// Decides the decoding strategy of every union in the model: unions whose
 /// variants have pairwise distinct JSON kinds become dispatch unions,
 /// everything else stays lazy
-fn resolve_union_strategies(model: &mut ResponseModel) {
+pub(crate) fn resolve_union_strategies(model: &mut ResponseModel) {
     // compute variant kinds against the completed closure
     let kinds: BTreeMap<String, Option<JsonKind>> = model
         .types
@@ -1238,16 +517,22 @@ mod tests {
         serde_yaml::from_reader(file).unwrap()
     }
 
+    /// The client model vendored with the specification
+    fn model() -> ClientModel {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-client-model.json");
+        ClientModel::read(std::path::Path::new(path)).unwrap()
+    }
+
     /// Reads the model of the four core APIs from the vendored specification
     /// (a subset, to keep the assertions below focused)
     fn core_model() -> ResponseModel {
-        read_response_model(&spec(), &["search", "index", "bulk", "get"]).unwrap()
+        read_response_model(&spec(), &model(), &["search", "index", "bulk", "get"]).unwrap()
     }
 
     #[test]
     fn typed_statuses_are_the_error_codes_answering_with_the_response_type() {
         let groups = ["get", "delete", "indices.delete", "search", "clear_scroll"];
-        let model = read_response_model(&spec(), &groups).unwrap();
+        let model = read_response_model(&spec(), &model(), &groups).unwrap();
         // a missing document is answered with the regular body
         assert_eq!(model.typed_statuses.get("get"), Some(&vec![404]));
         assert_eq!(model.typed_statuses.get("delete"), Some(&vec![404]));
@@ -1259,7 +544,7 @@ mod tests {
 
     #[test]
     fn undeclared_typed_statuses_are_added() {
-        let model = read_response_model(&spec(), &["cluster.health"]).unwrap();
+        let model = read_response_model(&spec(), &model(), &["cluster.health"]).unwrap();
         assert_eq!(model.typed_statuses.get("cluster.health"), Some(&vec![408]));
     }
 
@@ -1298,7 +583,7 @@ mod tests {
             groups.len()
         );
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        let model = read_response_model(&spec, &refs).unwrap();
+        let model = read_response_model(&spec, &model(), &refs).unwrap();
         for g in &groups {
             assert!(
                 model.endpoints.contains_key(g) || model.untyped_groups.contains_key(g),
@@ -1434,12 +719,23 @@ mod tests {
 
     #[test]
     fn case_variants_become_aliases_unless_titled_apart() {
-        let spec = spec();
-        let schemas = spec["components"]["schemas"].as_object().unwrap();
-        let values = |name: &str| {
-            collect_const_values(&schemas[name], schemas)
-                .unwrap()
-                .unwrap()
+        // the two enums as fields of a fixture root, with their vendored entries
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-client-model.json");
+        let vendored: Value =
+            serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        let mut types = serde_json::json!({ "t___Root": { "type_kind": "object", "fields": {}, "constraints": [] } });
+        for name in [
+            "indices._common___TranslogDurability",
+            "_common.aggregations___CalendarInterval",
+        ] {
+            types[name] = vendored["types"][name].clone();
+            types["t___Root"]["fields"][name] =
+                serde_json::json!({ "type": { "ref": name }, "required": false });
+        }
+        let all = fixture_model(types);
+        let values = |name: &str| match &all.types[name] {
+            TypeModel::StrEnum(e) => e.values.clone(),
+            other => panic!("expected string enum, got {:?}", other),
         };
 
         // ASYNC / async: one value, the lowercase spelling as an alias
@@ -1511,20 +807,26 @@ mod tests {
         assert!(hit.fields.iter().any(|f| f.json_name == "_index"));
     }
 
-    /// The model of a single `t` operation group whose 200 response is the
-    /// `t___Root` schema, with the given schemas
-    fn fixture_model(schemas: Value) -> ResponseModel {
+    /// The response model of a single `t` operation group whose 200 response
+    /// is the `t___Root` type, with the given client model types
+    fn fixture_model(types: Value) -> ResponseModel {
         let spec = serde_json::json!({
             "components": {
-                "schemas": schemas,
-                "responses": {
-                    "t___200": { "content": { "application/json": { "schema": {
-                        "$ref": "#/components/schemas/t___Root"
-                    } } } }
-                }
+                "schemas": {},
+                "responses": { "t___200": {} }
             }
         });
-        read_response_model(&spec, &["t"]).unwrap()
+        let model = serde_json::json!({
+            "format": "opensearch-client-model",
+            "version": "0.2.0",
+            "types": types,
+            "responses": {
+                "t___200": { "media_type": "application/json", "type": { "ref": "t___Root" } }
+            },
+            "request_bodies": {}
+        });
+        let model = ClientModel::parse(&model.to_string()).unwrap();
+        read_response_model(&spec, &model, &["t"]).unwrap()
     }
 
     fn field<'a>(model: &'a ResponseModel, ty: &str, name: &str) -> &'a FieldModel {
@@ -1538,7 +840,8 @@ mod tests {
     fn head_only_groups_and_generic_roots() {
         let spec = spec();
         // ism.exists_policy declares a JSON 200 body, but is HEAD-only
-        let model = read_response_model(&spec, &["ism.exists_policy", "get_source"]).unwrap();
+        let model =
+            read_response_model(&spec, &model(), &["ism.exists_policy", "get_source"]).unwrap();
         assert!(model.untyped_groups["ism.exists_policy"].contains("HEAD-only"));
         // get_source's whole response is the generic TDocument
         let root = &model.endpoints["get_source"];
@@ -1552,13 +855,14 @@ mod tests {
     fn integers_without_format_are_64_bit() {
         let model = fixture_model(serde_json::json!({
             "t___Root": {
-                "type": "object",
-                "properties": {
-                    "no_format": { "type": "integer" },
-                    "int32": { "type": "integer", "format": "int32" },
-                    "int64": { "type": "integer", "format": "int64" },
-                    "uint64": { "type": "integer", "format": "uint64" }
-                }
+                "type_kind": "object",
+                "fields": {
+                    "no_format": { "type": { "scalar": "integer" }, "required": false },
+                    "int32": { "type": { "scalar": "integer", "format": "int32" }, "required": false },
+                    "int64": { "type": { "scalar": "integer", "format": "int64" }, "required": false },
+                    "uint64": { "type": { "scalar": "integer", "format": "uint64" }, "required": false }
+                },
+                "constraints": []
             }
         }));
         let ty = |name: &str| field(&model, "t___Root", name).ty.clone();
@@ -1570,20 +874,27 @@ mod tests {
 
     #[test]
     fn type_arrays_become_typed_fields() {
+        // the client model writes `type: [null, X]` as a union with `null`
+        let union = |members: Value| {
+            serde_json::json!({
+                "type": { "union": members, "union_kind": "scalar", "exclusive": true }, "required": false
+            })
+        };
         let model = fixture_model(serde_json::json!({
             "t___Root": {
-                "type": "object",
-                "properties": {
-                    "nullable_string": { "type": ["null", "string"] },
-                    "nullable_number": { "type": ["null", "number"] },
-                    "nullable_bool": { "type": ["boolean", "null"] },
-                    "nullable_list": { "type": ["array", "null"], "items": { "type": "string" } },
-                    "nullable_object": {
-                        "type": ["null", "object"],
-                        "properties": { "a": { "type": "integer" } }
-                    },
-                    "number_or_string": { "type": ["number", "string"] }
-                }
+                "type_kind": "object",
+                "fields": {
+                    "nullable_string": union(serde_json::json!([{ "scalar": "null" }, { "scalar": "string" }])),
+                    "nullable_number": union(serde_json::json!([{ "scalar": "null" }, { "scalar": "number" }])),
+                    "nullable_bool": union(serde_json::json!([{ "scalar": "boolean" }, { "scalar": "null" }])),
+                    "nullable_list": union(serde_json::json!([{ "array": { "scalar": "string" } }, { "scalar": "null" }])),
+                    "nullable_object": union(serde_json::json!([{ "scalar": "null" }, { "object": {
+                        "fields": { "a": { "type": { "scalar": "integer" }, "required": false } },
+                        "constraints": []
+                    } }])),
+                    "number_or_string": union(serde_json::json!([{ "scalar": "number" }, { "scalar": "string" }]))
+                },
+                "constraints": []
             }
         }));
         let root = "t___Root";
@@ -1637,7 +948,7 @@ mod tests {
         let spec = spec();
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
-        let model = read_response_model(&spec, &refs).unwrap();
+        let model = read_response_model(&spec, &model(), &refs).unwrap();
         let schemas = spec["components"]["schemas"].as_object().unwrap();
         for (name, ty) in &model.types {
             let s = match ty {

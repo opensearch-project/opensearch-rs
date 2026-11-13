@@ -13,7 +13,7 @@ use super::InitializerResult;
 use crate::BoxError;
 use reqwest::ClientBuilder;
 
-pub trait ClientInitializer: 'static {
+pub trait ClientInitializer: Send + Sync + 'static {
     type Result: InitializerResult<ClientBuilder>;
 
     fn init(self, client: ClientBuilder) -> Self::Result;
@@ -21,7 +21,7 @@ pub trait ClientInitializer: 'static {
 
 impl<F, R> ClientInitializer for F
 where
-    F: FnOnce(ClientBuilder) -> R + 'static,
+    F: FnOnce(ClientBuilder) -> R + Send + Sync + 'static,
     R: InitializerResult<ClientBuilder>,
 {
     type Result = R;
@@ -31,7 +31,7 @@ where
     }
 }
 
-pub(crate) trait BoxedClientInitializer {
+pub(crate) trait BoxedClientInitializer: Send + Sync {
     fn init(self: Box<Self>, client: ClientBuilder) -> Result<ClientBuilder, BoxError<'static>>;
 }
 

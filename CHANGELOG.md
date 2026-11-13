@@ -61,6 +61,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 
 ### Fixed
+- Fixed `TransportBuilder` not being `Send` and `Sync` since the middleware types were added: `ClientInitializer` now requires `Send + Sync`, like `RequestInitializer` and `RequestHandler`, so a builder can be held across `.await` in a spawned task again
 - Skipped the `_source` empty-value deprecation warning yaml tests, which expect warnings that OpenSearch distributions do not emit (verified on released versions up to 3.7.0 and a 3.9.0 nightly build)
 - Fixed `yaml_test_runner` ignoring comma-separated multi-range version skips in YAML tests (e.g. `" - 2.6.99, 2.13.0 - "`)
 

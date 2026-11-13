@@ -944,6 +944,25 @@ pub mod tests {
     use crate::auth::ClientCertificate;
     use url::Url;
 
+    // A builder is held across `.await` while its settings are loaded, so it
+    // must stay Send + Sync for multi-threaded runtimes, as it was in 2.x
+    #[test]
+    fn transport_builder_is_send_and_sync() {
+        fn assert_send_sync<T: Send + Sync>() {}
+        assert_send_sync::<TransportBuilder>();
+        assert_send_sync::<Transport>();
+    }
+
+    #[test]
+    fn transport_builder_with_client_initializer_can_be_spawned() {
+        let builder = TransportBuilder::default()
+            .with_client_initializer(|client: reqwest::ClientBuilder| client.no_proxy());
+        let built = std::thread::spawn(move || builder.build().is_ok())
+            .join()
+            .unwrap();
+        assert!(built);
+    }
+
     #[test]
     #[cfg(feature = "native-tls")]
     fn invalid_pkcs12_cert_credentials() {

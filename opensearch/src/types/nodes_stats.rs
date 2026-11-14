@@ -1144,6 +1144,16 @@ impl<'de> serde::Deserialize<'de> for ShardSearchBackpressureMode {
         })
     }
 }
+impl From<&str> for ShardSearchBackpressureMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "disabled" => ShardSearchBackpressureMode::Disabled,
+            "enforced" => ShardSearchBackpressureMode::Enforced,
+            "monitor_only" => ShardSearchBackpressureMode::MonitorOnly,
+            _ => ShardSearchBackpressureMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardSearchBackpressureStats {
@@ -1438,6 +1448,16 @@ impl<'de> serde::Deserialize<'de> for StatsIp {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::Ip> for StatsIp {
+    fn from(value: crate::types::common::Ip) -> Self {
+        StatsIp::Ip(value)
+    }
+}
+impl From<Vec<crate::types::common::Ip>> for StatsIp {
+    fn from(value: Vec<crate::types::common::Ip>) -> Self {
+        StatsIp::Array(value)
     }
 }
 

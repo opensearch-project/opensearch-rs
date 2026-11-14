@@ -83,6 +83,14 @@ impl<'de> serde::Deserialize<'de> for AggregateMetricDoublePropertyType {
         })
     }
 }
+impl From<&str> for AggregateMetricDoublePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "aggregate_metric_double" => AggregateMetricDoublePropertyType::AggregateMetricDouble,
+            _ => AggregateMetricDoublePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AllField {
@@ -159,6 +167,14 @@ impl<'de> serde::Deserialize<'de> for BinaryPropertyType {
         })
     }
 }
+impl From<&str> for BinaryPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "binary" => BinaryPropertyType::Binary,
+            _ => BinaryPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BooleanProperty {
@@ -227,6 +243,14 @@ impl<'de> serde::Deserialize<'de> for BooleanPropertyType {
             "boolean" => BooleanPropertyType::Boolean,
             _ => BooleanPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for BooleanPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "boolean" => BooleanPropertyType::Boolean,
+            _ => BooleanPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -299,6 +323,14 @@ impl<'de> serde::Deserialize<'de> for ByteNumberPropertyType {
             "byte" => ByteNumberPropertyType::Byte,
             _ => ByteNumberPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ByteNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "byte" => ByteNumberPropertyType::Byte,
+            _ => ByteNumberPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -375,6 +407,14 @@ impl<'de> serde::Deserialize<'de> for CompletionPropertyType {
         })
     }
 }
+impl From<&str> for CompletionPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "completion" => CompletionPropertyType::Completion,
+            _ => CompletionPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ConstantKeywordProperty {
@@ -429,6 +469,14 @@ impl<'de> serde::Deserialize<'de> for ConstantKeywordPropertyType {
             "constant_keyword" => ConstantKeywordPropertyType::ConstantKeyword,
             _ => ConstantKeywordPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ConstantKeywordPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "constant_keyword" => ConstantKeywordPropertyType::ConstantKeyword,
+            _ => ConstantKeywordPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -510,6 +558,14 @@ impl<'de> serde::Deserialize<'de> for DateNanosPropertyType {
         })
     }
 }
+impl From<&str> for DateNanosPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "date_nanos" => DateNanosPropertyType::DateNanos,
+            _ => DateNanosPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DateProperty {
@@ -588,6 +644,14 @@ impl<'de> serde::Deserialize<'de> for DatePropertyType {
         })
     }
 }
+impl From<&str> for DatePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "date" => DatePropertyType::Date,
+            _ => DatePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DateRangeProperty {
@@ -656,6 +720,14 @@ impl<'de> serde::Deserialize<'de> for DateRangePropertyType {
             "date_range" => DateRangePropertyType::DateRange,
             _ => DateRangePropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for DateRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "date_range" => DateRangePropertyType::DateRange,
+            _ => DateRangePropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -730,6 +802,14 @@ impl<'de> serde::Deserialize<'de> for DoubleNumberPropertyType {
         })
     }
 }
+impl From<&str> for DoubleNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "double" => DoubleNumberPropertyType::Double,
+            _ => DoubleNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DoubleRangeProperty {
@@ -798,6 +878,14 @@ impl<'de> serde::Deserialize<'de> for DoubleRangePropertyType {
         })
     }
 }
+impl From<&str> for DoubleRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "double_range" => DoubleRangePropertyType::DoubleRange,
+            _ => DoubleRangePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -829,6 +917,16 @@ impl<'de> serde::Deserialize<'de> for DynamicMapping {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common_mapping::DynamicMappingString> for DynamicMapping {
+    fn from(value: crate::types::common_mapping::DynamicMappingString) -> Self {
+        DynamicMapping::String(value)
+    }
+}
+impl From<bool> for DynamicMapping {
+    fn from(value: bool) -> Self {
+        DynamicMapping::Boolean(value)
     }
 }
 
@@ -878,6 +976,17 @@ impl<'de> serde::Deserialize<'de> for DynamicMappingString {
             "true" => DynamicMappingString::True,
             _ => DynamicMappingString::Unknown(s),
         })
+    }
+}
+impl From<&str> for DynamicMappingString {
+    fn from(s: &str) -> Self {
+        match s {
+            "false" => DynamicMappingString::False,
+            "strict" => DynamicMappingString::Strict,
+            "strict_allow_templates" => DynamicMappingString::StrictAllowTemplates,
+            "true" => DynamicMappingString::True,
+            _ => DynamicMappingString::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -952,6 +1061,14 @@ impl<'de> serde::Deserialize<'de> for FieldAliasPropertyType {
             "alias" => FieldAliasPropertyType::Alias,
             _ => FieldAliasPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for FieldAliasPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "alias" => FieldAliasPropertyType::Alias,
+            _ => FieldAliasPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1186,6 +1303,60 @@ impl<'de> serde::Deserialize<'de> for FieldType {
         })
     }
 }
+impl From<&str> for FieldType {
+    fn from(s: &str) -> Self {
+        match s {
+            "aggregate_metric_double" => FieldType::AggregateMetricDouble,
+            "alias" => FieldType::Alias,
+            "binary" => FieldType::Binary,
+            "boolean" => FieldType::Boolean,
+            "byte" => FieldType::Byte,
+            "completion" => FieldType::Completion,
+            "constant_keyword" => FieldType::ConstantKeyword,
+            "date" => FieldType::Date,
+            "date_nanos" => FieldType::DateNanos,
+            "date_range" => FieldType::DateRange,
+            "double" => FieldType::Double,
+            "double_range" => FieldType::DoubleRange,
+            "flat_object" => FieldType::FlatObject,
+            "float" => FieldType::Float,
+            "float_range" => FieldType::FloatRange,
+            "geo_point" => FieldType::GeoPoint,
+            "geo_shape" => FieldType::GeoShape,
+            "half_float" => FieldType::HalfFloat,
+            "histogram" => FieldType::Histogram,
+            "icu_collation_keyword" => FieldType::IcuCollationKeyword,
+            "integer" => FieldType::Integer,
+            "integer_range" => FieldType::IntegerRange,
+            "ip" => FieldType::Ip,
+            "ip_range" => FieldType::IpRange,
+            "join" => FieldType::Join,
+            "keyword" => FieldType::Keyword,
+            "knn_vector" => FieldType::KnnVector,
+            "long" => FieldType::Long,
+            "long_range" => FieldType::LongRange,
+            "match_only_text" => FieldType::MatchOnlyText,
+            "murmur3" => FieldType::Murmur3,
+            "nested" => FieldType::Nested,
+            "object" => FieldType::Object,
+            "percolator" => FieldType::Percolator,
+            "rank_feature" => FieldType::RankFeature,
+            "rank_features" => FieldType::RankFeatures,
+            "scaled_float" => FieldType::ScaledFloat,
+            "search_as_you_type" => FieldType::SearchAsYouType,
+            "semantic" => FieldType::Semantic,
+            "short" => FieldType::Short,
+            "text" => FieldType::Text,
+            "token_count" => FieldType::TokenCount,
+            "unsigned_long" => FieldType::UnsignedLong,
+            "version" => FieldType::Version,
+            "wildcard" => FieldType::Wildcard,
+            "xy_point" => FieldType::XyPoint,
+            "xy_shape" => FieldType::XyShape,
+            _ => FieldType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FlatObjectProperty {
@@ -1242,6 +1413,14 @@ impl<'de> serde::Deserialize<'de> for FlatObjectPropertyType {
             "flat_object" => FlatObjectPropertyType::FlatObject,
             _ => FlatObjectPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for FlatObjectPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "flat_object" => FlatObjectPropertyType::FlatObject,
+            _ => FlatObjectPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1316,6 +1495,14 @@ impl<'de> serde::Deserialize<'de> for FloatNumberPropertyType {
         })
     }
 }
+impl From<&str> for FloatNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "float" => FloatNumberPropertyType::Float,
+            _ => FloatNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FloatRangeProperty {
@@ -1384,6 +1571,14 @@ impl<'de> serde::Deserialize<'de> for FloatRangePropertyType {
         })
     }
 }
+impl From<&str> for FloatRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "float_range" => FloatRangePropertyType::FloatRange,
+            _ => FloatRangePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GeoOrientation {
@@ -1439,6 +1634,19 @@ impl<'de> serde::Deserialize<'de> for GeoOrientation {
             "ccw" => GeoOrientation::Ccw,
             _ => GeoOrientation::Unknown(s),
         })
+    }
+}
+impl From<&str> for GeoOrientation {
+    fn from(s: &str) -> Self {
+        match s {
+            "left" | "LEFT" => GeoOrientation::Left,
+            "clockwise" => GeoOrientation::Clockwise,
+            "cw" => GeoOrientation::Cw,
+            "right" | "RIGHT" => GeoOrientation::Right,
+            "counterclockwise" => GeoOrientation::Counterclockwise,
+            "ccw" => GeoOrientation::Ccw,
+            _ => GeoOrientation::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1507,6 +1715,14 @@ impl<'de> serde::Deserialize<'de> for GeoPointPropertyType {
             "geo_point" => GeoPointPropertyType::GeoPoint,
             _ => GeoPointPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for GeoPointPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "geo_point" => GeoPointPropertyType::GeoPoint,
+            _ => GeoPointPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1583,6 +1799,14 @@ impl<'de> serde::Deserialize<'de> for GeoShapePropertyType {
         })
     }
 }
+impl From<&str> for GeoShapePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "geo_shape" => GeoShapePropertyType::GeoShape,
+            _ => GeoShapePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GeoStrategy {
@@ -1622,6 +1846,15 @@ impl<'de> serde::Deserialize<'de> for GeoStrategy {
             "term" => GeoStrategy::Term,
             _ => GeoStrategy::Unknown(s),
         })
+    }
+}
+impl From<&str> for GeoStrategy {
+    fn from(s: &str) -> Self {
+        match s {
+            "recursive" => GeoStrategy::Recursive,
+            "term" => GeoStrategy::Term,
+            _ => GeoStrategy::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1696,6 +1929,14 @@ impl<'de> serde::Deserialize<'de> for HalfFloatNumberPropertyType {
         })
     }
 }
+impl From<&str> for HalfFloatNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "half_float" => HalfFloatNumberPropertyType::HalfFloat,
+            _ => HalfFloatNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HistogramProperty {
@@ -1750,6 +1991,14 @@ impl<'de> serde::Deserialize<'de> for HistogramPropertyType {
             "histogram" => HistogramPropertyType::Histogram,
             _ => HistogramPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for HistogramPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "histogram" => HistogramPropertyType::Histogram,
+            _ => HistogramPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1840,6 +2089,14 @@ impl<'de> serde::Deserialize<'de> for IcuCollationKeywordPropertyType {
         })
     }
 }
+impl From<&str> for IcuCollationKeywordPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_collation_keyword" => IcuCollationKeywordPropertyType::IcuCollationKeyword,
+            _ => IcuCollationKeywordPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IndexField {
@@ -1892,6 +2149,17 @@ impl<'de> serde::Deserialize<'de> for IndexOptions {
             "positions" => IndexOptions::Positions,
             _ => IndexOptions::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "docs" => IndexOptions::Docs,
+            "freqs" => IndexOptions::Freqs,
+            "offsets" => IndexOptions::Offsets,
+            "positions" => IndexOptions::Positions,
+            _ => IndexOptions::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1966,6 +2234,14 @@ impl<'de> serde::Deserialize<'de> for IntegerNumberPropertyType {
         })
     }
 }
+impl From<&str> for IntegerNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "integer" => IntegerNumberPropertyType::Integer,
+            _ => IntegerNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IntegerRangeProperty {
@@ -2032,6 +2308,14 @@ impl<'de> serde::Deserialize<'de> for IntegerRangePropertyType {
             "integer_range" => IntegerRangePropertyType::IntegerRange,
             _ => IntegerRangePropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IntegerRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "integer_range" => IntegerRangePropertyType::IntegerRange,
+            _ => IntegerRangePropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2104,6 +2388,14 @@ impl<'de> serde::Deserialize<'de> for IpPropertyType {
         })
     }
 }
+impl From<&str> for IpPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ip" => IpPropertyType::Ip,
+            _ => IpPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IpRangeProperty {
@@ -2172,6 +2464,14 @@ impl<'de> serde::Deserialize<'de> for IpRangePropertyType {
         })
     }
 }
+impl From<&str> for IpRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ip_range" => IpRangePropertyType::IpRange,
+            _ => IpRangePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct JoinProperty {
@@ -2231,6 +2531,16 @@ impl<'de> serde::Deserialize<'de> for JoinPropertyRelationsValue {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::RelationName> for JoinPropertyRelationsValue {
+    fn from(value: crate::types::common::RelationName) -> Self {
+        JoinPropertyRelationsValue::RelationName(value)
+    }
+}
+impl From<Vec<crate::types::common::RelationName>> for JoinPropertyRelationsValue {
+    fn from(value: Vec<crate::types::common::RelationName>) -> Self {
+        JoinPropertyRelationsValue::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinPropertyType {
@@ -2266,6 +2576,14 @@ impl<'de> serde::Deserialize<'de> for JoinPropertyType {
             "join" => JoinPropertyType::Join,
             _ => JoinPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for JoinPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "join" => JoinPropertyType::Join,
+            _ => JoinPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2344,6 +2662,14 @@ impl<'de> serde::Deserialize<'de> for KeywordPropertyType {
             "keyword" => KeywordPropertyType::Keyword,
             _ => KeywordPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KeywordPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keyword" => KeywordPropertyType::Keyword,
+            _ => KeywordPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2432,6 +2758,14 @@ impl<'de> serde::Deserialize<'de> for KnnVectorPropertyType {
         })
     }
 }
+impl From<&str> for KnnVectorPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "knn_vector" => KnnVectorPropertyType::KnnVector,
+            _ => KnnVectorPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LongNumberProperty {
@@ -2504,6 +2838,14 @@ impl<'de> serde::Deserialize<'de> for LongNumberPropertyType {
         })
     }
 }
+impl From<&str> for LongNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "long" => LongNumberPropertyType::Long,
+            _ => LongNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LongRangeProperty {
@@ -2572,6 +2914,14 @@ impl<'de> serde::Deserialize<'de> for LongRangePropertyType {
         })
     }
 }
+impl From<&str> for LongRangePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "long_range" => LongRangePropertyType::LongRange,
+            _ => LongRangePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MatchOnlyTextProperty {
@@ -2622,6 +2972,14 @@ impl<'de> serde::Deserialize<'de> for MatchOnlyTextPropertyType {
         })
     }
 }
+impl From<&str> for MatchOnlyTextPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "match_only_text" => MatchOnlyTextPropertyType::MatchOnlyText,
+            _ => MatchOnlyTextPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MatchType {
@@ -2661,6 +3019,15 @@ impl<'de> serde::Deserialize<'de> for MatchType {
             "simple" => MatchType::Simple,
             _ => MatchType::Unknown(s),
         })
+    }
+}
+impl From<&str> for MatchType {
+    fn from(s: &str) -> Self {
+        match s {
+            "regex" => MatchType::Regex,
+            "simple" => MatchType::Simple,
+            _ => MatchType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2723,6 +3090,14 @@ impl<'de> serde::Deserialize<'de> for Murmur3HashPropertyType {
             "murmur3" => Murmur3HashPropertyType::Murmur3,
             _ => Murmur3HashPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for Murmur3HashPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "murmur3" => Murmur3HashPropertyType::Murmur3,
+            _ => Murmur3HashPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2791,6 +3166,14 @@ impl<'de> serde::Deserialize<'de> for NestedPropertyType {
         })
     }
 }
+impl From<&str> for NestedPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "nested" => NestedPropertyType::Nested,
+            _ => NestedPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ObjectProperty {
@@ -2854,6 +3237,14 @@ impl<'de> serde::Deserialize<'de> for ObjectPropertyType {
         })
     }
 }
+impl From<&str> for ObjectPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "object" => ObjectPropertyType::Object,
+            _ => ObjectPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PercolatorProperty {
@@ -2906,6 +3297,14 @@ impl<'de> serde::Deserialize<'de> for PercolatorPropertyType {
             "percolator" => PercolatorPropertyType::Percolator,
             _ => PercolatorPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PercolatorPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "percolator" => PercolatorPropertyType::Percolator,
+            _ => PercolatorPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3402,6 +3801,14 @@ impl<'de> serde::Deserialize<'de> for RankFeaturePropertyType {
         })
     }
 }
+impl From<&str> for RankFeaturePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "rank_feature" => RankFeaturePropertyType::RankFeature,
+            _ => RankFeaturePropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RankFeaturesProperty {
@@ -3454,6 +3861,14 @@ impl<'de> serde::Deserialize<'de> for RankFeaturesPropertyType {
             "rank_features" => RankFeaturesPropertyType::RankFeatures,
             _ => RankFeaturesPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for RankFeaturesPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "rank_features" => RankFeaturesPropertyType::RankFeatures,
+            _ => RankFeaturesPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3535,6 +3950,14 @@ impl<'de> serde::Deserialize<'de> for ScaledFloatNumberPropertyType {
         })
     }
 }
+impl From<&str> for ScaledFloatNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "scaled_float" => ScaledFloatNumberPropertyType::ScaledFloat,
+            _ => ScaledFloatNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SearchAsYouTypeProperty {
@@ -3609,6 +4032,14 @@ impl<'de> serde::Deserialize<'de> for SearchAsYouTypePropertyType {
             "search_as_you_type" => SearchAsYouTypePropertyType::SearchAsYouType,
             _ => SearchAsYouTypePropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SearchAsYouTypePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "search_as_you_type" => SearchAsYouTypePropertyType::SearchAsYouType,
+            _ => SearchAsYouTypePropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3687,6 +4118,18 @@ impl<'de> serde::Deserialize<'de> for SemanticPropertyChunking {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<bool> for SemanticPropertyChunking {
+    fn from(value: bool) -> Self {
+        SemanticPropertyChunking::Boolean(value)
+    }
+}
+impl From<Vec<crate::types::common_mapping::SemanticChunkingStrategy>>
+    for SemanticPropertyChunking
+{
+    fn from(value: Vec<crate::types::common_mapping::SemanticChunkingStrategy>) -> Self {
+        SemanticPropertyChunking::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SemanticPropertyType {
@@ -3722,6 +4165,14 @@ impl<'de> serde::Deserialize<'de> for SemanticPropertyType {
             "semantic" => SemanticPropertyType::Semantic,
             _ => SemanticPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SemanticPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "semantic" => SemanticPropertyType::Semantic,
+            _ => SemanticPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3804,6 +4255,14 @@ impl<'de> serde::Deserialize<'de> for ShortNumberPropertyType {
         })
     }
 }
+impl From<&str> for ShortNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "short" => ShortNumberPropertyType::Short,
+            _ => ShortNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SizeField {
@@ -3868,6 +4327,21 @@ impl<'de> serde::Deserialize<'de> for SuggestContextPrecision {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<f64> for SuggestContextPrecision {
+    fn from(value: f64) -> Self {
+        SuggestContextPrecision::Number(value)
+    }
+}
+impl From<String> for SuggestContextPrecision {
+    fn from(value: String) -> Self {
+        SuggestContextPrecision::String(value)
+    }
+}
+impl From<&str> for SuggestContextPrecision {
+    fn from(value: &str) -> Self {
+        SuggestContextPrecision::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TermVectorOption {
@@ -3927,6 +4401,20 @@ impl<'de> serde::Deserialize<'de> for TermVectorOption {
             "yes" => TermVectorOption::Yes,
             _ => TermVectorOption::Unknown(s),
         })
+    }
+}
+impl From<&str> for TermVectorOption {
+    fn from(s: &str) -> Self {
+        match s {
+            "no" => TermVectorOption::No,
+            "with_offsets" => TermVectorOption::WithOffsets,
+            "with_positions" => TermVectorOption::WithPositions,
+            "with_positions_offsets" => TermVectorOption::WithPositionsOffsets,
+            "with_positions_offsets_payloads" => TermVectorOption::WithPositionsOffsetsPayloads,
+            "with_positions_payloads" => TermVectorOption::WithPositionsPayloads,
+            "yes" => TermVectorOption::Yes,
+            _ => TermVectorOption::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4023,6 +4511,14 @@ impl<'de> serde::Deserialize<'de> for TextPropertyType {
         })
     }
 }
+impl From<&str> for TextPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "text" => TextPropertyType::Text,
+            _ => TextPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TokenCountProperty {
@@ -4093,6 +4589,14 @@ impl<'de> serde::Deserialize<'de> for TokenCountPropertyType {
             "token_count" => TokenCountPropertyType::TokenCount,
             _ => TokenCountPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for TokenCountPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "token_count" => TokenCountPropertyType::TokenCount,
+            _ => TokenCountPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4210,6 +4714,14 @@ impl<'de> serde::Deserialize<'de> for UnsignedLongNumberPropertyType {
         })
     }
 }
+impl From<&str> for UnsignedLongNumberPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "unsigned_long" => UnsignedLongNumberPropertyType::UnsignedLong,
+            _ => UnsignedLongNumberPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct VersionProperty {
@@ -4270,6 +4782,14 @@ impl<'de> serde::Deserialize<'de> for VersionPropertyType {
             "version" => VersionPropertyType::Version,
             _ => VersionPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for VersionPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "version" => VersionPropertyType::Version,
+            _ => VersionPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4336,6 +4856,14 @@ impl<'de> serde::Deserialize<'de> for WildcardPropertyType {
             "wildcard" => WildcardPropertyType::Wildcard,
             _ => WildcardPropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for WildcardPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "wildcard" => WildcardPropertyType::Wildcard,
+            _ => WildcardPropertyType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4406,6 +4934,14 @@ impl<'de> serde::Deserialize<'de> for XyPointPropertyType {
         })
     }
 }
+impl From<&str> for XyPointPropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "xy_point" => XyPointPropertyType::XyPoint,
+            _ => XyPointPropertyType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct XyShapeProperty {
@@ -4474,5 +5010,13 @@ impl<'de> serde::Deserialize<'de> for XyShapePropertyType {
             "xy_shape" => XyShapePropertyType::XyShape,
             _ => XyShapePropertyType::Unknown(s),
         })
+    }
+}
+impl From<&str> for XyShapePropertyType {
+    fn from(s: &str) -> Self {
+        match s {
+            "xy_shape" => XyShapePropertyType::XyShape,
+            _ => XyShapePropertyType::Unknown(s.to_string()),
+        }
     }
 }

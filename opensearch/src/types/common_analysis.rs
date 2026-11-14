@@ -252,6 +252,14 @@ impl<'de> serde::Deserialize<'de> for AsciiFoldingTokenFilterType {
         })
     }
 }
+impl From<&str> for AsciiFoldingTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "asciifolding" => AsciiFoldingTokenFilterType::Asciifolding,
+            _ => AsciiFoldingTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -391,6 +399,14 @@ impl<'de> serde::Deserialize<'de> for CharGroupTokenizerType {
         })
     }
 }
+impl From<&str> for CharGroupTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "char_group" => CharGroupTokenizerType::CharGroup,
+            _ => CharGroupTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CjkAnalyzer {
@@ -436,6 +452,14 @@ impl<'de> serde::Deserialize<'de> for CjkAnalyzerType {
             "cjk" => CjkAnalyzerType::Cjk,
             _ => CjkAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for CjkAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "cjk" => CjkAnalyzerType::Cjk,
+            _ => CjkAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -490,6 +514,14 @@ impl<'de> serde::Deserialize<'de> for CommonGramsTokenFilterType {
         })
     }
 }
+impl From<&str> for CommonGramsTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "common_grams" => CommonGramsTokenFilterType::CommonGrams,
+            _ => CommonGramsTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ConditionTokenFilter {
@@ -534,6 +566,14 @@ impl<'de> serde::Deserialize<'de> for ConditionTokenFilterType {
             "condition" => ConditionTokenFilterType::Condition,
             _ => ConditionTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ConditionTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "condition" => ConditionTokenFilterType::Condition,
+            _ => ConditionTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -587,6 +627,14 @@ impl<'de> serde::Deserialize<'de> for CustomAnalyzerType {
         })
     }
 }
+impl From<&str> for CustomAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "custom" => CustomAnalyzerType::Custom,
+            _ => CustomAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CustomNormalizer {
@@ -633,6 +681,14 @@ impl<'de> serde::Deserialize<'de> for CustomNormalizerType {
         })
     }
 }
+impl From<&str> for CustomNormalizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "custom" => CustomNormalizerType::Custom,
+            _ => CustomNormalizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DelimitedPayloadEncoding {
@@ -676,6 +732,16 @@ impl<'de> serde::Deserialize<'de> for DelimitedPayloadEncoding {
             "int" => DelimitedPayloadEncoding::Int,
             _ => DelimitedPayloadEncoding::Unknown(s),
         })
+    }
+}
+impl From<&str> for DelimitedPayloadEncoding {
+    fn from(s: &str) -> Self {
+        match s {
+            "float" => DelimitedPayloadEncoding::Float,
+            "identity" => DelimitedPayloadEncoding::Identity,
+            "int" => DelimitedPayloadEncoding::Int,
+            _ => DelimitedPayloadEncoding::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -724,6 +790,14 @@ impl<'de> serde::Deserialize<'de> for DelimitedPayloadTokenFilterType {
             "delimited_payload" => DelimitedPayloadTokenFilterType::DelimitedPayload,
             _ => DelimitedPayloadTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for DelimitedPayloadTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "delimited_payload" => DelimitedPayloadTokenFilterType::DelimitedPayload,
+            _ => DelimitedPayloadTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -788,6 +862,16 @@ impl<'de> serde::Deserialize<'de> for DictionaryDecompounderTokenFilterType {
         })
     }
 }
+impl From<&str> for DictionaryDecompounderTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "dictionary_decompounder" => {
+                DictionaryDecompounderTokenFilterType::DictionaryDecompounder
+            }
+            _ => DictionaryDecompounderTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DutchAnalyzer {
@@ -832,6 +916,14 @@ impl<'de> serde::Deserialize<'de> for DutchAnalyzerType {
         })
     }
 }
+impl From<&str> for DutchAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "dutch" => DutchAnalyzerType::Dutch,
+            _ => DutchAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EdgeNGramSide {
@@ -871,6 +963,15 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramSide {
             "front" => EdgeNGramSide::Front,
             _ => EdgeNGramSide::Unknown(s),
         })
+    }
+}
+impl From<&str> for EdgeNGramSide {
+    fn from(s: &str) -> Self {
+        match s {
+            "back" => EdgeNGramSide::Back,
+            "front" => EdgeNGramSide::Front,
+            _ => EdgeNGramSide::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -925,6 +1026,14 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramTokenFilterType {
         })
     }
 }
+impl From<&str> for EdgeNGramTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "edge_ngram" => EdgeNGramTokenFilterType::EdgeNgram,
+            _ => EdgeNGramTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EdgeNGramTokenizer {
@@ -972,6 +1081,14 @@ impl<'de> serde::Deserialize<'de> for EdgeNGramTokenizerType {
             "edge_ngram" => EdgeNGramTokenizerType::EdgeNgram,
             _ => EdgeNGramTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for EdgeNGramTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "edge_ngram" => EdgeNGramTokenizerType::EdgeNgram,
+            _ => EdgeNGramTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1022,6 +1139,14 @@ impl<'de> serde::Deserialize<'de> for ElisionTokenFilterType {
             "elision" => ElisionTokenFilterType::Elision,
             _ => ElisionTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ElisionTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "elision" => ElisionTokenFilterType::Elision,
+            _ => ElisionTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1075,6 +1200,14 @@ impl<'de> serde::Deserialize<'de> for FingerprintAnalyzerType {
         })
     }
 }
+impl From<&str> for FingerprintAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "fingerprint" => FingerprintAnalyzerType::Fingerprint,
+            _ => FingerprintAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FingerprintTokenFilter {
@@ -1123,6 +1256,14 @@ impl<'de> serde::Deserialize<'de> for FingerprintTokenFilterType {
         })
     }
 }
+impl From<&str> for FingerprintTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "fingerprint" => FingerprintTokenFilterType::Fingerprint,
+            _ => FingerprintTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HtmlStripCharFilter {
@@ -1165,6 +1306,14 @@ impl<'de> serde::Deserialize<'de> for HtmlStripCharFilterType {
             "html_strip" => HtmlStripCharFilterType::HtmlStrip,
             _ => HtmlStripCharFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for HtmlStripCharFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "html_strip" => HtmlStripCharFilterType::HtmlStrip,
+            _ => HtmlStripCharFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1216,6 +1365,14 @@ impl<'de> serde::Deserialize<'de> for HunspellTokenFilterType {
             "hunspell" => HunspellTokenFilterType::Hunspell,
             _ => HunspellTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for HunspellTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "hunspell" => HunspellTokenFilterType::Hunspell,
+            _ => HunspellTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1280,6 +1437,16 @@ impl<'de> serde::Deserialize<'de> for HyphenationDecompounderTokenFilterType {
         })
     }
 }
+impl From<&str> for HyphenationDecompounderTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "hyphenation_decompounder" => {
+                HyphenationDecompounderTokenFilterType::HyphenationDecompounder
+            }
+            _ => HyphenationDecompounderTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IcuAnalyzer {
@@ -1324,6 +1491,14 @@ impl<'de> serde::Deserialize<'de> for IcuAnalyzerType {
         })
     }
 }
+impl From<&str> for IcuAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_analyzer" => IcuAnalyzerType::IcuAnalyzer,
+            _ => IcuAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IcuCollationAlternate {
@@ -1363,6 +1538,15 @@ impl<'de> serde::Deserialize<'de> for IcuCollationAlternate {
             "shifted" => IcuCollationAlternate::Shifted,
             _ => IcuCollationAlternate::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuCollationAlternate {
+    fn from(s: &str) -> Self {
+        match s {
+            "non-ignorable" => IcuCollationAlternate::NonIgnorable,
+            "shifted" => IcuCollationAlternate::Shifted,
+            _ => IcuCollationAlternate::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1406,6 +1590,15 @@ impl<'de> serde::Deserialize<'de> for IcuCollationCaseFirst {
         })
     }
 }
+impl From<&str> for IcuCollationCaseFirst {
+    fn from(s: &str) -> Self {
+        match s {
+            "lower" => IcuCollationCaseFirst::Lower,
+            "upper" => IcuCollationCaseFirst::Upper,
+            _ => IcuCollationCaseFirst::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IcuCollationDecomposition {
@@ -1445,6 +1638,15 @@ impl<'de> serde::Deserialize<'de> for IcuCollationDecomposition {
             "no" => IcuCollationDecomposition::No,
             _ => IcuCollationDecomposition::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuCollationDecomposition {
+    fn from(s: &str) -> Self {
+        match s {
+            "canonical" => IcuCollationDecomposition::Canonical,
+            "no" => IcuCollationDecomposition::No,
+            _ => IcuCollationDecomposition::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1498,6 +1700,18 @@ impl<'de> serde::Deserialize<'de> for IcuCollationStrength {
             "tertiary" => IcuCollationStrength::Tertiary,
             _ => IcuCollationStrength::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuCollationStrength {
+    fn from(s: &str) -> Self {
+        match s {
+            "identical" => IcuCollationStrength::Identical,
+            "primary" => IcuCollationStrength::Primary,
+            "quaternary" => IcuCollationStrength::Quaternary,
+            "secondary" => IcuCollationStrength::Secondary,
+            "tertiary" => IcuCollationStrength::Tertiary,
+            _ => IcuCollationStrength::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1572,6 +1786,14 @@ impl<'de> serde::Deserialize<'de> for IcuCollationTokenFilterType {
         })
     }
 }
+impl From<&str> for IcuCollationTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_collation" => IcuCollationTokenFilterType::IcuCollation,
+            _ => IcuCollationTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IcuFoldingTokenFilter {
@@ -1615,6 +1837,14 @@ impl<'de> serde::Deserialize<'de> for IcuFoldingTokenFilterType {
             "icu_folding" => IcuFoldingTokenFilterType::IcuFolding,
             _ => IcuFoldingTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuFoldingTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_folding" => IcuFoldingTokenFilterType::IcuFolding,
+            _ => IcuFoldingTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1665,6 +1895,14 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationCharFilterType {
         })
     }
 }
+impl From<&str> for IcuNormalizationCharFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_normalizer" => IcuNormalizationCharFilterType::IcuNormalizer,
+            _ => IcuNormalizationCharFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IcuNormalizationMode {
@@ -1704,6 +1942,15 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationMode {
             "decompose" => IcuNormalizationMode::Decompose,
             _ => IcuNormalizationMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuNormalizationMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "compose" => IcuNormalizationMode::Compose,
+            "decompose" => IcuNormalizationMode::Decompose,
+            _ => IcuNormalizationMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1751,6 +1998,14 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationTokenFilterType {
         })
     }
 }
+impl From<&str> for IcuNormalizationTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_normalizer" => IcuNormalizationTokenFilterType::IcuNormalizer,
+            _ => IcuNormalizationTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IcuNormalizationType {
@@ -1794,6 +2049,16 @@ impl<'de> serde::Deserialize<'de> for IcuNormalizationType {
             "nfkc_cf" => IcuNormalizationType::NfkcCf,
             _ => IcuNormalizationType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuNormalizationType {
+    fn from(s: &str) -> Self {
+        match s {
+            "nfc" => IcuNormalizationType::Nfc,
+            "nfkc" => IcuNormalizationType::Nfkc,
+            "nfkc_cf" => IcuNormalizationType::NfkcCf,
+            _ => IcuNormalizationType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1841,6 +2106,14 @@ impl<'de> serde::Deserialize<'de> for IcuTokenizerType {
         })
     }
 }
+impl From<&str> for IcuTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_tokenizer" => IcuTokenizerType::IcuTokenizer,
+            _ => IcuTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IcuTransformDirection {
@@ -1880,6 +2153,15 @@ impl<'de> serde::Deserialize<'de> for IcuTransformDirection {
             "reverse" => IcuTransformDirection::Reverse,
             _ => IcuTransformDirection::Unknown(s),
         })
+    }
+}
+impl From<&str> for IcuTransformDirection {
+    fn from(s: &str) -> Self {
+        match s {
+            "forward" => IcuTransformDirection::Forward,
+            "reverse" => IcuTransformDirection::Reverse,
+            _ => IcuTransformDirection::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1929,6 +2211,14 @@ impl<'de> serde::Deserialize<'de> for IcuTransformTokenFilterType {
         })
     }
 }
+impl From<&str> for IcuTransformTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "icu_transform" => IcuTransformTokenFilterType::IcuTransform,
+            _ => IcuTransformTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KStemTokenFilter {
@@ -1973,6 +2263,14 @@ impl<'de> serde::Deserialize<'de> for KStemTokenFilterType {
         })
     }
 }
+impl From<&str> for KStemTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kstem" => KStemTokenFilterType::Kstem,
+            _ => KStemTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum KeepTypesMode {
@@ -2012,6 +2310,15 @@ impl<'de> serde::Deserialize<'de> for KeepTypesMode {
             "include" => KeepTypesMode::Include,
             _ => KeepTypesMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for KeepTypesMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "exclude" => KeepTypesMode::Exclude,
+            "include" => KeepTypesMode::Include,
+            _ => KeepTypesMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2060,6 +2367,14 @@ impl<'de> serde::Deserialize<'de> for KeepTypesTokenFilterType {
             "keep_types" => KeepTypesTokenFilterType::KeepTypes,
             _ => KeepTypesTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KeepTypesTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keep_types" => KeepTypesTokenFilterType::KeepTypes,
+            _ => KeepTypesTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2112,6 +2427,14 @@ impl<'de> serde::Deserialize<'de> for KeepWordsTokenFilterType {
         })
     }
 }
+impl From<&str> for KeepWordsTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keep" => KeepWordsTokenFilterType::Keep,
+            _ => KeepWordsTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KeywordAnalyzer {
@@ -2154,6 +2477,14 @@ impl<'de> serde::Deserialize<'de> for KeywordAnalyzerType {
             "keyword" => KeywordAnalyzerType::Keyword,
             _ => KeywordAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KeywordAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keyword" => KeywordAnalyzerType::Keyword,
+            _ => KeywordAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2208,6 +2539,14 @@ impl<'de> serde::Deserialize<'de> for KeywordMarkerTokenFilterType {
         })
     }
 }
+impl From<&str> for KeywordMarkerTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keyword_marker" => KeywordMarkerTokenFilterType::KeywordMarker,
+            _ => KeywordMarkerTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KeywordTokenizer {
@@ -2253,6 +2592,14 @@ impl<'de> serde::Deserialize<'de> for KeywordTokenizerType {
         })
     }
 }
+impl From<&str> for KeywordTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "keyword" => KeywordTokenizerType::Keyword,
+            _ => KeywordTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KuromojiAnalyzer {
@@ -2296,6 +2643,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiAnalyzerType {
             "kuromoji" => KuromojiAnalyzerType::Kuromoji,
             _ => KuromojiAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KuromojiAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji" => KuromojiAnalyzerType::Kuromoji,
+            _ => KuromojiAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2344,6 +2699,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiIterationMarkCharFilterType {
         })
     }
 }
+impl From<&str> for KuromojiIterationMarkCharFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji_iteration_mark" => KuromojiIterationMarkCharFilterType::KuromojiIterationMark,
+            _ => KuromojiIterationMarkCharFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KuromojiPartOfSpeechTokenFilter {
@@ -2387,6 +2750,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiPartOfSpeechTokenFilterType {
             "kuromoji_part_of_speech" => KuromojiPartOfSpeechTokenFilterType::KuromojiPartOfSpeech,
             _ => KuromojiPartOfSpeechTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KuromojiPartOfSpeechTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji_part_of_speech" => KuromojiPartOfSpeechTokenFilterType::KuromojiPartOfSpeech,
+            _ => KuromojiPartOfSpeechTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2434,6 +2805,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiReadingFormTokenFilterType {
         })
     }
 }
+impl From<&str> for KuromojiReadingFormTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji_readingform" => KuromojiReadingFormTokenFilterType::KuromojiReadingform,
+            _ => KuromojiReadingFormTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct KuromojiStemmerTokenFilter {
@@ -2479,6 +2858,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiStemmerTokenFilterType {
         })
     }
 }
+impl From<&str> for KuromojiStemmerTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji_stemmer" => KuromojiStemmerTokenFilterType::KuromojiStemmer,
+            _ => KuromojiStemmerTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum KuromojiTokenizationMode {
@@ -2522,6 +2909,16 @@ impl<'de> serde::Deserialize<'de> for KuromojiTokenizationMode {
             "search" => KuromojiTokenizationMode::Search,
             _ => KuromojiTokenizationMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for KuromojiTokenizationMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "extended" => KuromojiTokenizationMode::Extended,
+            "normal" => KuromojiTokenizationMode::Normal,
+            "search" => KuromojiTokenizationMode::Search,
+            _ => KuromojiTokenizationMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2579,6 +2976,14 @@ impl<'de> serde::Deserialize<'de> for KuromojiTokenizerType {
             "kuromoji_tokenizer" => KuromojiTokenizerType::KuromojiTokenizer,
             _ => KuromojiTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for KuromojiTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "kuromoji_tokenizer" => KuromojiTokenizerType::KuromojiTokenizer,
+            _ => KuromojiTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2750,6 +3155,47 @@ impl<'de> serde::Deserialize<'de> for Language {
         })
     }
 }
+impl From<&str> for Language {
+    fn from(s: &str) -> Self {
+        match s {
+            "Arabic" => Language::Arabic,
+            "Armenian" => Language::Armenian,
+            "Basque" => Language::Basque,
+            "Brazilian" => Language::Brazilian,
+            "Bulgarian" => Language::Bulgarian,
+            "Catalan" => Language::Catalan,
+            "Chinese" => Language::Chinese,
+            "Cjk" => Language::Cjk,
+            "Czech" => Language::Czech,
+            "Danish" => Language::Danish,
+            "Dutch" => Language::Dutch,
+            "English" => Language::English,
+            "Estonian" => Language::Estonian,
+            "Finnish" => Language::Finnish,
+            "French" => Language::French,
+            "Galician" => Language::Galician,
+            "German" => Language::German,
+            "Greek" => Language::Greek,
+            "Hindi" => Language::Hindi,
+            "Hungarian" => Language::Hungarian,
+            "Indonesian" => Language::Indonesian,
+            "Irish" => Language::Irish,
+            "Italian" => Language::Italian,
+            "Latvian" => Language::Latvian,
+            "Norwegian" => Language::Norwegian,
+            "Persian" => Language::Persian,
+            "Portuguese" => Language::Portuguese,
+            "Romanian" => Language::Romanian,
+            "Russian" => Language::Russian,
+            "Sorani" => Language::Sorani,
+            "Spanish" => Language::Spanish,
+            "Swedish" => Language::Swedish,
+            "Thai" => Language::Thai,
+            "Turkish" => Language::Turkish,
+            _ => Language::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LanguageAnalyzer {
@@ -2800,6 +3246,14 @@ impl<'de> serde::Deserialize<'de> for LanguageAnalyzerType {
         })
     }
 }
+impl From<&str> for LanguageAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "language" => LanguageAnalyzerType::Language,
+            _ => LanguageAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LengthTokenFilter {
@@ -2848,6 +3302,14 @@ impl<'de> serde::Deserialize<'de> for LengthTokenFilterType {
         })
     }
 }
+impl From<&str> for LengthTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "length" => LengthTokenFilterType::Length,
+            _ => LengthTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LetterTokenizer {
@@ -2890,6 +3352,14 @@ impl<'de> serde::Deserialize<'de> for LetterTokenizerType {
             "letter" => LetterTokenizerType::Letter,
             _ => LetterTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for LetterTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "letter" => LetterTokenizerType::Letter,
+            _ => LetterTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2940,6 +3410,14 @@ impl<'de> serde::Deserialize<'de> for LimitTokenCountTokenFilterType {
         })
     }
 }
+impl From<&str> for LimitTokenCountTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "limit" => LimitTokenCountTokenFilterType::Limit,
+            _ => LimitTokenCountTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LowercaseNormalizer {
@@ -2980,6 +3458,14 @@ impl<'de> serde::Deserialize<'de> for LowercaseNormalizerType {
             "lowercase" => LowercaseNormalizerType::Lowercase,
             _ => LowercaseNormalizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for LowercaseNormalizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "lowercase" => LowercaseNormalizerType::Lowercase,
+            _ => LowercaseNormalizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3028,6 +3514,14 @@ impl<'de> serde::Deserialize<'de> for LowercaseTokenFilterType {
         })
     }
 }
+impl From<&str> for LowercaseTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "lowercase" => LowercaseTokenFilterType::Lowercase,
+            _ => LowercaseTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LowercaseTokenizer {
@@ -3070,6 +3564,14 @@ impl<'de> serde::Deserialize<'de> for LowercaseTokenizerType {
             "lowercase" => LowercaseTokenizerType::Lowercase,
             _ => LowercaseTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for LowercaseTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "lowercase" => LowercaseTokenizerType::Lowercase,
+            _ => LowercaseTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3120,6 +3622,14 @@ impl<'de> serde::Deserialize<'de> for MappingCharFilterType {
         })
     }
 }
+impl From<&str> for MappingCharFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "mapping" => MappingCharFilterType::Mapping,
+            _ => MappingCharFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MultiplexerTokenFilter {
@@ -3165,6 +3675,14 @@ impl<'de> serde::Deserialize<'de> for MultiplexerTokenFilterType {
             "multiplexer" => MultiplexerTokenFilterType::Multiplexer,
             _ => MultiplexerTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for MultiplexerTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "multiplexer" => MultiplexerTokenFilterType::Multiplexer,
+            _ => MultiplexerTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3217,6 +3735,14 @@ impl<'de> serde::Deserialize<'de> for NGramTokenFilterType {
         })
     }
 }
+impl From<&str> for NGramTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ngram" => NGramTokenFilterType::Ngram,
+            _ => NGramTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NGramTokenizer {
@@ -3264,6 +3790,14 @@ impl<'de> serde::Deserialize<'de> for NGramTokenizerType {
             "ngram" => NGramTokenizerType::Ngram,
             _ => NGramTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for NGramTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ngram" => NGramTokenizerType::Ngram,
+            _ => NGramTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3316,6 +3850,14 @@ impl<'de> serde::Deserialize<'de> for NoriAnalyzerType {
         })
     }
 }
+impl From<&str> for NoriAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "nori" => NoriAnalyzerType::Nori,
+            _ => NoriAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NoriDecompoundMode {
@@ -3359,6 +3901,16 @@ impl<'de> serde::Deserialize<'de> for NoriDecompoundMode {
             "none" => NoriDecompoundMode::None,
             _ => NoriDecompoundMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for NoriDecompoundMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "discard" => NoriDecompoundMode::Discard,
+            "mixed" => NoriDecompoundMode::Mixed,
+            "none" => NoriDecompoundMode::None,
+            _ => NoriDecompoundMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3405,6 +3957,14 @@ impl<'de> serde::Deserialize<'de> for NoriPartOfSpeechTokenFilterType {
             "nori_part_of_speech" => NoriPartOfSpeechTokenFilterType::NoriPartOfSpeech,
             _ => NoriPartOfSpeechTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for NoriPartOfSpeechTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "nori_part_of_speech" => NoriPartOfSpeechTokenFilterType::NoriPartOfSpeech,
+            _ => NoriPartOfSpeechTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3457,6 +4017,14 @@ impl<'de> serde::Deserialize<'de> for NoriTokenizerType {
             "nori_tokenizer" => NoriTokenizerType::NoriTokenizer,
             _ => NoriTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for NoriTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "nori_tokenizer" => NoriTokenizerType::NoriTokenizer,
+            _ => NoriTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3544,6 +4112,14 @@ impl<'de> serde::Deserialize<'de> for PathHierarchyTokenizerType {
         })
     }
 }
+impl From<&str> for PathHierarchyTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "path_hierarchy" => PathHierarchyTokenizerType::PathHierarchy,
+            _ => PathHierarchyTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PatternAnalyzer {
@@ -3595,6 +4171,14 @@ impl<'de> serde::Deserialize<'de> for PatternAnalyzerType {
         })
     }
 }
+impl From<&str> for PatternAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "pattern" => PatternAnalyzerType::Pattern,
+            _ => PatternAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PatternCaptureTokenFilter {
@@ -3640,6 +4224,14 @@ impl<'de> serde::Deserialize<'de> for PatternCaptureTokenFilterType {
             "pattern_capture" => PatternCaptureTokenFilterType::PatternCapture,
             _ => PatternCaptureTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PatternCaptureTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "pattern_capture" => PatternCaptureTokenFilterType::PatternCapture,
+            _ => PatternCaptureTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3689,6 +4281,14 @@ impl<'de> serde::Deserialize<'de> for PatternReplaceCharFilterType {
             "pattern_replace" => PatternReplaceCharFilterType::PatternReplace,
             _ => PatternReplaceCharFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PatternReplaceCharFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "pattern_replace" => PatternReplaceCharFilterType::PatternReplace,
+            _ => PatternReplaceCharFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3742,6 +4342,14 @@ impl<'de> serde::Deserialize<'de> for PatternReplaceTokenFilterType {
         })
     }
 }
+impl From<&str> for PatternReplaceTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "pattern_replace" => PatternReplaceTokenFilterType::PatternReplace,
+            _ => PatternReplaceTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PatternTokenizer {
@@ -3792,6 +4400,14 @@ impl<'de> serde::Deserialize<'de> for PatternTokenizerType {
         })
     }
 }
+impl From<&str> for PatternTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "pattern" => PatternTokenizerType::Pattern,
+            _ => PatternTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PersianStemTokenFilter {
@@ -3834,6 +4450,14 @@ impl<'de> serde::Deserialize<'de> for PersianStemTokenFilterType {
             "persian_stem" => PersianStemTokenFilterType::PersianStem,
             _ => PersianStemTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PersianStemTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "persian_stem" => PersianStemTokenFilterType::PersianStem,
+            _ => PersianStemTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3882,6 +4506,14 @@ impl<'de> serde::Deserialize<'de> for PhoneAnalyzerType {
         })
     }
 }
+impl From<&str> for PhoneAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "phone" => PhoneAnalyzerType::Phone,
+            _ => PhoneAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneSearchAnalyzer {
@@ -3926,6 +4558,14 @@ impl<'de> serde::Deserialize<'de> for PhoneSearchAnalyzerType {
             "phone-search" => PhoneSearchAnalyzerType::PhoneSearch,
             _ => PhoneSearchAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PhoneSearchAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "phone-search" => PhoneSearchAnalyzerType::PhoneSearch,
+            _ => PhoneSearchAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4009,6 +4649,25 @@ impl<'de> serde::Deserialize<'de> for PhoneticEncoder {
         })
     }
 }
+impl From<&str> for PhoneticEncoder {
+    fn from(s: &str) -> Self {
+        match s {
+            "beider_morse" => PhoneticEncoder::BeiderMorse,
+            "caverphone1" => PhoneticEncoder::Caverphone1,
+            "caverphone2" => PhoneticEncoder::Caverphone2,
+            "cologne" => PhoneticEncoder::Cologne,
+            "daitch_mokotoff" => PhoneticEncoder::DaitchMokotoff,
+            "double_metaphone" => PhoneticEncoder::DoubleMetaphone,
+            "haasephonetik" => PhoneticEncoder::Haasephonetik,
+            "koelnerphonetik" => PhoneticEncoder::Koelnerphonetik,
+            "metaphone" => PhoneticEncoder::Metaphone,
+            "nysiis" => PhoneticEncoder::Nysiis,
+            "refined_soundex" => PhoneticEncoder::RefinedSoundex,
+            "soundex" => PhoneticEncoder::Soundex,
+            _ => PhoneticEncoder::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PhoneticLanguage {
@@ -4090,6 +4749,25 @@ impl<'de> serde::Deserialize<'de> for PhoneticLanguage {
         })
     }
 }
+impl From<&str> for PhoneticLanguage {
+    fn from(s: &str) -> Self {
+        match s {
+            "any" => PhoneticLanguage::Any,
+            "common" => PhoneticLanguage::Common,
+            "cyrillic" => PhoneticLanguage::Cyrillic,
+            "english" => PhoneticLanguage::English,
+            "french" => PhoneticLanguage::French,
+            "german" => PhoneticLanguage::German,
+            "hebrew" => PhoneticLanguage::Hebrew,
+            "hungarian" => PhoneticLanguage::Hungarian,
+            "polish" => PhoneticLanguage::Polish,
+            "romanian" => PhoneticLanguage::Romanian,
+            "russian" => PhoneticLanguage::Russian,
+            "spanish" => PhoneticLanguage::Spanish,
+            _ => PhoneticLanguage::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PhoneticNameType {
@@ -4135,6 +4813,16 @@ impl<'de> serde::Deserialize<'de> for PhoneticNameType {
         })
     }
 }
+impl From<&str> for PhoneticNameType {
+    fn from(s: &str) -> Self {
+        match s {
+            "ashkenazi" => PhoneticNameType::Ashkenazi,
+            "generic" => PhoneticNameType::Generic,
+            "sephardic" => PhoneticNameType::Sephardic,
+            _ => PhoneticNameType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PhoneticRuleType {
@@ -4174,6 +4862,15 @@ impl<'de> serde::Deserialize<'de> for PhoneticRuleType {
             "exact" => PhoneticRuleType::Exact,
             _ => PhoneticRuleType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PhoneticRuleType {
+    fn from(s: &str) -> Self {
+        match s {
+            "approx" => PhoneticRuleType::Approx,
+            "exact" => PhoneticRuleType::Exact,
+            _ => PhoneticRuleType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4228,6 +4925,14 @@ impl<'de> serde::Deserialize<'de> for PhoneticTokenFilterType {
         })
     }
 }
+impl From<&str> for PhoneticTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "phonetic" => PhoneticTokenFilterType::Phonetic,
+            _ => PhoneticTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PorterStemTokenFilter {
@@ -4270,6 +4975,14 @@ impl<'de> serde::Deserialize<'de> for PorterStemTokenFilterType {
             "porter_stem" => PorterStemTokenFilterType::PorterStem,
             _ => PorterStemTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for PorterStemTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "porter_stem" => PorterStemTokenFilterType::PorterStem,
+            _ => PorterStemTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4317,6 +5030,14 @@ impl<'de> serde::Deserialize<'de> for PredicateTokenFilterType {
         })
     }
 }
+impl From<&str> for PredicateTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "predicate_token_filter" => PredicateTokenFilterType::PredicateTokenFilter,
+            _ => PredicateTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RemoveDuplicatesTokenFilter {
@@ -4361,6 +5082,14 @@ impl<'de> serde::Deserialize<'de> for RemoveDuplicatesTokenFilterType {
         })
     }
 }
+impl From<&str> for RemoveDuplicatesTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "remove_duplicates" => RemoveDuplicatesTokenFilterType::RemoveDuplicates,
+            _ => RemoveDuplicatesTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ReverseTokenFilter {
@@ -4403,6 +5132,14 @@ impl<'de> serde::Deserialize<'de> for ReverseTokenFilterType {
             "reverse" => ReverseTokenFilterType::Reverse,
             _ => ReverseTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ReverseTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "reverse" => ReverseTokenFilterType::Reverse,
+            _ => ReverseTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4461,6 +5198,14 @@ impl<'de> serde::Deserialize<'de> for ShingleTokenFilterType {
         })
     }
 }
+impl From<&str> for ShingleTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "shingle" => ShingleTokenFilterType::Shingle,
+            _ => ShingleTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SimpleAnalyzer {
@@ -4503,6 +5248,14 @@ impl<'de> serde::Deserialize<'de> for SimpleAnalyzerType {
             "simple" => SimpleAnalyzerType::Simple,
             _ => SimpleAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SimpleAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "simple" => SimpleAnalyzerType::Simple,
+            _ => SimpleAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4551,6 +5304,14 @@ impl<'de> serde::Deserialize<'de> for SimplePatternSplitTokenizerType {
         })
     }
 }
+impl From<&str> for SimplePatternSplitTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "simple_pattern_split" => SimplePatternSplitTokenizerType::SimplePatternSplit,
+            _ => SimplePatternSplitTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SimplePatternTokenizer {
@@ -4597,6 +5358,14 @@ impl<'de> serde::Deserialize<'de> for SimplePatternTokenizerType {
         })
     }
 }
+impl From<&str> for SimplePatternTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "simple_pattern" => SimplePatternTokenizerType::SimplePattern,
+            _ => SimplePatternTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SmartcnAnalyzer {
@@ -4638,6 +5407,14 @@ impl<'de> serde::Deserialize<'de> for SmartcnAnalyzerType {
             "smartcn" => SmartcnAnalyzerType::Smartcn,
             _ => SmartcnAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SmartcnAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "smartcn" => SmartcnAnalyzerType::Smartcn,
+            _ => SmartcnAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4684,6 +5461,14 @@ impl<'de> serde::Deserialize<'de> for SmartcnStopTokenFilterType {
         })
     }
 }
+impl From<&str> for SmartcnStopTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "smartcn_stop" => SmartcnStopTokenFilterType::SmartcnStop,
+            _ => SmartcnStopTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SmartcnTokenizer {
@@ -4726,6 +5511,14 @@ impl<'de> serde::Deserialize<'de> for SmartcnTokenizerType {
             "smartcn_tokenizer" => SmartcnTokenizerType::SmartcnTokenizer,
             _ => SmartcnTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SmartcnTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "smartcn_tokenizer" => SmartcnTokenizerType::SmartcnTokenizer,
+            _ => SmartcnTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4773,6 +5566,14 @@ impl<'de> serde::Deserialize<'de> for SnowballAnalyzerType {
             "snowball" => SnowballAnalyzerType::Snowball,
             _ => SnowballAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SnowballAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "snowball" => SnowballAnalyzerType::Snowball,
+            _ => SnowballAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4896,6 +5697,35 @@ impl<'de> serde::Deserialize<'de> for SnowballLanguage {
         })
     }
 }
+impl From<&str> for SnowballLanguage {
+    fn from(s: &str) -> Self {
+        match s {
+            "Armenian" => SnowballLanguage::Armenian,
+            "Basque" => SnowballLanguage::Basque,
+            "Catalan" => SnowballLanguage::Catalan,
+            "Danish" => SnowballLanguage::Danish,
+            "Dutch" => SnowballLanguage::Dutch,
+            "English" => SnowballLanguage::English,
+            "Finnish" => SnowballLanguage::Finnish,
+            "French" => SnowballLanguage::French,
+            "German" => SnowballLanguage::German,
+            "German2" => SnowballLanguage::German2,
+            "Hungarian" => SnowballLanguage::Hungarian,
+            "Italian" => SnowballLanguage::Italian,
+            "Kp" => SnowballLanguage::Kp,
+            "Lovins" => SnowballLanguage::Lovins,
+            "Norwegian" => SnowballLanguage::Norwegian,
+            "Porter" => SnowballLanguage::Porter,
+            "Portuguese" => SnowballLanguage::Portuguese,
+            "Romanian" => SnowballLanguage::Romanian,
+            "Russian" => SnowballLanguage::Russian,
+            "Spanish" => SnowballLanguage::Spanish,
+            "Swedish" => SnowballLanguage::Swedish,
+            "Turkish" => SnowballLanguage::Turkish,
+            _ => SnowballLanguage::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SnowballTokenFilter {
@@ -4939,6 +5769,14 @@ impl<'de> serde::Deserialize<'de> for SnowballTokenFilterType {
             "snowball" => SnowballTokenFilterType::Snowball,
             _ => SnowballTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SnowballTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "snowball" => SnowballTokenFilterType::Snowball,
+            _ => SnowballTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -4987,6 +5825,14 @@ impl<'de> serde::Deserialize<'de> for StandardAnalyzerType {
         })
     }
 }
+impl From<&str> for StandardAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "standard" => StandardAnalyzerType::Standard,
+            _ => StandardAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StandardTokenizer {
@@ -5031,6 +5877,14 @@ impl<'de> serde::Deserialize<'de> for StandardTokenizerType {
             "standard" => StandardTokenizerType::Standard,
             _ => StandardTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for StandardTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "standard" => StandardTokenizerType::Standard,
+            _ => StandardTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -5081,6 +5935,14 @@ impl<'de> serde::Deserialize<'de> for StemmerOverrideTokenFilterType {
         })
     }
 }
+impl From<&str> for StemmerOverrideTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "stemmer_override" => StemmerOverrideTokenFilterType::StemmerOverride,
+            _ => StemmerOverrideTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StemmerTokenFilter {
@@ -5125,6 +5987,14 @@ impl<'de> serde::Deserialize<'de> for StemmerTokenFilterType {
             "stemmer" => StemmerTokenFilterType::Stemmer,
             _ => StemmerTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for StemmerTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "stemmer" => StemmerTokenFilterType::Stemmer,
+            _ => StemmerTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -5173,6 +6043,14 @@ impl<'de> serde::Deserialize<'de> for StopAnalyzerType {
             "stop" => StopAnalyzerType::Stop,
             _ => StopAnalyzerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for StopAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "stop" => StopAnalyzerType::Stop,
+            _ => StopAnalyzerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -5227,6 +6105,14 @@ impl<'de> serde::Deserialize<'de> for StopTokenFilterType {
         })
     }
 }
+impl From<&str> for StopTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "stop" => StopTokenFilterType::Stop,
+            _ => StopTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "Language value, such as `arabic` or `thai`. Defaults to `english`. Each language value corresponds to a predefined list of stop words in Lucene. See Stop words by language for supported language values and their stop words. Also accepts an array of stop words."]
 pub type StopWords = crate::types::common::StringOrStringArray;
@@ -5269,6 +6155,15 @@ impl<'de> serde::Deserialize<'de> for SynonymFormat {
             "wordnet" => SynonymFormat::Wordnet,
             _ => SynonymFormat::Unknown(s),
         })
+    }
+}
+impl From<&str> for SynonymFormat {
+    fn from(s: &str) -> Self {
+        match s {
+            "solr" => SynonymFormat::Solr,
+            "wordnet" => SynonymFormat::Wordnet,
+            _ => SynonymFormat::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -5329,6 +6224,14 @@ impl<'de> serde::Deserialize<'de> for SynonymGraphTokenFilterType {
         })
     }
 }
+impl From<&str> for SynonymGraphTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "synonym_graph" => SynonymGraphTokenFilterType::SynonymGraph,
+            _ => SynonymGraphTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SynonymTokenFilter {
@@ -5387,6 +6290,14 @@ impl<'de> serde::Deserialize<'de> for SynonymTokenFilterType {
         })
     }
 }
+impl From<&str> for SynonymTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "synonym" => SynonymTokenFilterType::Synonym,
+            _ => SynonymTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TokenChar {
@@ -5442,6 +6353,19 @@ impl<'de> serde::Deserialize<'de> for TokenChar {
             "whitespace" => TokenChar::Whitespace,
             _ => TokenChar::Unknown(s),
         })
+    }
+}
+impl From<&str> for TokenChar {
+    fn from(s: &str) -> Self {
+        match s {
+            "custom" => TokenChar::Custom,
+            "digit" => TokenChar::Digit,
+            "letter" => TokenChar::Letter,
+            "punctuation" => TokenChar::Punctuation,
+            "symbol" => TokenChar::Symbol,
+            "whitespace" => TokenChar::Whitespace,
+            _ => TokenChar::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -6185,6 +7109,14 @@ impl<'de> serde::Deserialize<'de> for TrimTokenFilterType {
         })
     }
 }
+impl From<&str> for TrimTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "trim" => TrimTokenFilterType::Trim,
+            _ => TrimTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TruncateTokenFilter {
@@ -6229,6 +7161,14 @@ impl<'de> serde::Deserialize<'de> for TruncateTokenFilterType {
             "truncate" => TruncateTokenFilterType::Truncate,
             _ => TruncateTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for TruncateTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "truncate" => TruncateTokenFilterType::Truncate,
+            _ => TruncateTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -6277,6 +7217,14 @@ impl<'de> serde::Deserialize<'de> for UaxEmailUrlTokenizerType {
         })
     }
 }
+impl From<&str> for UaxEmailUrlTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "uax_url_email" => UaxEmailUrlTokenizerType::UaxUrlEmail,
+            _ => UaxEmailUrlTokenizerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UniqueTokenFilter {
@@ -6323,6 +7271,14 @@ impl<'de> serde::Deserialize<'de> for UniqueTokenFilterType {
         })
     }
 }
+impl From<&str> for UniqueTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "unique" => UniqueTokenFilterType::Unique,
+            _ => UniqueTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UppercaseTokenFilter {
@@ -6365,6 +7321,14 @@ impl<'de> serde::Deserialize<'de> for UppercaseTokenFilterType {
             "uppercase" => UppercaseTokenFilterType::Uppercase,
             _ => UppercaseTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for UppercaseTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "uppercase" => UppercaseTokenFilterType::Uppercase,
+            _ => UppercaseTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -6411,6 +7375,14 @@ impl<'de> serde::Deserialize<'de> for WhitespaceAnalyzerType {
         })
     }
 }
+impl From<&str> for WhitespaceAnalyzerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "whitespace" => WhitespaceAnalyzerType::Whitespace,
+            _ => WhitespaceAnalyzerType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WhitespaceTokenizer {
@@ -6455,6 +7427,14 @@ impl<'de> serde::Deserialize<'de> for WhitespaceTokenizerType {
             "whitespace" => WhitespaceTokenizerType::Whitespace,
             _ => WhitespaceTokenizerType::Unknown(s),
         })
+    }
+}
+impl From<&str> for WhitespaceTokenizerType {
+    fn from(s: &str) -> Self {
+        match s {
+            "whitespace" => WhitespaceTokenizerType::Whitespace,
+            _ => WhitespaceTokenizerType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -6531,6 +7511,14 @@ impl<'de> serde::Deserialize<'de> for WordDelimiterGraphTokenFilterType {
         })
     }
 }
+impl From<&str> for WordDelimiterGraphTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "word_delimiter_graph" => WordDelimiterGraphTokenFilterType::WordDelimiterGraph,
+            _ => WordDelimiterGraphTokenFilterType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WordDelimiterTokenFilter {
@@ -6599,5 +7587,13 @@ impl<'de> serde::Deserialize<'de> for WordDelimiterTokenFilterType {
             "word_delimiter" => WordDelimiterTokenFilterType::WordDelimiter,
             _ => WordDelimiterTokenFilterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for WordDelimiterTokenFilterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "word_delimiter" => WordDelimiterTokenFilterType::WordDelimiter,
+            _ => WordDelimiterTokenFilterType::Unknown(s.to_string()),
+        }
     }
 }

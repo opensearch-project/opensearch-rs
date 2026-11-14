@@ -111,6 +111,14 @@ impl<'de> serde::Deserialize<'de> for ClusterRemoteProxyInfoMode {
         })
     }
 }
+impl From<&str> for ClusterRemoteProxyInfoMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "proxy" => ClusterRemoteProxyInfoMode::Proxy,
+            _ => ClusterRemoteProxyInfoMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ClusterRemoteSniffInfo {
@@ -157,6 +165,14 @@ impl<'de> serde::Deserialize<'de> for ClusterRemoteSniffInfoMode {
             "sniff" => ClusterRemoteSniffInfoMode::Sniff,
             _ => ClusterRemoteSniffInfoMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for ClusterRemoteSniffInfoMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "sniff" => ClusterRemoteSniffInfoMode::Sniff,
+            _ => ClusterRemoteSniffInfoMode::Unknown(s.to_string()),
+        }
     }
 }
 

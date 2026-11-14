@@ -118,6 +118,17 @@ impl<'de> serde::Deserialize<'de> for BuiltinStorageType {
         })
     }
 }
+impl From<&str> for BuiltinStorageType {
+    fn from(s: &str) -> Self {
+        match s {
+            "fs" => BuiltinStorageType::Fs,
+            "hybridfs" => BuiltinStorageType::Hybridfs,
+            "mmapfs" => BuiltinStorageType::Mmapfs,
+            "niofs" => BuiltinStorageType::Niofs,
+            _ => BuiltinStorageType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DataStream {
@@ -242,6 +253,16 @@ impl<'de> serde::Deserialize<'de> for IndexCheckOnStartup {
         })
     }
 }
+impl From<&str> for IndexCheckOnStartup {
+    fn from(s: &str) -> Self {
+        match s {
+            "checksum" => IndexCheckOnStartup::Checksum,
+            "false" => IndexCheckOnStartup::False,
+            "true" => IndexCheckOnStartup::True,
+            _ => IndexCheckOnStartup::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The upgrade status information for indexes."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -361,6 +382,17 @@ impl<'de> serde::Deserialize<'de> for IndexRoutingAllocationOptions {
         })
     }
 }
+impl From<&str> for IndexRoutingAllocationOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => IndexRoutingAllocationOptions::All,
+            "new_primaries" => IndexRoutingAllocationOptions::NewPrimaries,
+            "none" => IndexRoutingAllocationOptions::None,
+            "primaries" => IndexRoutingAllocationOptions::Primaries,
+            _ => IndexRoutingAllocationOptions::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The configuration for shard rebalancing."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -417,6 +449,17 @@ impl<'de> serde::Deserialize<'de> for IndexRoutingRebalanceOptions {
         })
     }
 }
+impl From<&str> for IndexRoutingRebalanceOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => IndexRoutingRebalanceOptions::All,
+            "none" => IndexRoutingRebalanceOptions::None,
+            "primaries" => IndexRoutingRebalanceOptions::Primaries,
+            "replicas" => IndexRoutingRebalanceOptions::Replicas,
+            _ => IndexRoutingRebalanceOptions::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The configuration for segment sorting."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -465,6 +508,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortMissing {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::SegmentSortMissing> for IndexSegmentSortMissing {
+    fn from(value: crate::types::indices_common::SegmentSortMissing) -> Self {
+        IndexSegmentSortMissing::SegmentSortMissing(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortMissing>> for IndexSegmentSortMissing {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortMissing>) -> Self {
+        IndexSegmentSortMissing::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -498,6 +551,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortMode {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::SegmentSortMode> for IndexSegmentSortMode {
+    fn from(value: crate::types::indices_common::SegmentSortMode) -> Self {
+        IndexSegmentSortMode::SegmentSortMode(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortMode>> for IndexSegmentSortMode {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortMode>) -> Self {
+        IndexSegmentSortMode::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -529,6 +592,16 @@ impl<'de> serde::Deserialize<'de> for IndexSegmentSortOrder {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::indices_common::SegmentSortOrder> for IndexSegmentSortOrder {
+    fn from(value: crate::types::indices_common::SegmentSortOrder) -> Self {
+        IndexSegmentSortOrder::SegmentSortOrder(value)
+    }
+}
+impl From<Vec<crate::types::indices_common::SegmentSortOrder>> for IndexSegmentSortOrder {
+    fn from(value: Vec<crate::types::indices_common::SegmentSortOrder>) -> Self {
+        IndexSegmentSortOrder::Array(value)
     }
 }
 
@@ -2020,6 +2093,18 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicy {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::indices_common::IndexSettingsMergePolicyName> for IndexSettingsMergePolicy {
+    fn from(value: crate::types::indices_common::IndexSettingsMergePolicyName) -> Self {
+        IndexSettingsMergePolicy::Name(value)
+    }
+}
+impl From<crate::types::indices_common::IndexSettingsMergeTieredPolicy>
+    for IndexSettingsMergePolicy
+{
+    fn from(value: crate::types::indices_common::IndexSettingsMergeTieredPolicy) -> Self {
+        IndexSettingsMergePolicy::TieredPolicyConfig(value)
+    }
+}
 
 #[doc = "The type of merge policy."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2064,6 +2149,16 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicyName {
             "tiered" => IndexSettingsMergePolicyName::Tiered,
             _ => IndexSettingsMergePolicyName::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexSettingsMergePolicyName {
+    fn from(s: &str) -> Self {
+        match s {
+            "default" => IndexSettingsMergePolicyName::Default,
+            "log_byte_size" => IndexSettingsMergePolicyName::LogByteSize,
+            "tiered" => IndexSettingsMergePolicyName::Tiered,
+            _ => IndexSettingsMergePolicyName::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2234,6 +2329,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityBm25Type {
         })
     }
 }
+impl From<&str> for IndexSettingsSimilarityBm25Type {
+    fn from(s: &str) -> Self {
+        match s {
+            "BM25" => IndexSettingsSimilarityBm25Type::Bm25,
+            _ => IndexSettingsSimilarityBm25Type::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The divergence from independence (DFI) similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2276,6 +2379,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityDfiType {
             "DFI" => IndexSettingsSimilarityDfiType::Dfi,
             _ => IndexSettingsSimilarityDfiType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexSettingsSimilarityDfiType {
+    fn from(s: &str) -> Self {
+        match s {
+            "DFI" => IndexSettingsSimilarityDfiType::Dfi,
+            _ => IndexSettingsSimilarityDfiType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2324,6 +2435,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityDfrType {
         })
     }
 }
+impl From<&str> for IndexSettingsSimilarityDfrType {
+    fn from(s: &str) -> Self {
+        match s {
+            "DFR" => IndexSettingsSimilarityDfrType::Dfr,
+            _ => IndexSettingsSimilarityDfrType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The information-based similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2368,6 +2487,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityIbType {
             "IB" => IndexSettingsSimilarityIbType::Ib,
             _ => IndexSettingsSimilarityIbType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexSettingsSimilarityIbType {
+    fn from(s: &str) -> Self {
+        match s {
+            "IB" => IndexSettingsSimilarityIbType::Ib,
+            _ => IndexSettingsSimilarityIbType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2415,6 +2542,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityLmdType {
         })
     }
 }
+impl From<&str> for IndexSettingsSimilarityLmdType {
+    fn from(s: &str) -> Self {
+        match s {
+            "LMDirichlet" => IndexSettingsSimilarityLmdType::Lmdirichlet,
+            _ => IndexSettingsSimilarityLmdType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The LM Jelinek-Mercer similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2460,6 +2595,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityLmjType {
         })
     }
 }
+impl From<&str> for IndexSettingsSimilarityLmjType {
+    fn from(s: &str) -> Self {
+        match s {
+            "LMJelinekMercer" => IndexSettingsSimilarityLmjType::LmjelinekMercer,
+            _ => IndexSettingsSimilarityLmjType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The scripted TF/IDF similarity algorithm configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2502,6 +2645,14 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsSimilarityScriptedTfidfType {
             "scripted" => IndexSettingsSimilarityScriptedTfidfType::Scripted,
             _ => IndexSettingsSimilarityScriptedTfidfType::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexSettingsSimilarityScriptedTfidfType {
+    fn from(s: &str) -> Self {
+        match s {
+            "scripted" => IndexSettingsSimilarityScriptedTfidfType::Scripted,
+            _ => IndexSettingsSimilarityScriptedTfidfType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2610,6 +2761,15 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsStoreFsLock {
             "simple" => IndexSettingsStoreFsLock::Simple,
             _ => IndexSettingsStoreFsLock::Unknown(s),
         })
+    }
+}
+impl From<&str> for IndexSettingsStoreFsLock {
+    fn from(s: &str) -> Self {
+        match s {
+            "native" => IndexSettingsStoreFsLock::Native,
+            "simple" => IndexSettingsStoreFsLock::Simple,
+            _ => IndexSettingsStoreFsLock::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2762,6 +2922,21 @@ impl<'de> serde::Deserialize<'de> for IndexingPressureMemoryLimit {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for IndexingPressureMemoryLimit {
+    fn from(value: String) -> Self {
+        IndexingPressureMemoryLimit::String(value)
+    }
+}
+impl From<&str> for IndexingPressureMemoryLimit {
+    fn from(value: &str) -> Self {
+        IndexingPressureMemoryLimit::String(value.to_string())
+    }
+}
+impl From<i64> for IndexingPressureMemoryLimit {
+    fn from(value: i64) -> Self {
+        IndexingPressureMemoryLimit::Integer(value)
+    }
+}
 
 #[doc = "The configuration for indexing slow log."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2897,6 +3072,20 @@ impl<'de> serde::Deserialize<'de> for IngestionSourcePointerInitReset {
         })
     }
 }
+impl From<&str> for IngestionSourcePointerInitReset {
+    fn from(s: &str) -> Self {
+        match s {
+            "EARLIEST" | "earliest" => IngestionSourcePointerInitReset::Earliest,
+            "LATEST" | "latest" => IngestionSourcePointerInitReset::Latest,
+            "NONE" | "none" => IngestionSourcePointerInitReset::None,
+            "RESET_BY_OFFSET" | "reset_by_offset" => IngestionSourcePointerInitReset::ResetByOffset,
+            "RESET_BY_TIMESTAMP" | "reset_by_timestamp" => {
+                IngestionSourcePointerInitReset::ResetByTimestamp
+            }
+            _ => IngestionSourcePointerInitReset::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IngestionSourcePoll {
@@ -2956,6 +3145,17 @@ impl<'de> serde::Deserialize<'de> for IngestionSourceType {
         })
     }
 }
+impl From<&str> for IngestionSourceType {
+    fn from(s: &str) -> Self {
+        match s {
+            "file" => IngestionSourceType::File,
+            "kafka" => IngestionSourceType::Kafka,
+            "kinesis" => IngestionSourceType::Kinesis,
+            "none" => IngestionSourceType::None,
+            _ => IngestionSourceType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The component managing the data stream or index."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3000,6 +3200,16 @@ impl<'de> serde::Deserialize<'de> for ManagedBy {
             "Unmanaged" => ManagedBy::Unmanaged,
             _ => ManagedBy::Unknown(s),
         })
+    }
+}
+impl From<&str> for ManagedBy {
+    fn from(s: &str) -> Self {
+        match s {
+            "Data stream lifecycle" => ManagedBy::DataStreamLifecycle,
+            "Index Lifecycle Management" => ManagedBy::IndexLifecycleManagement,
+            "Unmanaged" => ManagedBy::Unmanaged,
+            _ => ManagedBy::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3050,6 +3260,15 @@ impl<'de> serde::Deserialize<'de> for NumericFielddataFormat {
         })
     }
 }
+impl From<&str> for NumericFielddataFormat {
+    fn from(s: &str) -> Self {
+        match s {
+            "array" => NumericFielddataFormat::Array,
+            "disabled" => NumericFielddataFormat::Disabled,
+            _ => NumericFielddataFormat::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReplicationType {
@@ -3089,6 +3308,15 @@ impl<'de> serde::Deserialize<'de> for ReplicationType {
             "SEGMENT" => ReplicationType::Segment,
             _ => ReplicationType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ReplicationType {
+    fn from(s: &str) -> Self {
+        match s {
+            "DOCUMENT" => ReplicationType::Document,
+            "SEGMENT" => ReplicationType::Segment,
+            _ => ReplicationType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3168,6 +3396,15 @@ impl<'de> serde::Deserialize<'de> for SegmentSortMissing {
         })
     }
 }
+impl From<&str> for SegmentSortMissing {
+    fn from(s: &str) -> Self {
+        match s {
+            "_first" => SegmentSortMissing::First,
+            "_last" => SegmentSortMissing::Last,
+            _ => SegmentSortMissing::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The sort mode for segments."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3210,6 +3447,15 @@ impl<'de> serde::Deserialize<'de> for SegmentSortMode {
         })
     }
 }
+impl From<&str> for SegmentSortMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "max" => SegmentSortMode::Max,
+            "min" => SegmentSortMode::Min,
+            _ => SegmentSortMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The sort order for segments."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3250,6 +3496,15 @@ impl<'de> serde::Deserialize<'de> for SegmentSortOrder {
             "desc" => SegmentSortOrder::Desc,
             _ => SegmentSortOrder::Unknown(s),
         })
+    }
+}
+impl From<&str> for SegmentSortOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "asc" => SegmentSortOrder::Asc,
+            "desc" => SegmentSortOrder::Desc,
+            _ => SegmentSortOrder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3383,6 +3638,15 @@ impl<'de> serde::Deserialize<'de> for TranslogDurability {
             "REQUEST" | "request" => TranslogDurability::Request,
             _ => TranslogDurability::Unknown(s),
         })
+    }
+}
+impl From<&str> for TranslogDurability {
+    fn from(s: &str) -> Self {
+        match s {
+            "ASYNC" | "async" => TranslogDurability::Async,
+            "REQUEST" | "request" => TranslogDurability::Request,
+            _ => TranslogDurability::Unknown(s.to_string()),
+        }
     }
 }
 

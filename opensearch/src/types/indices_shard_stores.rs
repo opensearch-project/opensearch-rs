@@ -182,6 +182,16 @@ impl<'de> serde::Deserialize<'de> for ShardStoreAllocation {
         })
     }
 }
+impl From<&str> for ShardStoreAllocation {
+    fn from(s: &str) -> Self {
+        match s {
+            "primary" => ShardStoreAllocation::Primary,
+            "replica" => ShardStoreAllocation::Replica,
+            "unused" => ShardStoreAllocation::Unused,
+            _ => ShardStoreAllocation::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The exception information for a shard store."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

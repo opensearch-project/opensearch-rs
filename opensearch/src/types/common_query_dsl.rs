@@ -106,6 +106,16 @@ impl<'de> serde::Deserialize<'de> for BoolQueryFilter {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common_query_dsl::QueryContainer> for BoolQueryFilter {
+    fn from(value: crate::types::common_query_dsl::QueryContainer) -> Self {
+        BoolQueryFilter::QueryContainer(Box::new(value))
+    }
+}
+impl From<Vec<crate::types::common_query_dsl::QueryContainer>> for BoolQueryFilter {
+    fn from(value: Vec<crate::types::common_query_dsl::QueryContainer>) -> Self {
+        BoolQueryFilter::Array(value)
+    }
+}
 
 #[doc = "The clause (query) must appear in matching documents and will contribute to the score."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -138,6 +148,16 @@ impl<'de> serde::Deserialize<'de> for BoolQueryMust {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common_query_dsl::QueryContainer> for BoolQueryMust {
+    fn from(value: crate::types::common_query_dsl::QueryContainer) -> Self {
+        BoolQueryMust::QueryContainer(Box::new(value))
+    }
+}
+impl From<Vec<crate::types::common_query_dsl::QueryContainer>> for BoolQueryMust {
+    fn from(value: Vec<crate::types::common_query_dsl::QueryContainer>) -> Self {
+        BoolQueryMust::Array(value)
     }
 }
 
@@ -174,6 +194,16 @@ impl<'de> serde::Deserialize<'de> for BoolQueryMustNot {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common_query_dsl::QueryContainer> for BoolQueryMustNot {
+    fn from(value: crate::types::common_query_dsl::QueryContainer) -> Self {
+        BoolQueryMustNot::QueryContainer(Box::new(value))
+    }
+}
+impl From<Vec<crate::types::common_query_dsl::QueryContainer>> for BoolQueryMustNot {
+    fn from(value: Vec<crate::types::common_query_dsl::QueryContainer>) -> Self {
+        BoolQueryMustNot::Array(value)
+    }
+}
 
 #[doc = "The clause (query) should appear in the matching document."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -206,6 +236,16 @@ impl<'de> serde::Deserialize<'de> for BoolQueryShould {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common_query_dsl::QueryContainer> for BoolQueryShould {
+    fn from(value: crate::types::common_query_dsl::QueryContainer) -> Self {
+        BoolQueryShould::QueryContainer(Box::new(value))
+    }
+}
+impl From<Vec<crate::types::common_query_dsl::QueryContainer>> for BoolQueryShould {
+    fn from(value: Vec<crate::types::common_query_dsl::QueryContainer>) -> Self {
+        BoolQueryShould::Array(value)
     }
 }
 
@@ -275,6 +315,18 @@ impl<'de> serde::Deserialize<'de> for ChildScoreMode {
         })
     }
 }
+impl From<&str> for ChildScoreMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => ChildScoreMode::Avg,
+            "max" => ChildScoreMode::Max,
+            "min" => ChildScoreMode::Min,
+            "none" => ChildScoreMode::None,
+            "sum" => ChildScoreMode::Sum,
+            _ => ChildScoreMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CombinedFieldsOperator {
@@ -314,6 +366,15 @@ impl<'de> serde::Deserialize<'de> for CombinedFieldsOperator {
             "or" => CombinedFieldsOperator::Or,
             _ => CombinedFieldsOperator::Unknown(s),
         })
+    }
+}
+impl From<&str> for CombinedFieldsOperator {
+    fn from(s: &str) -> Self {
+        match s {
+            "and" => CombinedFieldsOperator::And,
+            "or" => CombinedFieldsOperator::Or,
+            _ => CombinedFieldsOperator::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -380,6 +441,15 @@ impl<'de> serde::Deserialize<'de> for CombinedFieldsZeroTerms {
         })
     }
 }
+impl From<&str> for CombinedFieldsZeroTerms {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => CombinedFieldsZeroTerms::All,
+            "none" => CombinedFieldsZeroTerms::None,
+            _ => CombinedFieldsZeroTerms::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -411,6 +481,21 @@ impl<'de> serde::Deserialize<'de> for CommonTermsQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for CommonTermsQuery {
+    fn from(value: String) -> Self {
+        CommonTermsQuery::Query(value)
+    }
+}
+impl From<&str> for CommonTermsQuery {
+    fn from(value: &str) -> Self {
+        CommonTermsQuery::Query(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::CommonTermsQueryObject> for CommonTermsQuery {
+    fn from(value: crate::types::common_query_dsl::CommonTermsQueryObject) -> Self {
+        CommonTermsQuery::Object(value)
     }
 }
 
@@ -726,6 +811,16 @@ impl<'de> serde::Deserialize<'de> for FieldAndFormat {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::Field> for FieldAndFormat {
+    fn from(value: crate::types::common::Field) -> Self {
+        FieldAndFormat::Field(value)
+    }
+}
+impl From<crate::types::common_query_dsl::FieldAndFormatObject> for FieldAndFormat {
+    fn from(value: crate::types::common_query_dsl::FieldAndFormatObject) -> Self {
+        FieldAndFormat::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldAndFormatObject {
@@ -818,6 +913,23 @@ impl<'de> serde::Deserialize<'de> for FieldValueFactorModifier {
         })
     }
 }
+impl From<&str> for FieldValueFactorModifier {
+    fn from(s: &str) -> Self {
+        match s {
+            "ln" => FieldValueFactorModifier::Ln,
+            "ln1p" => FieldValueFactorModifier::Ln1P,
+            "ln2p" => FieldValueFactorModifier::Ln2P,
+            "log" => FieldValueFactorModifier::Log,
+            "log1p" => FieldValueFactorModifier::Log1P,
+            "log2p" => FieldValueFactorModifier::Log2P,
+            "none" => FieldValueFactorModifier::None,
+            "reciprocal" => FieldValueFactorModifier::Reciprocal,
+            "sqrt" => FieldValueFactorModifier::Sqrt,
+            "square" => FieldValueFactorModifier::Square,
+            _ => FieldValueFactorModifier::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldValueFactorScoreFunction {
@@ -886,6 +998,19 @@ impl<'de> serde::Deserialize<'de> for FunctionBoostMode {
             "sum" => FunctionBoostMode::Sum,
             _ => FunctionBoostMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for FunctionBoostMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => FunctionBoostMode::Avg,
+            "max" => FunctionBoostMode::Max,
+            "min" => FunctionBoostMode::Min,
+            "multiply" => FunctionBoostMode::Multiply,
+            "replace" => FunctionBoostMode::Replace,
+            "sum" => FunctionBoostMode::Sum,
+            _ => FunctionBoostMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -963,6 +1088,19 @@ impl<'de> serde::Deserialize<'de> for FunctionScoreMode {
             "sum" => FunctionScoreMode::Sum,
             _ => FunctionScoreMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for FunctionScoreMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => FunctionScoreMode::Avg,
+            "first" => FunctionScoreMode::First,
+            "max" => FunctionScoreMode::Max,
+            "min" => FunctionScoreMode::Min,
+            "multiply" => FunctionScoreMode::Multiply,
+            "sum" => FunctionScoreMode::Sum,
+            _ => FunctionScoreMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1388,6 +1526,15 @@ impl<'de> serde::Deserialize<'de> for GeoExecution {
         })
     }
 }
+impl From<&str> for GeoExecution {
+    fn from(s: &str) -> Self {
+        match s {
+            "indexed" => GeoExecution::Indexed,
+            "memory" => GeoExecution::Memory,
+            _ => GeoExecution::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeoPolygonPoints {
@@ -1673,6 +1820,16 @@ impl<'de> serde::Deserialize<'de> for GeoValidationMethod {
         })
     }
 }
+impl From<&str> for GeoValidationMethod {
+    fn from(s: &str) -> Self {
+        match s {
+            "coerce" => GeoValidationMethod::Coerce,
+            "ignore_malformed" => GeoValidationMethod::IgnoreMalformed,
+            "strict" => GeoValidationMethod::Strict,
+            _ => GeoValidationMethod::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HasChildQuery {
@@ -1954,6 +2111,16 @@ impl<'de> serde::Deserialize<'de> for KnnQueryRescore {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<bool> for KnnQueryRescore {
+    fn from(value: bool) -> Self {
+        KnnQueryRescore::Enable(value)
+    }
+}
+impl From<crate::types::common_query_dsl::RescoreContext> for KnnQueryRescore {
+    fn from(value: crate::types::common_query_dsl::RescoreContext) -> Self {
+        KnnQueryRescore::Context(value)
+    }
+}
 
 #[doc = "Text that we want similar documents for or a lookup to a document's field for the text."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -1986,6 +2153,21 @@ impl<'de> serde::Deserialize<'de> for Like {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for Like {
+    fn from(value: String) -> Self {
+        Like::Text(value)
+    }
+}
+impl From<&str> for Like {
+    fn from(value: &str) -> Self {
+        Like::Text(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::LikeDocument> for Like {
+    fn from(value: crate::types::common_query_dsl::LikeDocument) -> Self {
+        Like::Document(value)
     }
 }
 
@@ -2055,6 +2237,21 @@ impl<'de> serde::Deserialize<'de> for MatchBoolPrefixQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for MatchBoolPrefixQuery {
+    fn from(value: String) -> Self {
+        MatchBoolPrefixQuery::Query(value)
+    }
+}
+impl From<&str> for MatchBoolPrefixQuery {
+    fn from(value: &str) -> Self {
+        MatchBoolPrefixQuery::Query(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::MatchBoolPrefixQueryObject> for MatchBoolPrefixQuery {
+    fn from(value: crate::types::common_query_dsl::MatchBoolPrefixQueryObject) -> Self {
+        MatchBoolPrefixQuery::Object(value)
     }
 }
 
@@ -2132,6 +2329,21 @@ impl<'de> serde::Deserialize<'de> for MatchPhrasePrefixQuery {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for MatchPhrasePrefixQuery {
+    fn from(value: String) -> Self {
+        MatchPhrasePrefixQuery::Query(value)
+    }
+}
+impl From<&str> for MatchPhrasePrefixQuery {
+    fn from(value: &str) -> Self {
+        MatchPhrasePrefixQuery::Query(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::MatchPhrasePrefixQueryObject> for MatchPhrasePrefixQuery {
+    fn from(value: crate::types::common_query_dsl::MatchPhrasePrefixQueryObject) -> Self {
+        MatchPhrasePrefixQuery::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MatchPhrasePrefixQueryObject {
@@ -2186,6 +2398,21 @@ impl<'de> serde::Deserialize<'de> for MatchPhraseQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for MatchPhraseQuery {
+    fn from(value: String) -> Self {
+        MatchPhraseQuery::Query(value)
+    }
+}
+impl From<&str> for MatchPhraseQuery {
+    fn from(value: &str) -> Self {
+        MatchPhraseQuery::Query(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::MatchPhraseQueryObject> for MatchPhraseQuery {
+    fn from(value: crate::types::common_query_dsl::MatchPhraseQueryObject) -> Self {
+        MatchPhraseQuery::Object(value)
     }
 }
 
@@ -2512,6 +2739,17 @@ impl<'de> serde::Deserialize<'de> for MultiValueMode {
         })
     }
 }
+impl From<&str> for MultiValueMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => MultiValueMode::Avg,
+            "max" => MultiValueMode::Max,
+            "min" => MultiValueMode::Min,
+            "sum" => MultiValueMode::Sum,
+            _ => MultiValueMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedQuery {
@@ -2627,6 +2865,21 @@ impl<'de> serde::Deserialize<'de> for NumberRangeQueryFrom {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<f64> for NumberRangeQueryFrom {
+    fn from(value: f64) -> Self {
+        NumberRangeQueryFrom::Number(value)
+    }
+}
+impl From<String> for NumberRangeQueryFrom {
+    fn from(value: String) -> Self {
+        NumberRangeQueryFrom::String(value)
+    }
+}
+impl From<&str> for NumberRangeQueryFrom {
+    fn from(value: &str) -> Self {
+        NumberRangeQueryFrom::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -2663,6 +2916,21 @@ impl<'de> serde::Deserialize<'de> for NumberRangeQueryTo {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<f64> for NumberRangeQueryTo {
+    fn from(value: f64) -> Self {
+        NumberRangeQueryTo::Number(value)
+    }
+}
+impl From<String> for NumberRangeQueryTo {
+    fn from(value: String) -> Self {
+        NumberRangeQueryTo::String(value)
+    }
+}
+impl From<&str> for NumberRangeQueryTo {
+    fn from(value: &str) -> Self {
+        NumberRangeQueryTo::String(value.to_string())
     }
 }
 
@@ -2714,6 +2982,15 @@ impl<'de> serde::Deserialize<'de> for Operator {
             "or" | "OR" => Operator::Or,
             _ => Operator::Unknown(s),
         })
+    }
+}
+impl From<&str> for Operator {
+    fn from(s: &str) -> Self {
+        match s {
+            "and" | "AND" => Operator::And,
+            "or" | "OR" => Operator::Or,
+            _ => Operator::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2796,6 +3073,21 @@ impl<'de> serde::Deserialize<'de> for PrefixQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for PrefixQuery {
+    fn from(value: String) -> Self {
+        PrefixQuery::Value(value)
+    }
+}
+impl From<&str> for PrefixQuery {
+    fn from(value: &str) -> Self {
+        PrefixQuery::Value(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::PrefixQueryObject> for PrefixQuery {
+    fn from(value: crate::types::common_query_dsl::PrefixQueryObject) -> Self {
+        PrefixQuery::Object(value)
     }
 }
 
@@ -3162,6 +3454,16 @@ impl<'de> serde::Deserialize<'de> for RangeRelation {
         })
     }
 }
+impl From<&str> for RangeRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "contains" => RangeRelation::Contains,
+            "intersects" => RangeRelation::Intersects,
+            "within" => RangeRelation::Within,
+            _ => RangeRelation::Unknown(s.to_string()),
+        }
+    }
+}
 
 pub type RankFeatureFunctionLinear = std::collections::BTreeMap<String, serde_json::Value>;
 
@@ -3235,6 +3537,21 @@ impl<'de> serde::Deserialize<'de> for RegexpQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for RegexpQuery {
+    fn from(value: String) -> Self {
+        RegexpQuery::Value(value)
+    }
+}
+impl From<&str> for RegexpQuery {
+    fn from(value: &str) -> Self {
+        RegexpQuery::Value(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::RegexpQueryObject> for RegexpQuery {
+    fn from(value: crate::types::common_query_dsl::RegexpQueryObject) -> Self {
+        RegexpQuery::Object(value)
     }
 }
 
@@ -3380,6 +3697,26 @@ impl<'de> serde::Deserialize<'de> for SimpleQueryStringFlag {
             "WHITESPACE" => SimpleQueryStringFlag::Whitespace,
             _ => SimpleQueryStringFlag::Unknown(s),
         })
+    }
+}
+impl From<&str> for SimpleQueryStringFlag {
+    fn from(s: &str) -> Self {
+        match s {
+            "ALL" => SimpleQueryStringFlag::All,
+            "AND" => SimpleQueryStringFlag::And,
+            "ESCAPE" => SimpleQueryStringFlag::Escape,
+            "FUZZY" => SimpleQueryStringFlag::Fuzzy,
+            "NEAR" => SimpleQueryStringFlag::Near,
+            "NONE" => SimpleQueryStringFlag::None,
+            "NOT" => SimpleQueryStringFlag::Not,
+            "OR" => SimpleQueryStringFlag::Or,
+            "PHRASE" => SimpleQueryStringFlag::Phrase,
+            "PRECEDENCE" => SimpleQueryStringFlag::Precedence,
+            "PREFIX" => SimpleQueryStringFlag::Prefix,
+            "SLOP" => SimpleQueryStringFlag::Slop,
+            "WHITESPACE" => SimpleQueryStringFlag::Whitespace,
+            _ => SimpleQueryStringFlag::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3619,6 +3956,21 @@ impl<'de> serde::Deserialize<'de> for SpanTermQuery {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for SpanTermQuery {
+    fn from(value: String) -> Self {
+        SpanTermQuery::Value(value)
+    }
+}
+impl From<&str> for SpanTermQuery {
+    fn from(value: &str) -> Self {
+        SpanTermQuery::Value(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::SpanTermQueryObject> for SpanTermQuery {
+    fn from(value: crate::types::common_query_dsl::SpanTermQueryObject) -> Self {
+        SpanTermQuery::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SpanTermQueryObject {
@@ -3833,6 +4185,16 @@ impl<'de> serde::Deserialize<'de> for TermsQueryField {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<crate::types::common::FieldValue>> for TermsQueryField {
+    fn from(value: Vec<crate::types::common::FieldValue>) -> Self {
+        TermsQueryField::Value(value)
+    }
+}
+impl From<crate::types::common_query_dsl::TermsLookup> for TermsQueryField {
+    fn from(value: crate::types::common_query_dsl::TermsLookup) -> Self {
+        TermsQueryField::Lookup(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TermsQueryValueType {
@@ -3872,6 +4234,15 @@ impl<'de> serde::Deserialize<'de> for TermsQueryValueType {
             "default" => TermsQueryValueType::Default,
             _ => TermsQueryValueType::Unknown(s),
         })
+    }
+}
+impl From<&str> for TermsQueryValueType {
+    fn from(s: &str) -> Self {
+        match s {
+            "bitmap" => TermsQueryValueType::Bitmap,
+            "default" => TermsQueryValueType::Default,
+            _ => TermsQueryValueType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3946,6 +4317,19 @@ impl<'de> serde::Deserialize<'de> for TextQueryType {
         })
     }
 }
+impl From<&str> for TextQueryType {
+    fn from(s: &str) -> Self {
+        match s {
+            "best_fields" => TextQueryType::BestFields,
+            "bool_prefix" => TextQueryType::BoolPrefix,
+            "cross_fields" => TextQueryType::CrossFields,
+            "most_fields" => TextQueryType::MostFields,
+            "phrase" => TextQueryType::Phrase,
+            "phrase_prefix" => TextQueryType::PhrasePrefix,
+            _ => TextQueryType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TypeQuery {
@@ -3988,6 +4372,21 @@ impl<'de> serde::Deserialize<'de> for WildcardQuery {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for WildcardQuery {
+    fn from(value: String) -> Self {
+        WildcardQuery::Value(value)
+    }
+}
+impl From<&str> for WildcardQuery {
+    fn from(value: &str) -> Self {
+        WildcardQuery::Value(value.to_string())
+    }
+}
+impl From<crate::types::common_query_dsl::WildcardQueryObject> for WildcardQuery {
+    fn from(value: crate::types::common_query_dsl::WildcardQueryObject) -> Self {
+        WildcardQuery::Object(value)
     }
 }
 
@@ -4179,5 +4578,14 @@ impl<'de> serde::Deserialize<'de> for ZeroTermsQuery {
             "none" | "NONE" => ZeroTermsQuery::None,
             _ => ZeroTermsQuery::Unknown(s),
         })
+    }
+}
+impl From<&str> for ZeroTermsQuery {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" | "ALL" => ZeroTermsQuery::All,
+            "none" | "NONE" => ZeroTermsQuery::None,
+            _ => ZeroTermsQuery::Unknown(s.to_string()),
+        }
     }
 }

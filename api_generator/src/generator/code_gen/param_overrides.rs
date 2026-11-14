@@ -11,8 +11,9 @@
 //! `opensearch/src/params.rs` outside the generated section.
 //!
 //! An override applies only when both name and kind match: the same name may
-//! carry different kinds on different endpoints (e.g. `slices` is an
-//! auto-or-integer union on most endpoints but a plain string on others).
+//! carry different kinds on different endpoints. Union parameters whose
+//! specification schema the legacy types cannot express take the type
+//! generated from that schema instead (`Type::model_ty`), not an override.
 
 use crate::generator::TypeKind;
 
@@ -67,14 +68,6 @@ const PARAM_TYPE_OVERRIDES: &[ParamTypeOverride] = &[
         field_ty: "&'b [ExpandWildcards]",
         fn_arg_ty: None,
         comma_separated: true,
-    },
-    // "auto"-or-integer union (_common___Slices)
-    ParamTypeOverride {
-        name: "slices",
-        applies_to: TypeKindMatch::Union,
-        field_ty: "Slices",
-        fn_arg_ty: None,
-        comma_separated: false,
     },
     // enum with digit values ("1".."5" plus "ALL",
     // security_analytics.alerts___AlertSeverityLevel), which the reader
@@ -137,12 +130,6 @@ mod tests {
     }
 
     #[test]
-    fn slices_overrides_union() {
-        let kind = TypeKind::Union(Box::new((TypeKind::String, TypeKind::Long)));
-        assert_eq!(param_type_override("slices", &kind, false), Some("Slices"));
-    }
-
-    #[test]
     fn severity_level_overrides_the_string_downgrade() {
         assert_eq!(
             param_type_override("severityLevel", &TypeKind::String, false),
@@ -161,11 +148,6 @@ mod tests {
 
     #[test]
     fn kind_mismatch_falls_through_to_the_general_mapping() {
-        // `slices` is a plain string on some endpoints
-        assert_eq!(
-            param_type_override("slices", &TypeKind::String, false),
-            None
-        );
         assert_eq!(
             param_type_override("track_total_hits", &TypeKind::String, false),
             None

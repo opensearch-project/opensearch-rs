@@ -178,6 +178,16 @@ impl<'de> serde::Deserialize<'de> for BoundaryScanner {
         })
     }
 }
+impl From<&str> for BoundaryScanner {
+    fn from(s: &str) -> Self {
+        match s {
+            "chars" => BoundaryScanner::Chars,
+            "sentence" => BoundaryScanner::Sentence,
+            "word" => BoundaryScanner::Word,
+            _ => BoundaryScanner::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BuiltinHighlighterType {
@@ -221,6 +231,16 @@ impl<'de> serde::Deserialize<'de> for BuiltinHighlighterType {
             "unified" => BuiltinHighlighterType::Unified,
             _ => BuiltinHighlighterType::Unknown(s),
         })
+    }
+}
+impl From<&str> for BuiltinHighlighterType {
+    fn from(s: &str) -> Self {
+        match s {
+            "plain" => BuiltinHighlighterType::Plain,
+            "fvh" => BuiltinHighlighterType::Fvh,
+            "unified" => BuiltinHighlighterType::Unified,
+            _ => BuiltinHighlighterType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -434,6 +454,16 @@ impl<'de> serde::Deserialize<'de> for FieldCollapseInnerHits {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::search::InnerHits> for FieldCollapseInnerHits {
+    fn from(value: crate::types::search::InnerHits) -> Self {
+        FieldCollapseInnerHits::InnerHits(Box::new(value))
+    }
+}
+impl From<Vec<crate::types::search::InnerHits>> for FieldCollapseInnerHits {
+    fn from(value: Vec<crate::types::search::InnerHits>) -> Self {
+        FieldCollapseInnerHits::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldSuggester {
@@ -616,6 +646,24 @@ impl<'de> serde::Deserialize<'de> for HighlightFields {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<std::collections::BTreeMap<String, crate::types::search::HighlightField>>
+    for HighlightFields
+{
+    fn from(
+        value: std::collections::BTreeMap<String, crate::types::search::HighlightField>,
+    ) -> Self {
+        HighlightFields::Object(value)
+    }
+}
+impl From<Vec<std::collections::BTreeMap<String, crate::types::search::HighlightField>>>
+    for HighlightFields
+{
+    fn from(
+        value: Vec<std::collections::BTreeMap<String, crate::types::search::HighlightField>>,
+    ) -> Self {
+        HighlightFields::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HighlighterEncoder {
@@ -655,6 +703,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterEncoder {
             "html" => HighlighterEncoder::Html,
             _ => HighlighterEncoder::Unknown(s),
         })
+    }
+}
+impl From<&str> for HighlighterEncoder {
+    fn from(s: &str) -> Self {
+        match s {
+            "default" => HighlighterEncoder::Default,
+            "html" => HighlighterEncoder::Html,
+            _ => HighlighterEncoder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -698,6 +755,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterFragmenter {
         })
     }
 }
+impl From<&str> for HighlighterFragmenter {
+    fn from(s: &str) -> Self {
+        match s {
+            "simple" => HighlighterFragmenter::Simple,
+            "span" => HighlighterFragmenter::Span,
+            _ => HighlighterFragmenter::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HighlighterOrder {
@@ -733,6 +799,14 @@ impl<'de> serde::Deserialize<'de> for HighlighterOrder {
             "score" => HighlighterOrder::Score,
             _ => HighlighterOrder::Unknown(s),
         })
+    }
+}
+impl From<&str> for HighlighterOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "score" => HighlighterOrder::Score,
+            _ => HighlighterOrder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -774,6 +848,15 @@ impl<'de> serde::Deserialize<'de> for HighlighterTagsSchema {
             "styled" => HighlighterTagsSchema::Styled,
             _ => HighlighterTagsSchema::Unknown(s),
         })
+    }
+}
+impl From<&str> for HighlighterTagsSchema {
+    fn from(s: &str) -> Self {
+        match s {
+            "default" => HighlighterTagsSchema::Default,
+            "styled" => HighlighterTagsSchema::Styled,
+            _ => HighlighterTagsSchema::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -1240,6 +1323,16 @@ impl<'de> serde::Deserialize<'de> for HitsMetadataHitsItemMatchedQueries {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for HitsMetadataHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        HitsMetadataHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>> for HitsMetadataHitsItemMatchedQueries {
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        HitsMetadataHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HitsMetadataJsonValue {
@@ -1674,6 +1767,16 @@ impl<'de> serde::Deserialize<'de> for HitsMetadataJsonValueHitsItemMatchedQuerie
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for HitsMetadataJsonValueHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        HitsMetadataJsonValueHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>> for HitsMetadataJsonValueHitsItemMatchedQueries {
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        HitsMetadataJsonValueHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -1708,6 +1811,16 @@ impl<'de> serde::Deserialize<'de> for HitsMetadataJsonValueTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for HitsMetadataJsonValueTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        HitsMetadataJsonValueTotal::TotalHits(value)
+    }
+}
+impl From<i64> for HitsMetadataJsonValueTotal {
+    fn from(value: i64) -> Self {
+        HitsMetadataJsonValueTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for HitsMetadataJsonValueTotal {
@@ -1776,6 +1889,16 @@ impl<'de> serde::Deserialize<'de> for HitsMetadataTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for HitsMetadataTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        HitsMetadataTotal::TotalHits(value)
+    }
+}
+impl From<i64> for HitsMetadataTotal {
+    fn from(value: i64) -> Self {
+        HitsMetadataTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for HitsMetadataTotal {
@@ -1948,6 +2071,16 @@ impl<'de> serde::Deserialize<'de> for PhraseSuggestOptions {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::PhraseSuggestOption> for PhraseSuggestOptions {
+    fn from(value: crate::types::search::PhraseSuggestOption) -> Self {
+        PhraseSuggestOptions::PhraseSuggestOption(value)
+    }
+}
+impl From<Vec<crate::types::search::PhraseSuggestOption>> for PhraseSuggestOptions {
+    fn from(value: Vec<crate::types::search::PhraseSuggestOption>) -> Self {
+        PhraseSuggestOptions::Array(value)
     }
 }
 
@@ -2521,6 +2654,16 @@ impl<'de> serde::Deserialize<'de> for SearchResponseHitsHitsItemMatchedQueries {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for SearchResponseHitsHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        SearchResponseHitsHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>> for SearchResponseHitsHitsItemMatchedQueries {
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        SearchResponseHitsHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -2555,6 +2698,16 @@ impl<'de> serde::Deserialize<'de> for SearchResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for SearchResponseHitsTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        SearchResponseHitsTotal::TotalHits(value)
+    }
+}
+impl From<i64> for SearchResponseHitsTotal {
+    fn from(value: i64) -> Self {
+        SearchResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchResponseHitsTotal {
@@ -3056,6 +3209,16 @@ impl<'de> serde::Deserialize<'de> for SearchResultHitsHitsItemMatchedQueries {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<Vec<String>> for SearchResultHitsHitsItemMatchedQueries {
+    fn from(value: Vec<String>) -> Self {
+        SearchResultHitsHitsItemMatchedQueries::Names(value)
+    }
+}
+impl From<std::collections::BTreeMap<String, f64>> for SearchResultHitsHitsItemMatchedQueries {
+    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
+        SearchResultHitsHitsItemMatchedQueries::Scores(value)
+    }
+}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -3090,6 +3253,16 @@ impl<'de> serde::Deserialize<'de> for SearchResultHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::TotalHits> for SearchResultHitsTotal {
+    fn from(value: crate::types::search::TotalHits) -> Self {
+        SearchResultHitsTotal::TotalHits(value)
+    }
+}
+impl From<i64> for SearchResultHitsTotal {
+    fn from(value: i64) -> Self {
+        SearchResultHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchResultHitsTotal {
@@ -3263,6 +3436,18 @@ impl<'de> serde::Deserialize<'de> for StringDistance {
         })
     }
 }
+impl From<&str> for StringDistance {
+    fn from(s: &str) -> Self {
+        match s {
+            "damerau_levenshtein" => StringDistance::DamerauLevenshtein,
+            "internal" => StringDistance::Internal,
+            "jaro_winkler" => StringDistance::JaroWinkler,
+            "levenshtein" => StringDistance::Levenshtein,
+            "ngram" => StringDistance::Ngram,
+            _ => StringDistance::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StupidBackoffSmoothingModel {
@@ -3345,6 +3530,18 @@ impl<'de> serde::Deserialize<'de> for SuggestCompletionOptions {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::search::SuggestCompletionOptionsObject> for SuggestCompletionOptions {
+    fn from(value: crate::types::search::SuggestCompletionOptionsObject) -> Self {
+        SuggestCompletionOptions::Object(value)
+    }
+}
+impl From<Vec<crate::types::search::SuggestCompletionOptionsArrayItem>>
+    for SuggestCompletionOptions
+{
+    fn from(value: Vec<crate::types::search::SuggestCompletionOptionsArrayItem>) -> Self {
+        SuggestCompletionOptions::Array(value)
     }
 }
 
@@ -3479,6 +3676,15 @@ impl<'de> serde::Deserialize<'de> for SuggestSort {
         })
     }
 }
+impl From<&str> for SuggestSort {
+    fn from(s: &str) -> Self {
+        match s {
+            "frequency" => SuggestSort::Frequency,
+            "score" => SuggestSort::Score,
+            _ => SuggestSort::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Suggester {
@@ -3603,6 +3809,16 @@ impl<'de> serde::Deserialize<'de> for TermSuggestOptions {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::search::TermSuggestOption> for TermSuggestOptions {
+    fn from(value: crate::types::search::TermSuggestOption) -> Self {
+        TermSuggestOptions::TermSuggestOption(value)
+    }
+}
+impl From<Vec<crate::types::search::TermSuggestOption>> for TermSuggestOptions {
+    fn from(value: Vec<crate::types::search::TermSuggestOption>) -> Self {
+        TermSuggestOptions::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TermSuggester {
@@ -3683,6 +3899,15 @@ impl<'de> serde::Deserialize<'de> for TotalHitsRelation {
         })
     }
 }
+impl From<&str> for TotalHitsRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "eq" => TotalHitsRelation::Eq,
+            "gte" => TotalHitsRelation::Gte,
+            _ => TotalHitsRelation::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The number of hits matching the query. When `true`, the exact number of hits is returned at the cost of some performance. When `false`, the response does not include the total number of hits matching the query. Default is `10,000` hits."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -3715,5 +3940,15 @@ impl<'de> serde::Deserialize<'de> for TrackHits {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<bool> for TrackHits {
+    fn from(value: bool) -> Self {
+        TrackHits::Enabled(value)
+    }
+}
+impl From<i32> for TrackHits {
+    fn from(value: i32) -> Self {
+        TrackHits::Count(value)
     }
 }

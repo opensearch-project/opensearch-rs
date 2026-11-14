@@ -137,3 +137,13 @@ impl<'de> serde::Deserialize<'de> for ResiliencyMode {
         })
     }
 }
+impl From<&str> for ResiliencyMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "enforced" => ResiliencyMode::Enforced,
+            "monitor" => ResiliencyMode::Monitor,
+            "soft" => ResiliencyMode::Soft,
+            _ => ResiliencyMode::Unknown(s.to_string()),
+        }
+    }
+}

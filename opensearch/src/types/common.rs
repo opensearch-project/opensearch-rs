@@ -82,6 +82,17 @@ impl<'de> serde::Deserialize<'de> for ActionStatusOptions {
         })
     }
 }
+impl From<&str> for ActionStatusOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "failure" => ActionStatusOptions::Failure,
+            "simulated" => ActionStatusOptions::Simulated,
+            "success" => ActionStatusOptions::Success,
+            "throttled" => ActionStatusOptions::Throttled,
+            _ => ActionStatusOptions::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BuiltinScriptLanguage {
@@ -129,6 +140,17 @@ impl<'de> serde::Deserialize<'de> for BuiltinScriptLanguage {
             "painless" => BuiltinScriptLanguage::Painless,
             _ => BuiltinScriptLanguage::Unknown(s),
         })
+    }
+}
+impl From<&str> for BuiltinScriptLanguage {
+    fn from(s: &str) -> Self {
+        match s {
+            "expression" => BuiltinScriptLanguage::Expression,
+            "java" => BuiltinScriptLanguage::Java,
+            "mustache" => BuiltinScriptLanguage::Mustache,
+            "painless" => BuiltinScriptLanguage::Painless,
+            _ => BuiltinScriptLanguage::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -372,6 +394,16 @@ impl<'de> serde::Deserialize<'de> for DFIIndependenceMeasure {
         })
     }
 }
+impl From<&str> for DFIIndependenceMeasure {
+    fn from(s: &str) -> Self {
+        match s {
+            "chisquared" => DFIIndependenceMeasure::Chisquared,
+            "saturated" => DFIIndependenceMeasure::Saturated,
+            "standardized" => DFIIndependenceMeasure::Standardized,
+            _ => DFIIndependenceMeasure::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DFRAfterEffect {
@@ -415,6 +447,16 @@ impl<'de> serde::Deserialize<'de> for DFRAfterEffect {
             "no" => DFRAfterEffect::No,
             _ => DFRAfterEffect::Unknown(s),
         })
+    }
+}
+impl From<&str> for DFRAfterEffect {
+    fn from(s: &str) -> Self {
+        match s {
+            "b" => DFRAfterEffect::B,
+            "l" => DFRAfterEffect::L,
+            "no" => DFRAfterEffect::No,
+            _ => DFRAfterEffect::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -478,6 +520,20 @@ impl<'de> serde::Deserialize<'de> for DFRBasicModel {
         })
     }
 }
+impl From<&str> for DFRBasicModel {
+    fn from(s: &str) -> Self {
+        match s {
+            "be" => DFRBasicModel::Be,
+            "d" => DFRBasicModel::D,
+            "g" => DFRBasicModel::G,
+            "if" => DFRBasicModel::If,
+            "in" => DFRBasicModel::In,
+            "ine" => DFRBasicModel::Ine,
+            "p" => DFRBasicModel::P,
+            _ => DFRBasicModel::Unknown(s.to_string()),
+        }
+    }
+}
 
 pub type DataStreamName = String;
 
@@ -519,6 +575,21 @@ impl<'de> serde::Deserialize<'de> for DateTime {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for DateTime {
+    fn from(value: String) -> Self {
+        DateTime::String(value)
+    }
+}
+impl From<&str> for DateTime {
+    fn from(value: &str) -> Self {
+        DateTime::String(value.to_string())
+    }
+}
+impl From<crate::types::common::EpochTimeUnitMillis> for DateTime {
+    fn from(value: crate::types::common::EpochTimeUnitMillis) -> Self {
+        DateTime::EpochTimeUnitMillis(value)
     }
 }
 
@@ -590,6 +661,22 @@ impl<'de> serde::Deserialize<'de> for DistanceUnit {
             "yd" => DistanceUnit::Yd,
             _ => DistanceUnit::Unknown(s),
         })
+    }
+}
+impl From<&str> for DistanceUnit {
+    fn from(s: &str) -> Self {
+        match s {
+            "cm" => DistanceUnit::Cm,
+            "ft" => DistanceUnit::Ft,
+            "in" => DistanceUnit::In,
+            "km" => DistanceUnit::Km,
+            "m" => DistanceUnit::M,
+            "mi" => DistanceUnit::Mi,
+            "mm" => DistanceUnit::Mm,
+            "nmi" => DistanceUnit::Nmi,
+            "yd" => DistanceUnit::Yd,
+            _ => DistanceUnit::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -910,6 +997,17 @@ impl<'de> serde::Deserialize<'de> for FieldSortNumericType {
         })
     }
 }
+impl From<&str> for FieldSortNumericType {
+    fn from(s: &str) -> Self {
+        match s {
+            "date" => FieldSortNumericType::Date,
+            "date_nanos" => FieldSortNumericType::DateNanos,
+            "double" => FieldSortNumericType::Double,
+            "long" => FieldSortNumericType::Long,
+            _ => FieldSortNumericType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "A field value."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -947,6 +1045,26 @@ impl<'de> serde::Deserialize<'de> for FieldValue {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<bool> for FieldValue {
+    fn from(value: bool) -> Self {
+        FieldValue::Boolean(value)
+    }
+}
+impl From<f64> for FieldValue {
+    fn from(value: f64) -> Self {
+        FieldValue::Number(value)
+    }
+}
+impl From<String> for FieldValue {
+    fn from(value: String) -> Self {
+        FieldValue::String(value)
+    }
+}
+impl From<&str> for FieldValue {
+    fn from(value: &str) -> Self {
+        FieldValue::String(value.to_string())
     }
 }
 
@@ -1002,6 +1120,16 @@ impl<'de> serde::Deserialize<'de> for Fields {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::Field> for Fields {
+    fn from(value: crate::types::common::Field) -> Self {
+        Fields::Field(value)
+    }
+}
+impl From<Vec<crate::types::common::Field>> for Fields {
+    fn from(value: Vec<crate::types::common::Field>) -> Self {
+        Fields::Array(value)
+    }
+}
 
 #[doc = "The statistics about flush operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1045,6 +1173,21 @@ impl<'de> serde::Deserialize<'de> for Fuzziness {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<String> for Fuzziness {
+    fn from(value: String) -> Self {
+        Fuzziness::String(value)
+    }
+}
+impl From<&str> for Fuzziness {
+    fn from(value: &str) -> Self {
+        Fuzziness::String(value.to_string())
+    }
+}
+impl From<i32> for Fuzziness {
+    fn from(value: i32) -> Self {
+        Fuzziness::Integer(value)
     }
 }
 
@@ -1304,6 +1447,15 @@ impl<'de> serde::Deserialize<'de> for GeoDistanceType {
         })
     }
 }
+impl From<&str> for GeoDistanceType {
+    fn from(s: &str) -> Self {
+        match s {
+            "arc" => GeoDistanceType::Arc,
+            "plane" => GeoDistanceType::Plane,
+            _ => GeoDistanceType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The geohash string representation of a geographical location."]
 pub type GeoHash = String;
@@ -1347,6 +1499,21 @@ impl<'de> serde::Deserialize<'de> for GeoHashPrecision {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for GeoHashPrecision {
+    fn from(value: i32) -> Self {
+        GeoHashPrecision::GeohashLength(value)
+    }
+}
+impl From<String> for GeoHashPrecision {
+    fn from(value: String) -> Self {
+        GeoHashPrecision::Distance(value)
+    }
+}
+impl From<&str> for GeoHashPrecision {
+    fn from(value: &str) -> Self {
+        GeoHashPrecision::Distance(value.to_string())
     }
 }
 
@@ -1438,6 +1605,17 @@ impl<'de> serde::Deserialize<'de> for GeoShapeRelation {
         })
     }
 }
+impl From<&str> for GeoShapeRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "contains" => GeoShapeRelation::Contains,
+            "disjoint" => GeoShapeRelation::Disjoint,
+            "intersects" => GeoShapeRelation::Intersects,
+            "within" => GeoShapeRelation::Within,
+            _ => GeoShapeRelation::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "A map tile reference, represented as `{zoom}/{x}/{y}`."]
 pub type GeoTile = String;
@@ -1511,6 +1689,16 @@ impl<'de> serde::Deserialize<'de> for HealthStatus {
         })
     }
 }
+impl From<&str> for HealthStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "green" | "GREEN" => HealthStatus::Green,
+            "yellow" | "YELLOW" => HealthStatus::Yellow,
+            "red" | "RED" => HealthStatus::Red,
+            _ => HealthStatus::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The hostname or IP address."]
 pub type Host = String;
@@ -1562,6 +1750,15 @@ impl<'de> serde::Deserialize<'de> for IBDistribution {
         })
     }
 }
+impl From<&str> for IBDistribution {
+    fn from(s: &str) -> Self {
+        match s {
+            "ll" => IBDistribution::Ll,
+            "spl" => IBDistribution::Spl,
+            _ => IBDistribution::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IBLambda {
@@ -1603,6 +1800,15 @@ impl<'de> serde::Deserialize<'de> for IBLambda {
         })
     }
 }
+impl From<&str> for IBLambda {
+    fn from(s: &str) -> Self {
+        match s {
+            "df" => IBLambda::Df,
+            "ttf" => IBLambda::Ttf,
+            _ => IBLambda::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The unique identifier for a resource."]
 pub type Id = String;
@@ -1637,6 +1843,16 @@ impl<'de> serde::Deserialize<'de> for Ids {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::Id> for Ids {
+    fn from(value: crate::types::common::Id) -> Self {
+        Ids::Id(value)
+    }
+}
+impl From<Vec<crate::types::common::Id>> for Ids {
+    fn from(value: Vec<crate::types::common::Id>) -> Self {
+        Ids::Array(value)
     }
 }
 
@@ -1712,6 +1928,16 @@ impl<'de> serde::Deserialize<'de> for Indices {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::IndexName> for Indices {
+    fn from(value: crate::types::common::IndexName) -> Self {
+        Indices::IndexName(value)
+    }
+}
+impl From<Vec<crate::types::common::IndexName>> for Indices {
+    fn from(value: Vec<crate::types::common::IndexName>) -> Self {
+        Indices::Array(value)
     }
 }
 
@@ -2090,6 +2316,21 @@ impl<'de> serde::Deserialize<'de> for InlineScript {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for InlineScript {
+    fn from(value: String) -> Self {
+        InlineScript::Source(value)
+    }
+}
+impl From<&str> for InlineScript {
+    fn from(value: &str) -> Self {
+        InlineScript::Source(value.to_string())
+    }
+}
+impl From<crate::types::common::InlineScriptObject> for InlineScript {
+    fn from(value: crate::types::common::InlineScriptObject) -> Self {
+        InlineScript::Object(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct InlineScriptObject {
@@ -2200,6 +2441,21 @@ impl<'de> serde::Deserialize<'de> for MinimumShouldMatch {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<i32> for MinimumShouldMatch {
+    fn from(value: i32) -> Self {
+        MinimumShouldMatch::Integer(value)
+    }
+}
+impl From<String> for MinimumShouldMatch {
+    fn from(value: String) -> Self {
+        MinimumShouldMatch::String(value)
+    }
+}
+impl From<&str> for MinimumShouldMatch {
+    fn from(value: &str) -> Self {
+        MinimumShouldMatch::String(value.to_string())
+    }
+}
 
 pub type MultiTermQueryRewrite = String;
 
@@ -2237,6 +2493,16 @@ impl<'de> serde::Deserialize<'de> for Names {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::Name> for Names {
+    fn from(value: crate::types::common::Name) -> Self {
+        Names::Name(value)
+    }
+}
+impl From<Vec<crate::types::common::Name>> for Names {
+    fn from(value: Vec<crate::types::common::Name>) -> Self {
+        Names::Array(value)
     }
 }
 
@@ -2305,6 +2571,16 @@ impl<'de> serde::Deserialize<'de> for NodeIds {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::NodeId> for NodeIds {
+    fn from(value: crate::types::common::NodeId) -> Self {
+        NodeIds::NodeId(value)
+    }
+}
+impl From<Vec<crate::types::common::NodeId>> for NodeIds {
+    fn from(value: Vec<crate::types::common::NodeId>) -> Self {
+        NodeIds::Array(value)
     }
 }
 
@@ -2401,6 +2677,28 @@ impl<'de> serde::Deserialize<'de> for NodeRole {
             "cluster_manager" => NodeRole::ClusterManager,
             _ => NodeRole::Unknown(s),
         })
+    }
+}
+impl From<&str> for NodeRole {
+    fn from(s: &str) -> Self {
+        match s {
+            "client" => NodeRole::Client,
+            "coordinating_only" => NodeRole::CoordinatingOnly,
+            "data" => NodeRole::Data,
+            "data_cold" => NodeRole::DataCold,
+            "data_content" => NodeRole::DataContent,
+            "data_frozen" => NodeRole::DataFrozen,
+            "data_hot" => NodeRole::DataHot,
+            "data_warm" => NodeRole::DataWarm,
+            "ingest" => NodeRole::Ingest,
+            "ml" => NodeRole::Ml,
+            "remote_cluster_client" => NodeRole::RemoteClusterClient,
+            "transform" => NodeRole::Transform,
+            "voting_only" => NodeRole::VotingOnly,
+            "master" => NodeRole::Master,
+            "cluster_manager" => NodeRole::ClusterManager,
+            _ => NodeRole::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -2799,6 +3097,18 @@ impl<'de> serde::Deserialize<'de> for Result {
         })
     }
 }
+impl From<&str> for Result {
+    fn from(s: &str) -> Self {
+        match s {
+            "created" => Result::Created,
+            "deleted" => Result::Deleted,
+            "noop" => Result::Noop,
+            "not_found" => Result::NotFound,
+            "updated" => Result::Updated,
+            _ => Result::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The retry statistics for bulk and search operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2948,6 +3258,16 @@ impl<'de> serde::Deserialize<'de> for ScriptSortType {
             "version" => ScriptSortType::Version,
             _ => ScriptSortType::Unknown(s),
         })
+    }
+}
+impl From<&str> for ScriptSortType {
+    fn from(s: &str) -> Self {
+        match s {
+            "number" => ScriptSortType::Number,
+            "string" => ScriptSortType::String,
+            "version" => ScriptSortType::Version,
+            _ => ScriptSortType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3241,6 +3561,104 @@ pub struct SlicedScroll {
     pub max: i32,
 }
 
+#[doc = "The slice configuration used to parallelize a process."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum Slices {
+    Count(i32),
+    Calculation(crate::types::common::SlicesCalculation),
+}
+impl<'de> serde::Deserialize<'de> for Slices {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(Slices::Count),
+            Some(b'"') => serde_json::from_str(text).map(Slices::Calculation),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "Slices"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for Slices {
+    fn from(value: i32) -> Self {
+        Slices::Count(value)
+    }
+}
+impl From<crate::types::common::SlicesCalculation> for Slices {
+    fn from(value: crate::types::common::SlicesCalculation) -> Self {
+        Slices::Calculation(value)
+    }
+}
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for Slices {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return Slices::Count(value);
+        }
+        Slices::Calculation(crate::types::common::SlicesCalculation::from(s))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SlicesCalculation {
+    #[doc = "`auto`"]
+    Auto,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SlicesCalculation {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SlicesCalculation::Auto => "auto",
+            SlicesCalculation::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SlicesCalculation {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SlicesCalculation {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "auto" => SlicesCalculation::Auto,
+            _ => SlicesCalculation::Unknown(s),
+        })
+    }
+}
+impl From<&str> for SlicesCalculation {
+    fn from(s: &str) -> Self {
+        match s {
+            "auto" => SlicesCalculation::Auto,
+            _ => SlicesCalculation::Unknown(s.to_string()),
+        }
+    }
+}
+
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
@@ -3370,6 +3788,18 @@ impl<'de> serde::Deserialize<'de> for SortMode {
         })
     }
 }
+impl From<&str> for SortMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "avg" => SortMode::Avg,
+            "max" => SortMode::Max,
+            "median" => SortMode::Median,
+            "min" => SortMode::Min,
+            "sum" => SortMode::Sum,
+            _ => SortMode::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SortOptions {
@@ -3423,6 +3853,15 @@ impl<'de> serde::Deserialize<'de> for SortOrder {
             "desc" => SortOrder::Desc,
             _ => SortOrder::Unknown(s),
         })
+    }
+}
+impl From<&str> for SortOrder {
+    fn from(s: &str) -> Self {
+        match s {
+            "asc" => SortOrder::Asc,
+            "desc" => SortOrder::Desc,
+            _ => SortOrder::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3491,6 +3930,21 @@ impl<'de> serde::Deserialize<'de> for StringOrStringArray {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for StringOrStringArray {
+    fn from(value: String) -> Self {
+        StringOrStringArray::String(value)
+    }
+}
+impl From<&str> for StringOrStringArray {
+    fn from(value: &str) -> Self {
+        StringOrStringArray::String(value.to_string())
+    }
+}
+impl From<Vec<String>> for StringOrStringArray {
+    fn from(value: Vec<String>) -> Self {
+        StringOrStringArray::Array(value)
+    }
+}
 
 #[doc = "Certain APIs may return values, including numbers such as epoch timestamps, as strings. This setting captures this behavior while keeping the semantics of the field type.  Depending on the target language, code generators can keep the union or remove it and leniently parse strings to the target type."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -3523,6 +3977,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedBoolean {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<bool> for StringifiedBoolean {
+    fn from(value: bool) -> Self {
+        StringifiedBoolean::Boolean(value)
+    }
+}
+impl From<String> for StringifiedBoolean {
+    fn from(value: String) -> Self {
+        StringifiedBoolean::String(value)
+    }
+}
+impl From<&str> for StringifiedBoolean {
+    fn from(value: &str) -> Self {
+        StringifiedBoolean::String(value.to_string())
     }
 }
 
@@ -3558,6 +4027,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedDouble {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<f64> for StringifiedDouble {
+    fn from(value: f64) -> Self {
+        StringifiedDouble::Number(value)
+    }
+}
+impl From<String> for StringifiedDouble {
+    fn from(value: String) -> Self {
+        StringifiedDouble::String(value)
+    }
+}
+impl From<&str> for StringifiedDouble {
+    fn from(value: &str) -> Self {
+        StringifiedDouble::String(value.to_string())
     }
 }
 
@@ -3596,6 +4080,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedEpochTimeUnitMillis {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::EpochTimeUnitMillis> for StringifiedEpochTimeUnitMillis {
+    fn from(value: crate::types::common::EpochTimeUnitMillis) -> Self {
+        StringifiedEpochTimeUnitMillis::EpochTimeUnitMillis(value)
+    }
+}
+impl From<String> for StringifiedEpochTimeUnitMillis {
+    fn from(value: String) -> Self {
+        StringifiedEpochTimeUnitMillis::String(value)
+    }
+}
+impl From<&str> for StringifiedEpochTimeUnitMillis {
+    fn from(value: &str) -> Self {
+        StringifiedEpochTimeUnitMillis::String(value.to_string())
+    }
+}
 
 #[doc = "Certain APIs may return values, including numbers such as epoch timestamps, as strings. This setting captures this behavior while keeping the semantics of the field type.  Depending on the target language, code generators can keep the union or remove it and leniently parse strings to the target type."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -3629,6 +4128,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedEpochTimeUnitSeconds {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::EpochTimeUnitSeconds> for StringifiedEpochTimeUnitSeconds {
+    fn from(value: crate::types::common::EpochTimeUnitSeconds) -> Self {
+        StringifiedEpochTimeUnitSeconds::EpochTimeUnitSeconds(value)
+    }
+}
+impl From<String> for StringifiedEpochTimeUnitSeconds {
+    fn from(value: String) -> Self {
+        StringifiedEpochTimeUnitSeconds::String(value)
+    }
+}
+impl From<&str> for StringifiedEpochTimeUnitSeconds {
+    fn from(value: &str) -> Self {
+        StringifiedEpochTimeUnitSeconds::String(value.to_string())
     }
 }
 
@@ -3667,6 +4181,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedInteger {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<i64> for StringifiedInteger {
+    fn from(value: i64) -> Self {
+        StringifiedInteger::Integer(value)
+    }
+}
+impl From<String> for StringifiedInteger {
+    fn from(value: String) -> Self {
+        StringifiedInteger::String(value)
+    }
+}
+impl From<&str> for StringifiedInteger {
+    fn from(value: &str) -> Self {
+        StringifiedInteger::String(value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -3700,6 +4229,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedLong {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i64> for StringifiedLong {
+    fn from(value: i64) -> Self {
+        StringifiedLong::Integer(value)
+    }
+}
+impl From<String> for StringifiedLong {
+    fn from(value: String) -> Self {
+        StringifiedLong::String(value)
+    }
+}
+impl From<&str> for StringifiedLong {
+    fn from(value: &str) -> Self {
+        StringifiedLong::String(value.to_string())
     }
 }
 
@@ -3736,6 +4280,21 @@ impl<'de> serde::Deserialize<'de> for StringifiedVersionNumber {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::VersionNumber> for StringifiedVersionNumber {
+    fn from(value: crate::types::common::VersionNumber) -> Self {
+        StringifiedVersionNumber::VersionNumber(value)
+    }
+}
+impl From<String> for StringifiedVersionNumber {
+    fn from(value: String) -> Self {
+        StringifiedVersionNumber::String(value)
+    }
+}
+impl From<&str> for StringifiedVersionNumber {
+    fn from(value: &str) -> Self {
+        StringifiedVersionNumber::String(value.to_string())
     }
 }
 
@@ -3781,6 +4340,16 @@ impl<'de> serde::Deserialize<'de> for SuggestMode {
             "popular" => SuggestMode::Popular,
             _ => SuggestMode::Unknown(s),
         })
+    }
+}
+impl From<&str> for SuggestMode {
+    fn from(s: &str) -> Self {
+        match s {
+            "always" => SuggestMode::Always,
+            "missing" => SuggestMode::Missing,
+            "popular" => SuggestMode::Popular,
+            _ => SuggestMode::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3850,6 +4419,18 @@ impl<'de> serde::Deserialize<'de> for TermFrequencyNormalization {
             "z" => TermFrequencyNormalization::Z,
             _ => TermFrequencyNormalization::Unknown(s),
         })
+    }
+}
+impl From<&str> for TermFrequencyNormalization {
+    fn from(s: &str) -> Self {
+        match s {
+            "h1" => TermFrequencyNormalization::H1,
+            "h2" => TermFrequencyNormalization::H2,
+            "h3" => TermFrequencyNormalization::H3,
+            "no" => TermFrequencyNormalization::No,
+            "z" => TermFrequencyNormalization::Z,
+            _ => TermFrequencyNormalization::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -3983,9 +4564,119 @@ impl<'de> serde::Deserialize<'de> for VersionType {
         })
     }
 }
+impl From<&str> for VersionType {
+    fn from(s: &str) -> Self {
+        match s {
+            "external" => VersionType::External,
+            "external_gte" => VersionType::ExternalGte,
+            "internal" => VersionType::Internal,
+            _ => VersionType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[doc = "The absence of any type. This is commonly used in APIs that don't return a body.  Although \"void\" is generally used for a unit type that has only one value, this is interpreted as the bottom type, which has no value. Most languages have a unit type, but few have a bottom type.  See https://en.m.wikipedia.org/wiki/Unit_type and https://en.m.wikipedia.org/wiki/Bottom_type."]
 pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WaitForActiveShardOptions {
+    #[doc = "`all`"]
+    All,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl WaitForActiveShardOptions {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            WaitForActiveShardOptions::All => "all",
+            WaitForActiveShardOptions::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for WaitForActiveShardOptions {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShardOptions {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s),
+        })
+    }
+}
+impl From<&str> for WaitForActiveShardOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s.to_string()),
+        }
+    }
+}
+
+#[doc = "Waits until the specified number of shards is active before returning a response. Use `all` for all shards."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum WaitForActiveShards {
+    Count(i32),
+    Option(crate::types::common::WaitForActiveShardOptions),
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShards {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => {
+                serde_json::from_str(text).map(WaitForActiveShards::Count)
+            }
+            Some(b'"') => serde_json::from_str(text).map(WaitForActiveShards::Option),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "WaitForActiveShards"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for WaitForActiveShards {
+    fn from(value: i32) -> Self {
+        WaitForActiveShards::Count(value)
+    }
+}
+impl From<crate::types::common::WaitForActiveShardOptions> for WaitForActiveShards {
+    fn from(value: crate::types::common::WaitForActiveShardOptions) -> Self {
+        WaitForActiveShards::Option(value)
+    }
+}
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for WaitForActiveShards {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return WaitForActiveShards::Count(value);
+        }
+        WaitForActiveShards::Option(crate::types::common::WaitForActiveShardOptions::from(s))
+    }
+}
 
 #[doc = "The statistics about index warmer operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -4074,5 +4765,25 @@ impl<'de> serde::Deserialize<'de> for XyLocation {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::XyCartesianCoordinates> for XyLocation {
+    fn from(value: crate::types::common::XyCartesianCoordinates) -> Self {
+        XyLocation::Cartesian(value)
+    }
+}
+impl From<Vec<f64>> for XyLocation {
+    fn from(value: Vec<f64>) -> Self {
+        XyLocation::Coords(value)
+    }
+}
+impl From<String> for XyLocation {
+    fn from(value: String) -> Self {
+        XyLocation::Text(value)
+    }
+}
+impl From<&str> for XyLocation {
+    fn from(value: &str) -> Self {
+        XyLocation::Text(value.to_string())
     }
 }

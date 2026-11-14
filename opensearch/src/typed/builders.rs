@@ -158,7 +158,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -295,7 +298,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -615,7 +621,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -813,7 +822,10 @@ impl<'a, 'b> TypedDelete<'a, 'b> {
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -1081,7 +1093,7 @@ where
         }
     }
     #[doc = "The number of slices this task should be divided into."]
-    pub fn slices(self, slices: &'b str) -> Self {
+    pub fn slices<T: Into<crate::types::common::Slices>>(self, slices: T) -> Self {
         Self {
             inner: self.inner.slices(slices),
         }
@@ -1123,7 +1135,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -2158,7 +2173,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -2945,7 +2963,7 @@ where
         }
     }
     #[doc = "The number of slices this task should be divided into.\nDefaults to 1 slice, meaning the task isn't sliced into subtasks."]
-    pub fn slices(self, slices: &'b str) -> Self {
+    pub fn slices<T: Into<crate::types::common::Slices>>(self, slices: T) -> Self {
         Self {
             inner: self.inner.slices(slices),
         }
@@ -2963,7 +2981,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -4152,7 +4173,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operations.\nSet to 'all' or any positive integer up to the total number of shards in the index\n(number_of_replicas+1). Defaults to 1 meaning the primary shard."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -4373,7 +4397,7 @@ where
         }
     }
     #[doc = "The number of slices this task should be divided into."]
-    pub fn slices(self, slices: &'b str) -> Self {
+    pub fn slices<T: Into<crate::types::common::Slices>>(self, slices: T) -> Self {
         Self {
             inner: self.inner.slices(slices),
         }
@@ -4415,7 +4439,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -6147,7 +6174,7 @@ impl<'a, 'b> TypedCatNodes<'a, 'b> {
         }
     }
     #[doc = "When `true`, returns the full node ID. When `false`, returns the shortened node ID."]
-    pub fn full_id(self, full_id: &'b str) -> Self {
+    pub fn full_id(self, full_id: bool) -> Self {
         Self {
             inner: self.inner.full_id(full_id),
         }
@@ -8375,7 +8402,10 @@ impl<'a, 'b> TypedClusterHealth<'a, 'b> {
             inner: self.inner.timeout(timeout),
         }
     }
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -8402,7 +8432,10 @@ impl<'a, 'b> TypedClusterHealth<'a, 'b> {
         }
     }
     #[doc = "Waits until the specified number of nodes (`N`) is available. Accepts `&gt;=N`, `&lt;=N`, `&gt;N`, and `&lt;N`. You can also use `ge(N)`, `le(N)`, `gt(N)`, and `lt(N)` notation."]
-    pub fn wait_for_nodes(self, wait_for_nodes: &'b str) -> Self {
+    pub fn wait_for_nodes<T: Into<crate::types::cluster_common::WaitForNodes>>(
+        self,
+        wait_for_nodes: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_nodes(wait_for_nodes),
         }
@@ -11342,7 +11375,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -11456,7 +11492,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -11546,7 +11585,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation. \nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -13133,7 +13175,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -13941,7 +13986,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to all or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -14199,7 +14247,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -14486,7 +14537,10 @@ where
         }
     }
     #[doc = "The number of shard copies that must be active before proceeding with the operation.\nSet to `all` or any positive integer up to the total number of shards in the index (`number_of_replicas+1`)."]
-    pub fn wait_for_active_shards(self, wait_for_active_shards: &'b str) -> Self {
+    pub fn wait_for_active_shards<T: Into<crate::types::common::WaitForActiveShards>>(
+        self,
+        wait_for_active_shards: T,
+    ) -> Self {
         Self {
             inner: self.inner.wait_for_active_shards(wait_for_active_shards),
         }
@@ -33116,7 +33170,7 @@ impl<'a, 'b> TypedSecurityGetSslinfo<'a, 'b> {
         }
     }
     #[doc = "Whether to include all domain names in the response."]
-    pub fn show_dn(self, show_dn: &'b str) -> Self {
+    pub fn show_dn(self, show_dn: bool) -> Self {
         Self {
             inner: self.inner.show_dn(show_dn),
         }

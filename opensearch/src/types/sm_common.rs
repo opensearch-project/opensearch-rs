@@ -171,6 +171,16 @@ impl<'de> serde::Deserialize<'de> for IntervalUnit {
         })
     }
 }
+impl From<&str> for IntervalUnit {
+    fn from(s: &str) -> Self {
+        match s {
+            "Days" => IntervalUnit::Days,
+            "Hours" => IntervalUnit::Hours,
+            "Minutes" => IntervalUnit::Minutes,
+            _ => IntervalUnit::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ListedPolicy {

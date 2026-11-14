@@ -172,6 +172,20 @@ impl<'de> serde::Deserialize<'de> for SearchStateResponseResourcesCreated {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::flow_framework_common::ResourcesCreated>
+    for SearchStateResponseResourcesCreated
+{
+    fn from(value: crate::types::flow_framework_common::ResourcesCreated) -> Self {
+        SearchStateResponseResourcesCreated::ResourcesCreated(value)
+    }
+}
+impl From<Vec<crate::types::flow_framework_common::ResourcesCreated>>
+    for SearchStateResponseResourcesCreated
+{
+    fn from(value: Vec<crate::types::flow_framework_common::ResourcesCreated>) -> Self {
+        SearchStateResponseResourcesCreated::Array(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Shards {
@@ -317,6 +331,17 @@ impl<'de> serde::Deserialize<'de> for WorkFlowState {
             "PROVISIONING" => WorkFlowState::Provisioning,
             _ => WorkFlowState::Unknown(s),
         })
+    }
+}
+impl From<&str> for WorkFlowState {
+    fn from(s: &str) -> Self {
+        match s {
+            "COMPLETED" => WorkFlowState::Completed,
+            "FAILED" => WorkFlowState::Failed,
+            "NOT_STARTED" => WorkFlowState::NotStarted,
+            "PROVISIONING" => WorkFlowState::Provisioning,
+            _ => WorkFlowState::Unknown(s.to_string()),
+        }
     }
 }
 

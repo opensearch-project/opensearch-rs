@@ -411,6 +411,21 @@ impl<'de> serde::Deserialize<'de> for NodeInfoSettingsHttpType {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for NodeInfoSettingsHttpType {
+    fn from(value: String) -> Self {
+        NodeInfoSettingsHttpType::Type(value)
+    }
+}
+impl From<&str> for NodeInfoSettingsHttpType {
+    fn from(value: &str) -> Self {
+        NodeInfoSettingsHttpType::Type(value.to_string())
+    }
+}
+impl From<crate::types::nodes_info::NodeInfoSettingsHttpTypeConfig> for NodeInfoSettingsHttpType {
+    fn from(value: crate::types::nodes_info::NodeInfoSettingsHttpTypeConfig) -> Self {
+        NodeInfoSettingsHttpType::Config(value)
+    }
+}
 
 #[doc = "The HTTP server type configuration details."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -587,6 +602,23 @@ impl<'de> serde::Deserialize<'de> for NodeInfoSettingsTransportType {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<String> for NodeInfoSettingsTransportType {
+    fn from(value: String) -> Self {
+        NodeInfoSettingsTransportType::Type(value)
+    }
+}
+impl From<&str> for NodeInfoSettingsTransportType {
+    fn from(value: &str) -> Self {
+        NodeInfoSettingsTransportType::Type(value.to_string())
+    }
+}
+impl From<crate::types::nodes_info::NodeInfoSettingsTransportTypeConfig>
+    for NodeInfoSettingsTransportType
+{
+    fn from(value: crate::types::nodes_info::NodeInfoSettingsTransportTypeConfig) -> Self {
+        NodeInfoSettingsTransportType::Config(value)
+    }
+}
 
 #[doc = "The detailed transport type configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -633,6 +665,16 @@ impl<'de> serde::Deserialize<'de> for NodeInfoTotalIndexingBuffer {
         parsed.map_err(serde::de::Error::custom)
     }
 }
+impl From<crate::types::common::ByteCount> for NodeInfoTotalIndexingBuffer {
+    fn from(value: crate::types::common::ByteCount) -> Self {
+        NodeInfoTotalIndexingBuffer::ByteCount(value)
+    }
+}
+impl From<crate::types::common::HumanReadableByteCount> for NodeInfoTotalIndexingBuffer {
+    fn from(value: crate::types::common::HumanReadableByteCount) -> Self {
+        NodeInfoTotalIndexingBuffer::HumanReadableByteCount(value)
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
@@ -667,6 +709,16 @@ impl<'de> serde::Deserialize<'de> for NodeInfoTotalIndexingBufferInBytes {
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<crate::types::common::HumanReadableByteCount> for NodeInfoTotalIndexingBufferInBytes {
+    fn from(value: crate::types::common::HumanReadableByteCount) -> Self {
+        NodeInfoTotalIndexingBufferInBytes::HumanReadableByteCount(value)
+    }
+}
+impl From<crate::types::common::ByteCount> for NodeInfoTotalIndexingBufferInBytes {
+    fn from(value: crate::types::common::ByteCount) -> Self {
+        NodeInfoTotalIndexingBufferInBytes::ByteCount(value)
     }
 }
 

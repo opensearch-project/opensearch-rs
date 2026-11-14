@@ -53,6 +53,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bump `codecov/codecov-action` from 5 to 6 ([#412](https://github.com/opensearch-project/opensearch-rs/pull/412))
 
 ### Changed
+- Generated the types of the union query parameters from the specification: `slices` takes `types::common::Slices`, `wait_for_active_shards` takes `types::common::WaitForActiveShards` and `wait_for_nodes` takes `types::cluster_common::WaitForNodes`, through `impl Into<..>` so that numbers, typed values and strings are accepted; `full_id` and `show_dn` are `bool` again ([#514](https://github.com/opensearch-project/opensearch-rs/pull/514))
 - Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))
 - Changed the supported (CI-tested) OpenSearch versions to 2.19.x and 3.x: every release of the current major plus the latest release of the previous major, re-evaluated at each release. The 2.x client remains the documented fallback for older OpenSearch lines
 

@@ -101,6 +101,16 @@ impl<'de> serde::Deserialize<'de> for EmailEncryptionMethod {
         })
     }
 }
+impl From<&str> for EmailEncryptionMethod {
+    fn from(s: &str) -> Self {
+        match s {
+            "none" => EmailEncryptionMethod::None,
+            "ssl" => EmailEncryptionMethod::Ssl,
+            "start_tls" => EmailEncryptionMethod::StartTls,
+            _ => EmailEncryptionMethod::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EmailGroup {
@@ -203,6 +213,16 @@ impl<'de> serde::Deserialize<'de> for HttpMethodType {
         })
     }
 }
+impl From<&str> for HttpMethodType {
+    fn from(s: &str) -> Self {
+        match s {
+            "PATCH" => HttpMethodType::Patch,
+            "POST" => HttpMethodType::Post,
+            "PUT" => HttpMethodType::Put,
+            _ => HttpMethodType::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MicrosoftTeamsItem {
@@ -290,6 +310,22 @@ impl<'de> serde::Deserialize<'de> for NotificationConfigType {
             "webhook" => NotificationConfigType::Webhook,
             _ => NotificationConfigType::Unknown(s),
         })
+    }
+}
+impl From<&str> for NotificationConfigType {
+    fn from(s: &str) -> Self {
+        match s {
+            "chime" => NotificationConfigType::Chime,
+            "email" => NotificationConfigType::Email,
+            "email_group" => NotificationConfigType::EmailGroup,
+            "microsoft_teams" => NotificationConfigType::MicrosoftTeams,
+            "ses_account" => NotificationConfigType::SesAccount,
+            "slack" => NotificationConfigType::Slack,
+            "smtp_account" => NotificationConfigType::SmtpAccount,
+            "sns" => NotificationConfigType::Sns,
+            "webhook" => NotificationConfigType::Webhook,
+            _ => NotificationConfigType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -405,6 +441,21 @@ impl<'de> serde::Deserialize<'de> for RestStatus {
         })
     }
 }
+impl From<&str> for RestStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "ACCEPTED" => RestStatus::Accepted,
+            "CREATED" => RestStatus::Created,
+            "MULTI_STATUS" => RestStatus::MultiStatus,
+            "NON_AUTHORITATIVE_INFORMATION" => RestStatus::NonAuthoritativeInformation,
+            "NO_CONTENT" => RestStatus::NoContent,
+            "OK" => RestStatus::Ok,
+            "PARTIAL_CONTENT" => RestStatus::PartialContent,
+            "RESET_CONTENT" => RestStatus::ResetContent,
+            _ => RestStatus::Unknown(s.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SesAccount {
@@ -456,6 +507,16 @@ impl<'de> serde::Deserialize<'de> for SeverityType {
             "info" => SeverityType::Info,
             _ => SeverityType::Unknown(s),
         })
+    }
+}
+impl From<&str> for SeverityType {
+    fn from(s: &str) -> Self {
+        match s {
+            "critical" => SeverityType::Critical,
+            "high" => SeverityType::High,
+            "info" => SeverityType::Info,
+            _ => SeverityType::Unknown(s.to_string()),
+        }
     }
 }
 
@@ -517,6 +578,15 @@ impl<'de> serde::Deserialize<'de> for TotalHitRelation {
             "gte" => TotalHitRelation::Gte,
             _ => TotalHitRelation::Unknown(s),
         })
+    }
+}
+impl From<&str> for TotalHitRelation {
+    fn from(s: &str) -> Self {
+        match s {
+            "eq" => TotalHitRelation::Eq,
+            "gte" => TotalHitRelation::Gte,
+            _ => TotalHitRelation::Unknown(s.to_string()),
+        }
     }
 }
 

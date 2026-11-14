@@ -481,8 +481,7 @@ fn to_legacy_type_kind(
     // ignored because the "true"/"false" consts cover it)
     // `Stringified*` schemas (e.g. _common___StringifiedBoolean: boolean or
     // string) describe a value the server may also write as a string; the
-    // specification lets generators drop the union and use the typed form,
-    // as opensearch-java does
+    // specification lets generators drop the union and use the typed form
     if ref_name.is_some_and(responses::is_stringified) {
         if let Some(one_of) = schema["oneOf"].as_array() {
             for variant in one_of {

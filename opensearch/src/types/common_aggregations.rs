@@ -72,30 +72,6 @@ impl<'de> serde::Deserialize<'de> for AdjacencyMatrixAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl
-    From<
-        std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::AdjacencyMatrixBucket,
-        >,
-    > for AdjacencyMatrixAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::AdjacencyMatrixBucket,
-        >,
-    ) -> Self {
-        AdjacencyMatrixAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::AdjacencyMatrixBucket>>
-    for AdjacencyMatrixAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::AdjacencyMatrixBucket>) -> Self {
-        AdjacencyMatrixAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct AdjacencyMatrixBucket {
@@ -801,26 +777,6 @@ impl<'de> serde::Deserialize<'de> for AutoDateHistogramAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl
-    From<std::collections::BTreeMap<String, crate::types::common_aggregations::DateHistogramBucket>>
-    for AutoDateHistogramAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::DateHistogramBucket,
-        >,
-    ) -> Self {
-        AutoDateHistogramAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::DateHistogramBucket>>
-    for AutoDateHistogramAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::DateHistogramBucket>) -> Self {
-        AutoDateHistogramAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AvgAggregate {
@@ -931,23 +887,6 @@ impl<'de> serde::Deserialize<'de> for CompositeAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::CompositeBucket>>
-    for CompositeAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::CompositeBucket,
-        >,
-    ) -> Self {
-        CompositeAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::CompositeBucket>> for CompositeAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::CompositeBucket>) -> Self {
-        CompositeAggregateBuckets::Array(value)
     }
 }
 
@@ -1083,26 +1022,6 @@ impl<'de> serde::Deserialize<'de> for DateHistogramAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl
-    From<std::collections::BTreeMap<String, crate::types::common_aggregations::DateHistogramBucket>>
-    for DateHistogramAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::DateHistogramBucket,
-        >,
-    ) -> Self {
-        DateHistogramAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::DateHistogramBucket>>
-    for DateHistogramAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::DateHistogramBucket>) -> Self {
-        DateHistogramAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct DateHistogramBucket {
@@ -1235,20 +1154,6 @@ impl<'de> serde::Deserialize<'de> for DateRangeAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>>
-    for DateRangeAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>,
-    ) -> Self {
-        DateRangeAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::RangeBucket>> for DateRangeAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::RangeBucket>) -> Self {
-        DateRangeAggregateBuckets::Array(value)
     }
 }
 
@@ -1536,20 +1441,6 @@ impl<'de> serde::Deserialize<'de> for FiltersAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::FiltersBucket>>
-    for FiltersAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<String, crate::types::common_aggregations::FiltersBucket>,
-    ) -> Self {
-        FiltersAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::FiltersBucket>> for FiltersAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::FiltersBucket>) -> Self {
-        FiltersAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct FiltersBucket {
@@ -1675,20 +1566,6 @@ impl<'de> serde::Deserialize<'de> for GeoDistanceAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>>
-    for GeoDistanceAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>,
-    ) -> Self {
-        GeoDistanceAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::RangeBucket>> for GeoDistanceAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::RangeBucket>) -> Self {
-        GeoDistanceAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeoHashGridAggregate {
@@ -1727,25 +1604,6 @@ impl<'de> serde::Deserialize<'de> for GeoHashGridAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::GeoHashGridBucket>>
-    for GeoHashGridAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::GeoHashGridBucket,
-        >,
-    ) -> Self {
-        GeoHashGridAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::GeoHashGridBucket>>
-    for GeoHashGridAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::GeoHashGridBucket>) -> Self {
-        GeoHashGridAggregateBuckets::Array(value)
     }
 }
 
@@ -1864,25 +1722,6 @@ impl<'de> serde::Deserialize<'de> for GeoTileGridAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::GeoTileGridBucket>>
-    for GeoTileGridAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::GeoTileGridBucket,
-        >,
-    ) -> Self {
-        GeoTileGridAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::GeoTileGridBucket>>
-    for GeoTileGridAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::GeoTileGridBucket>) -> Self {
-        GeoTileGridAggregateBuckets::Array(value)
     }
 }
 
@@ -2024,23 +1863,6 @@ impl<'de> serde::Deserialize<'de> for HistogramAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::HistogramBucket>>
-    for HistogramAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::HistogramBucket,
-        >,
-    ) -> Self {
-        HistogramAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::HistogramBucket>> for HistogramAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::HistogramBucket>) -> Self {
-        HistogramAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct HistogramBucket {
@@ -2171,20 +1993,6 @@ impl<'de> serde::Deserialize<'de> for IpRangeAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::IpRangeBucket>>
-    for IpRangeAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<String, crate::types::common_aggregations::IpRangeBucket>,
-    ) -> Self {
-        IpRangeAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::IpRangeBucket>> for IpRangeAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::IpRangeBucket>) -> Self {
-        IpRangeAggregateBuckets::Array(value)
     }
 }
 
@@ -2340,21 +2148,6 @@ impl<'de> serde::Deserialize<'de> for KeyedPercentilesAdditional {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<f64> for KeyedPercentilesAdditional {
-    fn from(value: f64) -> Self {
-        KeyedPercentilesAdditional::Number(value)
-    }
-}
-impl From<String> for KeyedPercentilesAdditional {
-    fn from(value: String) -> Self {
-        KeyedPercentilesAdditional::String(value)
-    }
-}
-impl From<&str> for KeyedPercentilesAdditional {
-    fn from(value: &str) -> Self {
-        KeyedPercentilesAdditional::String(value.to_string())
-    }
-}
 
 #[doc = "Result of the `rare_terms` aggregation when the field is some kind of whole number like a integer, long, or a date."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2396,26 +2189,6 @@ impl<'de> serde::Deserialize<'de> for LongRareTermsAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl
-    From<std::collections::BTreeMap<String, crate::types::common_aggregations::LongRareTermsBucket>>
-    for LongRareTermsAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::LongRareTermsBucket,
-        >,
-    ) -> Self {
-        LongRareTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::LongRareTermsBucket>>
-    for LongRareTermsAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::LongRareTermsBucket>) -> Self {
-        LongRareTermsAggregateBuckets::Array(value)
     }
 }
 
@@ -2666,21 +2439,6 @@ impl<'de> serde::Deserialize<'de> for LongTermsBucketKey {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<i64> for LongTermsBucketKey {
-    fn from(value: i64) -> Self {
-        LongTermsBucketKey::Signed(value)
-    }
-}
-impl From<String> for LongTermsBucketKey {
-    fn from(value: String) -> Self {
-        LongTermsBucketKey::Unsigned(value)
-    }
-}
-impl From<&str> for LongTermsBucketKey {
-    fn from(value: &str) -> Self {
-        LongTermsBucketKey::Unsigned(value.to_string())
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MatrixStatsAggregate {
@@ -2784,23 +2542,6 @@ impl<'de> serde::Deserialize<'de> for MultiTermsAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::MultiTermsBucket>>
-    for MultiTermsAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::MultiTermsBucket,
-        >,
-    ) -> Self {
-        MultiTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::MultiTermsBucket>> for MultiTermsAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::MultiTermsBucket>) -> Self {
-        MultiTermsAggregateBuckets::Array(value)
     }
 }
 
@@ -2959,16 +2700,6 @@ impl<'de> serde::Deserialize<'de> for Percentiles {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<crate::types::common_aggregations::KeyedPercentiles> for Percentiles {
-    fn from(value: crate::types::common_aggregations::KeyedPercentiles) -> Self {
-        Percentiles::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::ArrayPercentilesItem>> for Percentiles {
-    fn from(value: Vec<crate::types::common_aggregations::ArrayPercentilesItem>) -> Self {
-        Percentiles::Array(value)
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PercentilesBucketAggregate {
@@ -3014,20 +2745,6 @@ impl<'de> serde::Deserialize<'de> for RangeAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>>
-    for RangeAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<String, crate::types::common_aggregations::RangeBucket>,
-    ) -> Self {
-        RangeAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::RangeBucket>> for RangeAggregateBuckets {
-    fn from(value: Vec<crate::types::common_aggregations::RangeBucket>) -> Self {
-        RangeAggregateBuckets::Array(value)
     }
 }
 
@@ -3252,30 +2969,6 @@ impl<'de> serde::Deserialize<'de> for SignificantLongTermsAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl
-    From<
-        std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::SignificantLongTermsBucket,
-        >,
-    > for SignificantLongTermsAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::SignificantLongTermsBucket,
-        >,
-    ) -> Self {
-        SignificantLongTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::SignificantLongTermsBucket>>
-    for SignificantLongTermsAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::SignificantLongTermsBucket>) -> Self {
-        SignificantLongTermsAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct SignificantLongTermsBucket {
@@ -3440,30 +3133,6 @@ impl<'de> serde::Deserialize<'de> for SignificantStringTermsAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl
-    From<
-        std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::SignificantStringTermsBucket,
-        >,
-    > for SignificantStringTermsAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::SignificantStringTermsBucket,
-        >,
-    ) -> Self {
-        SignificantStringTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::SignificantStringTermsBucket>>
-    for SignificantStringTermsAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::SignificantStringTermsBucket>) -> Self {
-        SignificantStringTermsAggregateBuckets::Array(value)
     }
 }
 
@@ -3690,30 +3359,6 @@ impl<'de> serde::Deserialize<'de> for StringRareTermsAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl
-    From<
-        std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::StringRareTermsBucket,
-        >,
-    > for StringRareTermsAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::StringRareTermsBucket,
-        >,
-    ) -> Self {
-        StringRareTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::StringRareTermsBucket>>
-    for StringRareTermsAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::StringRareTermsBucket>) -> Self {
-        StringRareTermsAggregateBuckets::Array(value)
     }
 }
 
@@ -3984,18 +3629,6 @@ impl<'de> serde::Deserialize<'de> for UnmappedRareTermsAggregateBuckets {
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<std::collections::BTreeMap<String, crate::types::common::Void>>
-    for UnmappedRareTermsAggregateBuckets
-{
-    fn from(value: std::collections::BTreeMap<String, crate::types::common::Void>) -> Self {
-        UnmappedRareTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common::Void>> for UnmappedRareTermsAggregateBuckets {
-    fn from(value: Vec<crate::types::common::Void>) -> Self {
-        UnmappedRareTermsAggregateBuckets::Array(value)
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UnmappedSignificantTermsAggregate {
@@ -4042,18 +3675,6 @@ impl<'de> serde::Deserialize<'de> for UnmappedSignificantTermsAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<std::collections::BTreeMap<String, crate::types::common::Void>>
-    for UnmappedSignificantTermsAggregateBuckets
-{
-    fn from(value: std::collections::BTreeMap<String, crate::types::common::Void>) -> Self {
-        UnmappedSignificantTermsAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common::Void>> for UnmappedSignificantTermsAggregateBuckets {
-    fn from(value: Vec<crate::types::common::Void>) -> Self {
-        UnmappedSignificantTermsAggregateBuckets::Array(value)
     }
 }
 
@@ -4250,30 +3871,6 @@ impl<'de> serde::Deserialize<'de> for VariableWidthHistogramAggregateBuckets {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl
-    From<
-        std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::VariableWidthHistogramBucket,
-        >,
-    > for VariableWidthHistogramAggregateBuckets
-{
-    fn from(
-        value: std::collections::BTreeMap<
-            String,
-            crate::types::common_aggregations::VariableWidthHistogramBucket,
-        >,
-    ) -> Self {
-        VariableWidthHistogramAggregateBuckets::Keyed(value)
-    }
-}
-impl From<Vec<crate::types::common_aggregations::VariableWidthHistogramBucket>>
-    for VariableWidthHistogramAggregateBuckets
-{
-    fn from(value: Vec<crate::types::common_aggregations::VariableWidthHistogramBucket>) -> Self {
-        VariableWidthHistogramAggregateBuckets::Array(value)
     }
 }
 

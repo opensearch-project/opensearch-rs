@@ -255,18 +255,6 @@ impl<'de> serde::Deserialize<'de> for ReplicationStatus {
         })
     }
 }
-impl From<&str> for ReplicationStatus {
-    fn from(s: &str) -> Self {
-        match s {
-            "BOOTSTRAPPING" => ReplicationStatus::Bootstrapping,
-            "PAUSED" => ReplicationStatus::Paused,
-            "REPLICATION NOT IN PROGRESS" => ReplicationStatus::ReplicationNotInProgress,
-            "RUNNING" => ReplicationStatus::Running,
-            "SYNCING" => ReplicationStatus::Syncing,
-            _ => ReplicationStatus::Unknown(s.to_string()),
-        }
-    }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Status {

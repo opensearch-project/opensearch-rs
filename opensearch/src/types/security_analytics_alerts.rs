@@ -137,18 +137,6 @@ impl<'de> serde::Deserialize<'de> for AlertState {
         })
     }
 }
-impl From<&str> for AlertState {
-    fn from(s: &str) -> Self {
-        match s {
-            "ACKNOWLEDGED" => AlertState::Acknowledged,
-            "ACTIVE" => AlertState::Active,
-            "COMPLETED" => AlertState::Completed,
-            "DELETED" => AlertState::Deleted,
-            "ERROR" => AlertState::Error,
-            _ => AlertState::Unknown(s.to_string()),
-        }
-    }
-}
 
 pub type Alerts = Vec<crate::types::security_analytics_alerts::Alert>;
 

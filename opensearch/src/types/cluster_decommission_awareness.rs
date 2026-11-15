@@ -81,15 +81,3 @@ impl<'de> serde::Deserialize<'de> for DecommissionStatus {
         })
     }
 }
-impl From<&str> for DecommissionStatus {
-    fn from(s: &str) -> Self {
-        match s {
-            "INIT" => DecommissionStatus::Init,
-            "DRAINING" => DecommissionStatus::Draining,
-            "IN_PROGRESS" => DecommissionStatus::InProgress,
-            "SUCCESSFUL" => DecommissionStatus::Successful,
-            "FAILED" => DecommissionStatus::Failed,
-            _ => DecommissionStatus::Unknown(s.to_string()),
-        }
-    }
-}

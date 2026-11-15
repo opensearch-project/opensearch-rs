@@ -505,18 +505,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesResponseHitsHitsItemMatchedQ
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<Vec<String>> for SearchFeaturesResponseHitsHitsItemMatchedQueries {
-    fn from(value: Vec<String>) -> Self {
-        SearchFeaturesResponseHitsHitsItemMatchedQueries::Names(value)
-    }
-}
-impl From<std::collections::BTreeMap<String, f64>>
-    for SearchFeaturesResponseHitsHitsItemMatchedQueries
-{
-    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
-        SearchFeaturesResponseHitsHitsItemMatchedQueries::Scores(value)
-    }
-}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -553,16 +541,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::search::TotalHits> for SearchFeaturesResponseHitsTotal {
-    fn from(value: crate::types::search::TotalHits) -> Self {
-        SearchFeaturesResponseHitsTotal::TotalHits(value)
-    }
-}
-impl From<i64> for SearchFeaturesResponseHitsTotal {
-    fn from(value: i64) -> Self {
-        SearchFeaturesResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchFeaturesResponseHitsTotal {
@@ -676,26 +654,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesResponseSuggestValueItemComp
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::ltr::SearchFeaturesResponseSuggestValueItemCompletionOptionsObject>
-    for SearchFeaturesResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: crate::types::ltr::SearchFeaturesResponseSuggestValueItemCompletionOptionsObject,
-    ) -> Self {
-        SearchFeaturesResponseSuggestValueItemCompletionOptions::Object(value)
-    }
-}
-impl From<Vec<crate::types::ltr::SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem>>
-    for SearchFeaturesResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: Vec<
-            crate::types::ltr::SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem,
-        >,
-    ) -> Self {
-        SearchFeaturesResponseSuggestValueItemCompletionOptions::Array(value)
     }
 }
 
@@ -1205,18 +1163,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesetsResponseHitsHitsItemMatch
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<Vec<String>> for SearchFeaturesetsResponseHitsHitsItemMatchedQueries {
-    fn from(value: Vec<String>) -> Self {
-        SearchFeaturesetsResponseHitsHitsItemMatchedQueries::Names(value)
-    }
-}
-impl From<std::collections::BTreeMap<String, f64>>
-    for SearchFeaturesetsResponseHitsHitsItemMatchedQueries
-{
-    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
-        SearchFeaturesetsResponseHitsHitsItemMatchedQueries::Scores(value)
-    }
-}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -1253,16 +1199,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesetsResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::search::TotalHits> for SearchFeaturesetsResponseHitsTotal {
-    fn from(value: crate::types::search::TotalHits) -> Self {
-        SearchFeaturesetsResponseHitsTotal::TotalHits(value)
-    }
-}
-impl From<i64> for SearchFeaturesetsResponseHitsTotal {
-    fn from(value: i64) -> Self {
-        SearchFeaturesetsResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchFeaturesetsResponseHitsTotal {
@@ -1379,28 +1315,6 @@ impl<'de> serde::Deserialize<'de> for SearchFeaturesetsResponseSuggestValueItemC
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::ltr::SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject>
-    for SearchFeaturesetsResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: crate::types::ltr::SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject,
-    ) -> Self {
-        SearchFeaturesetsResponseSuggestValueItemCompletionOptions::Object(value)
-    }
-}
-impl
-    From<
-        Vec<crate::types::ltr::SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem>,
-    > for SearchFeaturesetsResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: Vec<
-            crate::types::ltr::SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem,
-        >,
-    ) -> Self {
-        SearchFeaturesetsResponseSuggestValueItemCompletionOptions::Array(value)
     }
 }
 
@@ -1911,18 +1825,6 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseHitsHitsItemMatchedQue
         parsed.map_err(serde::de::Error::custom)
     }
 }
-impl From<Vec<String>> for SearchModelsResponseHitsHitsItemMatchedQueries {
-    fn from(value: Vec<String>) -> Self {
-        SearchModelsResponseHitsHitsItemMatchedQueries::Names(value)
-    }
-}
-impl From<std::collections::BTreeMap<String, f64>>
-    for SearchModelsResponseHitsHitsItemMatchedQueries
-{
-    fn from(value: std::collections::BTreeMap<String, f64>) -> Self {
-        SearchModelsResponseHitsHitsItemMatchedQueries::Scores(value)
-    }
-}
 
 #[doc = "The total number of hits, present only if `track_total_hits` is not set to `false` in the search request."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -1957,16 +1859,6 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseHitsTotal {
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::search::TotalHits> for SearchModelsResponseHitsTotal {
-    fn from(value: crate::types::search::TotalHits) -> Self {
-        SearchModelsResponseHitsTotal::TotalHits(value)
-    }
-}
-impl From<i64> for SearchModelsResponseHitsTotal {
-    fn from(value: i64) -> Self {
-        SearchModelsResponseHitsTotal::Integer(value)
     }
 }
 impl crate::types::TotalHitCount for SearchModelsResponseHitsTotal {
@@ -2080,26 +1972,6 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseSuggestValueItemComple
             }
         };
         parsed.map_err(serde::de::Error::custom)
-    }
-}
-impl From<crate::types::ltr::SearchModelsResponseSuggestValueItemCompletionOptionsObject>
-    for SearchModelsResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: crate::types::ltr::SearchModelsResponseSuggestValueItemCompletionOptionsObject,
-    ) -> Self {
-        SearchModelsResponseSuggestValueItemCompletionOptions::Object(value)
-    }
-}
-impl From<Vec<crate::types::ltr::SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem>>
-    for SearchModelsResponseSuggestValueItemCompletionOptions
-{
-    fn from(
-        value: Vec<
-            crate::types::ltr::SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem,
-        >,
-    ) -> Self {
-        SearchModelsResponseSuggestValueItemCompletionOptions::Array(value)
     }
 }
 

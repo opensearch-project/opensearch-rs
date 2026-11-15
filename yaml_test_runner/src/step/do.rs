@@ -479,6 +479,26 @@ impl ApiCall {
 
                     let kind = &ty.ty;
 
+                    // a union parameter takes the type generated from its
+                    // specification schema: decode the value through it
+                    if let Some(model_ty) = &ty.model_ty {
+                        let path: syn::Path = syn::parse_str(&format!("opensearch::{}", model_ty))?;
+                        let value = match v {
+                            Value::String(s) if s.starts_with('$') => {
+                                let set_value = from_set_value(s);
+                                quote! { serde_json::from_value::<#path>(#set_value.clone())? }
+                            }
+                            other => {
+                                let json = serde_json::to_string(other)?;
+                                quote! { serde_json::from_str::<#path>(#json)? }
+                            }
+                        };
+                        tokens.append_all(quote! {
+                            .#param_ident(#value)
+                        });
+                        continue;
+                    }
+
                     match v {
                         Value::String(ref s) => {
                             let is_set_value = s.starts_with('$');
@@ -1091,6 +1111,27 @@ mod tests {
         assert!(!filtered.contains("check_typed_response"), "{}", filtered);
         // the request itself still carries the parameter
         assert!(filtered.contains("filter_path"), "{}", filtered);
+    }
+
+    #[test]
+    fn union_params_are_decoded_through_their_generated_type() {
+        let api = spec_api();
+        let count = do_tokens(
+            &api,
+            "delete_by_query:\n  index: test\n  slices: 2\n  body: {}\n",
+        );
+        assert!(
+            count.contains(
+                "serde_json :: from_str :: < opensearch :: types :: common :: Slices > (\"2\")"
+            ),
+            "{}",
+            count
+        );
+        let auto = do_tokens(
+            &api,
+            "delete_by_query:\n  index: test\n  slices: auto\n  body: {}\n",
+        );
+        assert!(auto.contains("(\"\\\"auto\\\"\")"), "{}", auto);
     }
 
     #[test]

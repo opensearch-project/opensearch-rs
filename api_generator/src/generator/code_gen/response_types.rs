@@ -23,12 +23,41 @@ use inflector::Inflector;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
+/// The types that get conversions (`From` impls) for callers: the unions
+/// used as query parameters, which callers build and pass through
+/// `impl Into<..>`, and the string enums among their variants, which the
+/// string form of such a union is read through. No other type is built by
+/// callers, and every public impl is part of the API, so no other type gets
+/// conversions.
+fn param_conversion_types(model: &ResponseModel, str_enums: &BTreeSet<String>) -> BTreeSet<String> {
+    let mut scope = model.param_types.clone();
+    for root in &model.param_types {
+        if let Some(TypeModel::DispatchUnion(u)) = model.types.get(root) {
+            for variant in &u.variants {
+                if let TypeRef::Named(name) = &variant.ty {
+                    if str_enums.contains(name) {
+                        scope.insert(name.clone());
+                    }
+                }
+            }
+        }
+    }
+    scope
+}
+
 /// Generates the response type modules: returns `(module name, source)`
 /// pairs and the content of the `response-modules` section of
 /// `types/mod.rs`
 pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>, String)> {
     let boxed = boxed_edges(model);
     let total_hits_unions = total_hits_unions(model);
+    let str_enums: BTreeSet<String> = model
+        .types
+        .iter()
+        .filter(|(_, ty)| matches!(ty, TypeModel::StrEnum(_)))
+        .map(|(key, _)| key.clone())
+        .collect();
+    let param_scope = param_conversion_types(model, &str_enums);
 
     // render each type into its module
     let mut modules: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
@@ -40,14 +69,21 @@ pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>,
                 render_struct(type_key, &rust_name, s, &boxed, &total_hits_unions)
             }
             TypeModel::DispatchUnion(u) => {
-                let mut out = render_dispatch_union(type_key, &rust_name, u, &boxed);
+                let mut out = render_dispatch_union(
+                    type_key,
+                    &rust_name,
+                    u,
+                    &boxed,
+                    &str_enums,
+                    param_scope.contains(type_key),
+                );
                 if total_hits_unions.contains(type_key) {
                     render_total_hit_count(&mut out, &rust_name, u);
                 }
                 out
             }
             TypeModel::LazyUnion(u) => render_lazy_union(&rust_name, u),
-            TypeModel::StrEnum(e) => render_str_enum(&rust_name, e),
+            TypeModel::StrEnum(e) => render_str_enum(&rust_name, e, param_scope.contains(type_key)),
             TypeModel::Alias(a) => {
                 let mut out = String::new();
                 doc(&mut out, a.description.as_deref());
@@ -116,7 +152,7 @@ pub fn module_name(ns: &str) -> String {
 }
 
 /// The Rust type name of a type key
-fn rust_type_name(type_key: &str) -> String {
+pub fn rust_type_name(type_key: &str) -> String {
     let name = type_name(type_key);
     if name.chars().next().is_some_and(|c| c.is_lowercase()) {
         name.to_pascal_case()
@@ -618,7 +654,7 @@ fn render_residual_impls(
 /// added by newer versions or plugins never fail a response and round-trip
 /// unchanged. `#[serde(other)]` cannot carry the string, hence the
 /// generated `Serialize` / `Deserialize` impls.
-fn render_str_enum(rust_name: &str, e: &StrEnumModel) -> String {
+fn render_str_enum(rust_name: &str, e: &StrEnumModel, with_from_str: bool) -> String {
     let mut out = String::new();
     doc(&mut out, e.description.as_deref());
     out.push_str("#[derive(Debug, Clone, PartialEq, Eq, Hash)]\n");
@@ -723,6 +759,23 @@ fn render_str_enum(rust_name: &str, e: &StrEnumModel) -> String {
         name = rust_name,
         arms = arms
     );
+    // From<&str>: the same spellings, so that a string can be passed where
+    // the enum is expected, and read by the string form of a query parameter
+    // union. Only for the enums that role needs (see [param_conversion_types])
+    if with_from_str {
+        let _ = writeln!(
+            out,
+            r#"impl From<&str> for {name} {{
+    fn from(s: &str) -> Self {{
+        match s {{
+{arms}            _ => {name}::Unknown(s.to_string()),
+        }}
+    }}
+}}"#,
+            name = rust_name,
+            arms = arms
+        );
+    }
     out
 }
 
@@ -743,6 +796,8 @@ fn render_dispatch_union(
     rust_name: &str,
     u: &UnionModel,
     boxed: &BTreeSet<(String, String)>,
+    str_enums: &BTreeSet<String>,
+    is_param: bool,
 ) -> String {
     let mut out = String::new();
     doc(&mut out, u.description.as_deref());
@@ -820,7 +875,141 @@ fn render_dispatch_union(
         name = rust_name,
         arms = arms
     );
+
+    // a value of each variant converts into the union, so that callers
+    // building one through a query parameter taking `impl Into<..>` can pass
+    // the variant's value directly. Only unions used as parameters get
+    // them: no other union is built by callers, and every public impl is
+    // part of the API. The variants have pairwise distinct JSON kinds, hence
+    // distinct payload types, and the impls do not overlap.
+    if is_param {
+        for (ident, payload) in &variant_idents {
+            let (from_ty, wrap) = match payload
+                .strip_prefix("Box<")
+                .and_then(|p| p.strip_suffix('>'))
+            {
+                Some(inner) => (inner.to_string(), "Box::new(value)"),
+                None => (payload.clone(), "value"),
+            };
+            let _ = writeln!(
+                out,
+                "impl From<{from}> for {name} {{\n    fn from(value: {from}) -> Self {{\n        {name}::{ident}({wrap})\n    }}\n}}",
+                from = from_ty,
+                name = rust_name,
+                ident = ident,
+                wrap = wrap
+            );
+        }
+    }
+    if is_param {
+        render_param_from_str(&mut out, rust_name, u, &variant_idents, str_enums);
+    }
     out
+}
+
+/// Renders `From<&str>` for a union used as a query parameter, so that the
+/// value can also be passed in its query string form (`"5"`, `"auto"`). The
+/// string is read as the first variant that accepts it: a boolean, an
+/// integer, a number, a known value of a string enum, and last the variant
+/// taking any string (a `String`, or a string enum's `Unknown`). Not
+/// rendered when no variant takes any string, as the conversion could fail.
+fn render_param_from_str(
+    out: &mut String,
+    rust_name: &str,
+    u: &UnionModel,
+    variant_idents: &[(String, String)],
+    str_enums: &BTreeSet<String>,
+) {
+    let wrap = |payload: &str, expr: &str| match payload.strip_prefix("Box<") {
+        Some(_) => format!("Box::new({})", expr),
+        None => expr.to_string(),
+    };
+    let unboxed = |payload: &str| {
+        payload
+            .strip_prefix("Box<")
+            .and_then(|p| p.strip_suffix('>'))
+            .unwrap_or(payload)
+            .to_string()
+    };
+
+    // integers before numbers, so that "5" is read as an integer
+    let mut checks = String::new();
+    for parse in [
+        Scalar::Bool,
+        Scalar::I32,
+        Scalar::I64,
+        Scalar::U64,
+        Scalar::F64,
+    ] {
+        for (v, (ident, payload)) in u.variants.iter().zip(variant_idents) {
+            if v.ty == TypeRef::Scalar(parse) {
+                let _ = writeln!(
+                    checks,
+                    "        if let Ok(value) = s.parse::<{ty}>() {{\n            return {name}::{ident}({value});\n        }}",
+                    ty = scalar_type(parse),
+                    name = rust_name,
+                    ident = ident,
+                    value = wrap(payload, "value"),
+                );
+            }
+        }
+    }
+
+    // the variant taking any string: a String, else the first string enum
+    let string_variant = u
+        .variants
+        .iter()
+        .zip(variant_idents)
+        .find(|(v, _)| v.ty == TypeRef::Scalar(Scalar::String));
+    let enum_variants: Vec<_> = u
+        .variants
+        .iter()
+        .zip(variant_idents)
+        .filter(|(v, _)| matches!(&v.ty, TypeRef::Named(n) if str_enums.contains(n)))
+        .collect();
+    let fallback = match (string_variant, enum_variants.first()) {
+        (Some((_, (ident, payload))), _) => {
+            format!(
+                "{}::{}({})",
+                rust_name,
+                ident,
+                wrap(payload, "s.to_string()")
+            )
+        }
+        (None, Some((_, (ident, payload)))) => {
+            let ty = unboxed(payload);
+            format!(
+                "{}::{}({})",
+                rust_name,
+                ident,
+                wrap(payload, &format!("{}::from(s)", ty))
+            )
+        }
+        (None, None) => return,
+    };
+    // known values of the string enums that are not the fallback
+    for (i, (_, (ident, payload))) in enum_variants.iter().enumerate() {
+        if string_variant.is_none() && i == 0 {
+            continue;
+        }
+        let ty = unboxed(payload);
+        let _ = writeln!(
+            checks,
+            "        match {ty}::from(s) {{\n            {ty}::Unknown(_) => {{}}\n            value => return {name}::{ident}({value}),\n        }}",
+            ty = ty,
+            name = rust_name,
+            ident = ident,
+            value = wrap(payload, "value"),
+        );
+    }
+
+    let _ = writeln!(
+        out,
+        "#[doc = \"Reads the query string form of the value, e.g. a number as the numeric variant\"]\nimpl From<&str> for {name} {{\n    fn from(s: &str) -> Self {{\n{checks}        {fallback}\n    }}\n}}",
+        name = rust_name,
+        checks = checks,
+        fallback = fallback
+    );
 }
 
 /// Renders a lazily decoded union: the raw JSON is captured unparsed and
@@ -939,7 +1128,7 @@ fn boxed_edges(model: &ResponseModel) -> BTreeSet<(String, String)> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openapi::responses::{all_operation_groups, read_response_model};
+    use crate::openapi::responses::{all_operation_groups, read_response_model, VariantModel};
 
     fn spec_model() -> ResponseModel {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
@@ -948,6 +1137,115 @@ mod tests {
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
         read_response_model(&spec, &refs).unwrap()
+    }
+
+    #[test]
+    fn param_unions_convert_from_each_variant() {
+        use crate::openapi::responses::{JsonKind, Scalar, UnionModel, VariantModel};
+        let union = UnionModel {
+            description: None,
+            nullable: false,
+            variants: vec![
+                VariantModel {
+                    name: "count".to_string(),
+                    ty: TypeRef::Scalar(Scalar::I32),
+                    kind: Some(JsonKind::Number),
+                },
+                VariantModel {
+                    name: "comparison".to_string(),
+                    ty: TypeRef::Scalar(Scalar::String),
+                    kind: Some(JsonKind::String),
+                },
+                VariantModel {
+                    name: "nested".to_string(),
+                    ty: TypeRef::Named("ns___Nested".to_string()),
+                    kind: Some(JsonKind::Object),
+                },
+            ],
+        };
+        let boxed: BTreeSet<(String, String)> =
+            std::iter::once(("ns___T".to_string(), "ns___Nested".to_string())).collect();
+        let out = render_dispatch_union("ns___T", "T", &union, &boxed, &BTreeSet::new(), true);
+        assert!(out.contains("impl From<i32> for T"), "{}", out);
+        assert!(out.contains("impl From<String> for T"), "{}", out);
+        // string literals convert too, e.g. `.wait_for_nodes(">=3")`
+        assert!(out.contains("impl From<&str> for T"), "{}", out);
+        assert!(out.contains("T::Comparison(s.to_string())"), "{}", out);
+        // a boxed variant converts from its unboxed value
+        assert!(
+            out.contains("impl From<crate::types::ns::Nested> for T"),
+            "{}",
+            out
+        );
+        assert!(out.contains("T::Nested(Box::new(value))"), "{}", out);
+
+        // a union that is not used as a parameter is not built by callers:
+        // it gets no conversions
+        let out = render_dispatch_union("ns___T", "T", &union, &boxed, &BTreeSet::new(), false);
+        assert!(!out.contains("impl From<"), "{}", out);
+        assert!(
+            out.contains("impl<'de> serde::Deserialize<'de> for T"),
+            "{}",
+            out
+        );
+    }
+
+    #[test]
+    fn conversions_are_scoped_to_parameter_unions_and_the_enums_they_read() {
+        use crate::openapi::responses::{StrEnumModel, StrEnumValue, UnionModel};
+        let mut model = ResponseModel::default();
+        let str_enum = || StrEnumModel {
+            description: None,
+            values: vec![StrEnumValue {
+                value: "auto".into(),
+                aliases: vec![],
+            }],
+        };
+        model
+            .types
+            .insert("ns___Calc".to_string(), TypeModel::StrEnum(str_enum()));
+        model
+            .types
+            .insert("ns___Other".to_string(), TypeModel::StrEnum(str_enum()));
+        let union = |enum_name: &str| UnionModel {
+            description: None,
+            nullable: false,
+            variants: vec![
+                variant("count", TypeRef::Scalar(Scalar::I32), JsonKind::Number),
+                variant(
+                    "calculation",
+                    TypeRef::Named(enum_name.to_string()),
+                    JsonKind::String,
+                ),
+            ],
+        };
+        model.types.insert(
+            "ns___Slices".to_string(),
+            TypeModel::DispatchUnion(union("ns___Calc")),
+        );
+        model.types.insert(
+            "ns___Unused".to_string(),
+            TypeModel::DispatchUnion(union("ns___Other")),
+        );
+        model.param_types.insert("ns___Slices".to_string());
+
+        let str_enums: BTreeSet<String> = ["ns___Calc", "ns___Other"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        let scope = param_conversion_types(&model, &str_enums);
+        // the parameter union and the enum its string form reads
+        assert!(
+            scope.contains("ns___Slices") && scope.contains("ns___Calc"),
+            "{:?}",
+            scope
+        );
+        // neither a union nor an enum no parameter uses
+        assert!(
+            !scope.contains("ns___Unused") && !scope.contains("ns___Other"),
+            "{:?}",
+            scope
+        );
     }
 
     #[test]
@@ -982,7 +1280,7 @@ mod tests {
                 },
             ],
         };
-        let out = render_str_enum("TranslogDurability", &e);
+        let out = render_str_enum("TranslogDurability", &e, true);
         // every listed spelling is read, matching exactly
         assert!(
             out.contains(r#""ASYNC" | "async" => TranslogDurability::Async"#),
@@ -1002,6 +1300,122 @@ mod tests {
         );
         assert!(out.contains("Unknown(String)"), "{}", out);
         assert!(out.contains("(also accepted: `async`)"), "{}", out);
+        // a string converts with the same spellings, e.g. for a parameter
+        assert!(
+            out.contains("impl From<&str> for TranslogDurability"),
+            "{}",
+            out
+        );
+        assert!(
+            out.contains(r#"_ => TranslogDurability::Unknown(s.to_string())"#),
+            "{}",
+            out
+        );
+        // an enum no parameter reads gets no conversion
+        let out = render_str_enum("TranslogDurability", &e, false);
+        assert!(!out.contains("impl From<"), "{}", out);
+        assert!(
+            out.contains("impl<'de> serde::Deserialize<'de> for TranslogDurability"),
+            "{}",
+            out
+        );
+    }
+
+    fn variant(name: &str, ty: TypeRef, kind: JsonKind) -> VariantModel {
+        VariantModel {
+            name: name.to_string(),
+            ty,
+            kind: Some(kind),
+        }
+    }
+
+    fn param_union(variants: Vec<VariantModel>, str_enums: &[&str]) -> String {
+        let union = UnionModel {
+            description: None,
+            nullable: false,
+            variants,
+        };
+        let str_enums: BTreeSet<String> = str_enums.iter().map(|s| s.to_string()).collect();
+        render_dispatch_union("ns___P", "P", &union, &BTreeSet::new(), &str_enums, true)
+    }
+
+    #[test]
+    fn param_unions_read_the_query_string_form() {
+        // the shape of _common___Slices: an integer or a string enum
+        let out = param_union(
+            vec![
+                variant("count", TypeRef::Scalar(Scalar::I32), JsonKind::Number),
+                variant(
+                    "calculation",
+                    TypeRef::Named("ns___Calc".to_string()),
+                    JsonKind::String,
+                ),
+            ],
+            &["ns___Calc"],
+        );
+        assert!(out.contains("impl From<&str> for P"), "{}", out);
+        // a number first, then the enum takes any other string
+        let int = out.find("s.parse::<i32>()").unwrap();
+        let fallback = out
+            .find("P::Calculation(crate::types::ns::Calc::from(s))")
+            .unwrap();
+        assert!(int < fallback, "{}", out);
+    }
+
+    #[test]
+    fn param_unions_check_booleans_and_numbers_before_strings() {
+        let out = param_union(
+            vec![
+                variant("text", TypeRef::Scalar(Scalar::String), JsonKind::String),
+                variant("ratio", TypeRef::Scalar(Scalar::F64), JsonKind::Number),
+                variant("flag", TypeRef::Scalar(Scalar::Bool), JsonKind::Bool),
+            ],
+            &[],
+        );
+        let flag = out.find("s.parse::<bool>()").unwrap();
+        let ratio = out.find("s.parse::<f64>()").unwrap();
+        let text = out.find("P::Text(s.to_string())").unwrap();
+        assert!(flag < ratio && ratio < text, "{}", out);
+        // one From<&str> only: the plain one of a String variant is replaced
+        assert_eq!(out.matches("impl From<&str> for P").count(), 1, "{}", out);
+    }
+
+    #[test]
+    fn param_unions_prefer_known_enum_values_to_a_string_variant() {
+        let out = param_union(
+            vec![
+                variant(
+                    "option",
+                    TypeRef::Named("ns___Opt".to_string()),
+                    JsonKind::String,
+                ),
+                variant("count", TypeRef::Scalar(Scalar::I32), JsonKind::Number),
+                variant("other", TypeRef::Scalar(Scalar::String), JsonKind::String),
+            ],
+            &["ns___Opt"],
+        );
+        // a known value of the enum is kept as such, anything else is a string
+        assert!(
+            out.contains("crate::types::ns::Opt::Unknown(_) => {}"),
+            "{}",
+            out
+        );
+        let known = out.find("crate::types::ns::Opt::from(s)").unwrap();
+        let other = out.find("P::Other(s.to_string())").unwrap();
+        assert!(known < other, "{}", out);
+    }
+
+    #[test]
+    fn param_unions_without_a_string_form_get_no_str_conversion() {
+        // nothing takes an arbitrary string: the conversion could fail
+        let out = param_union(
+            vec![
+                variant("count", TypeRef::Scalar(Scalar::I32), JsonKind::Number),
+                variant("flag", TypeRef::Scalar(Scalar::Bool), JsonKind::Bool),
+            ],
+            &[],
+        );
+        assert!(!out.contains("impl From<&str>"), "{}", out);
     }
 
     #[test]

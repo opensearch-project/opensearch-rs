@@ -3241,6 +3241,104 @@ pub struct SlicedScroll {
     pub max: i32,
 }
 
+#[doc = "The slice configuration used to parallelize a process."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum Slices {
+    Count(i32),
+    Calculation(crate::types::common::SlicesCalculation),
+}
+impl<'de> serde::Deserialize<'de> for Slices {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(Slices::Count),
+            Some(b'"') => serde_json::from_str(text).map(Slices::Calculation),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "Slices"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for Slices {
+    fn from(value: i32) -> Self {
+        Slices::Count(value)
+    }
+}
+impl From<crate::types::common::SlicesCalculation> for Slices {
+    fn from(value: crate::types::common::SlicesCalculation) -> Self {
+        Slices::Calculation(value)
+    }
+}
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for Slices {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return Slices::Count(value);
+        }
+        Slices::Calculation(crate::types::common::SlicesCalculation::from(s))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SlicesCalculation {
+    #[doc = "`auto`"]
+    Auto,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SlicesCalculation {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SlicesCalculation::Auto => "auto",
+            SlicesCalculation::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SlicesCalculation {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SlicesCalculation {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "auto" => SlicesCalculation::Auto,
+            _ => SlicesCalculation::Unknown(s),
+        })
+    }
+}
+impl From<&str> for SlicesCalculation {
+    fn from(s: &str) -> Self {
+        match s {
+            "auto" => SlicesCalculation::Auto,
+            _ => SlicesCalculation::Unknown(s.to_string()),
+        }
+    }
+}
+
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
@@ -3986,6 +4084,106 @@ impl<'de> serde::Deserialize<'de> for VersionType {
 
 #[doc = "The absence of any type. This is commonly used in APIs that don't return a body.  Although \"void\" is generally used for a unit type that has only one value, this is interpreted as the bottom type, which has no value. Most languages have a unit type, but few have a bottom type.  See https://en.m.wikipedia.org/wiki/Unit_type and https://en.m.wikipedia.org/wiki/Bottom_type."]
 pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WaitForActiveShardOptions {
+    #[doc = "`all`"]
+    All,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl WaitForActiveShardOptions {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            WaitForActiveShardOptions::All => "all",
+            WaitForActiveShardOptions::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for WaitForActiveShardOptions {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShardOptions {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s),
+        })
+    }
+}
+impl From<&str> for WaitForActiveShardOptions {
+    fn from(s: &str) -> Self {
+        match s {
+            "all" => WaitForActiveShardOptions::All,
+            _ => WaitForActiveShardOptions::Unknown(s.to_string()),
+        }
+    }
+}
+
+#[doc = "Waits until the specified number of shards is active before returning a response. Use `all` for all shards."]
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(untagged)]
+pub enum WaitForActiveShards {
+    Count(i32),
+    Option(crate::types::common::WaitForActiveShardOptions),
+}
+impl<'de> serde::Deserialize<'de> for WaitForActiveShards {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // dispatch on the first byte of the raw JSON text: unlike the value
+        // kind reported by `deserialize_any`, it does not depend on serde_json's
+        // `arbitrary_precision` feature
+        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
+        let text = raw.get().trim_start();
+        let parsed = match text.as_bytes().first() {
+            Some(b'-') | Some(b'0'..=b'9') => {
+                serde_json::from_str(text).map(WaitForActiveShards::Count)
+            }
+            Some(b'"') => serde_json::from_str(text).map(WaitForActiveShards::Option),
+            other => {
+                // the type name is an argument, not part of the literal, so
+                // that rustfmt can wrap the line for long names
+                return Err(serde::de::Error::custom(format_args!(
+                    "invalid type: {}, expected a {} value",
+                    crate::types::union::json_kind_name(other.copied()),
+                    "WaitForActiveShards"
+                )));
+            }
+        };
+        parsed.map_err(serde::de::Error::custom)
+    }
+}
+impl From<i32> for WaitForActiveShards {
+    fn from(value: i32) -> Self {
+        WaitForActiveShards::Count(value)
+    }
+}
+impl From<crate::types::common::WaitForActiveShardOptions> for WaitForActiveShards {
+    fn from(value: crate::types::common::WaitForActiveShardOptions) -> Self {
+        WaitForActiveShards::Option(value)
+    }
+}
+#[doc = "Reads the query string form of the value, e.g. a number as the numeric variant"]
+impl From<&str> for WaitForActiveShards {
+    fn from(s: &str) -> Self {
+        if let Ok(value) = s.parse::<i32>() {
+            return WaitForActiveShards::Count(value);
+        }
+        WaitForActiveShards::Option(crate::types::common::WaitForActiveShardOptions::from(s))
+    }
+}
 
 #[doc = "The statistics about index warmer operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

@@ -33,7 +33,12 @@ use crate::generator::{build_api, endpoint_from_file, Api, Type};
 use anyhow::{anyhow, bail};
 use log::{info, warn};
 use serde_json::{json, Map, Value};
-use std::{collections::BTreeMap, fs::File, io::Write, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs::File,
+    io::Write,
+    path::Path,
+};
 
 /// The release artifact of the OpenSearch API specification
 pub const SPEC_URL: &str = "https://api-spec.opensearch.org/opensearch-openapi.yaml";
@@ -56,25 +61,7 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
     let file = File::open(openapi_file)?;
     let spec: Value = serde_yaml::from_reader(file)?;
 
-    let components = &spec["components"];
-    let parameters = components["parameters"]
-        .as_object()
-        .cloned()
-        .unwrap_or_default();
-    let request_bodies = components["requestBodies"]
-        .as_object()
-        .cloned()
-        .unwrap_or_default();
-    let schemas = components["schemas"]
-        .as_object()
-        .cloned()
-        .unwrap_or_default();
-
-    let resolver = Resolver {
-        parameters,
-        request_bodies,
-        schemas,
-    };
+    let resolver = Resolver::from_spec(&spec);
 
     let paths = spec["paths"]
         .as_object()
@@ -134,6 +121,12 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
         let (name, mut endpoint) =
             endpoint_from_file(format!("openapi:{}", name), &mut json.as_bytes())?;
         endpoint.typed_response = responses::typed_response_path(&response_model, &name);
+        for param in endpoint.params.values_mut() {
+            param.model_ty = param
+                .schema
+                .as_deref()
+                .and_then(|schema| responses::param_type_path(&response_model, schema));
+        }
         if endpoint.typed_response.is_some() {
             endpoint.typed_response_statuses = response_model
                 .typed_statuses
@@ -164,6 +157,16 @@ struct Resolver {
 }
 
 impl Resolver {
+    fn from_spec(spec: &Value) -> Self {
+        let components = &spec["components"];
+        let section = |name: &str| components[name].as_object().cloned().unwrap_or_default();
+        Self {
+            parameters: section("parameters"),
+            request_bodies: section("requestBodies"),
+            schemas: section("schemas"),
+        }
+    }
+
     /// Resolves a parameter that may be a `$ref` into the parameter object
     fn parameter<'a>(&'a self, param: &'a Value) -> anyhow::Result<&'a Value> {
         match param["$ref"].as_str() {
@@ -408,6 +411,11 @@ fn to_legacy_type(param: &Value, resolver: &Resolver) -> anyhow::Result<Value> {
         "type": kind,
         "description": param["description"].as_str(),
     });
+    // a union the legacy types cannot express: keep the schema, so that the
+    // type generated from it can replace the string fallback
+    if let Some(name) = union_fallback_schema(schema, ref_name, kind) {
+        ty["schema"] = json!(name);
+    }
     if let Some(options) = options {
         ty["options"] = Value::Array(options);
     }
@@ -421,6 +429,40 @@ fn to_legacy_type(param: &Value, resolver: &Resolver) -> anyhow::Result<Value> {
         });
     }
     Ok(ty)
+}
+
+/// The name of a parameter schema that is a `oneOf` the legacy types cannot
+/// express, so that it falls back to a string, e.g. _common___Slices (an
+/// integer or `auto`). A type is generated from such a schema
+/// ([responses::param_type_path]) and replaces the string when it can be
+/// constructed by callers.
+fn union_fallback_schema<'a>(
+    schema: &Value,
+    ref_name: Option<&'a str>,
+    kind: &str,
+) -> Option<&'a str> {
+    (kind == "string" && schema["oneOf"].is_array())
+        .then_some(ref_name)
+        .flatten()
+}
+
+/// The schemas of the query parameters of a document that are unions the
+/// legacy types cannot express (see [union_fallback_schema]): the roots of
+/// the parameter types generated with the response types
+pub fn param_union_schemas(spec: &Value) -> anyhow::Result<BTreeSet<String>> {
+    let resolver = Resolver::from_spec(spec);
+    let mut names = BTreeSet::new();
+    for param in resolver.parameters.values() {
+        if param["in"].as_str() != Some("query") {
+            continue;
+        }
+        let (schema, ref_name) = resolver.schema(&param["schema"])?;
+        let (kind, _) = to_legacy_type_kind(schema, ref_name, &resolver)?;
+        if let Some(name) = union_fallback_schema(schema, ref_name, kind) {
+            names.insert(name.to_string());
+        }
+    }
+    Ok(names)
 }
 
 /// Maps a resolved OpenAPI schema to a legacy type kind string and
@@ -437,6 +479,20 @@ fn to_legacy_type_kind(
     // _common___ExpandWildcards (scalar and array-of-scalar variants for
     // the comma-separated form) and _common___Refresh (a boolean variant,
     // ignored because the "true"/"false" consts cover it)
+    // `Stringified*` schemas (e.g. _common___StringifiedBoolean: boolean or
+    // string) describe a value the server may also write as a string; the
+    // specification lets generators drop the union and use the typed form
+    if ref_name.is_some_and(responses::is_stringified) {
+        if let Some(one_of) = schema["oneOf"].as_array() {
+            for variant in one_of {
+                let (resolved, name) = resolver.schema(variant)?;
+                if resolved["type"].as_str().is_some_and(|t| t != "string") {
+                    return to_legacy_type_kind(resolved, name, resolver);
+                }
+            }
+        }
+    }
+
     if let Some(values) = collect_enum_values(schema, resolver)? {
         return Ok(match valid_enum_values(values) {
             Some(values) => ("enum", Some(values)),
@@ -838,6 +894,60 @@ components:
             api.endpoint_for_api_call("search").unwrap().typed_response,
             None
         );
+    }
+
+    #[test]
+    fn union_params_take_the_type_generated_from_their_schema() {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml");
+        let spec: Value = serde_yaml::from_reader(File::open(path).unwrap()).unwrap();
+        let unions = param_union_schemas(&spec).unwrap();
+        // unions the legacy types cannot express
+        for name in [
+            "_common___Slices",
+            "cluster._common___WaitForNodes",
+            "_common___WaitForActiveShards",
+            "_core.search___SourceConfigParam",
+        ] {
+            assert!(unions.contains(name), "{}", name);
+        }
+        // unions the legacy types do express: enums, lists, Stringified*
+        for name in [
+            "_common___Refresh",
+            "_common___ExpandWildcards",
+            "_common___StringifiedBoolean",
+        ] {
+            assert!(!unions.contains(name), "{}", name);
+        }
+
+        let api = read_api("test", Path::new(path)).unwrap();
+        let param = |group: &str, name: &str| {
+            api.endpoint_for_api_call(group).unwrap().params[name].clone()
+        };
+        // a union callers can build takes its generated type
+        for group in ["delete_by_query", "reindex", "update_by_query"] {
+            let slices = param(group, "slices");
+            assert_eq!(slices.schema.as_deref(), Some("_common___Slices"));
+            assert_eq!(slices.model_ty.as_deref(), Some("types::common::Slices"));
+        }
+        assert_eq!(
+            param("cluster.health", "wait_for_nodes")
+                .model_ty
+                .as_deref(),
+            Some("types::cluster_common::WaitForNodes")
+        );
+        // a parameter-only union whose Stringified variant takes its typed
+        // form: kinds no longer overlap
+        assert_eq!(
+            param("bulk", "wait_for_active_shards").model_ty.as_deref(),
+            Some("types::common::WaitForActiveShards")
+        );
+        // a union decoded lazily cannot be built by callers: string fallback
+        let source = param("bulk", "_source");
+        assert_eq!(source.ty, TypeKind::String);
+        assert_eq!(source.model_ty, None);
+        // Stringified* take the type of their non-string variant
+        assert_eq!(param("cat.nodes", "full_id").ty, TypeKind::Boolean);
+        assert_eq!(param("cat.nodes", "full_id").schema, None);
     }
 
     #[test]

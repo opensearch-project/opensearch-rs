@@ -131,7 +131,7 @@ impl<'a> EnumBuilder<'a> {
         let params = path.path.params();
         let fields = params
             .iter()
-            .map(|&p| typekind_to_ty(p, &path.parts[p].ty, true, false));
+            .map(|&p| typekind_to_ty(p, &path.parts[p], true, false));
 
         parse_quote!(
             #doc
@@ -310,6 +310,8 @@ mod tests {
                                     options: vec![],
                                     default: None,
                                     deprecated: None,
+                                    schema: None,
+                                    model_ty: None,
                                 });
                                 map
                             },
@@ -326,6 +328,8 @@ mod tests {
                                     options: vec![],
                                     default: None,
                                     deprecated: None,
+                                    schema: None,
+                                    model_ty: None,
                                 });
                                 map.insert("type".to_string(), Type {
                                     ty: TypeKind::List,
@@ -333,6 +337,8 @@ mod tests {
                                     options: vec![],
                                     default: None,
                                     deprecated: None,
+                                    schema: None,
+                                    model_ty: None,
                                 });
                                 map
                             },

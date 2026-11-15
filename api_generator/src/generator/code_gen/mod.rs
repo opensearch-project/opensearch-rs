@@ -25,7 +25,7 @@ pub mod root;
 pub mod typed_client;
 pub mod url;
 
-use crate::generator::{Stability, TypeKind};
+use crate::generator::{Stability, Type, TypeKind};
 use inflector::Inflector;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
@@ -200,16 +200,25 @@ impl GetIdent for ImplItem {
     }
 }
 
-/// Gets the Ty syntax token for a TypeKind. Per-parameter deviations from
-/// the general mapping live in the [param_overrides] module.
-fn typekind_to_ty(name: &str, kind: &TypeKind, required: bool, fn_arg: bool) -> syn::Type {
+/// Gets the Ty syntax token for a param or part. A union parameter uses the
+/// type generated from its OpenAPI schema ([Type::model_ty]), taken through
+/// `Into` by builder methods; other per-parameter deviations from the
+/// general mapping of its [TypeKind] live in the [param_overrides] module.
+fn typekind_to_ty(name: &str, ty: &Type, required: bool, fn_arg: bool) -> syn::Type {
+    let kind = &ty.ty;
     let mut v = String::new();
     if !required {
         v.push_str("Option<");
     }
 
     let str_type = "&'b str";
-    if let Some(ty) = param_overrides::param_type_override(name, kind, fn_arg) {
+    if let Some(model_ty) = &ty.model_ty {
+        if fn_arg {
+            v.push_str(&format!("Into<crate::{}>", model_ty));
+        } else {
+            v.push_str(&format!("crate::{}", model_ty));
+        }
+    } else if let Some(ty) = param_overrides::param_type_override(name, kind, fn_arg) {
         v.push_str(ty);
     } else {
         match kind {

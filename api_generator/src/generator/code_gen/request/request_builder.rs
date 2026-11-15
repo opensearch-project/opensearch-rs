@@ -318,7 +318,7 @@ impl<'a> RequestBuilder<'a> {
         let ident = ident(&valid_name(f.0).to_lowercase());
 
         let (ty, value, fn_generics) = {
-            let ty = typekind_to_ty(f.0, &f.1.ty, true, true);
+            let ty = typekind_to_ty(f.0, f.1, true, true);
             match ty {
                 syn::Type::Path(ref p) => {
                     if p.get_ident() == "Into" {
@@ -662,7 +662,7 @@ impl<'a> RequestBuilder<'a> {
     /// Creates the AST for a field for a struct
     fn create_struct_field(f: (&String, &Type)) -> syn::Field {
         let ident = ident(&valid_name(f.0).to_lowercase());
-        let ty = typekind_to_ty(f.0, &f.1.ty, false, false);
+        let ty = typekind_to_ty(f.0, f.1, false, false);
         parse_named_field!(#ident: #ty)
     }
 
@@ -977,6 +977,18 @@ mod tests {
         )
         .build_typed()
         .map(|(b, c)| (b.to_string(), c.to_string()))
+    }
+
+    #[test]
+    fn union_params_take_their_generated_type_through_into() {
+        let api = api();
+        let endpoint = api.endpoint_for_api_call("delete_by_query").unwrap();
+        let (builder, _) = typed(&api, "delete_by_query", endpoint).unwrap();
+        assert!(
+            builder.contains("pub fn slices < T : Into < crate :: types :: common :: Slices > > (self , slices : T)"),
+            "{}",
+            builder
+        );
     }
 
     #[test]

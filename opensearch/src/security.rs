@@ -5082,7 +5082,7 @@ pub struct SecurityGetSslinfo<'a, 'b> {
     human: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
-    show_dn: Option<&'b str>,
+    show_dn: Option<bool>,
     source: Option<&'b str>,
 }
 impl<'a, 'b> SecurityGetSslinfo<'a, 'b> {
@@ -5133,7 +5133,7 @@ impl<'a, 'b> SecurityGetSslinfo<'a, 'b> {
         self
     }
     #[doc = "Whether to include all domain names in the response."]
-    pub fn show_dn(mut self, show_dn: &'b str) -> Self {
+    pub fn show_dn(mut self, show_dn: bool) -> Self {
         self.show_dn = Some(show_dn);
         self
     }
@@ -5157,7 +5157,7 @@ impl<'a, 'b> SecurityGetSslinfo<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
-                show_dn: Option<&'b str>,
+                show_dn: Option<bool>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {

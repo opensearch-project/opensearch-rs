@@ -18,3 +18,5 @@ The client may still function against older servers, but those lines are not par
 ## Upgrading
 
 Major versions of OpenSearch introduce breaking changes that require careful upgrades of the client. Please refer to the [OpenSearch documentation](https://opensearch.org/docs/latest/clients/index/) for more information.
+
+Major versions of the client have breaking changes of their own; see [UPGRADING.md](UPGRADING.md) for the changes between 2.x and 3.0 and how to adapt your code.

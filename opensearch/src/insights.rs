@@ -66,7 +66,7 @@ pub struct InsightsTopQueries<'a, 'b> {
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
-    ty: Option<Type>,
+    ty: Option<MetricType>,
 }
 impl<'a, 'b> InsightsTopQueries<'a, 'b> {
     #[doc = "Creates a new instance of [InsightsTopQueries]"]
@@ -121,7 +121,7 @@ impl<'a, 'b> InsightsTopQueries<'a, 'b> {
         self
     }
     #[doc = "Get top n queries by a specific metric."]
-    pub fn ty(mut self, ty: Type) -> Self {
+    pub fn ty(mut self, ty: MetricType) -> Self {
         self.ty = Some(ty);
         self
     }
@@ -142,7 +142,7 @@ impl<'a, 'b> InsightsTopQueries<'a, 'b> {
                 pretty: Option<bool>,
                 source: Option<&'b str>,
                 #[serde(rename = "type")]
-                ty: Option<Type>,
+                ty: Option<MetricType>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,

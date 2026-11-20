@@ -512,14 +512,24 @@ impl ApiCall {
                                             .split(',')
                                             .collect::<Vec<_>>()
                                             .iter()
-                                            .map(|e| Self::generate_enum(n, e, &ty.options))
+                                            .map(|e| {
+                                                Self::generate_enum(
+                                                    ty.enum_type_name(n),
+                                                    e,
+                                                    &ty.options,
+                                                )
+                                            })
                                             .collect_results()?;
 
                                         tokens.append_all(quote! {
                                             .#param_ident(&[#(#idents),*])
                                         });
                                     } else {
-                                        let e = Self::generate_enum(n, s.as_str(), &ty.options)?;
+                                        let e = Self::generate_enum(
+                                            ty.enum_type_name(n),
+                                            s.as_str(),
+                                            &ty.options,
+                                        )?;
                                         tokens.append_all(quote! {
                                             .#param_ident(#e)
                                         });
@@ -720,7 +730,13 @@ impl ApiCall {
                             if n == &"expand_wildcards" {
                                 let result: Vec<TokenStream> = result
                                     .iter()
-                                    .map(|s| Self::generate_enum(n, s.as_str(), &ty.options))
+                                    .map(|s| {
+                                        Self::generate_enum(
+                                            ty.enum_type_name(n),
+                                            s.as_str(),
+                                            &ty.options,
+                                        )
+                                    })
                                     .collect_results()?;
 
                                 tokens.append_all(quote! {
@@ -740,7 +756,7 @@ impl ApiCall {
                                     // one element array in yaml tests
                                     TypeKind::Enum if result.len() == 1 => {
                                         let e = Self::generate_enum(
-                                            n,
+                                            ty.enum_type_name(n),
                                             result[0].as_str(),
                                             &ty.options,
                                         )?;

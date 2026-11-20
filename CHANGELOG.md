@@ -4,8 +4,7 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 ### ⚠️ Breaking Changes ⚠️
 - Internalized the `BuildError` type, consolidating on the `Error` type ([#228](https://github.com/opensearch-project/opensearch-rs/pull/228))
-- `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#391](https://github.com/opensearch-project/opensearch-rs/pull/391))
-- Regenerated the client from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document, removing APIs that no longer exist in OpenSearch: `cat.master`, `indices.unfreeze`, `indices.reload_search_analyzers`, `indices.migrate_to_data_stream`, `indices.promote_data_stream`, `snapshot.get_features` and the `text_structure` namespace
+- Regenerated the client from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document, removing APIs that no longer exist in OpenSearch: `indices.unfreeze`, `indices.reload_search_analyzers`, `indices.migrate_to_data_stream`, `indices.promote_data_stream`, `snapshot.get_features` and the `text_structure` namespace
 - Some URL part and query parameter types changed to match the OpenAPI specification (e.g. `IndicesGetIndexTemplateParts::Name` now takes a single `&str`)
 - Marked `auth::Credentials`, `auth::ClientCertificate` and `cert::CertificateValidation` as `#[non_exhaustive]`, so that variants can be added without a breaking change; a `match` on them outside the crate needs a wildcard arm
 
@@ -27,34 +26,37 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added an `up-to-date` CI check that regenerates the client from the committed OpenAPI specification on every PR and fails on any difference, ensuring the generated code is always a pure function of the committed specification and generator ([#482](https://github.com/opensearch-project/opensearch-rs/issues/482))
 - Added `MultiNodeConnectionPool`, a `ConnectionPool` implementation that distributes requests across multiple cluster nodes in round-robin fashion, and a `Transport::multi_node()` convenience constructor ([#483](https://github.com/opensearch-project/opensearch-rs/issues/483))
 - Added a retry policy to the transport, on by default: a request is sent again when the response status is 502, 503 or 504, or when it cannot be sent or its response cannot be received (connection refused or reset), up to 3 times with exponential backoff and full jitter (100 ms base, at most 1 minute per delay and 5 s of delays per request), each attempt on the next node of the connection pool. Configured on `TransportBuilder` with `max_retries`, `retry_on_status`, `retry_on_timeout` (timeouts are not retried by default), `retry_backoff`, `retry_budget` and `disable_retry` ([#484](https://github.com/opensearch-project/opensearch-rs/issues/484))
+- Added an upgrade guide from 2.x to 3.0 ([UPGRADING.md](UPGRADING.md)), linked from [COMPATIBILITY.md](COMPATIBILITY.md#upgrading)
 
 ### Dependencies
-- Bumps `sysinfo` from 0.31.2 to 0.39.1 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389), [#420](https://github.com/opensearch-project/opensearch-rs/pull/420))
-- Bumps `thiserror` from 1 to 2
-- Bump `dangoslen/dependabot-changelog-helper` from 2 to 4 ([#298](https://github.com/opensearch-project/opensearch-rs/pull/298), [#329](https://github.com/opensearch-project/opensearch-rs/pull/329))
-- Bump `VachaShah/backport` from 1.1.4 to 2.2.0 ([#299](https://github.com/opensearch-project/opensearch-rs/pull/299))
-- Bump `stefanzweifel/git-auto-commit-action` from 4 to 7 ([#300](https://github.com/opensearch-project/opensearch-rs/pull/300), [#343](https://github.com/opensearch-project/opensearch-rs/pull/343), [#363](https://github.com/opensearch-project/opensearch-rs/pull/363))
-- Bump `softprops/action-gh-release` from 1 to 3 ([#303](https://github.com/opensearch-project/opensearch-rs/pull/303), [#414](https://github.com/opensearch-project/opensearch-rs/pull/414))
-- Bump `actions/cache` from 3 to 5 ([#304](https://github.com/opensearch-project/opensearch-rs/pull/304), [#376](https://github.com/opensearch-project/opensearch-rs/pull/376))
-- Bump `actions/setup-java` from 3 to 5 ([#302](https://github.com/opensearch-project/opensearch-rs/pull/302), [#355](https://github.com/opensearch-project/opensearch-rs/pull/355))
-- Bump `lycheeverse/lychee-action` from 1.5.0 to 2.8.0 ([#310](https://github.com/opensearch-project/opensearch-rs/pull/310), [#321](https://github.com/opensearch-project/opensearch-rs/pull/321), [#332](https://github.com/opensearch-project/opensearch-rs/pull/332), [#341](https://github.com/opensearch-project/opensearch-rs/pull/341), [#351](https://github.com/opensearch-project/opensearch-rs/pull/351), [#353](https://github.com/opensearch-project/opensearch-rs/pull/353), [#370](https://github.com/opensearch-project/opensearch-rs/pull/370), [#404](https://github.com/opensearch-project/opensearch-rs/pull/404))
-- Bump `peter-evans/create-pull-request` from 5 to 8 ([#308](https://github.com/opensearch-project/opensearch-rs/pull/308), [#378](https://github.com/opensearch-project/opensearch-rs/pull/378))
-- Bump `actions/github-script` from 6 to 9 ([#309](https://github.com/opensearch-project/opensearch-rs/pull/309), [#361](https://github.com/opensearch-project/opensearch-rs/pull/361), [#415](https://github.com/opensearch-project/opensearch-rs/pull/415))
-- Bump `itertools` from 0.13.0 to 0.14.0 ([#319](https://github.com/opensearch-project/opensearch-rs/pull/319))
-- Bump `toml` from 0.8.0 to 1.0.2 ([#345](https://github.com/opensearch-project/opensearch-rs/pull/345), [#397](https://github.com/opensearch-project/opensearch-rs/pull/397))
-- Bump `dialoguer` from 0.11.0 to 0.12.0 ([#354](https://github.com/opensearch-project/opensearch-rs/pull/354))
-- Bump `xml-rs` from 0.8 to 1.0 ([#356](https://github.com/opensearch-project/opensearch-rs/pull/356))
-- Bump `actions/checkout` from 4 to 6 ([#350](https://github.com/opensearch-project/opensearch-rs/pull/350), [#372](https://github.com/opensearch-project/opensearch-rs/pull/372))
-- Bump `actions/upload-artifact` from 4 to 7 ([#365](https://github.com/opensearch-project/opensearch-rs/pull/365), [#377](https://github.com/opensearch-project/opensearch-rs/pull/377), [#403](https://github.com/opensearch-project/opensearch-rs/pull/403))
-- Bump `reqwest` from 0.12 to 0.13 ([#387](https://github.com/opensearch-project/opensearch-rs/pull/387))
+- Bumps `sysinfo` from 0.38.0 to 0.39.1 ([#420](https://github.com/opensearch-project/opensearch-rs/pull/420))
+- Bumps `toml` from 0.9.2 to 1.0.2 ([#397](https://github.com/opensearch-project/opensearch-rs/pull/397))
 - Lock native-tls to 0.2.15 version as it has issues with tlsv13 ([#398](https://github.com/opensearch-project/opensearch-rs/pull/398))
-- Bump `actions/create-github-app-token` from 2 to 3 ([#407](https://github.com/opensearch-project/opensearch-rs/pull/407))
 - Bump native-tls to 0.2.18 ([#402](https://github.com/opensearch-project/opensearch-rs/pull/402))
-- Bump `codecov/codecov-action` from 5 to 6 ([#412](https://github.com/opensearch-project/opensearch-rs/pull/412))
+- Bumps `itertools` from 0.14.0 to 0.15.0 ([#436](https://github.com/opensearch-project/opensearch-rs/pull/436))
+- Bumps `base64` from 0.22 to 0.23 ([#460](https://github.com/opensearch-project/opensearch-rs/pull/460))
+- Bumps `syn` from 2.0 to 3.0 ([#459](https://github.com/opensearch-project/opensearch-rs/pull/459))
+- Bumps `html-escape` from 0.2.11 to 0.3.0 ([#497](https://github.com/opensearch-project/opensearch-rs/pull/497))
+- Bump `softprops/action-gh-release` from 2 to 3.0.1 ([#414](https://github.com/opensearch-project/opensearch-rs/pull/414), [#435](https://github.com/opensearch-project/opensearch-rs/pull/435))
+- Bump `lycheeverse/lychee-action` from 2.7.0 to 2.9.0 ([#404](https://github.com/opensearch-project/opensearch-rs/pull/404), [#458](https://github.com/opensearch-project/opensearch-rs/pull/458))
+- Bump `actions/github-script` from 8 to 9 ([#415](https://github.com/opensearch-project/opensearch-rs/pull/415))
+- Bump `actions/upload-artifact` from 6 to 7.0.2 ([#403](https://github.com/opensearch-project/opensearch-rs/pull/403), [#495](https://github.com/opensearch-project/opensearch-rs/pull/495))
+- Bump `actions/create-github-app-token` from 2 to 3.3.0 ([#407](https://github.com/opensearch-project/opensearch-rs/pull/407), [#498](https://github.com/opensearch-project/opensearch-rs/pull/498))
+- Bump `codecov/codecov-action` from 5 to 7.1.1 ([#412](https://github.com/opensearch-project/opensearch-rs/pull/412), [#431](https://github.com/opensearch-project/opensearch-rs/pull/431), [#491](https://github.com/opensearch-project/opensearch-rs/pull/491))
+- Bump `actions/checkout` from 6 to 7.0.1 ([#426](https://github.com/opensearch-project/opensearch-rs/pull/426), [#433](https://github.com/opensearch-project/opensearch-rs/pull/433), [#455](https://github.com/opensearch-project/opensearch-rs/pull/455))
+- Bump `actions/setup-java` from 5 to 6.2.0 ([#434](https://github.com/opensearch-project/opensearch-rs/pull/434), [#442](https://github.com/opensearch-project/opensearch-rs/pull/442), [#453](https://github.com/opensearch-project/opensearch-rs/pull/453), [#457](https://github.com/opensearch-project/opensearch-rs/pull/457), [#462](https://github.com/opensearch-project/opensearch-rs/pull/462), [#474](https://github.com/opensearch-project/opensearch-rs/pull/474), [#486](https://github.com/opensearch-project/opensearch-rs/pull/486), [#499](https://github.com/opensearch-project/opensearch-rs/pull/499), [#509](https://github.com/opensearch-project/opensearch-rs/pull/509))
+- Bump `actions/cache/restore` and `actions/cache/save` from 5.0.5 to 6.1.0 ([#441](https://github.com/opensearch-project/opensearch-rs/pull/441), [#447](https://github.com/opensearch-project/opensearch-rs/pull/447))
+- Bump `stefanzweifel/git-auto-commit-action` from 7 to 7.2.1 ([#446](https://github.com/opensearch-project/opensearch-rs/pull/446), [#503](https://github.com/opensearch-project/opensearch-rs/pull/503))
+- Bump `peter-evans/create-pull-request` from 8.1.1 to 8.1.2 ([#510](https://github.com/opensearch-project/opensearch-rs/pull/510))
+- Bump `dangoslen/dependabot-changelog-helper` from 4.2.1 to 4.3.0 ([#428](https://github.com/opensearch-project/opensearch-rs/pull/428))
+- Bump `dangoslen/changelog-enforcer` from 3.6.1 to 3.7.0 ([#430](https://github.com/opensearch-project/opensearch-rs/pull/430))
+- Bump `davidB/rust-cargo-make` from 1.14.0 to 1.17.0 ([#448](https://github.com/opensearch-project/opensearch-rs/pull/448), [#468](https://github.com/opensearch-project/opensearch-rs/pull/468))
+- Bump `Swatinem/rust-cache` from 2.9.1 to 2.9.3 ([#490](https://github.com/opensearch-project/opensearch-rs/pull/490), [#502](https://github.com/opensearch-project/opensearch-rs/pull/502))
+- Bump `trstringer/manual-approval` from 1.12.0 to 1.13.1 ([#443](https://github.com/opensearch-project/opensearch-rs/pull/443))
+- Pin `dtolnay/rust-toolchain` to a commit ([#429](https://github.com/opensearch-project/opensearch-rs/pull/429))
 
 ### Changed
 - Generated the types of the union query parameters from the specification: `slices` takes `types::common::Slices`, `wait_for_active_shards` takes `types::common::WaitForActiveShards` and `wait_for_nodes` takes `types::cluster_common::WaitForNodes`, through `impl Into<..>` so that numbers, typed values and strings are accepted; `full_id` and `show_dn` are `bool` again ([#514](https://github.com/opensearch-project/opensearch-rs/pull/514))
-- Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))
 - Changed the supported (CI-tested) OpenSearch versions to 2.19.x and 3.x: every release of the current major plus the latest release of the previous major, re-evaluated at each release. The 2.x client remains the documented fallback for older OpenSearch lines
 
 ### Deprecated
@@ -67,6 +69,34 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixed `yaml_test_runner` ignoring comma-separated multi-range version skips in YAML tests (e.g. `" - 2.6.99, 2.13.0 - "`)
 
 ### Security
+
+## [2.4.0]
+
+### ⚠️ Breaking Changes ⚠️
+- `ConnectionPool::next` now returns a `Connection` wrapping an `Arc<Url>`, not a reference. ([#392](https://github.com/opensearch-project/opensearch-rs/pull/392))
+
+### Dependencies
+- Bumps `sysinfo` from 0.31.2 to 0.38.0 ([#331](https://github.com/opensearch-project/opensearch-rs/pull/331), [#339](https://github.com/opensearch-project/opensearch-rs/pull/339), [#346](https://github.com/opensearch-project/opensearch-rs/pull/346), [#352](https://github.com/opensearch-project/opensearch-rs/pull/352), [#389](https://github.com/opensearch-project/opensearch-rs/pull/389))
+- Bumps `thiserror` from 1 to 2
+- Bump `dangoslen/dependabot-changelog-helper` from 2 to 4 ([#298](https://github.com/opensearch-project/opensearch-rs/pull/298), [#329](https://github.com/opensearch-project/opensearch-rs/pull/329))
+- Bump `VachaShah/backport` from 1.1.4 to 2.2.0 ([#299](https://github.com/opensearch-project/opensearch-rs/pull/299))
+- Bump `stefanzweifel/git-auto-commit-action` from 4 to 7 ([#300](https://github.com/opensearch-project/opensearch-rs/pull/300), [#343](https://github.com/opensearch-project/opensearch-rs/pull/343), [#363](https://github.com/opensearch-project/opensearch-rs/pull/363))
+- Bump `softprops/action-gh-release` from 1 to 2 ([#303](https://github.com/opensearch-project/opensearch-rs/pull/303))
+- Bump `actions/cache` from 3 to 5 ([#304](https://github.com/opensearch-project/opensearch-rs/pull/304), [#376](https://github.com/opensearch-project/opensearch-rs/pull/376))
+- Bump `actions/setup-java` from 3 to 5 ([#302](https://github.com/opensearch-project/opensearch-rs/pull/302), [#355](https://github.com/opensearch-project/opensearch-rs/pull/355))
+- Bump `lycheeverse/lychee-action` from 1.5.0 to 2.7.0 ([#310](https://github.com/opensearch-project/opensearch-rs/pull/310), [#321](https://github.com/opensearch-project/opensearch-rs/pull/321), [#332](https://github.com/opensearch-project/opensearch-rs/pull/332), [#341](https://github.com/opensearch-project/opensearch-rs/pull/341), [#351](https://github.com/opensearch-project/opensearch-rs/pull/351), [#353](https://github.com/opensearch-project/opensearch-rs/pull/353), [#370](https://github.com/opensearch-project/opensearch-rs/pull/370))
+- Bump `peter-evans/create-pull-request` from 5 to 8 ([#308](https://github.com/opensearch-project/opensearch-rs/pull/308), [#378](https://github.com/opensearch-project/opensearch-rs/pull/378))
+- Bump `actions/github-script` from 6 to 8 ([#309](https://github.com/opensearch-project/opensearch-rs/pull/309), [#361](https://github.com/opensearch-project/opensearch-rs/pull/361))
+- Bump `itertools` from 0.13.0 to 0.14.0 ([#319](https://github.com/opensearch-project/opensearch-rs/pull/319))
+- Bump `toml` from 0.8.0 to 0.9.2 ([#345](https://github.com/opensearch-project/opensearch-rs/pull/345))
+- Bump `dialoguer` from 0.11.0 to 0.12.0 ([#354](https://github.com/opensearch-project/opensearch-rs/pull/354))
+- Bump `xml-rs` from 0.8 to 1.0 ([#356](https://github.com/opensearch-project/opensearch-rs/pull/356))
+- Bump `actions/checkout` from 4 to 6 ([#350](https://github.com/opensearch-project/opensearch-rs/pull/350), [#372](https://github.com/opensearch-project/opensearch-rs/pull/372))
+- Bump `actions/upload-artifact` from 4 to 6 ([#365](https://github.com/opensearch-project/opensearch-rs/pull/365), [#377](https://github.com/opensearch-project/opensearch-rs/pull/377))
+- Bump `reqwest` from 0.12 to 0.13 ([#387](https://github.com/opensearch-project/opensearch-rs/pull/387))
+
+### Changed
+- Changed documentation link in Cargo.toml to utilize standard docs.rs generation ([#323](https://github.com/opensearch-project/opensearch-rs/pull/323))
 
 ## [2.3.0]
 
@@ -134,7 +164,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
 
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.0.0...v2.1.0

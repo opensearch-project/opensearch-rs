@@ -187,7 +187,6 @@ match credentials {
 }
 ```
 
-`http::Method` is not, but it gained `Patch` for the security plugin APIs, so a `match` on it needs an arm
 for it either way.
 
 ### New in 3.0

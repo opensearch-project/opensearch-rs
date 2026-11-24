@@ -349,6 +349,20 @@ pub(crate) fn typed_statuses(
         schema
     }
 
+    // the same JSON Schema, whatever the client model (`x-model`) a named
+    // schema carries next to it
+    fn same_schema(a: &Value, b: &Value) -> bool {
+        match (a.as_object(), b.as_object()) {
+            (Some(a), Some(b)) => {
+                let key = super::client_model::MODEL_KEY;
+                a.iter()
+                    .filter(|(k, _)| *k != key)
+                    .eq(b.iter().filter(|(k, _)| *k != key))
+            }
+            _ => a == b,
+        }
+    }
+
     let success = resolve(schemas, success);
     let prefix = format!("{}___", group);
     let mut statuses: Vec<u16> = responses
@@ -359,7 +373,7 @@ pub(crate) fn typed_statuses(
                 return None;
             }
             let schema = &response["content"]["application/json"]["schema"];
-            (!schema.is_null() && resolve(schemas, schema) == success).then_some(code)
+            (!schema.is_null() && same_schema(resolve(schemas, schema), success)).then_some(code)
         })
         .collect();
     statuses.extend(
@@ -599,10 +613,13 @@ mod tests {
         serde_yaml::from_reader(file).unwrap()
     }
 
-    /// The client model vendored with the specification
+    /// The client model of the vendored specification (its `x-model`)
     fn model() -> ClientModel {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-client-model.json");
-        ClientModel::read(std::path::Path::new(path)).unwrap()
+        ClientModel::from_spec_file(std::path::Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/opensearch-openapi.yaml"
+        )))
+        .unwrap()
     }
 
     /// Reads the model of the four core APIs from the vendored specification
@@ -802,9 +819,11 @@ mod tests {
     #[test]
     fn case_variants_become_aliases_unless_titled_apart() {
         // the two enums as fields of a fixture root, with their vendored entries
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-client-model.json");
-        let vendored: Value =
-            serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        let schemas = &spec()["components"]["schemas"];
+        let vendored = serde_json::json!({ "types": {
+            "indices._common___TranslogDurability": schemas["indices._common___TranslogDurability"]["x-model"],
+            "_common.aggregations___CalendarInterval": schemas["_common.aggregations___CalendarInterval"]["x-model"],
+        } });
         let mut types = serde_json::json!({ "t___Root": { "type_kind": "object", "fields": {}, "constraints": [] } });
         for name in [
             "indices._common___TranslogDurability",

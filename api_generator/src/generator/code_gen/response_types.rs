@@ -1138,10 +1138,9 @@ mod tests {
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
         read_response_model(
             &spec,
-            &crate::openapi::client_model::ClientModel::read(std::path::Path::new(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/opensearch-client-model.json"
-            )))
+            &crate::openapi::client_model::ClientModel::from_spec_file(std::path::Path::new(
+                concat!(env!("CARGO_MANIFEST_DIR"), "/opensearch-openapi.yaml"),
+            ))
             .unwrap(),
             &refs,
         )

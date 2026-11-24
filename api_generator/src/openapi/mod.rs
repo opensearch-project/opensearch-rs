@@ -26,6 +26,8 @@
 //! through the existing serde model, guaranteeing that both ingestion
 //! paths produce identical structures.
 
+pub mod client_model;
+pub mod model_reader;
 pub mod raw_fields;
 pub mod responses;
 
@@ -112,7 +114,8 @@ pub fn read_api(commit: &str, openapi_file: &Path) -> anyhow::Result<Api> {
     // the response types generated for the specification: every endpoint
     // records the Rust path of its response type so consumers (the yaml test
     // runner's typed verification) need no second source of truth
-    let response_model = responses::read_all_response_models(&spec)?;
+    let client_model = client_model::ClientModel::from_spec_file(openapi_file)?;
+    let response_model = responses::read_all_response_models(&spec, &client_model)?;
 
     let mut endpoints = Vec::with_capacity(groups.len());
     for (name, operations) in groups {

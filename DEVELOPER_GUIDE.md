@@ -103,6 +103,14 @@ The `OpenSearch` category of steps are specifically defined for this project and
   cargo make generate-api
   ```
 
+- Generate client from the OpenAPI specification
+
+  ```sh
+  cargo run -p api_generator -- --openapi api_generator/opensearch-openapi.yaml
+  ```
+
+  The response types are read from the specification's resolved client model, which the specification carries as `x-model` on every component schema, response and request body (see "Client Model" in the specification's `CLIENT_GENERATOR_GUIDE.md`, and opensearch-project/opensearch-api-specification#1329). A specification merged by that repository's `npm run merge` has it; the generator stops with an error for one that has responses but no `components.x-model`.
+
 - Run OpenSearch package tests
 
   Optionally pass

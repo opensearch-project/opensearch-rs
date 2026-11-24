@@ -8361,7 +8361,7 @@ impl<'a, 'b> TypedClusterHealth<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
-    pub fn level(self, level: Level) -> Self {
+    pub fn level(self, level: ClusterHealthLevel) -> Self {
         Self {
             inner: self.inner.level(level),
         }
@@ -16192,7 +16192,7 @@ impl<'a, 'b> TypedInsightsTopQueries<'a, 'b> {
         }
     }
     #[doc = "Get top n queries by a specific metric."]
-    pub fn ty(self, ty: Type) -> Self {
+    pub fn ty(self, ty: MetricType) -> Self {
         Self {
             inner: self.inner.ty(ty),
         }

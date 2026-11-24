@@ -23,8 +23,9 @@ closely. On top of that, the transport retries failed requests by default.
 ### Checklist
 
 1. Replace the calls to [removed APIs](#removed-apis).
-2. Fix the compile errors from [changed URL parts](#changed-url-parts) and
-   [query parameter types](#changed-query-parameter-types): most are a `&str` becoming a slice, or the reverse.
+2. Fix the compile errors from [changed URL parts](#changed-url-parts),
+   [query parameter types](#changed-query-parameter-types) and [parameter enums](#changed-parameter-enums):
+   most are a `&str` becoming a slice, or the reverse, or an enum that was renamed.
 3. If you build a `Transport` with `TransportBuilder`, check that the [retry defaults](#retries-are-on-by-default)
    suit you, and call `disable_retry()` otherwise.
 4. Add a wildcard arm to matches on the [non-exhaustive types](#non-exhaustive-types).
@@ -136,12 +137,28 @@ client.index(parts).wait_for_active_shards(shards.as_str()); // shards: String
 New value enums cover the parameters the specification adds, e.g. `params::Metric`, `params::Status`
 and `params::SortOrder`.
 
-The values of the existing enums follow the specification:
+The values of the existing enums follow the specification: `params::VersionType` no longer has `Force`.
 
-| Enum | Removed | Added |
+Parameters that share a name but take different values in different APIs no longer share one enum. Each
+enum is named after the specification schema it comes from:
+
+| Parameter | 2.x | 3.0 |
 |---|---|---|
-| `params::VersionType` | `Force` | |
-| `params::Level` | | `AwarenessAttributes` (`cluster().health(..)`) |
+| `nodes().hot_threads(..).ty(..)` | `params::Type` (`Cpu`, `Wait`, `Block`) | `params::SampleType`, with the same values |
+| `cluster().health(..).level(..)` | `params::Level` | `params::ClusterHealthLevel`, which adds `AwarenessAttributes` |
+
+`indices().stats(..)` and `nodes().stats(..)` keep `params::Level`. `insights().top_queries(..).ty(..)`, new
+in 3.0, takes `params::MetricType`; `params::Type` is gone.
+
+```rust
+// 2.x
+client.nodes().hot_threads(NodesHotThreadsParts::None).ty(Type::Block);
+client.cluster().health(ClusterHealthParts::None).level(Level::Shards);
+
+// 3.0
+client.nodes().hot_threads(NodesHotThreadsParts::None).ty(SampleType::Block);
+client.cluster().health(ClusterHealthParts::None).level(ClusterHealthLevel::Shards);
+```
 
 Several `params` enums (e.g. `ExpandWildcards`, `Refresh`, `Time`, `Bytes`) declare their variants in
 another order, which changes their discriminants. This only matters if you cast them to integers

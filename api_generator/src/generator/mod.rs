@@ -20,6 +20,8 @@ use crate::generator::{
     code_gen::url::url_builder::PathString,
     output::{merge_file, write_file},
 };
+use anyhow::bail;
+use inflector::Inflector;
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
@@ -141,6 +143,25 @@ pub struct Type {
     /// `types::common::Slices`, used instead of the string fallback
     #[serde(skip)]
     pub model_ty: Option<String>,
+    /// The specification schema an enum parameter takes its values from
+    /// (e.g. `nodes._common___SampleType`); `None` for inline enums and for
+    /// the legacy REST specs
+    #[serde(default)]
+    pub enum_schema: Option<String>,
+    /// The name of the `params` enum of an enum parameter, set by
+    /// [build_api]; see [Type::enum_type_name]
+    #[serde(skip)]
+    pub enum_type: Option<String>,
+}
+
+impl Type {
+    /// The name of the `params` enum of an enum parameter named `param`,
+    /// before conversion to Pascal case: the parameter name, unless
+    /// parameters with the same name take different values (see
+    /// [enum_type_names])
+    pub fn enum_type_name<'a>(&'a self, param: &'a str) -> &'a str {
+        self.enum_type.as_deref().unwrap_or(param)
+    }
 }
 
 /// The type of the param or part
@@ -725,12 +746,14 @@ pub(crate) fn build_api(
     let mut enums: HashSet<ApiEnum> = HashSet::new();
     let root_key = "root";
 
-    for (name, api_endpoint) in endpoints {
-        if api_endpoint.stability != Stability::Stable && api_endpoint.deprecated.is_some() {
-            // Do not generate deprecated unstable endpoints
-            continue;
-        }
+    // Do not generate deprecated unstable endpoints
+    let api_endpoints: Vec<(String, ApiEndpoint)> = endpoints
+        .into_iter()
+        .filter(|(_, e)| e.stability == Stability::Stable || e.deprecated.is_none())
+        .collect();
+    let enum_types = enum_type_names(&api_endpoints)?;
 
+    for (name, mut api_endpoint) in api_endpoints {
         let name_parts: Vec<&str> = name.splitn(2, '.').collect();
         let (namespace, method_name) = match name_parts.len() {
             len if len > 1 => (name_parts[0].to_string(), name_parts[1].to_string()),
@@ -738,21 +761,19 @@ pub(crate) fn build_api(
         };
 
         // collect unique enum values
-        for param in api_endpoint
+        for (param, ty) in api_endpoint
             .params
-            .iter()
+            .iter_mut()
             .filter(|p| p.1.ty == TypeKind::Enum)
         {
-            let options: Vec<String> = param
-                .1
-                .options
-                .iter()
-                .map(|v| v.as_str().unwrap().to_string())
-                .collect();
+            let options = enum_options(ty);
+            let enum_type = enum_types[&(param.clone(), sorted(&options))].clone();
+            ty.enum_type = Some(enum_type.clone());
 
+            // the first API using an enum decides its stability
             enums.insert(ApiEnum {
-                name: param.0.to_string(),
-                description: param.1.description.clone(),
+                name: enum_type,
+                description: ty.description.clone(),
                 values: options,
                 stability: api_endpoint.stability,
             });
@@ -784,6 +805,121 @@ pub(crate) fn build_api(
         namespaces,
         enums: sorted_enums,
     })
+}
+
+/// The values of an enum parameter
+fn enum_options(ty: &Type) -> Vec<String> {
+    ty.options
+        .iter()
+        .map(|v| v.as_str().unwrap().to_string())
+        .collect()
+}
+
+fn sorted(values: &[String]) -> Vec<String> {
+    let mut values = values.to_vec();
+    values.sort();
+    values
+}
+
+/// Names the `params` enums, keyed by parameter name and sorted values.
+///
+/// An enum is named after its parameter (`expand_wildcards` becomes
+/// `ExpandWildcards`), so that the parameters of many APIs sharing a name
+/// share one enum. When parameters with the same name take different values
+/// (the `type` of `nodes.hot_threads` and of `insights.top_queries`), one
+/// enum would silently drop the values of the other APIs, so each set of
+/// values is named after the specification schema it comes from instead:
+/// the schema name (`nodes._common___SampleType` becomes `SampleType`), or,
+/// when those collide, the schema name prefixed with its namespace
+/// (`cluster.health___Level` becomes `ClusterHealthLevel`, while
+/// `_common___Level` stays `Level`).
+fn enum_type_names(
+    endpoints: &[(String, ApiEndpoint)],
+) -> anyhow::Result<HashMap<(String, Vec<String>), String>> {
+    // parameter name -> sorted values -> schemas, and the APIs for errors
+    type Uses<'a> = (BTreeSet<Option<&'a str>>, BTreeSet<&'a str>);
+    let mut by_param: BTreeMap<&str, BTreeMap<Vec<String>, Uses>> = BTreeMap::new();
+    for (api, endpoint) in endpoints {
+        for (param, ty) in endpoint.params.iter().filter(|p| p.1.ty == TypeKind::Enum) {
+            let (schemas, apis) = by_param
+                .entry(param.as_str())
+                .or_default()
+                .entry(sorted(&enum_options(ty)))
+                .or_default();
+            schemas.insert(ty.enum_schema.as_deref());
+            apis.insert(api.as_str());
+        }
+    }
+
+    let mut names = HashMap::new();
+    for (param, value_sets) in &by_param {
+        if value_sets.len() == 1 {
+            for values in value_sets.keys() {
+                names.insert((param.to_string(), values.clone()), param.to_string());
+            }
+            continue;
+        }
+
+        let mut named = Vec::with_capacity(value_sets.len());
+        for (values, (schemas, apis)) in value_sets {
+            let schema = match schemas.iter().collect::<Vec<_>>().as_slice() {
+                [Some(schema)] => *schema,
+                _ => bail!(
+                    "parameter `{}` takes values {:?} in {:?}, unlike other APIs, and has no single \
+                     specification schema to name its enum after (schemas: {:?})",
+                    param,
+                    values,
+                    apis,
+                    schemas
+                ),
+            };
+            named.push((values, schema));
+        }
+        let short: Vec<String> = named
+            .iter()
+            .map(|(_, s)| schema_type_name(s, false))
+            .collect();
+        let qualify = short.iter().collect::<HashSet<_>>().len() != short.len();
+        for (values, schema) in named {
+            let name = schema_type_name(schema, qualify);
+            names.insert((param.to_string(), values.clone()), name);
+        }
+    }
+
+    // different enums must not end up with the same Rust name
+    let mut by_rust_name: HashMap<String, &Vec<String>> = HashMap::new();
+    for ((param, values), name) in &names {
+        let rust_name = name.to_pascal_case();
+        if let Some(other) = by_rust_name.insert(rust_name.clone(), values) {
+            if other != values {
+                bail!(
+                    "the enum of parameter `{}` ({:?}) and another enum ({:?}) are both named `{}`",
+                    param,
+                    values,
+                    other,
+                    rust_name
+                );
+            }
+        }
+    }
+    Ok(names)
+}
+
+/// The Rust name of a specification schema: the name after `___`, prefixed
+/// with the namespace other than `_common` when `qualified`
+/// (`cluster.health___Level` becomes `ClusterHealthLevel`)
+fn schema_type_name(schema: &str, qualified: bool) -> String {
+    let (namespace, name) = schema.rsplit_once("___").unwrap_or(("", schema));
+    if !qualified {
+        return name.to_pascal_case();
+    }
+    let mut out: String = namespace
+        .split('.')
+        .filter(|s| !s.is_empty() && *s != "_common")
+        .map(|s| s.to_pascal_case())
+        .collect();
+    out.push_str(&name.to_pascal_case());
+    out
 }
 
 /// deserializes an ApiEndpoint from a file

@@ -88,7 +88,7 @@ pub struct NodesHotThreads<'a, 'b> {
     source: Option<&'b str>,
     threads: Option<i64>,
     timeout: Option<&'b str>,
-    ty: Option<Type>,
+    ty: Option<SampleType>,
 }
 impl<'a, 'b> NodesHotThreads<'a, 'b> {
     #[doc = "Creates a new instance of [NodesHotThreads] with the specified API parts"]
@@ -173,7 +173,7 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
         self
     }
     #[doc = "The type to sample."]
-    pub fn ty(mut self, ty: Type) -> Self {
+    pub fn ty(mut self, ty: SampleType) -> Self {
         self.ty = Some(ty);
         self
     }
@@ -199,7 +199,7 @@ impl<'a, 'b> NodesHotThreads<'a, 'b> {
                 threads: Option<i64>,
                 timeout: Option<&'b str>,
                 #[serde(rename = "type")]
-                ty: Option<Type>,
+                ty: Option<SampleType>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,

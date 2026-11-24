@@ -69,7 +69,9 @@ fn create_client() -> Result<OpenSearch, Error> {
     fn running_proxy() -> bool {
         let system = System::new_with_specifics(
             RefreshKind::nothing().with_processes(ProcessRefreshKind::default()),
-        );
+        )
+        .expect("Unabled to create System instance");
+
         let has_fiddler = system
             .processes_by_name(OsStr::new("Fiddler"))
             .next()

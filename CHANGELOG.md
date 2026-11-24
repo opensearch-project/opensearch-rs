@@ -2,6 +2,24 @@
 Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
+### ⚠ Breaking Changes ⚠
+
+### Added
+
+### Dependencies
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.0.0]
+
 ### ⚠️ Breaking Changes ⚠️
 - Internalized the `BuildError` type, consolidating on the `Error` type ([#228](https://github.com/opensearch-project/opensearch-rs/pull/228))
 - Regenerated the client from the [opensearch-api-specification](https://github.com/opensearch-project/opensearch-api-specification) OpenAPI document, removing APIs that no longer exist in OpenSearch: `indices.unfreeze`, `indices.reload_search_analyzers`, `indices.migrate_to_data_stream`, `indices.promote_data_stream`, `snapshot.get_features` and the `text_structure` namespace
@@ -60,16 +78,10 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Generated the types of the union query parameters from the specification: `slices` takes `types::common::Slices`, `wait_for_active_shards` takes `types::common::WaitForActiveShards` and `wait_for_nodes` takes `types::cluster_common::WaitForNodes`, through `impl Into<..>` so that numbers, typed values and strings are accepted; `full_id` and `show_dn` are `bool` again ([#514](https://github.com/opensearch-project/opensearch-rs/pull/514))
 - Changed the supported (CI-tested) OpenSearch versions to 2.19.x and 3.x: every release of the current major plus the latest release of the previous major, re-evaluated at each release. The 2.x client remains the documented fallback for older OpenSearch lines
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 - Fixed `TransportBuilder` not being `Send` and `Sync` since the middleware types were added: `ClientInitializer` now requires `Send + Sync`, like `RequestInitializer` and `RequestHandler`, so a builder can be held across `.await` in a spawned task again
 - Skipped the `_source` empty-value deprecation warning yaml tests, which expect warnings that OpenSearch distributions do not emit (verified on released versions up to 3.7.0 and a 3.9.0 nightly build)
 - Fixed `yaml_test_runner` ignoring comma-separated multi-range version skips in YAML tests (e.g. `" - 2.6.99, 2.13.0 - "`)
-
-### Security
 
 ## [2.4.0]
 
@@ -165,7 +177,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fixes f64 comparison in `yaml_test_runner` to use numeric-based comparison instead of string-based ([#150](https://github.com/opensearch-project/opensearch-rs/pull/150))
 - Fixes YAML spec tests by adding u64 (unsigned long) support ([#167](https://github.com/opensearch-project/opensearch-rs/pull/167))
 
-[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/opensearch-rs/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.4.0...v3.0.0
 [2.4.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/opensearch-project/opensearch-rs/compare/v2.1.0...v2.2.0

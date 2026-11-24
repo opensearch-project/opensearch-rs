@@ -747,13 +747,13 @@ pub(crate) fn build_api(
     let root_key = "root";
 
     // Do not generate deprecated unstable endpoints
-    let endpoints: Vec<(String, ApiEndpoint)> = endpoints
+    let api_endpoints: Vec<(String, ApiEndpoint)> = endpoints
         .into_iter()
         .filter(|(_, e)| e.stability == Stability::Stable || e.deprecated.is_none())
         .collect();
-    let enum_types = enum_type_names(&endpoints)?;
+    let enum_types = enum_type_names(&api_endpoints)?;
 
-    for (name, mut api_endpoint) in endpoints {
+    for (name, mut api_endpoint) in api_endpoints {
         let name_parts: Vec<&str> = name.splitn(2, '.').collect();
         let (namespace, method_name) = match name_parts.len() {
             len if len > 1 => (name_parts[0].to_string(), name_parts[1].to_string()),

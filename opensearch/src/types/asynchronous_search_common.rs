@@ -60,17 +60,17 @@ pub struct NodesStats {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ResponseBody {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub expiration_time_in_millis: Option<f64>,
+    pub error: Option<crate::types::common::ErrorCause>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expiration_time_in_millis: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response: Option<crate::types::search::SearchResponse>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub start_time_in_millis: Option<f64>,
+    pub start_time_in_millis: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub took: Option<f64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

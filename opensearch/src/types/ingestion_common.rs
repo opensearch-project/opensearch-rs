@@ -101,8 +101,14 @@ pub struct PauseIngestionResponse {
     pub acknowledged: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    #[doc = "Shard-level failures grouped by index name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub failures: Option<Vec<crate::types::ingestion_common::IngestionStateShardFailure>>,
+    pub failures: Option<
+        std::collections::BTreeMap<
+            String,
+            Vec<crate::types::ingestion_common::IngestionStateShardFailure>,
+        >,
+    >,
     #[doc = "Indicates if the pause request has been acknowledged by individual shards."]
     pub shards_acknowledged: bool,
 }
@@ -166,8 +172,14 @@ pub struct ResumeIngestionResponse {
     pub acknowledged: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    #[doc = "Shard-level failures grouped by index name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub failures: Option<Vec<crate::types::ingestion_common::IngestionStateShardFailure>>,
+    pub failures: Option<
+        std::collections::BTreeMap<
+            String,
+            Vec<crate::types::ingestion_common::IngestionStateShardFailure>,
+        >,
+    >,
     #[doc = "Indicates if the resume request has been acknowledged by individual shards."]
     pub shards_acknowledged: bool,
 }
@@ -180,6 +192,12 @@ pub struct ShardIngestionState {
     #[doc = "Indicates the policy used to handle failed messages."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error_policy: Option<crate::types::ingestion_common::ErrorPolicy>,
+    #[doc = "Indicates whether this is the primary shard."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_primary: Option<bool>,
+    #[doc = "The node on which the shard is located."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub node: Option<String>,
     #[doc = "Indicates if the poller has been paused."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub poller_paused: Option<bool>,

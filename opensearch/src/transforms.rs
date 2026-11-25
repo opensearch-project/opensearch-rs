@@ -60,7 +60,7 @@ impl<'b> TransformsDeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Delete API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
+#[doc = "Builder for the [Transforms Delete API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
 #[derive(Clone, Debug)]
 pub struct TransformsDelete<'a, 'b> {
     transport: &'a Transport,
@@ -179,7 +179,7 @@ impl<'b> TransformsExplainParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Explain API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
+#[doc = "Builder for the [Transforms Explain API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
 #[derive(Clone, Debug)]
 pub struct TransformsExplain<'a, 'b> {
     transport: &'a Transport,
@@ -297,7 +297,7 @@ impl<'b> TransformsGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Get API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
+#[doc = "Builder for the [Transforms Get API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
 #[derive(Clone, Debug)]
 pub struct TransformsGet<'a, 'b> {
     transport: &'a Transport,
@@ -409,7 +409,7 @@ impl TransformsPreviewParts {
         }
     }
 }
-#[doc = "Builder for the [Transforms Preview API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
+#[doc = "Builder for the [Transforms Preview API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
 #[derive(Clone, Debug)]
 pub struct TransformsPreview<'a, 'b, B> {
     transport: &'a Transport,
@@ -550,7 +550,7 @@ impl<'b> TransformsPutParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Put API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
+#[doc = "Builder for the [Transforms Put API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
 #[derive(Clone, Debug)]
 pub struct TransformsPut<'a, 'b, B> {
     transport: &'a Transport,
@@ -705,7 +705,7 @@ impl TransformsSearchParts {
         }
     }
 }
-#[doc = "Builder for the [Transforms Search API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
+#[doc = "Builder for the [Transforms Search API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
 #[derive(Clone, Debug)]
 pub struct TransformsSearch<'a, 'b> {
     transport: &'a Transport,
@@ -871,7 +871,7 @@ impl<'b> TransformsStartParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Start API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
+#[doc = "Builder for the [Transforms Start API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
 #[derive(Clone, Debug)]
 pub struct TransformsStart<'a, 'b, B> {
     transport: &'a Transport,
@@ -1013,7 +1013,7 @@ impl<'b> TransformsStopParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Transforms Stop API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
+#[doc = "Builder for the [Transforms Stop API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
 #[derive(Clone, Debug)]
 pub struct TransformsStop<'a, 'b, B> {
     transport: &'a Transport,
@@ -1146,35 +1146,35 @@ impl<'a> Transforms<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Transforms Delete API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
+    #[doc = "[Transforms Delete API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
     pub fn delete<'b>(&'a self, parts: TransformsDeleteParts<'b>) -> TransformsDelete<'a, 'b> {
         TransformsDelete::new(self.transport(), parts)
     }
-    #[doc = "[Transforms Explain API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
+    #[doc = "[Transforms Explain API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
     pub fn explain<'b>(&'a self, parts: TransformsExplainParts<'b>) -> TransformsExplain<'a, 'b> {
         TransformsExplain::new(self.transport(), parts)
     }
-    #[doc = "[Transforms Get API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
+    #[doc = "[Transforms Get API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
     pub fn get<'b>(&'a self, parts: TransformsGetParts<'b>) -> TransformsGet<'a, 'b> {
         TransformsGet::new(self.transport(), parts)
     }
-    #[doc = "[Transforms Preview API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
+    #[doc = "[Transforms Preview API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
     pub fn preview<'b>(&'a self) -> TransformsPreview<'a, 'b, ()> {
         TransformsPreview::new(self.transport())
     }
-    #[doc = "[Transforms Put API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
+    #[doc = "[Transforms Put API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
     pub fn put<'b>(&'a self, parts: TransformsPutParts<'b>) -> TransformsPut<'a, 'b, ()> {
         TransformsPut::new(self.transport(), parts)
     }
-    #[doc = "[Transforms Search API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
+    #[doc = "[Transforms Search API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
     pub fn search<'b>(&'a self) -> TransformsSearch<'a, 'b> {
         TransformsSearch::new(self.transport())
     }
-    #[doc = "[Transforms Start API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
+    #[doc = "[Transforms Start API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
     pub fn start<'b>(&'a self, parts: TransformsStartParts<'b>) -> TransformsStart<'a, 'b, ()> {
         TransformsStart::new(self.transport(), parts)
     }
-    #[doc = "[Transforms Stop API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
+    #[doc = "[Transforms Stop API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
     pub fn stop<'b>(&'a self, parts: TransformsStopParts<'b>) -> TransformsStop<'a, 'b, ()> {
         TransformsStop::new(self.transport(), parts)
     }

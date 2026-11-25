@@ -76,7 +76,7 @@ impl<'b> IngestDeletePipelineParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
+#[doc = "Builder for the [Ingest Delete Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
 #[derive(Clone, Debug)]
 pub struct IngestDeletePipeline<'a, 'b> {
     transport: &'a Transport,
@@ -225,7 +225,7 @@ impl<'b> IngestGetPipelineParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
+#[doc = "Builder for the [Ingest Get Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
 #[derive(Clone, Debug)]
 pub struct IngestGetPipeline<'a, 'b> {
     transport: &'a Transport,
@@ -356,7 +356,7 @@ impl IngestProcessorGrokParts {
         }
     }
 }
-#[doc = "Builder for the [Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
+#[doc = "Builder for the [Ingest Processor Grok API](https://docs.opensearch.org/latest/)\n\nReturns a list of built-in grok patterns."]
 #[derive(Clone, Debug)]
 pub struct IngestProcessorGrok<'a, 'b> {
     transport: &'a Transport,
@@ -659,7 +659,7 @@ impl<'b> IngestSimulateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
+#[doc = "Builder for the [Ingest Simulate API](https://docs.opensearch.org/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
 #[derive(Clone, Debug)]
 pub struct IngestSimulate<'a, 'b, B> {
     transport: &'a Transport,
@@ -805,21 +805,21 @@ impl<'a> Ingest<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
+    #[doc = "[Ingest Delete Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
     pub fn delete_pipeline<'b>(
         &'a self,
         parts: IngestDeletePipelineParts<'b>,
     ) -> IngestDeletePipeline<'a, 'b> {
         IngestDeletePipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
+    #[doc = "[Ingest Get Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
     pub fn get_pipeline<'b>(
         &'a self,
         parts: IngestGetPipelineParts<'b>,
     ) -> IngestGetPipeline<'a, 'b> {
         IngestGetPipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
+    #[doc = "[Ingest Processor Grok API](https://docs.opensearch.org/latest/)\n\nReturns a list of built-in grok patterns."]
     pub fn processor_grok<'b>(&'a self) -> IngestProcessorGrok<'a, 'b> {
         IngestProcessorGrok::new(self.transport())
     }
@@ -830,7 +830,7 @@ impl<'a> Ingest<'a> {
     ) -> IngestPutPipeline<'a, 'b, ()> {
         IngestPutPipeline::new(self.transport(), parts)
     }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
+    #[doc = "[Ingest Simulate API](https://docs.opensearch.org/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
     pub fn simulate<'b>(&'a self, parts: IngestSimulateParts<'b>) -> IngestSimulate<'a, 'b, ()> {
         IngestSimulate::new(self.transport(), parts)
     }

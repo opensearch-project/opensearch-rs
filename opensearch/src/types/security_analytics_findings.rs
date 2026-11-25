@@ -76,7 +76,7 @@ pub type Findings = Vec<crate::types::security_analytics_findings::Finding>;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GetFindingsResponse {
     pub findings: crate::types::security_analytics_findings::Findings,
-    pub total_findings: i64,
+    pub total_findings: i32,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

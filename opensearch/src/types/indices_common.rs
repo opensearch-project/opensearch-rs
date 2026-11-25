@@ -282,6 +282,11 @@ pub struct IndexRoutingAllocation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_primary_shards_per_node: Option<crate::types::common::StringifiedInteger>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_remote_capable_primary_shards_per_node:
+        Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_remote_capable_shards_per_node: Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_shards_per_node: Option<crate::types::common::StringifiedInteger>,
 }
 
@@ -610,6 +615,7 @@ pub struct IndexSettings {
     pub query_string: Option<crate::types::indices_common::IndexSettingsQueryString>,
     pub query_string_lenient: Option<crate::types::common::StringifiedBoolean>,
     pub refresh_interval: Option<crate::types::common::Duration>,
+    pub replication: Option<crate::types::indices_common::IndexSettingsReplication>,
     #[doc = "Defines the replication type."]
     pub replication_type: Option<crate::types::indices_common::ReplicationType>,
     pub routing: Option<crate::types::indices_common::IndexRouting>,
@@ -804,6 +810,10 @@ impl<'de> serde::Deserialize<'de> for IndexSettings {
                 let mut seen_query_string_lenient = false;
                 let mut f_refresh_interval: Option<crate::types::common::Duration> = None;
                 let mut seen_refresh_interval = false;
+                let mut f_replication: Option<
+                    crate::types::indices_common::IndexSettingsReplication,
+                > = None;
+                let mut seen_replication = false;
                 let mut f_replication_type: Option<crate::types::indices_common::ReplicationType> =
                     None;
                 let mut seen_replication_type = false;
@@ -1315,6 +1325,13 @@ impl<'de> serde::Deserialize<'de> for IndexSettings {
                             f_refresh_interval =
                                 map.next_value::<Option<crate::types::common::Duration>>()?;
                         }
+                        "replication" => {
+                            if seen_replication {
+                                return Err(serde::de::Error::duplicate_field("replication"));
+                            }
+                            seen_replication = true;
+                            f_replication = map.next_value::<Option<crate::types::indices_common::IndexSettingsReplication>>()?;
+                        }
                         "replication.type" => {
                             if seen_replication_type {
                                 return Err(serde::de::Error::duplicate_field("replication.type"));
@@ -1535,6 +1552,7 @@ impl<'de> serde::Deserialize<'de> for IndexSettings {
                     query_string: f_query_string,
                     query_string_lenient: f_query_string_lenient,
                     refresh_interval: f_refresh_interval,
+                    replication: f_replication,
                     replication_type: f_replication_type,
                     routing: f_routing,
                     routing_partition_size: f_routing_partition_size,
@@ -1733,6 +1751,9 @@ impl serde::Serialize for IndexSettings {
         if let Some(v) = &self.refresh_interval {
             map.serialize_entry("refresh_interval", v)?;
         }
+        if let Some(v) = &self.replication {
+            map.serialize_entry("replication", v)?;
+        }
         if let Some(v) = &self.replication_type {
             map.serialize_entry("replication.type", v)?;
         }
@@ -1880,6 +1901,9 @@ pub struct IndexSettingsMapping {
     pub dimension_fields:
         Option<crate::types::indices_common::IndexSettingsMappingLimitDimensionFields>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dynamic_properties:
+        Option<crate::types::indices_common::IndexSettingsMappingDynamicProperties>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field_name_length:
         Option<crate::types::indices_common::IndexSettingsMappingLimitFieldNameLength>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1891,6 +1915,22 @@ pub struct IndexSettingsMapping {
         Option<crate::types::indices_common::IndexSettingsMappingLimitNestedObjects>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_fields: Option<crate::types::indices_common::IndexSettingsMappingLimitTotalFields>,
+}
+
+#[doc = "Limits on dynamically created properties."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IndexSettingsMappingDynamicProperties {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lucene_field:
+        Option<crate::types::indices_common::IndexSettingsMappingDynamicPropertiesLuceneField>,
+}
+
+#[doc = "Limits applied to dynamically created Lucene fields."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IndexSettingsMappingDynamicPropertiesLuceneField {
+    #[doc = "The maximum number of dynamically created Lucene fields allowed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<crate::types::common::StringifiedLong>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2072,6 +2112,9 @@ impl<'de> serde::Deserialize<'de> for IndexSettingsMergePolicyName {
 pub struct IndexSettingsMergeScheduler {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_throttle: Option<crate::types::common::StringifiedBoolean>,
+    #[doc = "The maximum bytes-per-second merge throttle; may be `Infinity`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_force_merge_mb_per_sec: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_merge_count: Option<crate::types::common::StringifiedInteger>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2117,6 +2160,14 @@ pub struct IndexSettingsQueriesCache {
 pub struct IndexSettingsQueryString {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lenient: Option<crate::types::common::StringifiedBoolean>,
+}
+
+#[doc = "The replication settings for an index."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IndexSettingsReplication {
+    #[doc = "Defines the replication type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<crate::types::indices_common::ReplicationType>,
 }
 
 #[doc = "The configuration for search operations."]
@@ -2552,6 +2603,12 @@ pub struct IndexSettingsStore {
     #[doc = "Whether memory-mapping is allowed. You can restrict the use of the `mmapfs` and the related `hybridfs` store types with the setting `node.store.allow_mmap`. This setting is useful, for example, if you are in an environment where you can not control the ability to create a lot of memory maps so you need disable the ability to use memory-mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_mmap: Option<crate::types::common::StringifiedBoolean>,
+    #[doc = "The store data locality setting."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub data_locality: Option<String>,
+    #[doc = "The store factory setting."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub factory: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fs: Option<crate::types::indices_common::IndexSettingsStoreFs>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2790,12 +2847,25 @@ pub struct IngestionSource {
     #[doc = "Indicates if all-active ingestion is enabled for this index."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub all_active: Option<crate::types::common::StringifiedBoolean>,
+    #[doc = "Configuration settings for the selected decoder type, keyed by setting name. Index settings values are always strings."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decoder_settings: Option<std::collections::BTreeMap<String, String>>,
+    #[doc = "The type of payload decoder used to decode ingestion messages."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decoder_type: Option<String>,
     #[doc = "Defines the policy for error handling."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error_strategy: Option<crate::types::ingestion_common::ErrorPolicy>,
     #[doc = "Defines the size of the internal blocking queue in pull-based ingestion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub internal_queue_size: Option<crate::types::common::StringifiedInteger>,
+    #[doc = "Configuration settings for the selected mapper type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mapper_settings:
+        Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[doc = "The type of message mapper used to extract document fields from ingestion messages."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mapper_type: Option<crate::types::indices_common::IngestionSourceMapperType>,
     #[doc = "Defines the number of processor or writer threads."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub num_processor_threads: Option<crate::types::common::StringifiedInteger>,
@@ -2810,7 +2880,10 @@ pub struct IngestionSource {
     #[doc = "Specifies the offset value or timestamp in milliseconds."]
     #[serde(rename = "pointer.init.reset.value")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pointer_init_reset_value: Option<String>,
+    pub pointer_init_reset_value: Option<crate::types::common::StringifiedLong>,
+    #[doc = "The interval for pointer-based lag updates."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pointer_based_lag_update_interval: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub poll: Option<crate::types::indices_common::IngestionSourcePoll>,
     #[doc = "The maximum number of records to retrieve in each poll operation."]
@@ -2824,6 +2897,54 @@ pub struct IngestionSource {
     #[doc = "The streaming source type."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub r#type: Option<crate::types::indices_common::IngestionSourceType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warmup: Option<crate::types::indices_common::IngestionSourceWarmup>,
+}
+
+#[doc = "The type of message mapper used to extract document fields from ingestion messages."]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum IngestionSourceMapperType {
+    #[doc = "`default`"]
+    Default,
+    #[doc = "`field_mapping`"]
+    FieldMapping,
+    #[doc = "`raw_payload`"]
+    RawPayload,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl IngestionSourceMapperType {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            IngestionSourceMapperType::Default => "default",
+            IngestionSourceMapperType::FieldMapping => "field_mapping",
+            IngestionSourceMapperType::RawPayload => "raw_payload",
+            IngestionSourceMapperType::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for IngestionSourceMapperType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for IngestionSourceMapperType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "default" => IngestionSourceMapperType::Default,
+            "field_mapping" => IngestionSourceMapperType::FieldMapping,
+            "raw_payload" => IngestionSourceMapperType::RawPayload,
+            _ => IngestionSourceMapperType::Unknown(s),
+        })
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2955,6 +3076,17 @@ impl<'de> serde::Deserialize<'de> for IngestionSourceType {
             _ => IngestionSourceType::Unknown(s),
         })
     }
+}
+
+#[doc = "Warmup settings for pull-based ingestion."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IngestionSourceWarmup {
+    #[doc = "The lag threshold that triggers warmup."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lag_threshold: Option<crate::types::common::StringifiedInteger>,
+    #[doc = "The warmup timeout; `-1` disables it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timeout: Option<crate::types::common::Duration>,
 }
 
 #[doc = "The component managing the data stream or index."]
@@ -3333,15 +3465,34 @@ pub struct TemplateMapping {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Translog {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_append: Option<crate::types::indices_common::TranslogBatchAppend>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub durability: Option<crate::types::indices_common::TranslogDurability>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flush_threshold_size: Option<crate::types::common::HumanReadableByteCount>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub generation_threshold_size: Option<crate::types::common::HumanReadableByteCount>,
+    #[doc = "Whether translog read-forward is enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub read_forward: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub retention: Option<crate::types::indices_common::TranslogRetention>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sync_interval: Option<crate::types::common::Duration>,
+}
+
+#[doc = "The translog batch append configuration."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TranslogBatchAppend {
+    #[doc = "Whether successful primary index operations are appended to the translog in bounded batches instead of one write per operation. Only takes effect on remote-backed indexes that use segment replication and a remote translog. Default is `false`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<crate::types::common::StringifiedBoolean>,
+    #[doc = "The maximum number of operations in one batched translog append. Valid values are `1` to `100000`. Default is `1000`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_operations: Option<crate::types::common::StringifiedInteger>,
+    #[doc = "The maximum serialized size of one batched translog append. Valid values are `4kb` to `64mb`. Default is `1mb`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_size: Option<crate::types::common::HumanReadableByteCount>,
 }
 
 #[doc = "The durability settings for the translog."]

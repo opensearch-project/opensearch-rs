@@ -233,69 +233,6 @@ pub struct Collector {
     pub time_in_nanos: crate::types::common::DurationValueUnitNanos,
 }
 
-#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(transparent)]
-pub struct CompletionContext {
-    raw: Box<serde_json::value::RawValue>,
-}
-impl CompletionContext {
-    #[doc = "The raw JSON of the value"]
-    pub fn raw(&self) -> &serde_json::value::RawValue {
-        &self.raw
-    }
-    #[doc = "Whether the value is an explicit null"]
-    pub fn is_null(&self) -> bool {
-        self.raw.get() == "null"
-    }
-    #[doc = "Parses the value as the `context` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
-    pub fn as_context(
-        &self,
-    ) -> std::result::Result<crate::types::search::Context, crate::types::UnionBranchError> {
-        crate::types::union::parse_branch(&self.raw, "context")
-    }
-    #[doc = "Parses the value as the `object` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
-    pub fn as_object(
-        &self,
-    ) -> std::result::Result<
-        crate::types::search::CompletionContextObject,
-        crate::types::UnionBranchError,
-    > {
-        crate::types::union::parse_branch(&self.raw, "object")
-    }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct CompletionContextObject {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub boost: Option<f64>,
-    pub context: crate::types::search::Context,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub neighbours: Option<Vec<crate::types::common::GeoHashPrecision>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub precision: Option<crate::types::common::GeoHashPrecision>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prefix: Option<bool>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct CompletionSuggester {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub analyzer: Option<String>,
-    pub field: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub contexts:
-        Option<std::collections::BTreeMap<String, Vec<crate::types::search::CompletionContext>>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub fuzzy: Option<crate::types::search::SuggestFuzziness>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub regex: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub skip_duplicates: Option<bool>,
-}
-
 #[doc = "Text or location that we want similar documents for or a lookup to a document's field for the text."]
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -326,31 +263,6 @@ impl Context {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct DirectGenerator {
-    pub field: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_edits: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_inspections: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_term_freq: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub min_doc_freq: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub min_word_length: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub post_filter: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pre_filter: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prefix_length: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub suggest_mode: Option<crate::types::common::SuggestMode>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FetchProfile {
     pub breakdown: crate::types::search::FetchProfileBreakdown,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -365,21 +277,33 @@ pub struct FetchProfile {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FetchProfileBreakdown {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub load_source: Option<i32>,
+    pub build_sub_phase_processors: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub load_source_count: Option<i32>,
+    pub build_sub_phase_processors_count: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub load_stored_fields: Option<i32>,
+    pub create_stored_fields_visitor: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub load_stored_fields_count: Option<i32>,
+    pub create_stored_fields_visitor_count: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_reader: Option<i32>,
+    pub get_next_reader: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_reader_count: Option<i32>,
+    pub get_next_reader_count: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub process: Option<i32>,
+    pub load_source: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub process_count: Option<i32>,
+    pub load_source_count: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub load_stored_fields: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub load_stored_fields_count: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_count: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub set_next_reader: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub set_next_reader_count: Option<i64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -433,22 +357,6 @@ impl<'de> serde::Deserialize<'de> for FieldCollapseInnerHits {
         };
         parsed.map_err(serde::de::Error::custom)
     }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct FieldSuggester {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prefix: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub regex: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub text: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completion: Option<crate::types::search::CompletionSuggester>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub phrase: Option<crate::types::search::PhraseSuggester>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub term: Option<crate::types::search::TermSuggester>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -843,6 +751,7 @@ pub struct HitsMetadataHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -1277,6 +1186,7 @@ pub struct HitsMetadataJsonValueHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -1718,7 +1628,7 @@ impl crate::types::TotalHitCount for HitsMetadataJsonValueTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -1733,7 +1643,7 @@ impl HitsMetadataJsonValueTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 
@@ -1786,7 +1696,7 @@ impl crate::types::TotalHitCount for HitsMetadataTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -1801,7 +1711,7 @@ impl HitsMetadataTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 
@@ -1857,18 +1767,6 @@ pub struct InnerHitsResult {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct LaplaceSmoothingModel {
-    pub alpha: f64,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct LinearInterpolationSmoothingModel {
-    pub bigram_lambda: f64,
-    pub trigram_lambda: f64,
-    pub unigram_lambda: f64,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedIdentity {
     #[serde(rename = "_nested")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1883,29 +1781,6 @@ pub struct PhraseSuggest {
     pub offset: i32,
     pub text: String,
     pub options: crate::types::search::PhraseSuggestOptions,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhraseSuggestCollate {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub params: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prune: Option<bool>,
-    pub query: crate::types::search::PhraseSuggestCollateQuery,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhraseSuggestCollateQuery {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub source: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhraseSuggestHighlight {
-    pub post_tag: String,
-    pub pre_tag: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1949,48 +1824,6 @@ impl<'de> serde::Deserialize<'de> for PhraseSuggestOptions {
         };
         parsed.map_err(serde::de::Error::custom)
     }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhraseSuggester {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub analyzer: Option<String>,
-    pub field: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub collate: Option<crate::types::search::PhraseSuggestCollate>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub confidence: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub direct_generator: Option<Vec<crate::types::search::DirectGenerator>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub force_unigrams: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub gram_size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub highlight: Option<crate::types::search::PhraseSuggestHighlight>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_errors: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub real_word_error_likelihood: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub separator: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub shard_size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub smoothing: Option<crate::types::search::SmoothingModel>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub text: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub token_limit: Option<i32>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PointInTimeReference {
-    pub id: crate::types::common::Id,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub keep_alive: Option<crate::types::common::Duration>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2074,7 +1907,7 @@ pub struct SearchResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phase_took: Option<crate::types::common::PhaseTook>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<crate::types::common::Id>,
+    pub pit_id: Option<crate::types::common::PitId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processor_results: Option<Vec<crate::types::search::ProcessorExecutionDetail>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2123,6 +1956,7 @@ pub struct SearchResponseHitsHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -2565,7 +2399,7 @@ impl crate::types::TotalHitCount for SearchResponseHitsTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -2580,7 +2414,7 @@ impl SearchResponseHitsTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 
@@ -2609,7 +2443,7 @@ pub struct SearchResult {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phase_took: Option<crate::types::common::PhaseTook>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<crate::types::common::Id>,
+    pub pit_id: Option<crate::types::common::PitId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processor_results: Option<Vec<crate::types::search::ProcessorExecutionDetail>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2658,6 +2492,7 @@ pub struct SearchResultHitsHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -3100,7 +2935,7 @@ impl crate::types::TotalHitCount for SearchResultHitsTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -3115,7 +2950,7 @@ impl SearchResultHitsTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 
@@ -3129,19 +2964,13 @@ impl SearchResultHitsTotal {
 pub struct ShardProfile {
     pub aggregations: Vec<crate::types::search::AggregationProfile>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub fetch: Option<crate::types::search::FetchProfile>,
+    pub fetch: Option<Vec<crate::types::search::FetchProfile>>,
     pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inbound_network_time_in_millis: Option<crate::types::common::DurationValueUnitMillis>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outbound_network_time_in_millis: Option<crate::types::common::DurationValueUnitMillis>,
     pub searches: Vec<crate::types::search::SearchProfile>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct SmoothingModel {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub laplace: Option<crate::types::search::LaplaceSmoothingModel>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub linear_interpolation: Option<crate::types::search::LinearInterpolationSmoothingModel>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stupid_backoff: Option<crate::types::search::StupidBackoffSmoothingModel>,
 }
 
 #[doc = "Defines how to fetch a source. Fetching can be disabled entirely, or the source can be filtered."]
@@ -3209,64 +3038,6 @@ pub struct SourceFilterObject {
     pub excludes: Option<crate::types::common::Fields>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub includes: Option<crate::types::common::Fields>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StringDistance {
-    #[doc = "`damerau_levenshtein`"]
-    DamerauLevenshtein,
-    #[doc = "`internal`"]
-    Internal,
-    #[doc = "`jaro_winkler`"]
-    JaroWinkler,
-    #[doc = "`levenshtein`"]
-    Levenshtein,
-    #[doc = "`ngram`"]
-    Ngram,
-    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
-    Unknown(String),
-}
-impl StringDistance {
-    #[doc = "The JSON string of the value"]
-    pub fn as_str(&self) -> &str {
-        match self {
-            StringDistance::DamerauLevenshtein => "damerau_levenshtein",
-            StringDistance::Internal => "internal",
-            StringDistance::JaroWinkler => "jaro_winkler",
-            StringDistance::Levenshtein => "levenshtein",
-            StringDistance::Ngram => "ngram",
-            StringDistance::Unknown(s) => s.as_str(),
-        }
-    }
-}
-impl serde::Serialize for StringDistance {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-impl<'de> serde::Deserialize<'de> for StringDistance {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "damerau_levenshtein" => StringDistance::DamerauLevenshtein,
-            "internal" => StringDistance::Internal,
-            "jaro_winkler" => StringDistance::JaroWinkler,
-            "levenshtein" => StringDistance::Levenshtein,
-            "ngram" => StringDistance::Ngram,
-            _ => StringDistance::Unknown(s),
-        })
-    }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct StupidBackoffSmoothingModel {
-    pub discount: f64,
 }
 
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
@@ -3431,127 +3202,6 @@ impl SuggestCompletionOptionsObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct SuggestFuzziness {
-    pub fuzziness: String,
-    pub min_length: i32,
-    pub prefix_length: i32,
-    pub transpositions: bool,
-    pub unicode_aware: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestSort {
-    #[doc = "`frequency`"]
-    Frequency,
-    #[doc = "`score`"]
-    Score,
-    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
-    Unknown(String),
-}
-impl SuggestSort {
-    #[doc = "The JSON string of the value"]
-    pub fn as_str(&self) -> &str {
-        match self {
-            SuggestSort::Frequency => "frequency",
-            SuggestSort::Score => "score",
-            SuggestSort::Unknown(s) => s.as_str(),
-        }
-    }
-}
-impl serde::Serialize for SuggestSort {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-impl<'de> serde::Deserialize<'de> for SuggestSort {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "frequency" => SuggestSort::Frequency,
-            "score" => SuggestSort::Score,
-            _ => SuggestSort::Unknown(s),
-        })
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Suggester {
-    #[doc = "The global suggest text, which avoids repetition when the same text is used in several suggesters."]
-    pub text: Option<String>,
-    pub additional: std::collections::BTreeMap<String, crate::types::search::FieldSuggester>,
-}
-impl<'de> serde::Deserialize<'de> for Suggester {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        struct ResidualVisitor;
-        impl<'de> serde::de::Visitor<'de> for ResidualVisitor {
-            type Value = Suggester;
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a Suggester object")
-            }
-            // locals are named after the field identifiers, which keep a
-            // leading underscore when two JSON names would otherwise clash
-            // (`_nodes` -> `f__nodes`)
-            #[allow(non_snake_case)]
-            fn visit_map<A>(self, mut map: A) -> std::result::Result<Self::Value, A::Error>
-            where
-                A: serde::de::MapAccess<'de>,
-            {
-                let mut f_text: Option<String> = None;
-                let mut seen_text = false;
-                let mut residual: std::collections::BTreeMap<
-                    String,
-                    crate::types::search::FieldSuggester,
-                > = Default::default();
-                while let Some(k) = map.next_key::<String>()? {
-                    match k.as_str() {
-                        "text" => {
-                            if seen_text {
-                                return Err(serde::de::Error::duplicate_field("text"));
-                            }
-                            seen_text = true;
-                            f_text = map.next_value::<Option<String>>()?;
-                        }
-                        _ => {
-                            residual.insert(k, map.next_value()?);
-                        }
-                    }
-                }
-                Ok(Suggester {
-                    text: f_text,
-                    additional: residual,
-                })
-            }
-        }
-        deserializer.deserialize_map(ResidualVisitor)
-    }
-}
-impl serde::Serialize for Suggester {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(None)?;
-        if let Some(v) = &self.text {
-            map.serialize_entry("text", v)?;
-        }
-        for (k, v) in &self.additional {
-            map.serialize_entry(k, v)?;
-        }
-        map.end()
-    }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TermSuggest {
     pub length: i32,
     pub offset: i32,
@@ -3564,7 +3214,7 @@ pub struct TermSuggestOption {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub collate_match: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub freq: Option<i64>,
+    pub freq: Option<i32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub highlighted: Option<String>,
     pub score: f64,
@@ -3605,115 +3255,7 @@ impl<'de> serde::Deserialize<'de> for TermSuggestOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct TermSuggester {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub analyzer: Option<String>,
-    pub field: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub lowercase_terms: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_edits: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_inspections: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_term_freq: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub min_doc_freq: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub min_word_length: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prefix_length: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub shard_size: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sort: Option<crate::types::search::SuggestSort>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub string_distance: Option<crate::types::search::StringDistance>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub suggest_mode: Option<crate::types::common::SuggestMode>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub text: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TotalHits {
-    pub relation: crate::types::search::TotalHitsRelation,
+    pub relation: crate::types::common::TotalHitsRelation,
     pub value: i64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TotalHitsRelation {
-    #[doc = "`eq`"]
-    Eq,
-    #[doc = "`gte`"]
-    Gte,
-    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
-    Unknown(String),
-}
-impl TotalHitsRelation {
-    #[doc = "The JSON string of the value"]
-    pub fn as_str(&self) -> &str {
-        match self {
-            TotalHitsRelation::Eq => "eq",
-            TotalHitsRelation::Gte => "gte",
-            TotalHitsRelation::Unknown(s) => s.as_str(),
-        }
-    }
-}
-impl serde::Serialize for TotalHitsRelation {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-impl<'de> serde::Deserialize<'de> for TotalHitsRelation {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "eq" => TotalHitsRelation::Eq,
-            "gte" => TotalHitsRelation::Gte,
-            _ => TotalHitsRelation::Unknown(s),
-        })
-    }
-}
-
-#[doc = "The number of hits matching the query. When `true`, the exact number of hits is returned at the cost of some performance. When `false`, the response does not include the total number of hits matching the query. Default is `10,000` hits."]
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum TrackHits {
-    Enabled(bool),
-    Count(i32),
-}
-impl<'de> serde::Deserialize<'de> for TrackHits {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b't') | Some(b'f') => serde_json::from_str(text).map(TrackHits::Enabled),
-            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(TrackHits::Count),
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "TrackHits"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
-    }
 }

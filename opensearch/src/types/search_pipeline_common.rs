@@ -82,6 +82,27 @@ pub struct FilterQueryRequestProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MLInferenceRequestProcessor {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub function_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ignore_failure: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_map: Option<Vec<std::collections::BTreeMap<String, String>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_config: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    pub model_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_input: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_map: Option<Vec<std::collections::BTreeMap<String, String>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MLOpenSearchReranker {
     pub model_id: String,
 }
@@ -265,6 +286,15 @@ impl RequestProcessor {
     > {
         crate::types::union::parse_branch(&self.raw, "oversample")
     }
+    #[doc = "Parses the value as the `ml_inference` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_ml_inference(
+        &self,
+    ) -> std::result::Result<
+        crate::types::search_pipeline_common::RequestProcessorMlInference,
+        crate::types::UnionBranchError,
+    > {
+        crate::types::union::parse_branch(&self.raw, "ml_inference")
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -276,6 +306,11 @@ pub struct RequestProcessorAgenticQueryTranslator {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RequestProcessorFilterQuery {
     pub filter_query: crate::types::search_pipeline_common::FilterQueryRequestProcessor,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct RequestProcessorMlInference {
+    pub ml_inference: crate::types::search_pipeline_common::MLInferenceRequestProcessor,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -537,12 +572,15 @@ pub struct ScoreNormalization {
     pub technique: Option<crate::types::search_pipeline_common::ScoreNormalizationTechnique>,
 }
 
+#[doc = "The score normalization technique. `z_score` is available since OpenSearch 3.0 and can only be combined with the `arithmetic_mean` combination technique."]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScoreNormalizationTechnique {
     #[doc = "`l2`"]
     L2,
     #[doc = "`min_max`"]
     MinMax,
+    #[doc = "`z_score`"]
+    ZScore,
     #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
     Unknown(String),
 }
@@ -552,6 +590,7 @@ impl ScoreNormalizationTechnique {
         match self {
             ScoreNormalizationTechnique::L2 => "l2",
             ScoreNormalizationTechnique::MinMax => "min_max",
+            ScoreNormalizationTechnique::ZScore => "z_score",
             ScoreNormalizationTechnique::Unknown(s) => s.as_str(),
         }
     }
@@ -573,6 +612,7 @@ impl<'de> serde::Deserialize<'de> for ScoreNormalizationTechnique {
         Ok(match s.as_str() {
             "l2" => ScoreNormalizationTechnique::L2,
             "min_max" => ScoreNormalizationTechnique::MinMax,
+            "z_score" => ScoreNormalizationTechnique::ZScore,
             _ => ScoreNormalizationTechnique::Unknown(s),
         })
     }

@@ -347,7 +347,7 @@ impl SecurityChangePasswordParts {
         }
     }
 }
-#[doc = "Builder for the [Security Change Password API](https://opensearch.org/docs/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
+#[doc = "Builder for the [Security Change Password API](https://docs.opensearch.org/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
 #[derive(Clone, Debug)]
 pub struct SecurityChangePassword<'a, 'b, B> {
     transport: &'a Transport,
@@ -484,7 +484,7 @@ impl SecurityConfigUpgradeCheckParts {
         }
     }
 }
-#[doc = "Builder for the [Security Config Upgrade Check API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
+#[doc = "Builder for the [Security Config Upgrade Check API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
 #[derive(Clone, Debug)]
 pub struct SecurityConfigUpgradeCheck<'a, 'b> {
     transport: &'a Transport,
@@ -598,7 +598,7 @@ impl SecurityConfigUpgradePerformParts {
         }
     }
 }
-#[doc = "Builder for the [Security Config Upgrade Perform API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
+#[doc = "Builder for the [Security Config Upgrade Perform API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
 #[derive(Clone, Debug)]
 pub struct SecurityConfigUpgradePerform<'a, 'b, B> {
     transport: &'a Transport,
@@ -740,7 +740,7 @@ impl<'b> SecurityCreateActionGroupParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Create Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
+#[doc = "Builder for the [Security Create Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateActionGroup<'a, 'b, B> {
     transport: &'a Transport,
@@ -862,6 +862,141 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Security Create Action Groups API"]
+pub enum SecurityCreateActionGroupsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SecurityCreateActionGroupsParts {
+    #[doc = "Builds a relative URL path to the Security Create Action Groups API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SecurityCreateActionGroupsParts::None => "/_plugins/_security/api/actiongroups".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Security Create Action Groups API](https://docs.opensearch.org/latest/security/api/action-groups/create-action-group/)\n\nCreates or replaces multiple action groups. Action groups omitted from the request are unchanged. All entries are validated before any changes are written."]
+#[derive(Clone, Debug)]
+pub struct SecurityCreateActionGroups<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SecurityCreateActionGroupsParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SecurityCreateActionGroups<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SecurityCreateActionGroups]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SecurityCreateActionGroups {
+            transport,
+            parts: SecurityCreateActionGroupsParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SecurityCreateActionGroups<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SecurityCreateActionGroups {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Security Create Action Groups API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Put;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Security Create Allowlist API"]
 pub enum SecurityCreateAllowlistParts {
     #[doc = "No parts"]
@@ -875,7 +1010,7 @@ impl SecurityCreateAllowlistParts {
         }
     }
 }
-#[doc = "Builder for the [Security Create Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
+#[doc = "Builder for the [Security Create Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateAllowlist<'a, 'b, B> {
     transport: &'a Transport,
@@ -1016,7 +1151,7 @@ impl<'b> SecurityCreateRoleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Create Role API](https://opensearch.org/docs/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
+#[doc = "Builder for the [Security Create Role API](https://docs.opensearch.org/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateRole<'a, 'b, B> {
     transport: &'a Transport,
@@ -1157,7 +1292,7 @@ impl<'b> SecurityCreateRoleMappingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Create Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
+#[doc = "Builder for the [Security Create Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateRoleMapping<'a, 'b, B> {
     transport: &'a Transport,
@@ -1279,6 +1414,151 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Security Create Role Mappings API"]
+pub enum SecurityCreateRoleMappingsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SecurityCreateRoleMappingsParts {
+    #[doc = "Builds a relative URL path to the Security Create Role Mappings API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SecurityCreateRoleMappingsParts::None => "/_plugins/_security/api/rolesmapping".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Security Create Role Mappings API](https://docs.opensearch.org/latest/security/api/role-mappings/create-role-mapping/)\n\nCreates or replaces multiple role mappings. Role mappings omitted from the request are unchanged. Every named role must exist, and all entries are validated before any changes are written."]
+#[derive(Clone, Debug)]
+pub struct SecurityCreateRoleMappings<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SecurityCreateRoleMappingsParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+    wait_for_completion: Option<bool>,
+}
+impl<'a, 'b, B> SecurityCreateRoleMappings<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SecurityCreateRoleMappings]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SecurityCreateRoleMappings {
+            transport,
+            parts: SecurityCreateRoleMappingsParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+            wait_for_completion: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SecurityCreateRoleMappings<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SecurityCreateRoleMappings {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+            wait_for_completion: self.wait_for_completion,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "If false, returns a task ID after validation and runs the configuration write and reload asynchronously."]
+    pub fn wait_for_completion(mut self, wait_for_completion: bool) -> Self {
+        self.wait_for_completion = Some(wait_for_completion);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Security Create Role Mappings API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Put;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+                wait_for_completion: Option<bool>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+                wait_for_completion: self.wait_for_completion,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Security Create Tenant API"]
 pub enum SecurityCreateTenantParts<'b> {
     #[doc = "Tenant"]
@@ -1299,7 +1579,7 @@ impl<'b> SecurityCreateTenantParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Create Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
+#[doc = "Builder for the [Security Create Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateTenant<'a, 'b, B> {
     transport: &'a Transport,
@@ -1436,7 +1716,7 @@ impl SecurityCreateUpdateTenancyConfigParts {
         }
     }
 }
-#[doc = "Builder for the [Security Create Update Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Create Update Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateUpdateTenancyConfig<'a, 'b, B> {
     transport: &'a Transport,
@@ -1578,7 +1858,7 @@ impl<'b> SecurityCreateUserParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Create User API](https://opensearch.org/docs/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
+#[doc = "Builder for the [Security Create User API](https://docs.opensearch.org/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
 #[derive(Clone, Debug)]
 pub struct SecurityCreateUser<'a, 'b, B> {
     transport: &'a Transport,
@@ -1862,7 +2142,7 @@ impl<'b> SecurityDeleteActionGroupParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
+#[doc = "Builder for the [Security Delete Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteActionGroup<'a, 'b> {
     transport: &'a Transport,
@@ -1981,7 +2261,7 @@ impl<'b> SecurityDeleteDistinguishedNameParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Delete Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteDistinguishedName<'a, 'b> {
     transport: &'a Transport,
@@ -2099,7 +2379,7 @@ impl<'b> SecurityDeleteRoleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete Role API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
+#[doc = "Builder for the [Security Delete Role API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteRole<'a, 'b> {
     transport: &'a Transport,
@@ -2217,7 +2497,7 @@ impl<'b> SecurityDeleteRoleMappingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
+#[doc = "Builder for the [Security Delete Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteRoleMapping<'a, 'b> {
     transport: &'a Transport,
@@ -2336,7 +2616,7 @@ impl<'b> SecurityDeleteTenantParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
+#[doc = "Builder for the [Security Delete Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteTenant<'a, 'b> {
     transport: &'a Transport,
@@ -2455,7 +2735,7 @@ impl<'b> SecurityDeleteUserParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Delete User API](https://opensearch.org/docs/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
+#[doc = "Builder for the [Security Delete User API](https://docs.opensearch.org/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
 #[derive(Clone, Debug)]
 pub struct SecurityDeleteUser<'a, 'b> {
     transport: &'a Transport,
@@ -2686,7 +2966,7 @@ impl SecurityFlushCacheParts {
         }
     }
 }
-#[doc = "Builder for the [Security Flush Cache API](https://opensearch.org/docs/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
+#[doc = "Builder for the [Security Flush Cache API](https://docs.opensearch.org/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
 #[derive(Clone, Debug)]
 pub struct SecurityFlushCache<'a, 'b> {
     transport: &'a Transport,
@@ -2800,7 +3080,7 @@ impl SecurityGenerateOboTokenParts {
         }
     }
 }
-#[doc = "Builder for the [Security Generate Obo Token API](https://opensearch.org/docs/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
+#[doc = "Builder for the [Security Generate Obo Token API](https://docs.opensearch.org/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
 #[derive(Clone, Debug)]
 pub struct SecurityGenerateOboToken<'a, 'b, B> {
     transport: &'a Transport,
@@ -3078,7 +3358,7 @@ impl SecurityGetAccountDetailsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Account Details API](https://opensearch.org/docs/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
+#[doc = "Builder for the [Security Get Account Details API](https://docs.opensearch.org/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetAccountDetails<'a, 'b> {
     transport: &'a Transport,
@@ -3197,7 +3477,7 @@ impl<'b> SecurityGetActionGroupParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
+#[doc = "Builder for the [Security Get Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetActionGroup<'a, 'b> {
     transport: &'a Transport,
@@ -3309,7 +3589,7 @@ impl SecurityGetActionGroupsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
+#[doc = "Builder for the [Security Get Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetActionGroups<'a, 'b> {
     transport: &'a Transport,
@@ -3551,7 +3831,7 @@ impl SecurityGetAllowlistParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
+#[doc = "Builder for the [Security Get Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetAllowlist<'a, 'b> {
     transport: &'a Transport,
@@ -3663,7 +3943,7 @@ impl SecurityGetAuditConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
+#[doc = "Builder for the [Security Get Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetAuditConfiguration<'a, 'b> {
     transport: &'a Transport,
@@ -3775,7 +4055,7 @@ impl SecurityGetCertificatesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
+#[doc = "Builder for the [Security Get Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetCertificates<'a, 'b> {
     transport: &'a Transport,
@@ -3887,7 +4167,7 @@ impl SecurityGetConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
+#[doc = "Builder for the [Security Get Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetConfiguration<'a, 'b> {
     transport: &'a Transport,
@@ -4118,7 +4398,7 @@ impl<'b> SecurityGetDistinguishedNameParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Get Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetDistinguishedName<'a, 'b> {
     transport: &'a Transport,
@@ -4239,7 +4519,7 @@ impl SecurityGetDistinguishedNamesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Get Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetDistinguishedNames<'a, 'b> {
     transport: &'a Transport,
@@ -4617,7 +4897,7 @@ impl<'b> SecurityGetRoleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get Role API](https://opensearch.org/docs/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
+#[doc = "Builder for the [Security Get Role API](https://docs.opensearch.org/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetRole<'a, 'b> {
     transport: &'a Transport,
@@ -4735,7 +5015,7 @@ impl<'b> SecurityGetRoleMappingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
+#[doc = "Builder for the [Security Get Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetRoleMapping<'a, 'b> {
     transport: &'a Transport,
@@ -4847,7 +5127,7 @@ impl SecurityGetRoleMappingsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
+#[doc = "Builder for the [Security Get Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetRoleMappings<'a, 'b> {
     transport: &'a Transport,
@@ -4959,7 +5239,7 @@ impl SecurityGetRolesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Roles API](https://opensearch.org/docs/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
+#[doc = "Builder for the [Security Get Roles API](https://docs.opensearch.org/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetRoles<'a, 'b> {
     transport: &'a Transport,
@@ -5192,7 +5472,7 @@ impl SecurityGetTenancyConfigParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Get Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetTenancyConfig<'a, 'b> {
     transport: &'a Transport,
@@ -5311,7 +5591,7 @@ impl<'b> SecurityGetTenantParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
+#[doc = "Builder for the [Security Get Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetTenant<'a, 'b> {
     transport: &'a Transport,
@@ -5423,7 +5703,7 @@ impl SecurityGetTenantsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
+#[doc = "Builder for the [Security Get Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetTenants<'a, 'b> {
     transport: &'a Transport,
@@ -5542,7 +5822,7 @@ impl<'b> SecurityGetUserParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Get User API](https://opensearch.org/docs/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
+#[doc = "Builder for the [Security Get User API](https://docs.opensearch.org/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetUser<'a, 'b> {
     transport: &'a Transport,
@@ -5773,7 +6053,7 @@ impl SecurityGetUsersParts {
         }
     }
 }
-#[doc = "Builder for the [Security Get Users API](https://opensearch.org/docs/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
+#[doc = "Builder for the [Security Get Users API](https://docs.opensearch.org/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
 #[derive(Clone, Debug)]
 pub struct SecurityGetUsers<'a, 'b> {
     transport: &'a Transport,
@@ -5997,7 +6277,7 @@ impl SecurityHealthParts {
         }
     }
 }
-#[doc = "Builder for the [Security Health API](https://opensearch.org/docs/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
+#[doc = "Builder for the [Security Health API](https://docs.opensearch.org/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
 #[derive(Clone, Debug)]
 pub struct SecurityHealth<'a, 'b, B> {
     transport: &'a Transport,
@@ -6287,7 +6567,7 @@ impl<'b> SecurityPatchActionGroupParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
+#[doc = "Builder for the [Security Patch Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchActionGroup<'a, 'b, B> {
     transport: &'a Transport,
@@ -6422,7 +6702,7 @@ impl SecurityPatchActionGroupsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
+#[doc = "Builder for the [Security Patch Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchActionGroups<'a, 'b, B> {
     transport: &'a Transport,
@@ -6557,7 +6837,7 @@ impl SecurityPatchAllowlistParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
+#[doc = "Builder for the [Security Patch Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchAllowlist<'a, 'b, B> {
     transport: &'a Transport,
@@ -6692,7 +6972,7 @@ impl SecurityPatchAuditConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
+#[doc = "Builder for the [Security Patch Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchAuditConfiguration<'a, 'b, B> {
     transport: &'a Transport,
@@ -6829,7 +7109,7 @@ impl SecurityPatchConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Patch Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchConfiguration<'a, 'b, B> {
     transport: &'a Transport,
@@ -7106,7 +7386,7 @@ impl SecurityPatchDistinguishedNamesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Patch Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchDistinguishedNames<'a, 'b, B> {
     transport: &'a Transport,
@@ -7247,7 +7527,7 @@ impl<'b> SecurityPatchRoleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Role API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
+#[doc = "Builder for the [Security Patch Role API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchRole<'a, 'b, B> {
     transport: &'a Transport,
@@ -7388,7 +7668,7 @@ impl<'b> SecurityPatchRoleMappingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
+#[doc = "Builder for the [Security Patch Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchRoleMapping<'a, 'b, B> {
     transport: &'a Transport,
@@ -7523,7 +7803,7 @@ impl SecurityPatchRoleMappingsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
+#[doc = "Builder for the [Security Patch Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchRoleMappings<'a, 'b, B> {
     transport: &'a Transport,
@@ -7658,7 +7938,7 @@ impl SecurityPatchRolesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Roles API](https://opensearch.org/docs/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
+#[doc = "Builder for the [Security Patch Roles API](https://docs.opensearch.org/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchRoles<'a, 'b, B> {
     transport: &'a Transport,
@@ -7800,7 +8080,7 @@ impl<'b> SecurityPatchTenantParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
+#[doc = "Builder for the [Security Patch Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchTenant<'a, 'b, B> {
     transport: &'a Transport,
@@ -7935,7 +8215,7 @@ impl SecurityPatchTenantsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
+#[doc = "Builder for the [Security Patch Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchTenants<'a, 'b, B> {
     transport: &'a Transport,
@@ -8077,7 +8357,7 @@ impl<'b> SecurityPatchUserParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Patch User API](https://opensearch.org/docs/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
+#[doc = "Builder for the [Security Patch User API](https://docs.opensearch.org/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchUser<'a, 'b, B> {
     transport: &'a Transport,
@@ -8212,7 +8492,7 @@ impl SecurityPatchUsersParts {
         }
     }
 }
-#[doc = "Builder for the [Security Patch Users API](https://opensearch.org/docs/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
+#[doc = "Builder for the [Security Patch Users API](https://docs.opensearch.org/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
 #[derive(Clone, Debug)]
 pub struct SecurityPatchUsers<'a, 'b, B> {
     transport: &'a Transport,
@@ -8484,7 +8764,7 @@ impl SecurityReloadHttpCertificatesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Reload Http Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
+#[doc = "Builder for the [Security Reload Http Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
 #[derive(Clone, Debug)]
 pub struct SecurityReloadHttpCertificates<'a, 'b, B> {
     transport: &'a Transport,
@@ -8621,7 +8901,7 @@ impl SecurityReloadTransportCertificatesParts {
         }
     }
 }
-#[doc = "Builder for the [Security Reload Transport Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
+#[doc = "Builder for the [Security Reload Transport Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
 #[derive(Clone, Debug)]
 pub struct SecurityReloadTransportCertificates<'a, 'b, B> {
     transport: &'a Transport,
@@ -8896,7 +9176,7 @@ impl SecurityUpdateAuditConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Update Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
+#[doc = "Builder for the [Security Update Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
 #[derive(Clone, Debug)]
 pub struct SecurityUpdateAuditConfiguration<'a, 'b, B> {
     transport: &'a Transport,
@@ -9033,7 +9313,7 @@ impl SecurityUpdateConfigurationParts {
         }
     }
 }
-#[doc = "Builder for the [Security Update Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Update Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityUpdateConfiguration<'a, 'b, B> {
     transport: &'a Transport,
@@ -9175,7 +9455,7 @@ impl<'b> SecurityUpdateDistinguishedNameParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Security Update Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
+#[doc = "Builder for the [Security Update Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
 #[derive(Clone, Debug)]
 pub struct SecurityUpdateDistinguishedName<'a, 'b, B> {
     transport: &'a Transport,
@@ -9687,57 +9967,65 @@ impl<'a> Security<'a> {
     pub fn authtoken<'b>(&'a self) -> SecurityAuthtoken<'a, 'b, ()> {
         SecurityAuthtoken::new(self.transport())
     }
-    #[doc = "[Security Change Password API](https://opensearch.org/docs/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
+    #[doc = "[Security Change Password API](https://docs.opensearch.org/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
     pub fn change_password<'b>(&'a self) -> SecurityChangePassword<'a, 'b, ()> {
         SecurityChangePassword::new(self.transport())
     }
-    #[doc = "[Security Config Upgrade Check API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
+    #[doc = "[Security Config Upgrade Check API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
     pub fn config_upgrade_check<'b>(&'a self) -> SecurityConfigUpgradeCheck<'a, 'b> {
         SecurityConfigUpgradeCheck::new(self.transport())
     }
-    #[doc = "[Security Config Upgrade Perform API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
+    #[doc = "[Security Config Upgrade Perform API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
     pub fn config_upgrade_perform<'b>(&'a self) -> SecurityConfigUpgradePerform<'a, 'b, ()> {
         SecurityConfigUpgradePerform::new(self.transport())
     }
-    #[doc = "[Security Create Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
+    #[doc = "[Security Create Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
     pub fn create_action_group<'b>(
         &'a self,
         parts: SecurityCreateActionGroupParts<'b>,
     ) -> SecurityCreateActionGroup<'a, 'b, ()> {
         SecurityCreateActionGroup::new(self.transport(), parts)
     }
-    #[doc = "[Security Create Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
+    #[doc = "[Security Create Action Groups API](https://docs.opensearch.org/latest/security/api/action-groups/create-action-group/)\n\nCreates or replaces multiple action groups. Action groups omitted from the request are unchanged. All entries are validated before any changes are written."]
+    pub fn create_action_groups<'b>(&'a self) -> SecurityCreateActionGroups<'a, 'b, ()> {
+        SecurityCreateActionGroups::new(self.transport())
+    }
+    #[doc = "[Security Create Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
     pub fn create_allowlist<'b>(&'a self) -> SecurityCreateAllowlist<'a, 'b, ()> {
         SecurityCreateAllowlist::new(self.transport())
     }
-    #[doc = "[Security Create Role API](https://opensearch.org/docs/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
+    #[doc = "[Security Create Role API](https://docs.opensearch.org/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
     pub fn create_role<'b>(
         &'a self,
         parts: SecurityCreateRoleParts<'b>,
     ) -> SecurityCreateRole<'a, 'b, ()> {
         SecurityCreateRole::new(self.transport(), parts)
     }
-    #[doc = "[Security Create Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
+    #[doc = "[Security Create Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
     pub fn create_role_mapping<'b>(
         &'a self,
         parts: SecurityCreateRoleMappingParts<'b>,
     ) -> SecurityCreateRoleMapping<'a, 'b, ()> {
         SecurityCreateRoleMapping::new(self.transport(), parts)
     }
-    #[doc = "[Security Create Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
+    #[doc = "[Security Create Role Mappings API](https://docs.opensearch.org/latest/security/api/role-mappings/create-role-mapping/)\n\nCreates or replaces multiple role mappings. Role mappings omitted from the request are unchanged. Every named role must exist, and all entries are validated before any changes are written."]
+    pub fn create_role_mappings<'b>(&'a self) -> SecurityCreateRoleMappings<'a, 'b, ()> {
+        SecurityCreateRoleMappings::new(self.transport())
+    }
+    #[doc = "[Security Create Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
     pub fn create_tenant<'b>(
         &'a self,
         parts: SecurityCreateTenantParts<'b>,
     ) -> SecurityCreateTenant<'a, 'b, ()> {
         SecurityCreateTenant::new(self.transport(), parts)
     }
-    #[doc = "[Security Create Update Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Create Update Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
     pub fn create_update_tenancy_config<'b>(
         &'a self,
     ) -> SecurityCreateUpdateTenancyConfig<'a, 'b, ()> {
         SecurityCreateUpdateTenancyConfig::new(self.transport())
     }
-    #[doc = "[Security Create User API](https://opensearch.org/docs/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
+    #[doc = "[Security Create User API](https://docs.opensearch.org/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
     pub fn create_user<'b>(
         &'a self,
         parts: SecurityCreateUserParts<'b>,
@@ -9751,42 +10039,42 @@ impl<'a> Security<'a> {
     ) -> SecurityCreateUserLegacy<'a, 'b, ()> {
         SecurityCreateUserLegacy::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
+    #[doc = "[Security Delete Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
     pub fn delete_action_group<'b>(
         &'a self,
         parts: SecurityDeleteActionGroupParts<'b>,
     ) -> SecurityDeleteActionGroup<'a, 'b> {
         SecurityDeleteActionGroup::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
+    #[doc = "[Security Delete Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
     pub fn delete_distinguished_name<'b>(
         &'a self,
         parts: SecurityDeleteDistinguishedNameParts<'b>,
     ) -> SecurityDeleteDistinguishedName<'a, 'b> {
         SecurityDeleteDistinguishedName::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete Role API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
+    #[doc = "[Security Delete Role API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
     pub fn delete_role<'b>(
         &'a self,
         parts: SecurityDeleteRoleParts<'b>,
     ) -> SecurityDeleteRole<'a, 'b> {
         SecurityDeleteRole::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
+    #[doc = "[Security Delete Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
     pub fn delete_role_mapping<'b>(
         &'a self,
         parts: SecurityDeleteRoleMappingParts<'b>,
     ) -> SecurityDeleteRoleMapping<'a, 'b> {
         SecurityDeleteRoleMapping::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
+    #[doc = "[Security Delete Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
     pub fn delete_tenant<'b>(
         &'a self,
         parts: SecurityDeleteTenantParts<'b>,
     ) -> SecurityDeleteTenant<'a, 'b> {
         SecurityDeleteTenant::new(self.transport(), parts)
     }
-    #[doc = "[Security Delete User API](https://opensearch.org/docs/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
+    #[doc = "[Security Delete User API](https://docs.opensearch.org/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
     pub fn delete_user<'b>(
         &'a self,
         parts: SecurityDeleteUserParts<'b>,
@@ -9800,11 +10088,11 @@ impl<'a> Security<'a> {
     ) -> SecurityDeleteUserLegacy<'a, 'b> {
         SecurityDeleteUserLegacy::new(self.transport(), parts)
     }
-    #[doc = "[Security Flush Cache API](https://opensearch.org/docs/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
+    #[doc = "[Security Flush Cache API](https://docs.opensearch.org/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
     pub fn flush_cache<'b>(&'a self) -> SecurityFlushCache<'a, 'b> {
         SecurityFlushCache::new(self.transport())
     }
-    #[doc = "[Security Generate Obo Token API](https://opensearch.org/docs/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
+    #[doc = "[Security Generate Obo Token API](https://docs.opensearch.org/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
     pub fn generate_obo_token<'b>(&'a self) -> SecurityGenerateOboToken<'a, 'b, ()> {
         SecurityGenerateOboToken::new(self.transport())
     }
@@ -9815,18 +10103,18 @@ impl<'a> Security<'a> {
     ) -> SecurityGenerateUserToken<'a, 'b, ()> {
         SecurityGenerateUserToken::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Account Details API](https://opensearch.org/docs/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
+    #[doc = "[Security Get Account Details API](https://docs.opensearch.org/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
     pub fn get_account_details<'b>(&'a self) -> SecurityGetAccountDetails<'a, 'b> {
         SecurityGetAccountDetails::new(self.transport())
     }
-    #[doc = "[Security Get Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
+    #[doc = "[Security Get Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
     pub fn get_action_group<'b>(
         &'a self,
         parts: SecurityGetActionGroupParts<'b>,
     ) -> SecurityGetActionGroup<'a, 'b> {
         SecurityGetActionGroup::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
+    #[doc = "[Security Get Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
     pub fn get_action_groups<'b>(&'a self) -> SecurityGetActionGroups<'a, 'b> {
         SecurityGetActionGroups::new(self.transport())
     }
@@ -9834,19 +10122,19 @@ impl<'a> Security<'a> {
     pub fn get_all_certificates<'b>(&'a self) -> SecurityGetAllCertificates<'a, 'b> {
         SecurityGetAllCertificates::new(self.transport())
     }
-    #[doc = "[Security Get Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
+    #[doc = "[Security Get Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
     pub fn get_allowlist<'b>(&'a self) -> SecurityGetAllowlist<'a, 'b> {
         SecurityGetAllowlist::new(self.transport())
     }
-    #[doc = "[Security Get Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
+    #[doc = "[Security Get Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
     pub fn get_audit_configuration<'b>(&'a self) -> SecurityGetAuditConfiguration<'a, 'b> {
         SecurityGetAuditConfiguration::new(self.transport())
     }
-    #[doc = "[Security Get Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
+    #[doc = "[Security Get Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
     pub fn get_certificates<'b>(&'a self) -> SecurityGetCertificates<'a, 'b> {
         SecurityGetCertificates::new(self.transport())
     }
-    #[doc = "[Security Get Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
+    #[doc = "[Security Get Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
     pub fn get_configuration<'b>(&'a self) -> SecurityGetConfiguration<'a, 'b> {
         SecurityGetConfiguration::new(self.transport())
     }
@@ -9854,14 +10142,14 @@ impl<'a> Security<'a> {
     pub fn get_dashboards_info<'b>(&'a self) -> SecurityGetDashboardsInfo<'a, 'b> {
         SecurityGetDashboardsInfo::new(self.transport())
     }
-    #[doc = "[Security Get Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
     pub fn get_distinguished_name<'b>(
         &'a self,
         parts: SecurityGetDistinguishedNameParts<'b>,
     ) -> SecurityGetDistinguishedName<'a, 'b> {
         SecurityGetDistinguishedName::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
     pub fn get_distinguished_names<'b>(&'a self) -> SecurityGetDistinguishedNames<'a, 'b> {
         SecurityGetDistinguishedNames::new(self.transport())
     }
@@ -9876,22 +10164,22 @@ impl<'a> Security<'a> {
     pub fn get_permissions_info<'b>(&'a self) -> SecurityGetPermissionsInfo<'a, 'b> {
         SecurityGetPermissionsInfo::new(self.transport())
     }
-    #[doc = "[Security Get Role API](https://opensearch.org/docs/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
+    #[doc = "[Security Get Role API](https://docs.opensearch.org/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
     pub fn get_role<'b>(&'a self, parts: SecurityGetRoleParts<'b>) -> SecurityGetRole<'a, 'b> {
         SecurityGetRole::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
+    #[doc = "[Security Get Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
     pub fn get_role_mapping<'b>(
         &'a self,
         parts: SecurityGetRoleMappingParts<'b>,
     ) -> SecurityGetRoleMapping<'a, 'b> {
         SecurityGetRoleMapping::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
+    #[doc = "[Security Get Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
     pub fn get_role_mappings<'b>(&'a self) -> SecurityGetRoleMappings<'a, 'b> {
         SecurityGetRoleMappings::new(self.transport())
     }
-    #[doc = "[Security Get Roles API](https://opensearch.org/docs/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
+    #[doc = "[Security Get Roles API](https://docs.opensearch.org/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
     pub fn get_roles<'b>(&'a self) -> SecurityGetRoles<'a, 'b> {
         SecurityGetRoles::new(self.transport())
     }
@@ -9899,22 +10187,22 @@ impl<'a> Security<'a> {
     pub fn get_sslinfo<'b>(&'a self) -> SecurityGetSslinfo<'a, 'b> {
         SecurityGetSslinfo::new(self.transport())
     }
-    #[doc = "[Security Get Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
     pub fn get_tenancy_config<'b>(&'a self) -> SecurityGetTenancyConfig<'a, 'b> {
         SecurityGetTenancyConfig::new(self.transport())
     }
-    #[doc = "[Security Get Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
+    #[doc = "[Security Get Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
     pub fn get_tenant<'b>(
         &'a self,
         parts: SecurityGetTenantParts<'b>,
     ) -> SecurityGetTenant<'a, 'b> {
         SecurityGetTenant::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
+    #[doc = "[Security Get Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
     pub fn get_tenants<'b>(&'a self) -> SecurityGetTenants<'a, 'b> {
         SecurityGetTenants::new(self.transport())
     }
-    #[doc = "[Security Get User API](https://opensearch.org/docs/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
+    #[doc = "[Security Get User API](https://docs.opensearch.org/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
     pub fn get_user<'b>(&'a self, parts: SecurityGetUserParts<'b>) -> SecurityGetUser<'a, 'b> {
         SecurityGetUser::new(self.transport(), parts)
     }
@@ -9925,7 +10213,7 @@ impl<'a> Security<'a> {
     ) -> SecurityGetUserLegacy<'a, 'b> {
         SecurityGetUserLegacy::new(self.transport(), parts)
     }
-    #[doc = "[Security Get Users API](https://opensearch.org/docs/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
+    #[doc = "[Security Get Users API](https://docs.opensearch.org/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
     pub fn get_users<'b>(&'a self) -> SecurityGetUsers<'a, 'b> {
         SecurityGetUsers::new(self.transport())
     }
@@ -9933,7 +10221,7 @@ impl<'a> Security<'a> {
     pub fn get_users_legacy<'b>(&'a self) -> SecurityGetUsersLegacy<'a, 'b> {
         SecurityGetUsersLegacy::new(self.transport())
     }
-    #[doc = "[Security Health API](https://opensearch.org/docs/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
+    #[doc = "[Security Health API](https://docs.opensearch.org/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
     pub fn health<'b>(&'a self) -> SecurityHealth<'a, 'b, ()> {
         SecurityHealth::new(self.transport())
     }
@@ -9941,26 +10229,26 @@ impl<'a> Security<'a> {
     pub fn migrate<'b>(&'a self) -> SecurityMigrate<'a, 'b, ()> {
         SecurityMigrate::new(self.transport())
     }
-    #[doc = "[Security Patch Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
+    #[doc = "[Security Patch Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
     pub fn patch_action_group<'b>(
         &'a self,
         parts: SecurityPatchActionGroupParts<'b>,
     ) -> SecurityPatchActionGroup<'a, 'b, ()> {
         SecurityPatchActionGroup::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
+    #[doc = "[Security Patch Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
     pub fn patch_action_groups<'b>(&'a self) -> SecurityPatchActionGroups<'a, 'b, ()> {
         SecurityPatchActionGroups::new(self.transport())
     }
-    #[doc = "[Security Patch Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
+    #[doc = "[Security Patch Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
     pub fn patch_allowlist<'b>(&'a self) -> SecurityPatchAllowlist<'a, 'b, ()> {
         SecurityPatchAllowlist::new(self.transport())
     }
-    #[doc = "[Security Patch Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
+    #[doc = "[Security Patch Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
     pub fn patch_audit_configuration<'b>(&'a self) -> SecurityPatchAuditConfiguration<'a, 'b, ()> {
         SecurityPatchAuditConfiguration::new(self.transport())
     }
-    #[doc = "[Security Patch Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
+    #[doc = "[Security Patch Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
     pub fn patch_configuration<'b>(&'a self) -> SecurityPatchConfiguration<'a, 'b, ()> {
         SecurityPatchConfiguration::new(self.transport())
     }
@@ -9971,51 +10259,51 @@ impl<'a> Security<'a> {
     ) -> SecurityPatchDistinguishedName<'a, 'b, ()> {
         SecurityPatchDistinguishedName::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Patch Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
     pub fn patch_distinguished_names<'b>(&'a self) -> SecurityPatchDistinguishedNames<'a, 'b, ()> {
         SecurityPatchDistinguishedNames::new(self.transport())
     }
-    #[doc = "[Security Patch Role API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
+    #[doc = "[Security Patch Role API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
     pub fn patch_role<'b>(
         &'a self,
         parts: SecurityPatchRoleParts<'b>,
     ) -> SecurityPatchRole<'a, 'b, ()> {
         SecurityPatchRole::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
+    #[doc = "[Security Patch Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
     pub fn patch_role_mapping<'b>(
         &'a self,
         parts: SecurityPatchRoleMappingParts<'b>,
     ) -> SecurityPatchRoleMapping<'a, 'b, ()> {
         SecurityPatchRoleMapping::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
+    #[doc = "[Security Patch Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
     pub fn patch_role_mappings<'b>(&'a self) -> SecurityPatchRoleMappings<'a, 'b, ()> {
         SecurityPatchRoleMappings::new(self.transport())
     }
-    #[doc = "[Security Patch Roles API](https://opensearch.org/docs/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
+    #[doc = "[Security Patch Roles API](https://docs.opensearch.org/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
     pub fn patch_roles<'b>(&'a self) -> SecurityPatchRoles<'a, 'b, ()> {
         SecurityPatchRoles::new(self.transport())
     }
-    #[doc = "[Security Patch Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
+    #[doc = "[Security Patch Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
     pub fn patch_tenant<'b>(
         &'a self,
         parts: SecurityPatchTenantParts<'b>,
     ) -> SecurityPatchTenant<'a, 'b, ()> {
         SecurityPatchTenant::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
+    #[doc = "[Security Patch Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
     pub fn patch_tenants<'b>(&'a self) -> SecurityPatchTenants<'a, 'b, ()> {
         SecurityPatchTenants::new(self.transport())
     }
-    #[doc = "[Security Patch User API](https://opensearch.org/docs/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
+    #[doc = "[Security Patch User API](https://docs.opensearch.org/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
     pub fn patch_user<'b>(
         &'a self,
         parts: SecurityPatchUserParts<'b>,
     ) -> SecurityPatchUser<'a, 'b, ()> {
         SecurityPatchUser::new(self.transport(), parts)
     }
-    #[doc = "[Security Patch Users API](https://opensearch.org/docs/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
+    #[doc = "[Security Patch Users API](https://docs.opensearch.org/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
     pub fn patch_users<'b>(&'a self) -> SecurityPatchUsers<'a, 'b, ()> {
         SecurityPatchUsers::new(self.transport())
     }
@@ -10023,11 +10311,11 @@ impl<'a> Security<'a> {
     pub fn post_dashboards_info<'b>(&'a self) -> SecurityPostDashboardsInfo<'a, 'b, ()> {
         SecurityPostDashboardsInfo::new(self.transport())
     }
-    #[doc = "[Security Reload Http Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
+    #[doc = "[Security Reload Http Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
     pub fn reload_http_certificates<'b>(&'a self) -> SecurityReloadHttpCertificates<'a, 'b, ()> {
         SecurityReloadHttpCertificates::new(self.transport())
     }
-    #[doc = "[Security Reload Transport Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
+    #[doc = "[Security Reload Transport Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
     pub fn reload_transport_certificates<'b>(
         &'a self,
     ) -> SecurityReloadTransportCertificates<'a, 'b, ()> {
@@ -10037,17 +10325,17 @@ impl<'a> Security<'a> {
     pub fn tenant_info<'b>(&'a self) -> SecurityTenantInfo<'a, 'b, ()> {
         SecurityTenantInfo::new(self.transport())
     }
-    #[doc = "[Security Update Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
+    #[doc = "[Security Update Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
     pub fn update_audit_configuration<'b>(
         &'a self,
     ) -> SecurityUpdateAuditConfiguration<'a, 'b, ()> {
         SecurityUpdateAuditConfiguration::new(self.transport())
     }
-    #[doc = "[Security Update Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Update Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
     pub fn update_configuration<'b>(&'a self) -> SecurityUpdateConfiguration<'a, 'b, ()> {
         SecurityUpdateConfiguration::new(self.transport())
     }
-    #[doc = "[Security Update Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
+    #[doc = "[Security Update Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
     pub fn update_distinguished_name<'b>(
         &'a self,
         parts: SecurityUpdateDistinguishedNameParts<'b>,

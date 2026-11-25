@@ -36,6 +36,9 @@ pub struct AutoFollowStats {
     #[doc = "When the last execution of this auto-follow pattern occurred."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_execution_time: Option<f64>,
+    #[doc = "The alias of the leader cluster for this pattern."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub leader_alias: Option<String>,
     #[doc = "The name of the auto-follow pattern."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -257,7 +260,48 @@ impl<'de> serde::Deserialize<'de> for ReplicationStatus {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct RestoreDetails {
+    #[doc = "The percentage of bytes recovered."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bytes_percent: Option<f64>,
+    #[doc = "The number of bytes recovered so far."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bytes_recovered: Option<i64>,
+    #[doc = "The total number of bytes to restore."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bytes_total: Option<i64>,
+    #[doc = "The percentage of files recovered."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub files_percent: Option<f64>,
+    #[doc = "The number of files recovered so far."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub files_recovered: Option<i32>,
+    #[doc = "The total number of files to restore."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub files_total: Option<i32>,
+    #[doc = "The elapsed restore time in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub running_time: Option<i64>,
+    #[doc = "When the restore started, in epoch milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start_time: Option<i64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ShardInfoResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bootstrap_task_details: Option<crate::types::replication_common::RestoreDetails>,
+    #[doc = "The shard identifier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub syncing_task_details: Option<crate::types::replication_common::SyncingDetails>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Status {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bootstrap_details: Option<crate::types::replication_common::RestoreDetails>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub follower_index: Option<crate::types::common::IndexName>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -267,6 +311,9 @@ pub struct Status {
     #[doc = "The reason for the current replication status."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
+    #[doc = "Per-shard replication details. Only present in verbose status responses."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_replication_details: Option<Vec<crate::types::replication_common::ShardInfoResponse>>,
     #[doc = "The current status of the replication process."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<crate::types::replication_common::ReplicationStatus>,

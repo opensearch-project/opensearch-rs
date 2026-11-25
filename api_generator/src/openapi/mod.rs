@@ -1380,7 +1380,7 @@ components:
                      schema:\n            type: string\n            enum: [on, off]\n      responses: {}\n";
         let err = read_fixture_err(&enum_names_fixture(paths, ""));
         assert!(err.contains("parameter `mode`"), "{}", err);
-        assert!(err.contains("no single specification schema"), "{}", err);
+        assert!(err.contains("no specification schema"), "{}", err);
     }
 
     #[test]

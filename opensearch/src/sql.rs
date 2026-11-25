@@ -54,7 +54,7 @@ impl SqlCloseParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Close API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
+#[doc = "Builder for the [Sql Close API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
 #[derive(Clone, Debug)]
 pub struct SqlClose<'a, 'b, B> {
     transport: &'a Transport,
@@ -62,7 +62,7 @@ pub struct SqlClose<'a, 'b, B> {
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -123,7 +123,7 @@ where
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -170,7 +170,7 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 sanitize: Option<bool>,
@@ -209,7 +209,7 @@ impl SqlExplainParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
+#[doc = "Builder for the [Sql Explain API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
 #[derive(Clone, Debug)]
 pub struct SqlExplain<'a, 'b, B> {
     transport: &'a Transport,
@@ -217,7 +217,7 @@ pub struct SqlExplain<'a, 'b, B> {
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -278,7 +278,7 @@ where
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -325,7 +325,7 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 sanitize: Option<bool>,
@@ -364,14 +364,14 @@ impl SqlGetStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Get Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
+#[doc = "Builder for the [Sql Get Stats API](https://docs.opensearch.org/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
 #[derive(Clone, Debug)]
 pub struct SqlGetStats<'a, 'b> {
     transport: &'a Transport,
     parts: SqlGetStatsParts,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -408,7 +408,7 @@ impl<'a, 'b> SqlGetStats<'a, 'b> {
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -455,7 +455,7 @@ impl<'a, 'b> SqlGetStats<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 sanitize: Option<bool>,
@@ -494,7 +494,7 @@ impl SqlPostStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Post Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
+#[doc = "Builder for the [Sql Post Stats API](https://docs.opensearch.org/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
 #[derive(Clone, Debug)]
 pub struct SqlPostStats<'a, 'b, B> {
     transport: &'a Transport,
@@ -502,7 +502,7 @@ pub struct SqlPostStats<'a, 'b, B> {
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -563,7 +563,7 @@ where
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -610,7 +610,7 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 sanitize: Option<bool>,
@@ -649,7 +649,7 @@ impl SqlQueryParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
+#[doc = "Builder for the [Sql Query API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
 #[derive(Clone, Debug)]
 pub struct SqlQuery<'a, 'b, B> {
     transport: &'a Transport,
@@ -657,7 +657,7 @@ pub struct SqlQuery<'a, 'b, B> {
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -718,7 +718,7 @@ where
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -765,7 +765,7 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 sanitize: Option<bool>,
@@ -804,7 +804,7 @@ impl SqlSettingsParts {
         }
     }
 }
-#[doc = "Builder for the [Sql Settings API](https://opensearch.org/docs/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
+#[doc = "Builder for the [Sql Settings API](https://docs.opensearch.org/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
 #[derive(Clone, Debug)]
 pub struct SqlSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -812,7 +812,7 @@ pub struct SqlSettings<'a, 'b, B> {
     body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<PplResponseFormat>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
@@ -870,7 +870,7 @@ where
         self
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: PplResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -912,7 +912,7 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<PplResponseFormat>,
                 human: Option<bool>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
@@ -947,27 +947,27 @@ impl<'a> Sql<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Sql Close API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
+    #[doc = "[Sql Close API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
     pub fn close<'b>(&'a self) -> SqlClose<'a, 'b, ()> {
         SqlClose::new(self.transport())
     }
-    #[doc = "[Sql Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
+    #[doc = "[Sql Explain API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
     pub fn explain<'b>(&'a self) -> SqlExplain<'a, 'b, ()> {
         SqlExplain::new(self.transport())
     }
-    #[doc = "[Sql Get Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
+    #[doc = "[Sql Get Stats API](https://docs.opensearch.org/latest/search-plugins/sql/monitoring/)\n\nRetrieves performance metrics for the SQL plugin."]
     pub fn get_stats<'b>(&'a self) -> SqlGetStats<'a, 'b> {
         SqlGetStats::new(self.transport())
     }
-    #[doc = "[Sql Post Stats API](https://opensearch.org/docs/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
+    #[doc = "[Sql Post Stats API](https://docs.opensearch.org/latest/search-plugins/sql/monitoring/)\n\nRetrieves filtered performance metrics for the SQL plugin."]
     pub fn post_stats<'b>(&'a self) -> SqlPostStats<'a, 'b, ()> {
         SqlPostStats::new(self.transport())
     }
-    #[doc = "[Sql Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
+    #[doc = "[Sql Query API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
     pub fn query<'b>(&'a self) -> SqlQuery<'a, 'b, ()> {
         SqlQuery::new(self.transport())
     }
-    #[doc = "[Sql Settings API](https://opensearch.org/docs/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
+    #[doc = "[Sql Settings API](https://docs.opensearch.org/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
     pub fn settings<'b>(&'a self) -> SqlSettings<'a, 'b, ()> {
         SqlSettings::new(self.transport())
     }

@@ -34,6 +34,9 @@ pub struct Cron {
     #[doc = "The cron expression that defines the schedule."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expression: Option<String>,
+    #[doc = "The delay in milliseconds before starting the rollup process."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schedule_delay: Option<i64>,
     #[doc = "The timezone for interpreting the cron expression."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub timezone: Option<String>,
@@ -106,55 +109,18 @@ pub struct HistogramDimension {
 #[doc = "Specifies the timing details for rollup job execution."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Interval {
-    #[doc = "The cron schedule configuration for the rollup job."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cron: Option<crate::types::rollups_common::IntervalCron>,
     #[doc = "The numerical value for the execution interval."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub period: Option<f64>,
+    pub period: Option<i32>,
     #[doc = "The delay in milliseconds before starting the rollup process."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub schedule_delay: Option<f64>,
+    pub schedule_delay: Option<i64>,
     #[doc = "When the rollup job should start, in epoch milliseconds."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub start_time: Option<f64>,
+    pub start_time: Option<i64>,
     #[doc = "The time unit for the execution interval, such as `MINUTES` or `HOURS`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
-}
-
-#[doc = "The cron schedule configuration for the rollup job."]
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum IntervalCron {
-    Array(Vec<crate::types::rollups_common::Cron>),
-    Cron(crate::types::rollups_common::Cron),
-}
-impl<'de> serde::Deserialize<'de> for IntervalCron {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b'[') => serde_json::from_str(text).map(IntervalCron::Array),
-            Some(b'{') => serde_json::from_str(text).map(IntervalCron::Cron),
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "IntervalCron"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
-    }
 }
 
 #[doc = "Defines metric aggregations for a field in a rollup job."]
@@ -265,9 +231,11 @@ pub struct RollupEntity {
     pub rollup: Option<crate::types::rollups_common::Rollup>,
 }
 
-#[doc = "Defines the execution schedule for a rollup job."]
+#[doc = "Defines the execution schedule for a rollup job. Exactly one of `interval` or `cron` must be specified."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Schedule {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cron: Option<crate::types::rollups_common::Cron>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub interval: Option<crate::types::rollups_common::Interval>,
 }

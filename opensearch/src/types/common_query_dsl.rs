@@ -2547,6 +2547,9 @@ pub struct NeuralQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_distance: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_parameters:
+        Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub min_score: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_id: Option<String>,
@@ -2554,6 +2557,31 @@ pub struct NeuralQuery {
     pub query_image: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_text: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NeuralSparseQuery {
+    #[serde(rename = "_name")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "Floating point number used to decrease or increase the relevance scores of the query. Boost values are relative to the default value of 1.0. A boost value between 0 and 1.0 decreases the relevance score. A value greater than 1.0 increases the relevance score."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boost: Option<f64>,
+    #[doc = "The analyzer to use for tokenization instead of an ML model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analyzer: Option<String>,
+    #[doc = "The maximum score threshold for sparse tokens. Deprecated since OpenSearch 2.12."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_token_score: Option<f64>,
+    #[doc = "The ID of the sparse encoding model or tokenizer model at the ML node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_id: Option<String>,
+    #[doc = "The query text to be encoded into sparse tokens by the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query_text: Option<String>,
+    #[doc = "Pre-computed sparse tokens and their weights. Use instead of query_text+model_id when tokens are already available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query_tokens: Option<std::collections::BTreeMap<String, f64>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -2817,6 +2845,7 @@ pub struct PrefixQueryObject {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct QueryContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agentic: Option<crate::types::common_query_dsl::AgenticQuery>,
@@ -2901,6 +2930,10 @@ pub struct QueryContainer {
     pub neural:
         Option<std::collections::BTreeMap<String, crate::types::common_query_dsl::NeuralQuery>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub neural_sparse: Option<
+        std::collections::BTreeMap<String, crate::types::common_query_dsl::NeuralSparseQuery>,
+    >,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<crate::types::common_query_dsl::ParentIdQuery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub percolate: Option<crate::types::common_query_dsl::PercolateQuery>,
@@ -2926,6 +2959,8 @@ pub struct QueryContainer {
     pub script_score: Option<Box<crate::types::common_query_dsl::ScriptScoreQuery>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub simple_query_string: Option<crate::types::common_query_dsl::SimpleQueryStringQuery>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sltr: Option<crate::types::common_query_dsl::StoredLtrQuery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub span_containing: Option<Box<crate::types::common_query_dsl::SpanContainingQuery>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3562,6 +3597,7 @@ pub struct SpanOrQuery {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct SpanQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub field_masking_span: Option<Box<crate::types::common_query_dsl::SpanFieldMaskingQuery>>,
@@ -3643,6 +3679,26 @@ pub struct SpanWithinQuery {
     pub little: Box<crate::types::common_query_dsl::SpanQuery>,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StoredLtrQuery {
+    #[serde(rename = "_name")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_features: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boost: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cache: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub featureset: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
+    pub params: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub store: Option<String>,
+}
+
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
@@ -3691,9 +3747,12 @@ pub struct TermQueryObject {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TermsLookup {
-    pub id: crate::types::common::Id,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<crate::types::common::Id>,
     pub index: crate::types::common::IndexName,
     pub path: crate::types::common::Field,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query: Option<crate::types::common_query_dsl::QueryContainer>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub routing: Option<crate::types::common::Routing>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

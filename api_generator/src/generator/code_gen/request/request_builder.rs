@@ -803,10 +803,20 @@ impl<'a> RequestBuilder<'a> {
 
         // the method creating the typed builder, with the omitted options that
         // have a fixed value set on the generic builder
+        // the value is a variant of the parameter's enum when the specification
+        // declares one (the `format` of the cat APIs), and a string otherwise
         let fixed = omitted.iter().filter_map(|(name, fixed)| {
-            fixed.map(|v| {
-                let name = ident(name);
-                quote!(.#name(#v))
+            fixed.map(|v| match self.endpoint.params.get(*name) {
+                Some(ty) if ty.ty == TypeKind::Enum => {
+                    let method = ident(name);
+                    let enum_ident = ident(&ty.enum_type_name(name).to_pascal_case());
+                    let variant = ident(&v.to_pascal_case());
+                    quote!(.#method(crate::params::#enum_ident::#variant))
+                }
+                _ => {
+                    let method = ident(name);
+                    quote!(.#method(#v))
+                }
             })
         });
         let inner_new = if self.enum_builder.contains_single_parameterless_part() {
@@ -1040,7 +1050,8 @@ mod tests {
 
         // the format option is not offered, and fixed to JSON on creation
         assert!(!builder.contains("fn format"), "{}", builder);
-        assert!(ctor.contains("crate :: cat :: CatIndices :: new (self . transport () , parts) . format (\"json\")"), "{}", ctor);
+        // the specification declares the format of the cat APIs as an enum
+        assert!(ctor.contains("crate :: cat :: CatIndices :: new (self . transport () , parts) . format (crate :: params :: CatResponseFormat :: Json)"), "{}", ctor);
         assert!(
             ctor.contains("parts : crate :: cat :: CatIndicesParts < 'b >"),
             "{}",

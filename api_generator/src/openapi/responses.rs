@@ -635,6 +635,14 @@ impl ModelBuilder<'_> {
         if depth > 8 {
             return Ok(None);
         }
+        // the fields of the schema itself make it a struct: a union next to them (e.g.
+        // `TermsLookup`: `properties` and an `allOf` of `oneOf: [{required: [id]},
+        // {required: [query]}]`) only constrains which of those fields are present
+        if schema["allOf"].is_array()
+            && (schema["properties"].is_object() || schema["additionalProperties"].is_object())
+        {
+            return Ok(None);
+        }
         if let Some(variants) = union_variants(schema) {
             return Ok(Some(variants));
         }
@@ -1653,7 +1661,7 @@ mod tests {
     #[test]
     fn const_unions_become_open_string_enums() {
         let model = core_model();
-        let relation = match &model.types["_core.search___TotalHitsRelation"] {
+        let relation = match &model.types["_common___TotalHitsRelation"] {
             TypeModel::StrEnum(e) => e,
             other => panic!("expected string enum, got {:?}", other),
         };
@@ -1815,6 +1823,41 @@ mod tests {
             model.non_exhaustive.iter().collect::<Vec<_>>(),
             vec!["t___Open"]
         );
+    }
+
+    #[test]
+    fn a_union_next_to_the_fields_of_a_schema_only_constrains_them() {
+        // `properties` next to an `allOf` holding a `oneOf` of presence constraints, as in
+        // `TermsLookup` and `SemanticProperty`: a struct with all the fields, none required by
+        // the constraint
+        let model = fixture_model(serde_json::json!({
+            "t___Root": {
+                "type": "object",
+                "properties": { "lookup": { "$ref": "#/components/schemas/t___Lookup" } }
+            },
+            "t___Lookup": {
+                "type": "object",
+                "properties": {
+                    "index": { "type": "string" },
+                    "id": { "type": "string" },
+                    "query": { "type": "object" }
+                },
+                "required": ["index"],
+                "allOf": [ { "oneOf": [
+                    { "type": "object", "properties": { "id": { "type": "string" } }, "required": ["id"] },
+                    { "type": "object", "properties": { "query": { "type": "object" } }, "required": ["query"] }
+                ] } ]
+            }
+        }));
+        match &model.types["t___Lookup"] {
+            TypeModel::Struct(s) => {
+                let names: Vec<&str> = s.fields.iter().map(|f| f.json_name.as_str()).collect();
+                assert_eq!(names, vec!["id", "index", "query"]);
+                let required: Vec<bool> = s.fields.iter().map(|f| f.required).collect();
+                assert_eq!(required, vec![false, true, false]);
+            }
+            other => panic!("expected a struct, got {:?}", other),
+        }
     }
 
     fn field<'a>(model: &'a ResponseModel, ty: &str, name: &str) -> &'a FieldModel {

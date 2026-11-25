@@ -29,19 +29,20 @@ let response_body = response.text().await?;
 
 # JSON responses
 
-JSON responses can be returned from Cat APIs either by using `.format("json")`
+JSON responses can be returned from Cat APIs either by using `.format(CatResponseFormat::Json)`
 
 ```rust,no_run
 # use opensearch::{OpenSearch, Error, SearchParts};
 # use url::Url;
 # use opensearch::auth::Credentials;
+# use opensearch::params::CatResponseFormat;
 # use serde_json::{json, Value};
 # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
 # let client = OpenSearch::default();
 let response = client
     .cat()
     .nodes()
-    .format("json")
+    .format(CatResponseFormat::Json)
     .send()
     .await?;
 

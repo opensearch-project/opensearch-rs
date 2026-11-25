@@ -94,6 +94,7 @@ needs the new arms: `ClusterStatsParts` (`MetricNodeId`, `MetricIndexMetricNodeI
 | `node_ids`, `node_names` | `&str` | `&[&str]` | `cluster().post_voting_config_exclusions(..)` |
 | `groups` | `bool` | `&[&str]` | `nodes().stats(..)` |
 | `size` | `params::Size` | `i64` | `cat().thread_pool(..)` |
+| `format` | `&str` | `params::CatResponseFormat` | the `cat` APIs (23) |
 
 For example:
 
@@ -101,10 +102,12 @@ For example:
 // 2.x
 client.get(GetParts::IndexId("movies", "1")).routing("user-1").refresh(true);
 client.search(SearchParts::None)._source(&["title", "year"]);
+client.cat().indices(CatIndicesParts::None).format("json");
 
 // 3.0
 client.get(GetParts::IndexId("movies", "1")).routing(&["user-1"]).refresh(Refresh::True);
 client.search(SearchParts::None)._source("title,year");
+client.cat().indices(CatIndicesParts::None).format(CatResponseFormat::Json);
 ```
 
 `slices`, `wait_for_active_shards` and `wait_for_nodes` take the type the specification declares for

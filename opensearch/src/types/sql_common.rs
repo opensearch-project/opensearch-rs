@@ -29,6 +29,16 @@
 #![allow(missing_docs)]
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CalciteExplain {
+    #[doc = "The Calcite logical query plan."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub logical: Option<String>,
+    #[doc = "The Calcite physical (enumerable) query plan."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub physical: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Cursor {
     #[doc = "The time to keep cursors alive."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -50,6 +60,8 @@ pub struct ExplainBody {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ExplainResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calcite: Option<crate::types::sql_common::CalciteExplain>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub root: Option<crate::types::sql_common::ExplainBody>,
 }

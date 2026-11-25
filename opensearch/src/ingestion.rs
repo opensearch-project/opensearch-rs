@@ -62,7 +62,7 @@ impl<'b> IngestionGetStateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingestion Get State API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
+#[doc = "Builder for the [Ingestion Get State API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
 #[derive(Clone, Debug)]
 pub struct IngestionGetState<'a, 'b> {
     transport: &'a Transport,
@@ -209,7 +209,7 @@ impl<'b> IngestionPauseParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingestion Pause API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
+#[doc = "Builder for the [Ingestion Pause API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
 #[derive(Clone, Debug)]
 pub struct IngestionPause<'a, 'b, B> {
     transport: &'a Transport,
@@ -372,7 +372,7 @@ impl<'b> IngestionResumeParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ingestion Resume API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
+#[doc = "Builder for the [Ingestion Resume API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
 #[derive(Clone, Debug)]
 pub struct IngestionResume<'a, 'b, B> {
     transport: &'a Transport,
@@ -525,15 +525,15 @@ impl<'a> Ingestion<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingestion Get State API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
+    #[doc = "[Ingestion Get State API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
     pub fn get_state<'b>(&'a self, parts: IngestionGetStateParts<'b>) -> IngestionGetState<'a, 'b> {
         IngestionGetState::new(self.transport(), parts)
     }
-    #[doc = "[Ingestion Pause API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
+    #[doc = "[Ingestion Pause API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
     pub fn pause<'b>(&'a self, parts: IngestionPauseParts<'b>) -> IngestionPause<'a, 'b, ()> {
         IngestionPause::new(self.transport(), parts)
     }
-    #[doc = "[Ingestion Resume API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
+    #[doc = "[Ingestion Resume API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
     pub fn resume<'b>(&'a self, parts: IngestionResumeParts<'b>) -> IngestionResume<'a, 'b, ()> {
         IngestionResume::new(self.transport(), parts)
     }

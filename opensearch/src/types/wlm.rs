@@ -35,7 +35,19 @@ pub struct DeleteQueryGroupResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DeleteWorkloadGroupResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub acknowledged: Option<bool>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GetQueryGroupResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_groups: Option<Vec<crate::types::wlm_common::QueryGroupResponse>>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct GetWorkloadGroupResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workload_groups: Option<Vec<crate::types::wlm_common::WorkloadGroupResponse>>,
 }

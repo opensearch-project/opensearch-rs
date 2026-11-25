@@ -54,7 +54,7 @@ impl ListHelpParts {
         }
     }
 }
-#[doc = "Builder for the [List Help API](https://opensearch.org/docs/latest/api-reference/list/index/)\n\nReturns help for the List APIs."]
+#[doc = "Builder for the [List Help API](https://docs.opensearch.org/latest/api-reference/list/index/)\n\nReturns help for the List APIs."]
 #[derive(Clone, Debug)]
 pub struct ListHelp<'a, 'b> {
     transport: &'a Transport,
@@ -177,7 +177,7 @@ impl<'b> ListIndicesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [List Indices API](https://opensearch.org/docs/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
+#[doc = "Builder for the [List Indices API](https://docs.opensearch.org/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
 #[derive(Clone, Debug)]
 pub struct ListIndices<'a, 'b> {
     transport: &'a Transport,
@@ -187,7 +187,7 @@ pub struct ListIndices<'a, 'b> {
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     health: Option<Health>,
@@ -202,7 +202,7 @@ pub struct ListIndices<'a, 'b> {
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
     size: Option<i64>,
-    sort: Option<Sort>,
+    sort: Option<SortOrder>,
     source: Option<&'b str>,
     time: Option<Time>,
     v: Option<bool>,
@@ -266,7 +266,7 @@ impl<'a, 'b> ListIndices<'a, 'b> {
         self
     }
     #[doc = "A short version of the Accept header, such as `JSON`, `YAML`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -342,7 +342,7 @@ impl<'a, 'b> ListIndices<'a, 'b> {
         self
     }
     #[doc = "Defines order in which indexes will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created indexes would be displayed first."]
-    pub fn sort(mut self, sort: Sort) -> Self {
+    pub fn sort(mut self, sort: SortOrder) -> Self {
         self.sort = Some(sort);
         self
     }
@@ -378,7 +378,7 @@ impl<'a, 'b> ListIndices<'a, 'b> {
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 health: Option<Health>,
@@ -393,7 +393,7 @@ impl<'a, 'b> ListIndices<'a, 'b> {
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
                 size: Option<i64>,
-                sort: Option<Sort>,
+                sort: Option<SortOrder>,
                 source: Option<&'b str>,
                 time: Option<Time>,
                 v: Option<bool>,
@@ -457,7 +457,7 @@ impl<'b> ListShardsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [List Shards API](https://opensearch.org/docs/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
+#[doc = "Builder for the [List Shards API](https://docs.opensearch.org/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
 #[derive(Clone, Debug)]
 pub struct ListShards<'a, 'b> {
     transport: &'a Transport,
@@ -466,7 +466,7 @@ pub struct ListShards<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
@@ -478,7 +478,7 @@ pub struct ListShards<'a, 'b> {
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
     size: Option<i64>,
-    sort: Option<Sort>,
+    sort: Option<SortOrder>,
     source: Option<&'b str>,
     time: Option<Time>,
     v: Option<bool>,
@@ -533,7 +533,7 @@ impl<'a, 'b> ListShards<'a, 'b> {
         self
     }
     #[doc = "A short version of the Accept header, such as `JSON`, `YAML`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -594,7 +594,7 @@ impl<'a, 'b> ListShards<'a, 'b> {
         self
     }
     #[doc = "Defines order in which shards will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created shards would be displayed first."]
-    pub fn sort(mut self, sort: Sort) -> Self {
+    pub fn sort(mut self, sort: SortOrder) -> Self {
         self.sort = Some(sort);
         self
     }
@@ -628,7 +628,7 @@ impl<'a, 'b> ListShards<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
@@ -640,7 +640,7 @@ impl<'a, 'b> ListShards<'a, 'b> {
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
                 size: Option<i64>,
-                sort: Option<Sort>,
+                sort: Option<SortOrder>,
                 source: Option<&'b str>,
                 time: Option<Time>,
                 v: Option<bool>,
@@ -675,6 +675,222 @@ impl<'a, 'b> ListShards<'a, 'b> {
         Ok(response)
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the List Wlm Stats API"]
+pub enum ListWlmStatsParts<'b> {
+    #[doc = "No parts"]
+    None,
+    #[doc = "WorkloadGroupId"]
+    WorkloadGroupId(&'b [&'b str]),
+    #[doc = "NodeId"]
+    NodeId(&'b [&'b str]),
+    #[doc = "NodeId and WorkloadGroupId"]
+    NodeIdWorkloadGroupId(&'b [&'b str], &'b [&'b str]),
+}
+impl<'b> ListWlmStatsParts<'b> {
+    #[doc = "Builds a relative URL path to the List Wlm Stats API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            ListWlmStatsParts::None => "/_list/wlm_stats".into(),
+            ListWlmStatsParts::WorkloadGroupId(workload_group_id) => {
+                let workload_group_id_str = workload_group_id.join(",");
+                let encoded_workload_group_id: Cow<str> =
+                    percent_encode(workload_group_id_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(23usize + encoded_workload_group_id.len());
+                p.push_str("/_list/wlm_stats/stats/");
+                p.push_str(encoded_workload_group_id.as_ref());
+                p.into()
+            }
+            ListWlmStatsParts::NodeId(node_id) => {
+                let node_id_str = node_id.join(",");
+                let encoded_node_id: Cow<str> =
+                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(23usize + encoded_node_id.len());
+                p.push_str("/_list/wlm_stats/");
+                p.push_str(encoded_node_id.as_ref());
+                p.push_str("/stats");
+                p.into()
+            }
+            ListWlmStatsParts::NodeIdWorkloadGroupId(node_id, workload_group_id) => {
+                let node_id_str = node_id.join(",");
+                let workload_group_id_str = workload_group_id.join(",");
+                let encoded_node_id: Cow<str> =
+                    percent_encode(node_id_str.as_bytes(), PARTS_ENCODED).into();
+                let encoded_workload_group_id: Cow<str> =
+                    percent_encode(workload_group_id_str.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(
+                    24usize + encoded_node_id.len() + encoded_workload_group_id.len(),
+                );
+                p.push_str("/_list/wlm_stats/");
+                p.push_str(encoded_node_id.as_ref());
+                p.push_str("/stats/");
+                p.push_str(encoded_workload_group_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the List Wlm Stats API\n\nReturns paginated workload management statistics in tabular form."]
+#[derive(Clone, Debug)]
+pub struct ListWlmStats<'a, 'b> {
+    transport: &'a Transport,
+    parts: ListWlmStatsParts<'b>,
+    breach: Option<bool>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    format: Option<CatResponseFormat>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    next_token: Option<&'b str>,
+    order: Option<Order>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    size: Option<i64>,
+    sort: Option<WlmStatsSortBy>,
+    source: Option<&'b str>,
+    v: Option<bool>,
+}
+impl<'a, 'b> ListWlmStats<'a, 'b> {
+    #[doc = "Creates a new instance of [ListWlmStats] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: ListWlmStatsParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        ListWlmStats {
+            transport,
+            parts,
+            headers,
+            breach: None,
+            error_trace: None,
+            filter_path: None,
+            format: None,
+            human: None,
+            next_token: None,
+            order: None,
+            pretty: None,
+            request_timeout: None,
+            size: None,
+            sort: None,
+            source: None,
+            v: None,
+        }
+    }
+    #[doc = "When `true`, returns only workload groups that have breached their resource limits."]
+    pub fn breach(mut self, breach: bool) -> Self {
+        self.breach = Some(breach);
+        self
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "A short version of the Accept header, such as `JSON`, `YAML`."]
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
+        self.format = Some(format);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Token used to retrieve the next page of workload management statistics."]
+    pub fn next_token(mut self, next_token: &'b str) -> Self {
+        self.next_token = Some(next_token);
+        self
+    }
+    #[doc = "The sort direction of the page. Allowed values are `asc` and `desc`. Defaults to `asc`."]
+    pub fn order(mut self, order: Order) -> Self {
+        self.order = Some(order);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The maximum number of node and workload group combinations to return in a page. Allowed range is 1 to 100."]
+    pub fn size(mut self, size: i64) -> Self {
+        self.size = Some(size);
+        self
+    }
+    #[doc = "The field used to sort results. Allowed values are `node_id` and `workload_group`. Defaults to `node_id`."]
+    pub fn sort(mut self, sort: WlmStatsSortBy) -> Self {
+        self.sort = Some(sort);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Verbose mode. Display column headers."]
+    pub fn v(mut self, v: bool) -> Self {
+        self.v = Some(v);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the List Wlm Stats API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                breach: Option<bool>,
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                format: Option<CatResponseFormat>,
+                human: Option<bool>,
+                next_token: Option<&'b str>,
+                order: Option<Order>,
+                pretty: Option<bool>,
+                size: Option<i64>,
+                sort: Option<WlmStatsSortBy>,
+                source: Option<&'b str>,
+                v: Option<bool>,
+            }
+            let query_params = QueryParams {
+                breach: self.breach,
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                format: self.format,
+                human: self.human,
+                next_token: self.next_token,
+                order: self.order,
+                pretty: self.pretty,
+                size: self.size,
+                sort: self.sort,
+                source: self.source,
+                v: self.v,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
 #[doc = "Namespace client for List APIs"]
 pub struct List<'a> {
     transport: &'a Transport,
@@ -687,17 +903,21 @@ impl<'a> List<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[List Help API](https://opensearch.org/docs/latest/api-reference/list/index/)\n\nReturns help for the List APIs."]
+    #[doc = "[List Help API](https://docs.opensearch.org/latest/api-reference/list/index/)\n\nReturns help for the List APIs."]
     pub fn help<'b>(&'a self) -> ListHelp<'a, 'b> {
         ListHelp::new(self.transport())
     }
-    #[doc = "[List Indices API](https://opensearch.org/docs/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
+    #[doc = "[List Indices API](https://docs.opensearch.org/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
     pub fn indices<'b>(&'a self, parts: ListIndicesParts<'b>) -> ListIndices<'a, 'b> {
         ListIndices::new(self.transport(), parts)
     }
-    #[doc = "[List Shards API](https://opensearch.org/docs/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
+    #[doc = "[List Shards API](https://docs.opensearch.org/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
     pub fn shards<'b>(&'a self, parts: ListShardsParts<'b>) -> ListShards<'a, 'b> {
         ListShards::new(self.transport(), parts)
+    }
+    #[doc = "List Wlm Stats API\n\nReturns paginated workload management statistics in tabular form."]
+    pub fn wlm_stats<'b>(&'a self, parts: ListWlmStatsParts<'b>) -> ListWlmStats<'a, 'b> {
+        ListWlmStats::new(self.transport(), parts)
     }
 }
 impl OpenSearch {

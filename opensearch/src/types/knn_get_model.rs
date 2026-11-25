@@ -29,4 +29,4 @@
 #![allow(missing_docs)]
 
 #[doc = "The response of the `knn.get_model` API"]
-pub type GetModelResponse = crate::types::knn::GetModelResponse;
+pub type GetModelResponse = crate::types::knn_common::ModelResponse;

@@ -42,7 +42,7 @@ use opensearch::{
         },
         StatusCode,
     },
-    params::TrackTotalHits,
+    params::{CatResponseFormat, TrackTotalHits},
     SearchParts,
 };
 use serde_json::{json, Value};
@@ -362,7 +362,7 @@ async fn cat_health_format_json() -> anyhow::Result<()> {
     let response = client
         .cat()
         .health()
-        .format("json")
+        .format(CatResponseFormat::Json)
         .pretty(true)
         .send()
         .await?;

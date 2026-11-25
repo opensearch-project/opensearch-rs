@@ -156,6 +156,9 @@ pub struct SnapshotShardFailure {
     #[doc = "The name of the index containing the failed shard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<crate::types::common::IndexName>,
+    #[doc = "The name of the index containing the failed shard. Despite the field name, the server writes the index name here rather than a UUID, so the value matches `index`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index_uuid: Option<String>,
     #[doc = "The ID of the node where the shard failure occurred."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_id: Option<crate::types::common::Id>,
@@ -164,7 +167,7 @@ pub struct SnapshotShardFailure {
     pub reason: Option<String>,
     #[doc = "The ID of the failed shard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub shard_id: Option<crate::types::common::Id>,
+    pub shard_id: Option<i32>,
     #[doc = "The status of the failed shard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,

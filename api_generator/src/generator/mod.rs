@@ -832,40 +832,48 @@ fn sorted(values: &[String]) -> Vec<String> {
 /// the schema name (`nodes._common___SampleType` becomes `SampleType`), or,
 /// when those collide, the schema name prefixed with its namespace
 /// (`cluster.health___Level` becomes `ClusterHealthLevel`, while
-/// `_common___Level` stays `Level`).
+/// `_common___Level` stays `Level`). Schemas that have the same values share
+/// one enum, named after the first of them.
 fn enum_type_names(
     endpoints: &[(String, ApiEndpoint)],
 ) -> anyhow::Result<HashMap<(String, Vec<String>), String>> {
-    // parameter name -> sorted values -> schemas, and the APIs for errors
+    // Rust name of the parameter -> the spellings of its name, and its sorted values -> schemas and
+    // the APIs, for errors. Names that differ only in case (`sort_order`, `sortOrder`) are one
+    // parameter: they have the same Rust name.
     type Uses<'a> = (BTreeSet<Option<&'a str>>, BTreeSet<&'a str>);
-    let mut by_param: BTreeMap<&str, BTreeMap<Vec<String>, Uses>> = BTreeMap::new();
+    type Group<'a> = (BTreeSet<&'a str>, BTreeMap<Vec<String>, Uses<'a>>);
+    let mut by_param: BTreeMap<String, Group> = BTreeMap::new();
     for (api, endpoint) in endpoints {
         for (param, ty) in endpoint.params.iter().filter(|p| p.1.ty == TypeKind::Enum) {
-            let (schemas, apis) = by_param
-                .entry(param.as_str())
-                .or_default()
-                .entry(sorted(&enum_options(ty)))
-                .or_default();
+            let (spellings, value_sets) = by_param.entry(param.to_pascal_case()).or_default();
+            spellings.insert(param.as_str());
+            let (schemas, apis) = value_sets.entry(sorted(&enum_options(ty))).or_default();
             schemas.insert(ty.enum_schema.as_deref());
             apis.insert(api.as_str());
         }
     }
 
     let mut names = HashMap::new();
-    for (param, value_sets) in &by_param {
+    for (spellings, value_sets) in by_param.values() {
+        // the first spelling names the enum when every API takes the same values
+        let param = *spellings.iter().next().unwrap();
         if value_sets.len() == 1 {
             for values in value_sets.keys() {
-                names.insert((param.to_string(), values.clone()), param.to_string());
+                for spelling in spellings {
+                    names.insert((spelling.to_string(), values.clone()), param.to_string());
+                }
             }
             continue;
         }
 
         let mut named = Vec::with_capacity(value_sets.len());
         for (values, (schemas, apis)) in value_sets {
-            let schema = match schemas.iter().collect::<Vec<_>>().as_slice() {
-                [Some(schema)] => *schema,
+            // several schemas with the same values (e.g. the response formats of two
+            // namespaces) share one enum, named after the first of them
+            let schema = match schemas.iter().next() {
+                Some(Some(schema)) if schemas.iter().all(Option::is_some) => *schema,
                 _ => bail!(
-                    "parameter `{}` takes values {:?} in {:?}, unlike other APIs, and has no single \
+                    "parameter `{}` takes values {:?} in {:?}, unlike other APIs, and has no \
                      specification schema to name its enum after (schemas: {:?})",
                     param,
                     values,
@@ -882,25 +890,34 @@ fn enum_type_names(
         let qualify = short.iter().collect::<HashSet<_>>().len() != short.len();
         for (values, schema) in named {
             let name = schema_type_name(schema, qualify);
-            names.insert((param.to_string(), values.clone()), name);
+            for spelling in spellings {
+                names.insert((spelling.to_string(), values.clone()), name.clone());
+            }
         }
     }
 
-    // different enums must not end up with the same Rust name
-    let mut by_rust_name: HashMap<String, &Vec<String>> = HashMap::new();
+    // Enums with the same Rust name are one enum when they have the same values, whatever their
+    // names (`SortOrder` named after a schema, `sortOrder` named after a parameter); otherwise they
+    // would define the same type twice.
+    let mut by_rust_name: HashMap<String, (Vec<String>, BTreeSet<String>)> = HashMap::new();
     for ((param, values), name) in &names {
-        let rust_name = name.to_pascal_case();
-        if let Some(other) = by_rust_name.insert(rust_name.clone(), values) {
-            if other != values {
-                bail!(
-                    "the enum of parameter `{}` ({:?}) and another enum ({:?}) are both named `{}`",
-                    param,
-                    values,
-                    other,
-                    rust_name
-                );
-            }
+        let (other, spellings) = by_rust_name
+            .entry(name.to_pascal_case())
+            .or_insert_with(|| (values.clone(), BTreeSet::new()));
+        if other != values {
+            bail!(
+                "the enum of parameter `{}` ({:?}) and another enum ({:?}) are both named `{}`",
+                param,
+                values,
+                other,
+                name.to_pascal_case()
+            );
         }
+        spellings.insert(name.clone());
+    }
+    for name in names.values_mut() {
+        let (_, spellings) = &by_rust_name[&name.to_pascal_case()];
+        *name = spellings.iter().next().unwrap().clone();
     }
     Ok(names)
 }

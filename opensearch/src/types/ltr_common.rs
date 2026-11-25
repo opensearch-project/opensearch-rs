@@ -90,6 +90,7 @@ pub struct CacheStats {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CacheStatsResponse {
+    #[doc = "Contains statistics about the number of nodes selected by the request's node filters."]
     #[serde(rename = "_nodes")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nodes: Option<crate::types::common::NodeStatistics>,

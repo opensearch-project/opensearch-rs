@@ -55,19 +55,20 @@
 //!
 //! # JSON responses
 //!
-//! JSON responses can be returned from Cat APIs either by using `.format("json")`
+//! JSON responses can be returned from Cat APIs either by using `.format(CatResponseFormat::Json)`
 //!
 //! ```rust,no_run
 //! # use opensearch::{OpenSearch, Error, SearchParts};
 //! # use url::Url;
 //! # use opensearch::auth::Credentials;
+//! # use opensearch::params::CatResponseFormat;
 //! # use serde_json::{json, Value};
 //! # async fn doc() -> Result<(), Box<dyn std::error::Error>> {
 //! # let client = OpenSearch::default();
 //! let response = client
 //!     .cat()
 //!     .nodes()
-//!     .format("json")
+//!     .format(CatResponseFormat::Json)
 //!     .send()
 //!     .await?;
 //!
@@ -160,7 +161,7 @@ impl<'b> CatAliasesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Aliases API](https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
+#[doc = "Builder for the [Cat Aliases API](https://docs.opensearch.org/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
 #[derive(Clone, Debug)]
 pub struct CatAliases<'a, 'b> {
     transport: &'a Transport,
@@ -168,11 +169,12 @@ pub struct CatAliases<'a, 'b> {
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -197,6 +199,7 @@ impl<'a, 'b> CatAliases<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             pretty: None,
             request_timeout: None,
@@ -220,7 +223,7 @@ impl<'a, 'b> CatAliases<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -242,6 +245,11 @@ impl<'a, 'b> CatAliases<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to return information from the local node only instead of from the cluster manager node."]
@@ -289,11 +297,12 @@ impl<'a, 'b> CatAliases<'a, 'b> {
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -309,6 +318,7 @@ impl<'a, 'b> CatAliases<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 pretty: self.pretty,
                 s: self.s,
@@ -339,7 +349,7 @@ impl CatAllPitSegmentsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat All Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
+#[doc = "Builder for the [Cat All Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
 #[derive(Clone, Debug)]
 pub struct CatAllPitSegments<'a, 'b> {
     transport: &'a Transport,
@@ -347,11 +357,12 @@ pub struct CatAllPitSegments<'a, 'b> {
     bytes: Option<Bytes>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -375,6 +386,7 @@ impl<'a, 'b> CatAllPitSegments<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -398,7 +410,7 @@ impl<'a, 'b> CatAllPitSegments<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -420,6 +432,11 @@ impl<'a, 'b> CatAllPitSegments<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -461,11 +478,12 @@ impl<'a, 'b> CatAllPitSegments<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -480,6 +498,7 @@ impl<'a, 'b> CatAllPitSegments<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -520,7 +539,7 @@ impl<'b> CatAllocationParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Allocation API](https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
+#[doc = "Builder for the [Cat Allocation API](https://docs.opensearch.org/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
 #[derive(Clone, Debug)]
 pub struct CatAllocation<'a, 'b> {
     transport: &'a Transport,
@@ -529,11 +548,12 @@ pub struct CatAllocation<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -560,6 +580,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -590,7 +611,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
         self
     }
     #[doc = "A short version of the HTTP `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -612,6 +633,11 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from cluster-manager node."]
@@ -665,11 +691,12 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -687,6 +714,7 @@ impl<'a, 'b> CatAllocation<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -718,7 +746,7 @@ impl CatClusterManagerParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Cluster Manager API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+#[doc = "Builder for the [Cat Cluster Manager API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
 #[derive(Clone, Debug)]
 pub struct CatClusterManager<'a, 'b> {
     transport: &'a Transport,
@@ -726,11 +754,12 @@ pub struct CatClusterManager<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -756,6 +785,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -781,7 +811,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
         self
     }
     #[doc = "A short version of the HTTP `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -803,6 +833,11 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -855,11 +890,12 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -876,6 +912,7 @@ impl<'a, 'b> CatClusterManager<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -918,18 +955,19 @@ impl<'b> CatCountParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Count API](https://opensearch.org/docs/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
+#[doc = "Builder for the [Cat Count API](https://docs.opensearch.org/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
 #[derive(Clone, Debug)]
 pub struct CatCount<'a, 'b> {
     transport: &'a Transport,
     parts: CatCountParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -952,6 +990,7 @@ impl<'a, 'b> CatCount<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -970,7 +1009,7 @@ impl<'a, 'b> CatCount<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -992,6 +1031,11 @@ impl<'a, 'b> CatCount<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -1032,11 +1076,12 @@ impl<'a, 'b> CatCount<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -1050,6 +1095,7 @@ impl<'a, 'b> CatCount<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -1090,7 +1136,7 @@ impl<'b> CatFielddataParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Fielddata API](https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
+#[doc = "Builder for the [Cat Fielddata API](https://docs.opensearch.org/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
 #[derive(Clone, Debug)]
 pub struct CatFielddata<'a, 'b> {
     transport: &'a Transport,
@@ -1099,11 +1145,12 @@ pub struct CatFielddata<'a, 'b> {
     error_trace: Option<bool>,
     fields: Option<&'b [&'b str]>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -1128,6 +1175,7 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -1156,7 +1204,7 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -1178,6 +1226,11 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -1221,11 +1274,12 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
                 fields: Option<&'b [&'b str]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -1241,6 +1295,7 @@ impl<'a, 'b> CatFielddata<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -1270,18 +1325,19 @@ impl CatHealthParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Health API](https://opensearch.org/docs/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
+#[doc = "Builder for the [Cat Health API](https://docs.opensearch.org/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
 #[derive(Clone, Debug)]
 pub struct CatHealth<'a, 'b> {
     transport: &'a Transport,
     parts: CatHealthParts,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -1306,6 +1362,7 @@ impl<'a, 'b> CatHealth<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -1326,7 +1383,7 @@ impl<'a, 'b> CatHealth<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -1348,6 +1405,11 @@ impl<'a, 'b> CatHealth<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -1398,11 +1460,12 @@ impl<'a, 'b> CatHealth<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -1418,6 +1481,7 @@ impl<'a, 'b> CatHealth<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -1449,7 +1513,7 @@ impl CatHelpParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Help API](https://opensearch.org/docs/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
+#[doc = "Builder for the [Cat Help API](https://docs.opensearch.org/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
 #[derive(Clone, Debug)]
 pub struct CatHelp<'a, 'b> {
     transport: &'a Transport,
@@ -1574,7 +1638,7 @@ impl<'b> CatIndicesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Indices API](https://opensearch.org/docs/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
+#[doc = "Builder for the [Cat Indices API](https://docs.opensearch.org/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
 #[derive(Clone, Debug)]
 pub struct CatIndices<'a, 'b> {
     transport: &'a Transport,
@@ -1584,13 +1648,14 @@ pub struct CatIndices<'a, 'b> {
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     health: Option<Health>,
     help: Option<bool>,
     human: Option<bool>,
     include_unloaded_segments: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -1622,6 +1687,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
             help: None,
             human: None,
             include_unloaded_segments: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -1658,7 +1724,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -1690,6 +1756,11 @@ impl<'a, 'b> CatIndices<'a, 'b> {
     #[doc = "Whether to include information from segments not loaded into memory."]
     pub fn include_unloaded_segments(mut self, include_unloaded_segments: bool) -> Self {
         self.include_unloaded_segments = Some(include_unloaded_segments);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -1755,13 +1826,14 @@ impl<'a, 'b> CatIndices<'a, 'b> {
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 health: Option<Health>,
                 help: Option<bool>,
                 human: Option<bool>,
                 include_unloaded_segments: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -1784,6 +1856,7 @@ impl<'a, 'b> CatIndices<'a, 'b> {
                 help: self.help,
                 human: self.human,
                 include_unloaded_segments: self.include_unloaded_segments,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -1819,7 +1892,7 @@ impl CatMasterParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+#[doc = "Builder for the [Cat Master API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
 #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -1829,11 +1902,12 @@ pub struct CatMaster<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -1860,6 +1934,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -1885,7 +1960,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -1907,6 +1982,11 @@ impl<'a, 'b> CatMaster<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -1959,11 +2039,12 @@ impl<'a, 'b> CatMaster<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -1980,6 +2061,7 @@ impl<'a, 'b> CatMaster<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -2011,7 +2093,7 @@ impl CatNodeattrsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Nodeattrs API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
+#[doc = "Builder for the [Cat Nodeattrs API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
 #[derive(Clone, Debug)]
 pub struct CatNodeattrs<'a, 'b> {
     transport: &'a Transport,
@@ -2019,11 +2101,12 @@ pub struct CatNodeattrs<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -2049,6 +2132,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -2074,7 +2158,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -2096,6 +2180,11 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -2148,11 +2237,12 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -2169,6 +2259,7 @@ impl<'a, 'b> CatNodeattrs<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -2200,7 +2291,7 @@ impl CatNodesParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Nodes API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
+#[doc = "Builder for the [Cat Nodes API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
 #[derive(Clone, Debug)]
 pub struct CatNodes<'a, 'b> {
     transport: &'a Transport,
@@ -2209,12 +2300,13 @@ pub struct CatNodes<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     full_id: Option<bool>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -2243,6 +2335,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -2274,7 +2367,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -2301,6 +2394,11 @@ impl<'a, 'b> CatNodes<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -2335,7 +2433,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -2360,12 +2458,13 @@ impl<'a, 'b> CatNodes<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 full_id: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -2385,6 +2484,7 @@ impl<'a, 'b> CatNodes<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -2417,7 +2517,7 @@ impl CatPendingTasksParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Pending Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
+#[doc = "Builder for the [Cat Pending Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
 #[derive(Clone, Debug)]
 pub struct CatPendingTasks<'a, 'b> {
     transport: &'a Transport,
@@ -2425,11 +2525,12 @@ pub struct CatPendingTasks<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -2456,6 +2557,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -2482,7 +2584,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -2504,6 +2606,11 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -2537,7 +2644,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -2561,11 +2668,12 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -2583,6 +2691,7 @@ impl<'a, 'b> CatPendingTasks<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -2615,7 +2724,7 @@ impl CatPitSegmentsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
+#[doc = "Builder for the [Cat Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
 #[derive(Clone, Debug)]
 pub struct CatPitSegments<'a, 'b, B> {
     transport: &'a Transport,
@@ -2624,11 +2733,12 @@ pub struct CatPitSegments<'a, 'b, B> {
     bytes: Option<Bytes>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -2656,6 +2766,7 @@ where
             h: None,
             help: None,
             human: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -2680,6 +2791,7 @@ where
             headers: self.headers,
             help: self.help,
             human: self.human,
+            limit: self.limit,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             s: self.s,
@@ -2703,7 +2815,7 @@ where
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -2725,6 +2837,11 @@ where
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -2766,11 +2883,12 @@ where
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -2785,6 +2903,7 @@ where
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -2814,7 +2933,7 @@ impl CatPluginsParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Plugins API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
+#[doc = "Builder for the [Cat Plugins API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
 #[derive(Clone, Debug)]
 pub struct CatPlugins<'a, 'b> {
     transport: &'a Transport,
@@ -2822,11 +2941,12 @@ pub struct CatPlugins<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -2852,6 +2972,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -2877,7 +2998,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -2899,6 +3020,11 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -2951,11 +3077,12 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -2972,6 +3099,7 @@ impl<'a, 'b> CatPlugins<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -3014,7 +3142,7 @@ impl<'b> CatRecoveryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Recovery API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
+#[doc = "Builder for the [Cat Recovery API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
 #[derive(Clone, Debug)]
 pub struct CatRecovery<'a, 'b> {
     transport: &'a Transport,
@@ -3024,12 +3152,13 @@ pub struct CatRecovery<'a, 'b> {
     detailed: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
     index: Option<&'b [&'b str]>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -3057,6 +3186,7 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
             help: None,
             human: None,
             index: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -3091,7 +3221,7 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -3120,6 +3250,11 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self.index = Some(index);
         self
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -3140,7 +3275,7 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -3166,13 +3301,14 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 index: Option<&'b [&'b str]>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -3191,6 +3327,7 @@ impl<'a, 'b> CatRecovery<'a, 'b> {
                 help: self.help,
                 human: self.human,
                 index: self.index,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 source: self.source,
@@ -3221,7 +3358,7 @@ impl CatRepositoriesParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Repositories API](https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
+#[doc = "Builder for the [Cat Repositories API](https://docs.opensearch.org/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
 #[derive(Clone, Debug)]
 pub struct CatRepositories<'a, 'b> {
     transport: &'a Transport,
@@ -3229,11 +3366,12 @@ pub struct CatRepositories<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -3259,6 +3397,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -3284,7 +3423,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -3306,6 +3445,11 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -3358,11 +3502,12 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -3379,6 +3524,7 @@ impl<'a, 'b> CatRepositories<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -3421,7 +3567,7 @@ impl<'b> CatSegmentReplicationParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Segment Replication API](https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
+#[doc = "Builder for the [Cat Segment Replication API](https://docs.opensearch.org/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
 #[derive(Clone, Debug)]
 pub struct CatSegmentReplication<'a, 'b> {
     transport: &'a Transport,
@@ -3434,7 +3580,7 @@ pub struct CatSegmentReplication<'a, 'b> {
     error_trace: Option<bool>,
     expand_wildcards: Option<&'b [ExpandWildcards]>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
@@ -3442,6 +3588,7 @@ pub struct CatSegmentReplication<'a, 'b> {
     ignore_throttled: Option<bool>,
     ignore_unavailable: Option<bool>,
     index: Option<&'b [&'b str]>,
+    limit: Option<i64>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     s: Option<&'b [&'b str]>,
@@ -3476,6 +3623,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
             ignore_throttled: None,
             ignore_unavailable: None,
             index: None,
+            limit: None,
             pretty: None,
             request_timeout: None,
             s: None,
@@ -3526,7 +3674,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -3565,6 +3713,11 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
         self.index = Some(index);
         self
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
@@ -3590,7 +3743,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -3625,7 +3778,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
                 expand_wildcards: Option<&'b [ExpandWildcards]>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
@@ -3634,6 +3787,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
                 ignore_unavailable: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 index: Option<&'b [&'b str]>,
+                limit: Option<i64>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 s: Option<&'b [&'b str]>,
@@ -3660,6 +3814,7 @@ impl<'a, 'b> CatSegmentReplication<'a, 'b> {
                 ignore_throttled: self.ignore_throttled,
                 ignore_unavailable: self.ignore_unavailable,
                 index: self.index,
+                limit: self.limit,
                 pretty: self.pretty,
                 s: self.s,
                 shards: self.shards,
@@ -3703,7 +3858,7 @@ impl<'b> CatSegmentsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Segments API](https://opensearch.org/docs/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
+#[doc = "Builder for the [Cat Segments API](https://docs.opensearch.org/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
 #[derive(Clone, Debug)]
 pub struct CatSegments<'a, 'b> {
     transport: &'a Transport,
@@ -3712,11 +3867,12 @@ pub struct CatSegments<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
@@ -3742,6 +3898,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             master_timeout: None,
             pretty: None,
             request_timeout: None,
@@ -3771,7 +3928,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -3793,6 +3950,11 @@ impl<'a, 'b> CatSegments<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
@@ -3841,11 +4003,12 @@ impl<'a, 'b> CatSegments<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -3862,6 +4025,7 @@ impl<'a, 'b> CatSegments<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 s: self.s,
@@ -3903,7 +4067,7 @@ impl<'b> CatShardsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Shards API](https://opensearch.org/docs/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
+#[doc = "Builder for the [Cat Shards API](https://docs.opensearch.org/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
 #[derive(Clone, Debug)]
 pub struct CatShards<'a, 'b> {
     transport: &'a Transport,
@@ -3912,11 +4076,12 @@ pub struct CatShards<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -3944,6 +4109,7 @@ impl<'a, 'b> CatShards<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -3975,7 +4141,7 @@ impl<'a, 'b> CatShards<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -3997,6 +4163,11 @@ impl<'a, 'b> CatShards<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -4054,11 +4225,12 @@ impl<'a, 'b> CatShards<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -4077,6 +4249,7 @@ impl<'a, 'b> CatShards<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -4120,7 +4293,7 @@ impl<'b> CatSnapshotsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Snapshots API](https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
+#[doc = "Builder for the [Cat Snapshots API](https://docs.opensearch.org/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
 #[derive(Clone, Debug)]
 pub struct CatSnapshots<'a, 'b> {
     transport: &'a Transport,
@@ -4128,12 +4301,13 @@ pub struct CatSnapshots<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
     ignore_unavailable: Option<bool>,
+    limit: Option<i64>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     repository: Option<&'b [&'b str]>,
@@ -4161,6 +4335,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
             help: None,
             human: None,
             ignore_unavailable: None,
+            limit: None,
             master_timeout: None,
             pretty: None,
             repository: None,
@@ -4187,7 +4362,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -4214,6 +4389,11 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
     #[doc = "When `true`, the response does not include information from unavailable snapshots."]
     pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
         self.ignore_unavailable = Some(ignore_unavailable);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
@@ -4247,7 +4427,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -4271,12 +4451,13 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
                 ignore_unavailable: Option<bool>,
+                limit: Option<i64>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -4296,6 +4477,7 @@ impl<'a, 'b> CatSnapshots<'a, 'b> {
                 help: self.help,
                 human: self.human,
                 ignore_unavailable: self.ignore_unavailable,
+                limit: self.limit,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 repository: self.repository,
@@ -4328,7 +4510,7 @@ impl CatTasksParts {
         }
     }
 }
-#[doc = "Builder for the [Cat Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
+#[doc = "Builder for the [Cat Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
 #[derive(Clone, Debug)]
 pub struct CatTasks<'a, 'b> {
     transport: &'a Transport,
@@ -4337,11 +4519,12 @@ pub struct CatTasks<'a, 'b> {
     detailed: Option<bool>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     nodes: Option<&'b [&'b str]>,
     parent_task_id: Option<&'b str>,
     pretty: Option<bool>,
@@ -4369,6 +4552,7 @@ impl<'a, 'b> CatTasks<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             nodes: None,
             parent_task_id: None,
             pretty: None,
@@ -4400,7 +4584,7 @@ impl<'a, 'b> CatTasks<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -4422,6 +4606,11 @@ impl<'a, 'b> CatTasks<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "A comma-separated list of node IDs or names used to limit the returned information. \nUse `_local` to return information from the node to which you're connecting, specify a specific node from which to get information, or keep the parameter empty to get information from all nodes."]
@@ -4454,7 +4643,7 @@ impl<'a, 'b> CatTasks<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(mut self, time: Time) -> Self {
         self.time = Some(time);
         self
@@ -4480,11 +4669,12 @@ impl<'a, 'b> CatTasks<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 nodes: Option<&'b [&'b str]>,
                 parent_task_id: Option<&'b str>,
@@ -4504,6 +4694,7 @@ impl<'a, 'b> CatTasks<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 nodes: self.nodes,
                 parent_task_id: self.parent_task_id,
                 pretty: self.pretty,
@@ -4545,7 +4736,7 @@ impl<'b> CatTemplatesParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Templates API](https://opensearch.org/docs/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
+#[doc = "Builder for the [Cat Templates API](https://docs.opensearch.org/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
 #[derive(Clone, Debug)]
 pub struct CatTemplates<'a, 'b> {
     transport: &'a Transport,
@@ -4553,11 +4744,12 @@ pub struct CatTemplates<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -4583,6 +4775,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -4608,7 +4801,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -4630,6 +4823,11 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -4682,11 +4880,12 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -4703,6 +4902,7 @@ impl<'a, 'b> CatTemplates<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -4745,7 +4945,7 @@ impl<'b> CatThreadPoolParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cat Thread Pool API](https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
+#[doc = "Builder for the [Cat Thread Pool API](https://docs.opensearch.org/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
 #[derive(Clone, Debug)]
 pub struct CatThreadPool<'a, 'b> {
     transport: &'a Transport,
@@ -4753,11 +4953,12 @@ pub struct CatThreadPool<'a, 'b> {
     cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    format: Option<&'b str>,
+    format: Option<CatResponseFormat>,
     h: Option<&'b [&'b str]>,
     headers: HeaderMap,
     help: Option<bool>,
     human: Option<bool>,
+    limit: Option<i64>,
     local: Option<bool>,
     master_timeout: Option<&'b str>,
     pretty: Option<bool>,
@@ -4784,6 +4985,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
             h: None,
             help: None,
             human: None,
+            limit: None,
             local: None,
             master_timeout: None,
             pretty: None,
@@ -4810,7 +5012,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
         self
     }
     #[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
-    pub fn format(mut self, format: &'b str) -> Self {
+    pub fn format(mut self, format: CatResponseFormat) -> Self {
         self.format = Some(format);
         self
     }
@@ -4832,6 +5034,11 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
     #[doc = "Whether to return human-readable values for statistics."]
     pub fn human(mut self, human: bool) -> Self {
         self.human = Some(human);
+        self
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
         self
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -4889,11 +5096,12 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                format: Option<&'b str>,
+                format: Option<CatResponseFormat>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 h: Option<&'b [&'b str]>,
                 help: Option<bool>,
                 human: Option<bool>,
+                limit: Option<i64>,
                 local: Option<bool>,
                 master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
@@ -4911,6 +5119,7 @@ impl<'a, 'b> CatThreadPool<'a, 'b> {
                 h: self.h,
                 help: self.help,
                 human: self.human,
+                limit: self.limit,
                 local: self.local,
                 master_timeout: self.master_timeout,
                 pretty: self.pretty,
@@ -4941,104 +5150,104 @@ impl<'a> Cat<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Cat Aliases API](https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
+    #[doc = "[Cat Aliases API](https://docs.opensearch.org/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
     pub fn aliases<'b>(&'a self, parts: CatAliasesParts<'b>) -> CatAliases<'a, 'b> {
         CatAliases::new(self.transport(), parts)
     }
-    #[doc = "[Cat All Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
+    #[doc = "[Cat All Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
     pub fn all_pit_segments<'b>(&'a self) -> CatAllPitSegments<'a, 'b> {
         CatAllPitSegments::new(self.transport())
     }
-    #[doc = "[Cat Allocation API](https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
+    #[doc = "[Cat Allocation API](https://docs.opensearch.org/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
     pub fn allocation<'b>(&'a self, parts: CatAllocationParts<'b>) -> CatAllocation<'a, 'b> {
         CatAllocation::new(self.transport(), parts)
     }
-    #[doc = "[Cat Cluster Manager API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[doc = "[Cat Cluster Manager API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
     pub fn cluster_manager<'b>(&'a self) -> CatClusterManager<'a, 'b> {
         CatClusterManager::new(self.transport())
     }
-    #[doc = "[Cat Count API](https://opensearch.org/docs/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
+    #[doc = "[Cat Count API](https://docs.opensearch.org/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
     pub fn count<'b>(&'a self, parts: CatCountParts<'b>) -> CatCount<'a, 'b> {
         CatCount::new(self.transport(), parts)
     }
-    #[doc = "[Cat Fielddata API](https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
+    #[doc = "[Cat Fielddata API](https://docs.opensearch.org/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
     pub fn fielddata<'b>(&'a self, parts: CatFielddataParts<'b>) -> CatFielddata<'a, 'b> {
         CatFielddata::new(self.transport(), parts)
     }
-    #[doc = "[Cat Health API](https://opensearch.org/docs/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
+    #[doc = "[Cat Health API](https://docs.opensearch.org/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
     pub fn health<'b>(&'a self) -> CatHealth<'a, 'b> {
         CatHealth::new(self.transport())
     }
-    #[doc = "[Cat Help API](https://opensearch.org/docs/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
+    #[doc = "[Cat Help API](https://docs.opensearch.org/latest/api-reference/cat/index/)\n\nReturns help for the Cat APIs."]
     pub fn help<'b>(&'a self) -> CatHelp<'a, 'b> {
         CatHelp::new(self.transport())
     }
-    #[doc = "[Cat Indices API](https://opensearch.org/docs/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
+    #[doc = "[Cat Indices API](https://docs.opensearch.org/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
     pub fn indices<'b>(&'a self, parts: CatIndicesParts<'b>) -> CatIndices<'a, 'b> {
         CatIndices::new(self.transport(), parts)
     }
-    #[doc = "[Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[doc = "[Cat Master API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
     #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
     #[allow(deprecated)]
     pub fn master<'b>(&'a self) -> CatMaster<'a, 'b> {
         CatMaster::new(self.transport())
     }
-    #[doc = "[Cat Nodeattrs API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
+    #[doc = "[Cat Nodeattrs API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
     pub fn nodeattrs<'b>(&'a self) -> CatNodeattrs<'a, 'b> {
         CatNodeattrs::new(self.transport())
     }
-    #[doc = "[Cat Nodes API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
+    #[doc = "[Cat Nodes API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
     pub fn nodes<'b>(&'a self) -> CatNodes<'a, 'b> {
         CatNodes::new(self.transport())
     }
-    #[doc = "[Cat Pending Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
+    #[doc = "[Cat Pending Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
     pub fn pending_tasks<'b>(&'a self) -> CatPendingTasks<'a, 'b> {
         CatPendingTasks::new(self.transport())
     }
-    #[doc = "[Cat Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
+    #[doc = "[Cat Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
     pub fn pit_segments<'b>(&'a self) -> CatPitSegments<'a, 'b, ()> {
         CatPitSegments::new(self.transport())
     }
-    #[doc = "[Cat Plugins API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
+    #[doc = "[Cat Plugins API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
     pub fn plugins<'b>(&'a self) -> CatPlugins<'a, 'b> {
         CatPlugins::new(self.transport())
     }
-    #[doc = "[Cat Recovery API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
+    #[doc = "[Cat Recovery API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
     pub fn recovery<'b>(&'a self, parts: CatRecoveryParts<'b>) -> CatRecovery<'a, 'b> {
         CatRecovery::new(self.transport(), parts)
     }
-    #[doc = "[Cat Repositories API](https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
+    #[doc = "[Cat Repositories API](https://docs.opensearch.org/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
     pub fn repositories<'b>(&'a self) -> CatRepositories<'a, 'b> {
         CatRepositories::new(self.transport())
     }
-    #[doc = "[Cat Segment Replication API](https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
+    #[doc = "[Cat Segment Replication API](https://docs.opensearch.org/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
     pub fn segment_replication<'b>(
         &'a self,
         parts: CatSegmentReplicationParts<'b>,
     ) -> CatSegmentReplication<'a, 'b> {
         CatSegmentReplication::new(self.transport(), parts)
     }
-    #[doc = "[Cat Segments API](https://opensearch.org/docs/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
+    #[doc = "[Cat Segments API](https://docs.opensearch.org/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
     pub fn segments<'b>(&'a self, parts: CatSegmentsParts<'b>) -> CatSegments<'a, 'b> {
         CatSegments::new(self.transport(), parts)
     }
-    #[doc = "[Cat Shards API](https://opensearch.org/docs/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
+    #[doc = "[Cat Shards API](https://docs.opensearch.org/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
     pub fn shards<'b>(&'a self, parts: CatShardsParts<'b>) -> CatShards<'a, 'b> {
         CatShards::new(self.transport(), parts)
     }
-    #[doc = "[Cat Snapshots API](https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
+    #[doc = "[Cat Snapshots API](https://docs.opensearch.org/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
     pub fn snapshots<'b>(&'a self, parts: CatSnapshotsParts<'b>) -> CatSnapshots<'a, 'b> {
         CatSnapshots::new(self.transport(), parts)
     }
-    #[doc = "[Cat Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
+    #[doc = "[Cat Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
     pub fn tasks<'b>(&'a self) -> CatTasks<'a, 'b> {
         CatTasks::new(self.transport())
     }
-    #[doc = "[Cat Templates API](https://opensearch.org/docs/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
+    #[doc = "[Cat Templates API](https://docs.opensearch.org/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
     pub fn templates<'b>(&'a self, parts: CatTemplatesParts<'b>) -> CatTemplates<'a, 'b> {
         CatTemplates::new(self.transport(), parts)
     }
-    #[doc = "[Cat Thread Pool API](https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
+    #[doc = "[Cat Thread Pool API](https://docs.opensearch.org/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
     pub fn thread_pool<'b>(&'a self, parts: CatThreadPoolParts<'b>) -> CatThreadPool<'a, 'b> {
         CatThreadPool::new(self.transport(), parts)
     }

@@ -66,7 +66,7 @@ impl<'b> SnapshotCleanupRepositoryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Cleanup Repository API](https://opensearch.org/docs/latest)\n\nRemoves any stale data from a snapshot repository."]
+#[doc = "Builder for the [Snapshot Cleanup Repository API](https://docs.opensearch.org/latest/)\n\nRemoves any stale data from a snapshot repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotCleanupRepository<'a, 'b, B> {
     transport: &'a Transport,
@@ -127,7 +127,7 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -256,7 +256,7 @@ impl<'b> SnapshotCloneParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Clone API](https://opensearch.org/docs/latest)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
+#[doc = "Builder for the [Snapshot Clone API](https://docs.opensearch.org/latest/)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
 #[derive(Clone, Debug)]
 pub struct SnapshotClone<'a, 'b, B> {
     transport: &'a Transport,
@@ -314,7 +314,7 @@ where
             source: self.source,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -425,7 +425,7 @@ impl<'b> SnapshotCreateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Create API](https://opensearch.org/docs/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
+#[doc = "Builder for the [Snapshot Create API](https://docs.opensearch.org/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotCreate<'a, 'b, B> {
     transport: &'a Transport,
@@ -486,7 +486,7 @@ where
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -598,7 +598,7 @@ impl<'b> SnapshotCreateRepositoryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Create Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
+#[doc = "Builder for the [Snapshot Create Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotCreateRepository<'a, 'b, B> {
     transport: &'a Transport,
@@ -662,7 +662,7 @@ where
             verify: self.verify,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -787,7 +787,7 @@ impl<'b> SnapshotDeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Delete API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
+#[doc = "Builder for the [Snapshot Delete API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
 #[derive(Clone, Debug)]
 pub struct SnapshotDelete<'a, 'b> {
     transport: &'a Transport,
@@ -820,7 +820,7 @@ impl<'a, 'b> SnapshotDelete<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -926,7 +926,7 @@ impl<'b> SnapshotDeleteRepositoryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Delete Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
+#[doc = "Builder for the [Snapshot Delete Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotDeleteRepository<'a, 'b> {
     transport: &'a Transport,
@@ -961,7 +961,7 @@ impl<'a, 'b> SnapshotDeleteRepository<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1080,7 +1080,7 @@ impl<'b> SnapshotGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Get API](https://opensearch.org/docs/latest)\n\nReturns information about a snapshot."]
+#[doc = "Builder for the [Snapshot Get API](https://docs.opensearch.org/latest/)\n\nReturns information about a snapshot."]
 #[derive(Clone, Debug)]
 pub struct SnapshotGet<'a, 'b> {
     transport: &'a Transport,
@@ -1117,7 +1117,7 @@ impl<'a, 'b> SnapshotGet<'a, 'b> {
             verbose: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1240,7 +1240,7 @@ impl<'b> SnapshotGetRepositoryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Get Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
+#[doc = "Builder for the [Snapshot Get Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotGetRepository<'a, 'b> {
     transport: &'a Transport,
@@ -1275,7 +1275,7 @@ impl<'a, 'b> SnapshotGetRepository<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1394,7 +1394,7 @@ impl<'b> SnapshotRestoreParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Restore API](https://opensearch.org/docs/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
+#[doc = "Builder for the [Snapshot Restore API](https://docs.opensearch.org/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
 #[derive(Clone, Debug)]
 pub struct SnapshotRestore<'a, 'b, B> {
     transport: &'a Transport,
@@ -1455,7 +1455,7 @@ where
             wait_for_completion: self.wait_for_completion,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1589,7 +1589,7 @@ impl<'b> SnapshotStatusParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Status API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
+#[doc = "Builder for the [Snapshot Status API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
 #[derive(Clone, Debug)]
 pub struct SnapshotStatus<'a, 'b> {
     transport: &'a Transport,
@@ -1624,7 +1624,7 @@ impl<'a, 'b> SnapshotStatus<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1737,7 +1737,7 @@ impl<'b> SnapshotVerifyRepositoryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Snapshot Verify Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
+#[doc = "Builder for the [Snapshot Verify Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
 #[derive(Clone, Debug)]
 pub struct SnapshotVerifyRepository<'a, 'b, B> {
     transport: &'a Transport,
@@ -1798,7 +1798,7 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1901,59 +1901,59 @@ impl<'a> Snapshot<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Snapshot Cleanup Repository API](https://opensearch.org/docs/latest)\n\nRemoves any stale data from a snapshot repository."]
+    #[doc = "[Snapshot Cleanup Repository API](https://docs.opensearch.org/latest/)\n\nRemoves any stale data from a snapshot repository."]
     pub fn cleanup_repository<'b>(
         &'a self,
         parts: SnapshotCleanupRepositoryParts<'b>,
     ) -> SnapshotCleanupRepository<'a, 'b, ()> {
         SnapshotCleanupRepository::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Clone API](https://opensearch.org/docs/latest)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
+    #[doc = "[Snapshot Clone API](https://docs.opensearch.org/latest/)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
     pub fn clone<'b>(&'a self, parts: SnapshotCloneParts<'b>) -> SnapshotClone<'a, 'b, ()> {
         SnapshotClone::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Create API](https://opensearch.org/docs/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
+    #[doc = "[Snapshot Create API](https://docs.opensearch.org/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
     pub fn create<'b>(&'a self, parts: SnapshotCreateParts<'b>) -> SnapshotCreate<'a, 'b, ()> {
         SnapshotCreate::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Create Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
+    #[doc = "[Snapshot Create Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
     pub fn create_repository<'b>(
         &'a self,
         parts: SnapshotCreateRepositoryParts<'b>,
     ) -> SnapshotCreateRepository<'a, 'b, ()> {
         SnapshotCreateRepository::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Delete API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
+    #[doc = "[Snapshot Delete API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
     pub fn delete<'b>(&'a self, parts: SnapshotDeleteParts<'b>) -> SnapshotDelete<'a, 'b> {
         SnapshotDelete::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Delete Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
+    #[doc = "[Snapshot Delete Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
     pub fn delete_repository<'b>(
         &'a self,
         parts: SnapshotDeleteRepositoryParts<'b>,
     ) -> SnapshotDeleteRepository<'a, 'b> {
         SnapshotDeleteRepository::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Get API](https://opensearch.org/docs/latest)\n\nReturns information about a snapshot."]
+    #[doc = "[Snapshot Get API](https://docs.opensearch.org/latest/)\n\nReturns information about a snapshot."]
     pub fn get<'b>(&'a self, parts: SnapshotGetParts<'b>) -> SnapshotGet<'a, 'b> {
         SnapshotGet::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Get Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
+    #[doc = "[Snapshot Get Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
     pub fn get_repository<'b>(
         &'a self,
         parts: SnapshotGetRepositoryParts<'b>,
     ) -> SnapshotGetRepository<'a, 'b> {
         SnapshotGetRepository::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Restore API](https://opensearch.org/docs/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
+    #[doc = "[Snapshot Restore API](https://docs.opensearch.org/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
     pub fn restore<'b>(&'a self, parts: SnapshotRestoreParts<'b>) -> SnapshotRestore<'a, 'b, ()> {
         SnapshotRestore::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Status API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
+    #[doc = "[Snapshot Status API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
     pub fn status<'b>(&'a self, parts: SnapshotStatusParts<'b>) -> SnapshotStatus<'a, 'b> {
         SnapshotStatus::new(self.transport(), parts)
     }
-    #[doc = "[Snapshot Verify Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
+    #[doc = "[Snapshot Verify Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
     pub fn verify_repository<'b>(
         &'a self,
         parts: SnapshotVerifyRepositoryParts<'b>,

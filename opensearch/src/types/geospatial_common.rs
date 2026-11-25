@@ -100,6 +100,9 @@ pub struct Database {
     #[serde(rename = "sha256_hash")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sha_256_hash: Option<String>,
+    #[doc = "Human-readable timestamp of when the database was updated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub updated_at_in_epoch_millis: Option<crate::types::common::EpochTimeUnitMillis>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -112,6 +115,9 @@ pub struct GeoSpatialGeojsonUploadResponse {
     pub errors: bool,
     #[doc = "Number of features that failed to upload."]
     pub failure: i64,
+    #[doc = "Details of individual feature upload failures. Only present when errors is true."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub failures: Option<Vec<crate::types::geospatial_common::UploadFailure>>,
     #[doc = "Number of features successfully uploaded."]
     pub success: i64,
     pub took: crate::types::common::DurationValueUnitMillis,
@@ -132,15 +138,43 @@ pub struct GetDataSourceResponse {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UpdateStats {
+    #[doc = "Human-readable timestamp of the last failed update."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_processing_time_in_millis: Option<crate::types::common::EpochTimeUnitMillis>,
+    pub last_failed_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_failed_at_in_epoch_millis: Option<crate::types::common::EpochTimeUnitMillis>,
+    #[doc = "Processing time of the last update in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_processing_time_in_millis: Option<i64>,
+    #[doc = "Human-readable timestamp of the last skipped update."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_skipped_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_skipped_at_in_epoch_millis: Option<crate::types::common::EpochTimeUnitMillis>,
+    #[doc = "Human-readable timestamp of the last successful update."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_succeeded_at: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_succeeded_at_in_epoch_millis: Option<crate::types::common::EpochTimeUnitMillis>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct UploadFailure {
+    #[doc = "The document ID that failed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[doc = "The failure message."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+    #[doc = "The HTTP status code of the failure."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<i32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UploadStatsMetric {
-    pub duration: crate::types::common::DurationValueUnitMillis,
+    #[doc = "Duration in milliseconds."]
+    pub duration: i64,
     #[doc = "Number of failed features in this upload."]
     pub failed: i64,
     pub id: crate::types::common::Id,
@@ -155,7 +189,8 @@ pub struct UploadStatsMetric {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UploadStatsTotal {
-    pub duration: crate::types::common::DurationValueUnitMillis,
+    #[doc = "Total duration in milliseconds."]
+    pub duration: i64,
     #[doc = "Total failed uploads."]
     pub failed: i64,
     #[doc = "Total number of upload requests."]

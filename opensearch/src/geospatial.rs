@@ -60,7 +60,7 @@ impl<'b> GeospatialDeleteIp2GeoDatasourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
+#[doc = "Builder for the [Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
 #[derive(Clone, Debug)]
 pub struct GeospatialDeleteIp2GeoDatasource<'a, 'b> {
     transport: &'a Transport,
@@ -455,7 +455,7 @@ impl<'b> GeospatialGetIp2GeoDatasourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
+#[doc = "Builder for the [Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
 #[derive(Clone, Debug)]
 pub struct GeospatialGetIp2GeoDatasource<'a, 'b> {
     transport: &'a Transport,
@@ -685,7 +685,7 @@ impl<'b> GeospatialPutIp2GeoDatasourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
+#[doc = "Builder for the [Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
 #[derive(Clone, Debug)]
 pub struct GeospatialPutIp2GeoDatasource<'a, 'b, B> {
     transport: &'a Transport,
@@ -827,7 +827,7 @@ impl<'b> GeospatialPutIp2GeoDatasourceSettingsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
+#[doc = "Builder for the [Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
 #[derive(Clone, Debug)]
 pub struct GeospatialPutIp2GeoDatasourceSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -963,7 +963,7 @@ impl<'a> Geospatial<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
+    #[doc = "[Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
     pub fn delete_ip2geo_datasource<'b>(
         &'a self,
         parts: GeospatialDeleteIp2GeoDatasourceParts<'b>,
@@ -978,7 +978,7 @@ impl<'a> Geospatial<'a> {
     pub fn geojson_upload_put<'b>(&'a self) -> GeospatialGeojsonUploadPut<'a, 'b, ()> {
         GeospatialGeojsonUploadPut::new(self.transport())
     }
-    #[doc = "[Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
+    #[doc = "[Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
     pub fn get_ip2geo_datasource<'b>(
         &'a self,
         parts: GeospatialGetIp2GeoDatasourceParts<'b>,
@@ -989,14 +989,14 @@ impl<'a> Geospatial<'a> {
     pub fn get_upload_stats<'b>(&'a self) -> GeospatialGetUploadStats<'a, 'b> {
         GeospatialGetUploadStats::new(self.transport())
     }
-    #[doc = "[Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
+    #[doc = "[Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
     pub fn put_ip2geo_datasource<'b>(
         &'a self,
         parts: GeospatialPutIp2GeoDatasourceParts<'b>,
     ) -> GeospatialPutIp2GeoDatasource<'a, 'b, ()> {
         GeospatialPutIp2GeoDatasource::new(self.transport(), parts)
     }
-    #[doc = "[Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
+    #[doc = "[Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
     pub fn put_ip2geo_datasource_settings<'b>(
         &'a self,
         parts: GeospatialPutIp2GeoDatasourceSettingsParts<'b>,

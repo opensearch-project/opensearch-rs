@@ -86,6 +86,10 @@ pub struct ResponseModel {
     /// type keys of the union query parameter schemas whose generated type
     /// replaces the string fallback (see [param_type_path])
     pub param_types: BTreeSet<String>,
+    /// type keys of the types the specification marks `x-non-exhaustive`:
+    /// they can be extended, e.g. by plugins, so that the generated types
+    /// can gain variants or fields without a breaking change
+    pub non_exhaustive: BTreeSet<String>,
 }
 
 /// The success status codes whose response schema is taken as the response
@@ -439,6 +443,17 @@ fn read_model(
         .cloned()
         .collect();
     prune_unreachable(&mut builder.model);
+    builder.model.non_exhaustive = builder
+        .model
+        .types
+        .keys()
+        .filter(|key| {
+            schemas
+                .get(key.as_str())
+                .is_some_and(|schema| schema["x-non-exhaustive"].as_bool() == Some(true))
+        })
+        .cloned()
+        .collect();
 
     Ok(builder.model)
 }
@@ -1771,6 +1786,35 @@ mod tests {
             }
         });
         read_response_model(&spec, &["t"]).unwrap()
+    }
+
+    #[test]
+    fn types_marked_non_exhaustive_by_the_specification_are_recorded() {
+        let model = fixture_model(serde_json::json!({
+            "t___Root": {
+                "type": "object",
+                "properties": {
+                    "open": { "$ref": "#/components/schemas/t___Open" },
+                    "closed": { "$ref": "#/components/schemas/t___Closed" },
+                    "explicitly_closed": { "$ref": "#/components/schemas/t___Explicit" }
+                }
+            },
+            "t___Open": {
+                "type": "object",
+                "properties": { "a": { "type": "string" } },
+                "x-non-exhaustive": true
+            },
+            "t___Closed": { "type": "object", "properties": { "b": { "type": "string" } } },
+            "t___Explicit": {
+                "type": "object",
+                "properties": { "c": { "type": "string" } },
+                "x-non-exhaustive": false
+            }
+        }));
+        assert_eq!(
+            model.non_exhaustive.iter().collect::<Vec<_>>(),
+            vec!["t___Open"]
+        );
     }
 
     fn field<'a>(model: &'a ResponseModel, ty: &str, name: &str) -> &'a FieldModel {

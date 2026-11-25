@@ -671,4 +671,8 @@ pub mod wlm_stats;
 pub mod wlm_update_query_group;
 pub mod wlm_update_workload_group;
 
+// the types of the total hit count, wherever the specification declares them
+pub(crate) use crate::types::common::TotalHitsRelation;
+pub(crate) use crate::types::search::TotalHits;
+
 // GENERATED-END

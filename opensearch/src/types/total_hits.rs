@@ -8,8 +8,7 @@
 
 //! Reading the total number of hits of a search (`hits.total`).
 
-use crate::types::common::TotalHitsRelation;
-use crate::types::search::TotalHits;
+use crate::types::{TotalHits, TotalHitsRelation};
 
 /// The total hit count of a search: `hits.total` of a response.
 ///

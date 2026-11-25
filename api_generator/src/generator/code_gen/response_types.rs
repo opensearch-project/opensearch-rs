@@ -170,8 +170,26 @@ pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>,
         let _ = writeln!(section, "pub mod {};", module);
         files.push((module, source));
     }
+    section.push_str(&render_total_hits_reexports(model));
 
     Ok((files, section))
+}
+
+/// The re-exports of the types the hand-written `types::total_hits` module refers to, so that it
+/// does not depend on the namespace the specification declares them in (it moved
+/// `TotalHitsRelation` from `search` to `common`). Empty without a total hit count type.
+fn render_total_hits_reexports(model: &ResponseModel) -> String {
+    if !model.types.contains_key(TOTAL_HITS) {
+        return String::new();
+    }
+    format!(
+        "\n// the types of the total hit count, wherever the specification declares them\n\
+         pub(crate) use crate::types::{}::{};\n\
+         pub(crate) use {};\n",
+        module_name(namespace(TOTAL_HITS)),
+        rust_type_name(TOTAL_HITS),
+        total_hits_relation_path(model),
+    )
 }
 
 /// The Rust module name of a specification namespace
@@ -1190,6 +1208,66 @@ mod tests {
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
         read_response_model(&spec, &refs).unwrap()
+    }
+
+    #[test]
+    fn the_total_hit_count_types_are_reexported_from_where_the_specification_declares_them() {
+        use crate::openapi::responses::{FieldModel, StrEnumModel, StrEnumValue, StructModel};
+        let mut model = ResponseModel::default();
+        // without a total hit count there is nothing to re-export
+        assert_eq!(render_total_hits_reexports(&model), "");
+
+        let relation_field = |relation: &str| FieldModel {
+            json_name: "relation".to_string(),
+            ty: TypeRef::Named(relation.to_string()),
+            required: true,
+            nullable: false,
+            description: None,
+        };
+        model.types.insert(
+            TOTAL_HITS.to_string(),
+            TypeModel::Struct(StructModel {
+                description: None,
+                fields: vec![relation_field("_common___TotalHitsRelation")],
+                residual: None,
+            }),
+        );
+        model.types.insert(
+            "_common___TotalHitsRelation".to_string(),
+            TypeModel::StrEnum(StrEnumModel {
+                description: None,
+                values: vec![StrEnumValue {
+                    value: "eq".into(),
+                    aliases: vec![],
+                }],
+            }),
+        );
+        let out = render_total_hits_reexports(&model);
+        assert!(
+            out.contains("pub(crate) use crate::types::search::TotalHits;"),
+            "{}",
+            out
+        );
+        assert!(
+            out.contains("pub(crate) use crate::types::common::TotalHitsRelation;"),
+            "{}",
+            out
+        );
+
+        // the relation declared in the namespace of the count, as before the specification moved it
+        model.types.get_mut(TOTAL_HITS).map(|t| {
+            *t = TypeModel::Struct(StructModel {
+                description: None,
+                fields: vec![relation_field("_core.search___TotalHitsRelation")],
+                residual: None,
+            })
+        });
+        let out = render_total_hits_reexports(&model);
+        assert!(
+            out.contains("pub(crate) use crate::types::search::TotalHitsRelation;"),
+            "{}",
+            out
+        );
     }
 
     #[test]

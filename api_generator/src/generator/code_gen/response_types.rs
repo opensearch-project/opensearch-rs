@@ -45,6 +45,32 @@ fn param_conversion_types(model: &ResponseModel, str_enums: &BTreeSet<String>) -
     scope
 }
 
+/// Marks the struct `rust_name` of a rendered type `#[non_exhaustive]`, as the
+/// specification marks the types that can be extended (`x-non-exhaustive`, e.g.
+/// by plugins): outside the crate, the struct then can't be built with a struct
+/// literal, so a field can be added without a breaking change.
+///
+/// The specification marks unions, which are generated as structs (a container with
+/// a field per variant, or a lazily decoded value).
+fn mark_non_exhaustive(rust_name: &str, source: String) -> String {
+    let declarations = [
+        format!("pub struct {} ", rust_name),
+        format!("pub struct {}<", rust_name),
+    ];
+    let mut offset = 0;
+    for line in source.split_inclusive('\n') {
+        if declarations.iter().any(|d| line.starts_with(d.as_str())) {
+            let mut marked = String::with_capacity(source.len() + 18);
+            marked.push_str(&source[..offset]);
+            marked.push_str("#[non_exhaustive]\n");
+            marked.push_str(&source[offset..]);
+            return marked;
+        }
+        offset += line.len();
+    }
+    source
+}
+
 /// Generates the response type modules: returns `(module name, source)`
 /// pairs and the content of the `response-modules` section of
 /// `types/mod.rs`
@@ -90,6 +116,11 @@ pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>,
                 let _ = writeln!(out, "pub type {} = {};", rust_name, render_ref(&a.ty));
                 out
             }
+        };
+        let source = if model.non_exhaustive.contains(type_key) {
+            mark_non_exhaustive(&rust_name, source)
+        } else {
+            source
         };
         modules.entry(module).or_default().push((rust_name, source));
     }
@@ -1137,6 +1168,74 @@ mod tests {
         let groups = all_operation_groups(&spec);
         let refs: Vec<&str> = groups.iter().map(String::as_str).collect();
         read_response_model(&spec, &refs).unwrap()
+    }
+
+    #[test]
+    fn non_exhaustive_is_added_before_the_declaration_of_the_type() {
+        let source = "#[doc = \"A container\"]\n#[derive(Debug)]\npub struct Container {\n    pub a: u8,\n}\nimpl Container {}\n";
+        assert_eq!(
+            mark_non_exhaustive("Container", source.to_string()),
+            "#[doc = \"A container\"]\n#[derive(Debug)]\n#[non_exhaustive]\npub struct Container {\n    pub a: u8,\n}\nimpl Container {}\n"
+        );
+        let source = "#[derive(Debug)]\npub enum Kind {\n    A,\n}\n";
+        assert_eq!(mark_non_exhaustive("Kind", source.to_string()), source);
+        // another type of the same prefix is not the declaration
+        let source = "pub struct ContainerItem {}\n";
+        assert_eq!(mark_non_exhaustive("Container", source.to_string()), source);
+        // an alias has nothing to mark
+        let source = "pub type Container = String;\n";
+        assert_eq!(mark_non_exhaustive("Container", source.to_string()), source);
+    }
+
+    #[test]
+    fn generated_types_marked_by_the_specification_are_non_exhaustive() {
+        use crate::openapi::responses::{FieldModel, StructModel};
+        let mut model = ResponseModel::default();
+        let make = |name: &str| {
+            TypeModel::Struct(StructModel {
+                description: None,
+                fields: vec![FieldModel {
+                    json_name: name.to_string(),
+                    ty: TypeRef::Scalar(Scalar::String),
+                    required: false,
+                    nullable: false,
+                    description: None,
+                }],
+                residual: None,
+            })
+        };
+        model.types.insert("ns___Open".to_string(), make("a"));
+        model.types.insert("ns___Closed".to_string(), make("b"));
+        model.non_exhaustive.insert("ns___Open".to_string());
+        model.types.insert(
+            "ns___Mode".to_string(),
+            TypeModel::StrEnum(crate::openapi::responses::StrEnumModel {
+                description: None,
+                values: vec![crate::openapi::responses::StrEnumValue {
+                    value: "fast".into(),
+                    aliases: vec![],
+                }],
+            }),
+        );
+        model.non_exhaustive.insert("ns___Mode".to_string());
+        let (modules, _) = generate(&model).unwrap();
+        let source = &modules.iter().find(|(m, _)| m == "ns").unwrap().1;
+        assert!(
+            source.contains("#[non_exhaustive]\npub struct Open {"),
+            "{}",
+            source
+        );
+        assert!(
+            !source.contains("#[non_exhaustive]\npub struct Closed {"),
+            "{}",
+            source
+        );
+        assert!(
+            !source.contains("#[non_exhaustive]\npub enum Mode {"),
+            "{}",
+            source
+        );
+        assert!(source.contains("pub enum Mode {"), "{}", source);
     }
 
     #[test]

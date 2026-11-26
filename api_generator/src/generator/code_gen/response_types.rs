@@ -50,10 +50,8 @@ fn param_conversion_types(model: &ResponseModel, str_enums: &BTreeSet<String>) -
 /// by plugins): outside the crate, the struct then can't be built with a struct
 /// literal, so a field can be added without a breaking change.
 ///
-/// Only structs are marked. The specification marks unions, which are generated as
-/// structs (a container with a field per variant, or a lazily decoded value); an
-/// enum is left exhaustive, and so is an alias, until the specification says which
-/// enums can grow.
+/// The specification marks unions, which are generated as structs (a container with
+/// a field per variant, or a lazily decoded value).
 fn mark_non_exhaustive(rust_name: &str, source: String) -> String {
     let declarations = [
         format!("pub struct {} ", rust_name),
@@ -1179,7 +1177,6 @@ mod tests {
             mark_non_exhaustive("Container", source.to_string()),
             "#[doc = \"A container\"]\n#[derive(Debug)]\n#[non_exhaustive]\npub struct Container {\n    pub a: u8,\n}\nimpl Container {}\n"
         );
-        // an enum is left exhaustive
         let source = "#[derive(Debug)]\npub enum Kind {\n    A,\n}\n";
         assert_eq!(mark_non_exhaustive("Kind", source.to_string()), source);
         // another type of the same prefix is not the declaration
@@ -1210,7 +1207,6 @@ mod tests {
         model.types.insert("ns___Open".to_string(), make("a"));
         model.types.insert("ns___Closed".to_string(), make("b"));
         model.non_exhaustive.insert("ns___Open".to_string());
-        // an enum is left exhaustive even when the specification marks it
         model.types.insert(
             "ns___Mode".to_string(),
             TypeModel::StrEnum(crate::openapi::responses::StrEnumModel {

@@ -27,10 +27,14 @@
 //! |-------------|---------------|
 //! | 1.x         | 1.x           |
 //! | 2.x         | 2.x, 1.x^     |
+//! | 3.x         | 3.x, 2.19+    |
 //! - ^: With the exception of some previously deprecated APIs
 //!
-//! A major version of the client is compatible with the same major version of OpenSearch.
-//! Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,
+//! A major version of the client is compatible with the same major version of OpenSearch,
+//! and a 3.x client is also compatible with OpenSearch 2.19 and later 2.x releases.
+//! The versions the client is tested against are every release of the current major version of
+//! OpenSearch plus the latest release of the previous major version, re-evaluated at each release of
+//! the client. Since OpenSearch is developed following [Semantic Versioning](https://semver.org/) principles,
 //! Any minor/patch version of the client can be used against any minor/patch version of OpenSearch
 //! **within the same major version lineage**. For example,
 //!
@@ -47,11 +51,17 @@
 //!
 //! In some instances, a new major version of OpenSearch may remain compatible with an
 //! older major version of the client, which may not warrant a need to update the client.
-//! Please consult COMPATIBILITY.md for more details.
+//! Please consult [COMPATIBILITY.md](https://github.com/opensearch-project/opensearch-rs/blob/main/COMPATIBILITY.md)
+//! for more details.
 //!
-//! **No compatibility assurances are given between different major versions of the client and
-//! OpenSearch**. Major differences likely exist between major versions of OpenSearch, particularly
+//! **Apart from the combinations in the table above, no compatibility assurances are given between
+//! different major versions of the client and OpenSearch**. Major differences likely exist between major versions of OpenSearch, particularly
 //! around request and response object formats, but also around API urls and behaviour.
+//!
+//! Moving from a 2.x client? The
+//! [upgrade guide](https://github.com/opensearch-project/opensearch-rs/blob/main/UPGRADING.md)
+//! lists what changes in 3.0, such as removed APIs, changed parameter types and retries being on by
+//! default.
 //!
 //! # Features
 //!
@@ -152,6 +162,36 @@
 //! let url = Url::parse("https://example.com")?;
 //! let conn_pool = SingleNodeConnectionPool::new(url);
 //! let transport = TransportBuilder::new(conn_pool).disable_proxy().build()?;
+//! let client = OpenSearch::new(transport);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! A cluster with the security plugin enabled, as OpenSearch sets up by default, serves HTTPS and needs
+//! credentials. Pass them with [TransportBuilder::auth](http::transport::TransportBuilder::auth)
+//! (see [Credentials](auth::Credentials)), and see [CertificateValidation](cert::CertificateValidation)
+//! for a cluster with a self-signed certificate.
+//!
+//! ## Retries
+//!
+//! The transport sends a request again when the response status is 502, 503 or 504, or when the
+//! connection fails, up to 3 times with an exponential backoff. Each attempt takes the next node of the
+//! connection pool. Timeouts are not retried by default, as the server may still apply a request that
+//! timed out. Use `disable_retry` to send every request once, e.g. for requests whose effect must not be
+//! repeated when a connection fails after the server received them.
+//!
+//! ```rust,no_run
+//! # use opensearch::{
+//! #     OpenSearch,
+//! #     http::transport::{SingleNodeConnectionPool, TransportBuilder},
+//! # };
+//! # use url::Url;
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let url = Url::parse("https://example.com")?;
+//! let transport = TransportBuilder::new(SingleNodeConnectionPool::new(url))
+//!     .max_retries(5)
+//!     .retry_on_status(&[429, 502, 503, 504])
+//!     .build()?;
 //! let client = OpenSearch::new(transport);
 //! # Ok(())
 //! # }
@@ -293,6 +333,44 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ### Typed responses
+//!
+//! The typed client, [OpenSearch::typed], returns the response type of the API (see [types]) from
+//! `send`, so that the fields of a response are read without parsing JSON by hand. Documents are decoded
+//! into a type of your own with `source_as`.
+//!
+//! ```rust,no_run
+//! # use opensearch::{OpenSearch, SearchParts};
+//! # use serde_json::json;
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # let client = OpenSearch::default();
+//! #[derive(serde::Deserialize)]
+//! struct Tweet {
+//!     message: String,
+//! }
+//!
+//! let response = client
+//!     .typed()
+//!     .search(SearchParts::Index(&["tweets"]))
+//!     .body(json!({ "query": { "match": { "message": "OpenSearch rust" } } }))
+//!     .send()
+//!     .await?;
+//!
+//! println!("took {} ms", response.took);
+//! for hit in &response.hits.hits {
+//!     if let Some(tweet) = hit.source_as::<Tweet>()? {
+//!         println!("{}", tweet.message);
+//!     }
+//! }
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! An error status, such as a missing index, is returned as an error whose status code and body are
+//! available from [Error::api_error]. Use the generic client to read the status code or the headers
+//! of a response.
 //!
 //! ## Request bodies
 //!

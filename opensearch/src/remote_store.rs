@@ -54,7 +54,7 @@ impl RemoteStoreRestoreParts {
         }
     }
 }
-#[doc = "Builder for the [Remote Store Restore API](https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup)\n\nRestores from remote store."]
+#[doc = "Builder for the [Remote Store Restore API](https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#restoring-from-a-backup)\n\nRestores from remote store."]
 #[derive(Clone, Debug)]
 pub struct RemoteStoreRestore<'a, 'b, B> {
     transport: &'a Transport,
@@ -207,7 +207,7 @@ impl<'a> RemoteStore<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Remote Store Restore API](https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup)\n\nRestores from remote store."]
+    #[doc = "[Remote Store Restore API](https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#restoring-from-a-backup)\n\nRestores from remote store."]
     pub fn restore<'b>(&'a self) -> RemoteStoreRestore<'a, 'b, ()> {
         RemoteStoreRestore::new(self.transport())
     }

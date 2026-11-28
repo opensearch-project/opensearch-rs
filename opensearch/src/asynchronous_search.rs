@@ -60,7 +60,7 @@ impl<'b> AsynchronousSearchDeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Asynchronous Search Delete API](https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
+#[doc = "Builder for the [Asynchronous Search Delete API](https://docs.opensearch.org/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
 #[derive(Clone, Debug)]
 pub struct AsynchronousSearchDelete<'a, 'b> {
     transport: &'a Transport,
@@ -178,7 +178,7 @@ impl<'b> AsynchronousSearchGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Asynchronous Search Get API](https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
+#[doc = "Builder for the [Asynchronous Search Get API](https://docs.opensearch.org/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
 #[derive(Clone, Debug)]
 pub struct AsynchronousSearchGet<'a, 'b> {
     transport: &'a Transport,
@@ -290,7 +290,7 @@ impl AsynchronousSearchSearchParts {
         }
     }
 }
-#[doc = "Builder for the [Asynchronous Search Search API](https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
+#[doc = "Builder for the [Asynchronous Search Search API](https://docs.opensearch.org/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
 #[derive(Clone, Debug)]
 pub struct AsynchronousSearchSearch<'a, 'b, B> {
     transport: &'a Transport,
@@ -465,7 +465,7 @@ impl AsynchronousSearchStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Asynchronous Search Stats API](https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
+#[doc = "Builder for the [Asynchronous Search Stats API](https://docs.opensearch.org/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
 #[derive(Clone, Debug)]
 pub struct AsynchronousSearchStats<'a, 'b> {
     transport: &'a Transport,
@@ -575,25 +575,25 @@ impl<'a> AsynchronousSearch<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Asynchronous Search Delete API](https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
+    #[doc = "[Asynchronous Search Delete API](https://docs.opensearch.org/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
     pub fn delete<'b>(
         &'a self,
         parts: AsynchronousSearchDeleteParts<'b>,
     ) -> AsynchronousSearchDelete<'a, 'b> {
         AsynchronousSearchDelete::new(self.transport(), parts)
     }
-    #[doc = "[Asynchronous Search Get API](https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
+    #[doc = "[Asynchronous Search Get API](https://docs.opensearch.org/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
     pub fn get<'b>(
         &'a self,
         parts: AsynchronousSearchGetParts<'b>,
     ) -> AsynchronousSearchGet<'a, 'b> {
         AsynchronousSearchGet::new(self.transport(), parts)
     }
-    #[doc = "[Asynchronous Search Search API](https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
+    #[doc = "[Asynchronous Search Search API](https://docs.opensearch.org/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
     pub fn search<'b>(&'a self) -> AsynchronousSearchSearch<'a, 'b, ()> {
         AsynchronousSearchSearch::new(self.transport())
     }
-    #[doc = "[Asynchronous Search Stats API](https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
+    #[doc = "[Asynchronous Search Stats API](https://docs.opensearch.org/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
     pub fn stats<'b>(&'a self) -> AsynchronousSearchStats<'a, 'b> {
         AsynchronousSearchStats::new(self.transport())
     }

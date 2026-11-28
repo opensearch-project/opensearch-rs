@@ -296,6 +296,48 @@ pub type Byte = f64;
 #[doc = "The size in bytes."]
 pub type ByteCount = i64;
 
+#[doc = "Whether the condition that tripped the circuit breaker fixes itself eventually (`TRANSIENT`) or requires manual intervention (`PERMANENT`)."]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CircuitBreakerDurability {
+    #[doc = "`PERMANENT`"]
+    Permanent,
+    #[doc = "`TRANSIENT`"]
+    Transient,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl CircuitBreakerDurability {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            CircuitBreakerDurability::Permanent => "PERMANENT",
+            CircuitBreakerDurability::Transient => "TRANSIENT",
+            CircuitBreakerDurability::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for CircuitBreakerDurability {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for CircuitBreakerDurability {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "PERMANENT" => CircuitBreakerDurability::Permanent,
+            "TRANSIENT" => CircuitBreakerDurability::Transient,
+            _ => CircuitBreakerDurability::Unknown(s),
+        })
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ClusterStatistics {
     pub skipped: i32,
@@ -646,12 +688,60 @@ pub type EpochTimeUnitSeconds = crate::types::common::UnitSeconds;
 
 #[derive(Debug, Clone)]
 pub struct ErrorCause {
+    #[doc = "The circuit breaker memory limit. Present in `circuit_breaking_exception` responses."]
+    pub bytes_limit: Option<i64>,
+    #[doc = "The number of bytes that were requested. Present in `circuit_breaking_exception` responses."]
+    pub bytes_wanted: Option<i64>,
     pub caused_by: Option<Box<crate::types::common::ErrorCause>>,
+    #[doc = "The column number of the parsing error. Present in `parsing_exception` and `search_parse_exception` responses."]
+    pub col: Option<i32>,
+    #[doc = "The circuit breaker durability. Present in `circuit_breaking_exception` responses."]
+    pub durability: Option<crate::types::common::CircuitBreakerDurability>,
+    #[doc = "The shard failures. Present in `search_phase_execution_exception` responses."]
+    pub failed_shards: Option<Vec<crate::types::common::ShardSearchFailure>>,
+    #[doc = "Whether shard failures are grouped. Present in `search_phase_execution_exception` responses."]
+    pub grouped: Option<bool>,
     pub header:
         Option<std::collections::BTreeMap<String, crate::types::common::StringOrStringArray>>,
+    #[doc = "The name of the index associated with the error. Present when the exception is associated with a specific index or shard."]
+    pub index: Option<crate::types::common::IndexName>,
+    #[doc = "The UUID of the index associated with the error, or `_na_` when the UUID is unknown. Present when the exception is associated with a specific index or shard."]
+    pub index_uuid: Option<crate::types::common::Uuid>,
+    #[doc = "The scripting language. Present in `script_exception` responses."]
+    pub lang: Option<String>,
+    #[doc = "The type of entity that breached the response limit. Present in `response_limit_breached_exception` responses."]
+    pub limit_entity: Option<crate::types::common::ResponseLimitEntity>,
+    #[doc = "The line number of the parsing error. Present in `parsing_exception` and `search_parse_exception` responses."]
+    pub line: Option<i32>,
+    #[doc = "The maximum number of buckets allowed. Present in `too_many_buckets_exception` responses."]
+    pub max_buckets: Option<i32>,
+    #[doc = "The node ID where the error occurred. Present in `failed_node_exception` responses."]
+    pub node_id: Option<crate::types::common::NodeId>,
+    #[doc = "The search phase that failed. Present in `search_phase_execution_exception` responses."]
+    pub phase: Option<String>,
+    #[doc = "The position of the error in the script. Present in `script_exception` responses."]
+    pub position: Option<crate::types::common::ScriptExceptionPosition>,
+    #[doc = "The tag of the processor whose configuration is invalid. Present in ingest or search pipeline configuration errors when the processor has a tag."]
+    pub processor_tag: Option<String>,
+    #[doc = "The type of the processor whose configuration is invalid, such as `set`. Present in ingest or search pipeline configuration errors when known."]
+    pub processor_type: Option<String>,
+    #[doc = "The name of the processor property that is missing or invalid. Present in ingest or search pipeline configuration errors when known."]
+    pub property_name: Option<String>,
     #[doc = "A human-readable explanation of the error, in English."]
     pub reason: Option<String>,
+    #[doc = "The identifiers of the resources associated with the error, such as the index expression that could not be resolved. A single identifier is returned as a string. Present in `index_not_found_exception` and `aliases_not_found_exception` responses."]
+    pub resource_id: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The type of resource identified by `resource.id`, such as `index_or_alias`, `index_expression`, or `aliases`. Present in `index_not_found_exception` and `aliases_not_found_exception` responses."]
+    pub resource_type: Option<String>,
+    #[doc = "The response limit that was breached. Present in `response_limit_breached_exception` responses."]
+    pub response_limit: Option<i32>,
     pub root_cause: Option<Vec<crate::types::common::ErrorCause>>,
+    #[doc = "The script that caused the error. Present in `script_exception` responses."]
+    pub script: Option<String>,
+    #[doc = "The script stack trace. Present in `script_exception` responses."]
+    pub script_stack: Option<Vec<String>>,
+    #[doc = "The shard number associated with the error, serialized as a string. Present when the exception is associated with a specific shard."]
+    pub shard: Option<String>,
     #[doc = "The server stack trace, present only if the `error_trace=true` parameter was sent with the request."]
     pub stack_trace: Option<String>,
     pub suppressed: Option<Vec<crate::types::common::ErrorCause>>,
@@ -678,16 +768,65 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
             where
                 A: serde::de::MapAccess<'de>,
             {
+                let mut f_bytes_limit: Option<i64> = None;
+                let mut seen_bytes_limit = false;
+                let mut f_bytes_wanted: Option<i64> = None;
+                let mut seen_bytes_wanted = false;
                 let mut f_caused_by: Option<Box<crate::types::common::ErrorCause>> = None;
                 let mut seen_caused_by = false;
+                let mut f_col: Option<i32> = None;
+                let mut seen_col = false;
+                let mut f_durability: Option<crate::types::common::CircuitBreakerDurability> = None;
+                let mut seen_durability = false;
+                let mut f_failed_shards: Option<Vec<crate::types::common::ShardSearchFailure>> =
+                    None;
+                let mut seen_failed_shards = false;
+                let mut f_grouped: Option<bool> = None;
+                let mut seen_grouped = false;
                 let mut f_header: Option<
                     std::collections::BTreeMap<String, crate::types::common::StringOrStringArray>,
                 > = None;
                 let mut seen_header = false;
+                let mut f_index: Option<crate::types::common::IndexName> = None;
+                let mut seen_index = false;
+                let mut f_index_uuid: Option<crate::types::common::Uuid> = None;
+                let mut seen_index_uuid = false;
+                let mut f_lang: Option<String> = None;
+                let mut seen_lang = false;
+                let mut f_limit_entity: Option<crate::types::common::ResponseLimitEntity> = None;
+                let mut seen_limit_entity = false;
+                let mut f_line: Option<i32> = None;
+                let mut seen_line = false;
+                let mut f_max_buckets: Option<i32> = None;
+                let mut seen_max_buckets = false;
+                let mut f_node_id: Option<crate::types::common::NodeId> = None;
+                let mut seen_node_id = false;
+                let mut f_phase: Option<String> = None;
+                let mut seen_phase = false;
+                let mut f_position: Option<crate::types::common::ScriptExceptionPosition> = None;
+                let mut seen_position = false;
+                let mut f_processor_tag: Option<String> = None;
+                let mut seen_processor_tag = false;
+                let mut f_processor_type: Option<String> = None;
+                let mut seen_processor_type = false;
+                let mut f_property_name: Option<String> = None;
+                let mut seen_property_name = false;
                 let mut f_reason: Option<String> = None;
                 let mut seen_reason = false;
+                let mut f_resource_id: Option<crate::types::common::StringOrStringArray> = None;
+                let mut seen_resource_id = false;
+                let mut f_resource_type: Option<String> = None;
+                let mut seen_resource_type = false;
+                let mut f_response_limit: Option<i32> = None;
+                let mut seen_response_limit = false;
                 let mut f_root_cause: Option<Vec<crate::types::common::ErrorCause>> = None;
                 let mut seen_root_cause = false;
+                let mut f_script: Option<String> = None;
+                let mut seen_script = false;
+                let mut f_script_stack: Option<Vec<String>> = None;
+                let mut seen_script_stack = false;
+                let mut f_shard: Option<String> = None;
+                let mut seen_shard = false;
                 let mut f_stack_trace: Option<String> = None;
                 let mut seen_stack_trace = false;
                 let mut f_suppressed: Option<Vec<crate::types::common::ErrorCause>> = None;
@@ -699,6 +838,20 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
                 > = Default::default();
                 while let Some(k) = map.next_key::<String>()? {
                     match k.as_str() {
+                        "bytes_limit" => {
+                            if seen_bytes_limit {
+                                return Err(serde::de::Error::duplicate_field("bytes_limit"));
+                            }
+                            seen_bytes_limit = true;
+                            f_bytes_limit = map.next_value::<Option<i64>>()?;
+                        }
+                        "bytes_wanted" => {
+                            if seen_bytes_wanted {
+                                return Err(serde::de::Error::duplicate_field("bytes_wanted"));
+                            }
+                            seen_bytes_wanted = true;
+                            f_bytes_wanted = map.next_value::<Option<i64>>()?;
+                        }
                         "caused_by" => {
                             if seen_caused_by {
                                 return Err(serde::de::Error::duplicate_field("caused_by"));
@@ -706,6 +859,34 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
                             seen_caused_by = true;
                             f_caused_by =
                                 map.next_value::<Option<Box<crate::types::common::ErrorCause>>>()?;
+                        }
+                        "col" => {
+                            if seen_col {
+                                return Err(serde::de::Error::duplicate_field("col"));
+                            }
+                            seen_col = true;
+                            f_col = map.next_value::<Option<i32>>()?;
+                        }
+                        "durability" => {
+                            if seen_durability {
+                                return Err(serde::de::Error::duplicate_field("durability"));
+                            }
+                            seen_durability = true;
+                            f_durability = map.next_value::<Option<crate::types::common::CircuitBreakerDurability>>()?;
+                        }
+                        "failed_shards" => {
+                            if seen_failed_shards {
+                                return Err(serde::de::Error::duplicate_field("failed_shards"));
+                            }
+                            seen_failed_shards = true;
+                            f_failed_shards = map.next_value::<Option<Vec<crate::types::common::ShardSearchFailure>>>()?;
+                        }
+                        "grouped" => {
+                            if seen_grouped {
+                                return Err(serde::de::Error::duplicate_field("grouped"));
+                            }
+                            seen_grouped = true;
+                            f_grouped = map.next_value::<Option<bool>>()?;
                         }
                         "header" => {
                             if seen_header {
@@ -719,12 +900,123 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
                                 >,
                             >>()?;
                         }
+                        "index" => {
+                            if seen_index {
+                                return Err(serde::de::Error::duplicate_field("index"));
+                            }
+                            seen_index = true;
+                            f_index =
+                                map.next_value::<Option<crate::types::common::IndexName>>()?;
+                        }
+                        "index_uuid" => {
+                            if seen_index_uuid {
+                                return Err(serde::de::Error::duplicate_field("index_uuid"));
+                            }
+                            seen_index_uuid = true;
+                            f_index_uuid =
+                                map.next_value::<Option<crate::types::common::Uuid>>()?;
+                        }
+                        "lang" => {
+                            if seen_lang {
+                                return Err(serde::de::Error::duplicate_field("lang"));
+                            }
+                            seen_lang = true;
+                            f_lang = map.next_value::<Option<String>>()?;
+                        }
+                        "limit_entity" => {
+                            if seen_limit_entity {
+                                return Err(serde::de::Error::duplicate_field("limit_entity"));
+                            }
+                            seen_limit_entity = true;
+                            f_limit_entity = map
+                                .next_value::<Option<crate::types::common::ResponseLimitEntity>>(
+                                )?;
+                        }
+                        "line" => {
+                            if seen_line {
+                                return Err(serde::de::Error::duplicate_field("line"));
+                            }
+                            seen_line = true;
+                            f_line = map.next_value::<Option<i32>>()?;
+                        }
+                        "max_buckets" => {
+                            if seen_max_buckets {
+                                return Err(serde::de::Error::duplicate_field("max_buckets"));
+                            }
+                            seen_max_buckets = true;
+                            f_max_buckets = map.next_value::<Option<i32>>()?;
+                        }
+                        "node_id" => {
+                            if seen_node_id {
+                                return Err(serde::de::Error::duplicate_field("node_id"));
+                            }
+                            seen_node_id = true;
+                            f_node_id = map.next_value::<Option<crate::types::common::NodeId>>()?;
+                        }
+                        "phase" => {
+                            if seen_phase {
+                                return Err(serde::de::Error::duplicate_field("phase"));
+                            }
+                            seen_phase = true;
+                            f_phase = map.next_value::<Option<String>>()?;
+                        }
+                        "position" => {
+                            if seen_position {
+                                return Err(serde::de::Error::duplicate_field("position"));
+                            }
+                            seen_position = true;
+                            f_position = map.next_value::<Option<crate::types::common::ScriptExceptionPosition>>()?;
+                        }
+                        "processor_tag" => {
+                            if seen_processor_tag {
+                                return Err(serde::de::Error::duplicate_field("processor_tag"));
+                            }
+                            seen_processor_tag = true;
+                            f_processor_tag = map.next_value::<Option<String>>()?;
+                        }
+                        "processor_type" => {
+                            if seen_processor_type {
+                                return Err(serde::de::Error::duplicate_field("processor_type"));
+                            }
+                            seen_processor_type = true;
+                            f_processor_type = map.next_value::<Option<String>>()?;
+                        }
+                        "property_name" => {
+                            if seen_property_name {
+                                return Err(serde::de::Error::duplicate_field("property_name"));
+                            }
+                            seen_property_name = true;
+                            f_property_name = map.next_value::<Option<String>>()?;
+                        }
                         "reason" => {
                             if seen_reason {
                                 return Err(serde::de::Error::duplicate_field("reason"));
                             }
                             seen_reason = true;
                             f_reason = map.next_value::<Option<String>>()?;
+                        }
+                        "resource.id" => {
+                            if seen_resource_id {
+                                return Err(serde::de::Error::duplicate_field("resource.id"));
+                            }
+                            seen_resource_id = true;
+                            f_resource_id = map
+                                .next_value::<Option<crate::types::common::StringOrStringArray>>(
+                                )?;
+                        }
+                        "resource.type" => {
+                            if seen_resource_type {
+                                return Err(serde::de::Error::duplicate_field("resource.type"));
+                            }
+                            seen_resource_type = true;
+                            f_resource_type = map.next_value::<Option<String>>()?;
+                        }
+                        "response_limit" => {
+                            if seen_response_limit {
+                                return Err(serde::de::Error::duplicate_field("response_limit"));
+                            }
+                            seen_response_limit = true;
+                            f_response_limit = map.next_value::<Option<i32>>()?;
                         }
                         "root_cause" => {
                             if seen_root_cause {
@@ -733,6 +1025,27 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
                             seen_root_cause = true;
                             f_root_cause =
                                 map.next_value::<Option<Vec<crate::types::common::ErrorCause>>>()?;
+                        }
+                        "script" => {
+                            if seen_script {
+                                return Err(serde::de::Error::duplicate_field("script"));
+                            }
+                            seen_script = true;
+                            f_script = map.next_value::<Option<String>>()?;
+                        }
+                        "script_stack" => {
+                            if seen_script_stack {
+                                return Err(serde::de::Error::duplicate_field("script_stack"));
+                            }
+                            seen_script_stack = true;
+                            f_script_stack = map.next_value::<Option<Vec<String>>>()?;
+                        }
+                        "shard" => {
+                            if seen_shard {
+                                return Err(serde::de::Error::duplicate_field("shard"));
+                            }
+                            seen_shard = true;
+                            f_shard = map.next_value::<Option<String>>()?;
                         }
                         "stack_trace" => {
                             if seen_stack_trace {
@@ -761,10 +1074,34 @@ impl<'de> serde::Deserialize<'de> for ErrorCause {
                     }
                 }
                 Ok(ErrorCause {
+                    bytes_limit: f_bytes_limit,
+                    bytes_wanted: f_bytes_wanted,
                     caused_by: f_caused_by,
+                    col: f_col,
+                    durability: f_durability,
+                    failed_shards: f_failed_shards,
+                    grouped: f_grouped,
                     header: f_header,
+                    index: f_index,
+                    index_uuid: f_index_uuid,
+                    lang: f_lang,
+                    limit_entity: f_limit_entity,
+                    line: f_line,
+                    max_buckets: f_max_buckets,
+                    node_id: f_node_id,
+                    phase: f_phase,
+                    position: f_position,
+                    processor_tag: f_processor_tag,
+                    processor_type: f_processor_type,
+                    property_name: f_property_name,
                     reason: f_reason,
+                    resource_id: f_resource_id,
+                    resource_type: f_resource_type,
+                    response_limit: f_response_limit,
                     root_cause: f_root_cause,
+                    script: f_script,
+                    script_stack: f_script_stack,
+                    shard: f_shard,
                     stack_trace: f_stack_trace,
                     suppressed: f_suppressed,
                     r#type: f_type.ok_or_else(|| serde::de::Error::missing_field("type"))?,
@@ -782,17 +1119,89 @@ impl serde::Serialize for ErrorCause {
     {
         use serde::ser::SerializeMap;
         let mut map = serializer.serialize_map(None)?;
+        if let Some(v) = &self.bytes_limit {
+            map.serialize_entry("bytes_limit", v)?;
+        }
+        if let Some(v) = &self.bytes_wanted {
+            map.serialize_entry("bytes_wanted", v)?;
+        }
         if let Some(v) = &self.caused_by {
             map.serialize_entry("caused_by", v)?;
+        }
+        if let Some(v) = &self.col {
+            map.serialize_entry("col", v)?;
+        }
+        if let Some(v) = &self.durability {
+            map.serialize_entry("durability", v)?;
+        }
+        if let Some(v) = &self.failed_shards {
+            map.serialize_entry("failed_shards", v)?;
+        }
+        if let Some(v) = &self.grouped {
+            map.serialize_entry("grouped", v)?;
         }
         if let Some(v) = &self.header {
             map.serialize_entry("header", v)?;
         }
+        if let Some(v) = &self.index {
+            map.serialize_entry("index", v)?;
+        }
+        if let Some(v) = &self.index_uuid {
+            map.serialize_entry("index_uuid", v)?;
+        }
+        if let Some(v) = &self.lang {
+            map.serialize_entry("lang", v)?;
+        }
+        if let Some(v) = &self.limit_entity {
+            map.serialize_entry("limit_entity", v)?;
+        }
+        if let Some(v) = &self.line {
+            map.serialize_entry("line", v)?;
+        }
+        if let Some(v) = &self.max_buckets {
+            map.serialize_entry("max_buckets", v)?;
+        }
+        if let Some(v) = &self.node_id {
+            map.serialize_entry("node_id", v)?;
+        }
+        if let Some(v) = &self.phase {
+            map.serialize_entry("phase", v)?;
+        }
+        if let Some(v) = &self.position {
+            map.serialize_entry("position", v)?;
+        }
+        if let Some(v) = &self.processor_tag {
+            map.serialize_entry("processor_tag", v)?;
+        }
+        if let Some(v) = &self.processor_type {
+            map.serialize_entry("processor_type", v)?;
+        }
+        if let Some(v) = &self.property_name {
+            map.serialize_entry("property_name", v)?;
+        }
         if let Some(v) = &self.reason {
             map.serialize_entry("reason", v)?;
         }
+        if let Some(v) = &self.resource_id {
+            map.serialize_entry("resource.id", v)?;
+        }
+        if let Some(v) = &self.resource_type {
+            map.serialize_entry("resource.type", v)?;
+        }
+        if let Some(v) = &self.response_limit {
+            map.serialize_entry("response_limit", v)?;
+        }
         if let Some(v) = &self.root_cause {
             map.serialize_entry("root_cause", v)?;
+        }
+        if let Some(v) = &self.script {
+            map.serialize_entry("script", v)?;
+        }
+        if let Some(v) = &self.script_stack {
+            map.serialize_entry("script_stack", v)?;
+        }
+        if let Some(v) = &self.shard {
+            map.serialize_entry("shard", v)?;
         }
         if let Some(v) = &self.stack_trace {
             map.serialize_entry("stack_trace", v)?;
@@ -1314,42 +1723,6 @@ pub struct GeoHashLocation {
     pub geohash: crate::types::common::GeoHash,
 }
 
-#[doc = "The level of geohash precision, which can be expressed as a geohash length between 1 and 12 or as a distance measure, such as \"1km\" or \"10m\"."]
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum GeoHashPrecision {
-    GeohashLength(i32),
-    Distance(String),
-}
-impl<'de> serde::Deserialize<'de> for GeoHashPrecision {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b'-') | Some(b'0'..=b'9') => {
-                serde_json::from_str(text).map(GeoHashPrecision::GeohashLength)
-            }
-            Some(b'"') => serde_json::from_str(text).map(GeoHashPrecision::Distance),
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "GeoHashPrecision"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
-    }
-}
-
 #[doc = "A latitude/longitude as a two-dimensional point. It can be represented in the following ways:  - As a `{lat, long}` object.  - As a geohash value.  - As a `[lon, lat]` array.  - As a string in `<lat>, <lon>` or WKT point format."]
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1670,6 +2043,9 @@ pub struct IndexingStats {
     pub index_total: i64,
     #[doc = "Whether indexing is currently throttled."]
     pub is_throttled: bool,
+    #[doc = "The epoch timestamp, in milliseconds, of the most recent indexing request. A value of -9223372036854775808 (`Long.MIN_VALUE`) indicates that no request has been recorded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_last_index_request_timestamp: Option<i64>,
     #[doc = "The total number of noop update operations."]
     pub noop_update_total: i64,
     #[doc = "The total amount of time spent throttling indexing operations."]
@@ -2160,6 +2536,52 @@ pub struct MergesStats {
     #[doc = "The number of unreferenced file cleanups performed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unreferenced_file_cleanups_performed: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warmer: Option<crate::types::common::MergesWarmerStats>,
+}
+
+#[doc = "The statistics about segment-replication merge warmer operations."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MergesWarmerStats {
+    #[doc = "The number of currently ongoing merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ongoing_count: Option<i64>,
+    #[doc = "The total number of bytes received during merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_bytes_received: Option<crate::types::common::ByteCount>,
+    #[doc = "The total number of bytes sent during merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_bytes_sent: Option<crate::types::common::ByteCount>,
+    #[doc = "The total number of failed merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_failure_count: Option<i64>,
+    #[doc = "The total number of merge warmer invocations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_invocations_count: Option<i64>,
+    #[doc = "The total amount of time spent receiving data during merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_receive_time: Option<crate::types::common::Duration>,
+    #[doc = "The total amount of time spent receiving data during merge warmer operations, in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_receive_time_millis: Option<crate::types::common::DurationValueUnitMillis>,
+    #[doc = "The total number of bytes received during merge warmer operations, in a human-readable format."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_received_size: Option<crate::types::common::HumanReadableByteCount>,
+    #[doc = "The total amount of time spent sending data during merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_send_time: Option<crate::types::common::Duration>,
+    #[doc = "The total amount of time spent sending data during merge warmer operations, in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_send_time_millis: Option<crate::types::common::DurationValueUnitMillis>,
+    #[doc = "The total number of bytes sent during merge warmer operations, in a human-readable format."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_sent_size: Option<crate::types::common::HumanReadableByteCount>,
+    #[doc = "The total amount of time spent on merge warmer operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_time: Option<crate::types::common::Duration>,
+    #[doc = "The total amount of time spent on merge warmer operations, in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_time_millis: Option<crate::types::common::DurationValueUnitMillis>,
 }
 
 #[doc = "The custom metadata attached to a resource."]
@@ -2274,40 +2696,6 @@ pub struct NodeAttributes {
 #[doc = "The unique identifier of a node."]
 pub type NodeId = String;
 
-#[doc = "A comma-separated list of node IDs used to filter results. Supports [node filters](https://opensearch.org/docs/latest/api-reference/nodes-apis/index/#node-filters)."]
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum NodeIds {
-    NodeId(crate::types::common::NodeId),
-    Array(Vec<crate::types::common::NodeId>),
-}
-impl<'de> serde::Deserialize<'de> for NodeIds {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b'"') => serde_json::from_str(text).map(NodeIds::NodeId),
-            Some(b'[') => serde_json::from_str(text).map(NodeIds::Array),
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "NodeIds"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
-    }
-}
-
 #[doc = "The name of the node."]
 pub type NodeName = String;
 
@@ -2343,6 +2731,10 @@ pub enum NodeRole {
     Master,
     #[doc = "`cluster_manager`"]
     ClusterManager,
+    #[doc = "`search`"]
+    Search,
+    #[doc = "`warm`"]
+    Warm,
     #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
     Unknown(String),
 }
@@ -2365,6 +2757,8 @@ impl NodeRole {
             NodeRole::VotingOnly => "voting_only",
             NodeRole::Master => "master",
             NodeRole::ClusterManager => "cluster_manager",
+            NodeRole::Search => "search",
+            NodeRole::Warm => "warm",
             NodeRole::Unknown(s) => s.as_str(),
         }
     }
@@ -2399,6 +2793,8 @@ impl<'de> serde::Deserialize<'de> for NodeRole {
             "voting_only" => NodeRole::VotingOnly,
             "master" => NodeRole::Master,
             "cluster_manager" => NodeRole::ClusterManager,
+            "search" => NodeRole::Search,
+            "warm" => NodeRole::Warm,
             _ => NodeRole::Unknown(s),
         })
     }
@@ -2494,6 +2890,9 @@ pub struct PhaseTook {
 }
 
 pub type PipelineName = String;
+
+#[doc = "Identifies a point in time (PIT): an opaque token returned by the create PIT response and by every search against the PIT. Requests send it in the body, never in a path, query parameter, or header. Don't expose it outside the service that uses it."]
+pub type PitId = String;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PluginStats {
@@ -2747,6 +3146,48 @@ pub struct ResourceStats {
     pub total: crate::types::common::ResourceStat,
 }
 
+#[doc = "The type of entity a response limit applies to."]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ResponseLimitEntity {
+    #[doc = "`INDICES`"]
+    Indices,
+    #[doc = "`SHARDS`"]
+    Shards,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl ResponseLimitEntity {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            ResponseLimitEntity::Indices => "INDICES",
+            ResponseLimitEntity::Shards => "SHARDS",
+            ResponseLimitEntity::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for ResponseLimitEntity {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for ResponseLimitEntity {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "INDICES" => ResponseLimitEntity::Indices,
+            "SHARDS" => ResponseLimitEntity::Shards,
+            _ => ResponseLimitEntity::Unknown(s),
+        })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Result {
     #[doc = "`created`"]
@@ -2847,6 +3288,17 @@ impl Script {
     {
         crate::types::union::parse_branch(&self.raw, "stored")
     }
+}
+
+#[doc = "The location of the error within the script source."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ScriptExceptionPosition {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub end: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start: Option<i32>,
 }
 
 #[doc = "The configuration for a script field."]
@@ -3011,6 +3463,9 @@ pub struct SearchStats {
     pub point_in_time_total: Option<i64>,
     #[doc = "The number of currently running shard query operations."]
     pub query_current: i64,
+    #[doc = "The total number of failed shard query operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query_failed: Option<i64>,
     #[doc = "The total amount of time taken to complete all shard query operations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_time: Option<crate::types::common::Duration>,
@@ -3030,9 +3485,24 @@ pub struct SearchStats {
     pub scroll_time_in_millis: crate::types::common::DurationValueUnitMillis,
     #[doc = "The total number of shard scroll operations."]
     pub scroll_total: i64,
-    #[doc = "The total number of idle search reactivations."]
+    #[doc = "The total number of times an idle search shard was reactivated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_idle_reactivate_count_total: Option<i64>,
+    #[doc = "The number of currently running shard star-tree query operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub startree_query_current: Option<i64>,
+    #[doc = "The total number of failed shard star-tree query operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub startree_query_failed: Option<i64>,
+    #[doc = "The total amount of time taken to complete all shard star-tree query operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub startree_query_time: Option<crate::types::common::Duration>,
+    #[doc = "The total amount of time taken to complete all shard star-tree query operations, in milliseconds."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub startree_query_time_in_millis: Option<crate::types::common::DurationValueUnitMillis>,
+    #[doc = "The total number of shard star-tree query operations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub startree_query_total: Option<i64>,
     #[doc = "The number of currently running shard suggest operations."]
     pub suggest_current: i64,
     #[doc = "The total amount of time take to complete all shard suggest operations."]
@@ -3228,18 +3698,6 @@ pub struct ShardsOperationResponseBase {
 
 #[doc = "The short integer value."]
 pub type Short = f64;
-
-#[doc = "The configuration for a sliced scroll request."]
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct SlicedScroll {
-    #[doc = "The field to slice on."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub field: Option<crate::types::common::Field>,
-    #[doc = "The ID of the slice."]
-    pub id: i32,
-    #[doc = "The maximum number of slices."]
-    pub max: i32,
-}
 
 #[doc = "The slice configuration used to parallelize a process."]
 #[derive(Debug, Clone, serde::Serialize)]
@@ -3837,51 +4295,6 @@ impl<'de> serde::Deserialize<'de> for StringifiedVersionNumber {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestMode {
-    #[doc = "`always`"]
-    Always,
-    #[doc = "`missing`"]
-    Missing,
-    #[doc = "`popular`"]
-    Popular,
-    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
-    Unknown(String),
-}
-impl SuggestMode {
-    #[doc = "The JSON string of the value"]
-    pub fn as_str(&self) -> &str {
-        match self {
-            SuggestMode::Always => "always",
-            SuggestMode::Missing => "missing",
-            SuggestMode::Popular => "popular",
-            SuggestMode::Unknown(s) => s.as_str(),
-        }
-    }
-}
-impl serde::Serialize for SuggestMode {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-impl<'de> serde::Deserialize<'de> for SuggestMode {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "always" => SuggestMode::Always,
-            "missing" => SuggestMode::Missing,
-            "popular" => SuggestMode::Popular,
-            _ => SuggestMode::Unknown(s),
-        })
-    }
-}
-
 pub type TDocument = Box<serde_json::value::RawValue>;
 
 #[doc = "The details of a task failure."]
@@ -3984,6 +4397,47 @@ pub struct TopRightBottomLeftGeoBounds {
     pub top_right: crate::types::common::GeoLocation,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TotalHitsRelation {
+    #[doc = "`eq`"]
+    Eq,
+    #[doc = "`gte`"]
+    Gte,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl TotalHitsRelation {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            TotalHitsRelation::Eq => "eq",
+            TotalHitsRelation::Gte => "gte",
+            TotalHitsRelation::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for TotalHitsRelation {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for TotalHitsRelation {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "eq" => TotalHitsRelation::Eq,
+            "gte" => TotalHitsRelation::Gte,
+            _ => TotalHitsRelation::Unknown(s),
+        })
+    }
+}
+
 #[doc = "The statistics about translog operations."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TranslogStats {
@@ -4082,7 +4536,7 @@ impl<'de> serde::Deserialize<'de> for VersionType {
     }
 }
 
-#[doc = "The absence of any type. This is commonly used in APIs that don't return a body.  Although \"void\" is generally used for a unit type that has only one value, this is interpreted as the bottom type, which has no value. Most languages have a unit type, but few have a bottom type.  See https://en.m.wikipedia.org/wiki/Unit_type and https://en.m.wikipedia.org/wiki/Bottom_type."]
+#[doc = "The absence of any type. This is commonly used in APIs that don't return a body.  Although \"void\" is generally used for a unit type that has only one value, this is interpreted as the bottom type, which has no value. Most languages have a unit type, but few have a bottom type.  See https://en.wikipedia.org/wiki/Unit_type and https://en.wikipedia.org/wiki/Bottom_type."]
 pub type Void = std::collections::BTreeMap<String, serde_json::Value>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

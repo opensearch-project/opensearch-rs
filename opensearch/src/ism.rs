@@ -46,7 +46,7 @@ pub enum IsmAddPolicyParts<'b> {
     #[doc = "No parts"]
     None,
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmAddPolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Add Policy API"]
@@ -54,8 +54,9 @@ impl<'b> IsmAddPolicyParts<'b> {
         match self {
             IsmAddPolicyParts::None => "/_plugins/_ism/add".into(),
             IsmAddPolicyParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(19usize + encoded_index.len());
                 p.push_str("/_plugins/_ism/add/");
                 p.push_str(encoded_index.as_ref());
@@ -64,7 +65,7 @@ impl<'b> IsmAddPolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Add Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
+#[doc = "Builder for the [Ism Add Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
 #[derive(Clone, Debug)]
 pub struct IsmAddPolicy<'a, 'b, B> {
     transport: &'a Transport,
@@ -74,10 +75,11 @@ pub struct IsmAddPolicy<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    index: Option<&'b str>,
+    index: Option<&'b [&'b str]>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    ty: Option<&'b str>,
 }
 impl<'a, 'b, B> IsmAddPolicy<'a, 'b, B>
 where
@@ -98,6 +100,7 @@ where
             pretty: None,
             request_timeout: None,
             source: None,
+            ty: None,
         }
     }
     #[doc = "The body for the API call"]
@@ -117,6 +120,7 @@ where
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
+            ty: self.ty,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -139,7 +143,8 @@ where
         self.human = Some(human);
         self
     }
-    pub fn index(mut self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
         self.index = Some(index);
         self
     }
@@ -158,6 +163,11 @@ where
         self.source = Some(source);
         self
     }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Ism Add Policy API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -172,9 +182,12 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                index: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -183,6 +196,7 @@ where
                 index: self.index,
                 pretty: self.pretty,
                 source: self.source,
+                ty: self.ty,
             };
             Some(query_params)
         };
@@ -200,7 +214,7 @@ pub enum IsmChangePolicyParts<'b> {
     #[doc = "No parts"]
     None,
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmChangePolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Change Policy API"]
@@ -208,8 +222,9 @@ impl<'b> IsmChangePolicyParts<'b> {
         match self {
             IsmChangePolicyParts::None => "/_plugins/_ism/change_policy".into(),
             IsmChangePolicyParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(29usize + encoded_index.len());
                 p.push_str("/_plugins/_ism/change_policy/");
                 p.push_str(encoded_index.as_ref());
@@ -218,7 +233,7 @@ impl<'b> IsmChangePolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Change Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
+#[doc = "Builder for the [Ism Change Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
 #[derive(Clone, Debug)]
 pub struct IsmChangePolicy<'a, 'b, B> {
     transport: &'a Transport,
@@ -228,10 +243,11 @@ pub struct IsmChangePolicy<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    index: Option<&'b str>,
+    index: Option<&'b [&'b str]>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    ty: Option<&'b str>,
 }
 impl<'a, 'b, B> IsmChangePolicy<'a, 'b, B>
 where
@@ -252,6 +268,7 @@ where
             pretty: None,
             request_timeout: None,
             source: None,
+            ty: None,
         }
     }
     #[doc = "The body for the API call"]
@@ -271,6 +288,7 @@ where
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
+            ty: self.ty,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -293,7 +311,8 @@ where
         self.human = Some(human);
         self
     }
-    pub fn index(mut self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
         self.index = Some(index);
         self
     }
@@ -312,6 +331,11 @@ where
         self.source = Some(source);
         self
     }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Ism Change Policy API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -326,9 +350,12 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                index: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -337,6 +364,7 @@ where
                 index: self.index,
                 pretty: self.pretty,
                 source: self.source,
+                ty: self.ty,
             };
             Some(query_params)
         };
@@ -369,7 +397,7 @@ impl<'b> IsmDeletePolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Delete Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
+#[doc = "Builder for the [Ism Delete Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
 #[derive(Clone, Debug)]
 pub struct IsmDeletePolicy<'a, 'b> {
     transport: &'a Transport,
@@ -379,6 +407,7 @@ pub struct IsmDeletePolicy<'a, 'b> {
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
@@ -394,6 +423,7 @@ impl<'a, 'b> IsmDeletePolicy<'a, 'b> {
             filter_path: None,
             human: None,
             pretty: None,
+            refresh: None,
             request_timeout: None,
             source: None,
         }
@@ -423,6 +453,11 @@ impl<'a, 'b> IsmDeletePolicy<'a, 'b> {
         self.pretty = Some(pretty);
         self
     }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
+        self.refresh = Some(refresh);
+        self
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
@@ -448,6 +483,7 @@ impl<'a, 'b> IsmDeletePolicy<'a, 'b> {
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
                 pretty: Option<bool>,
+                refresh: Option<Refresh>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -455,6 +491,7 @@ impl<'a, 'b> IsmDeletePolicy<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 pretty: self.pretty,
+                refresh: self.refresh,
                 source: self.source,
             };
             Some(query_params)
@@ -488,7 +525,7 @@ impl<'b> IsmExistsPolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Exists Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy)\n\nChecks for the existence of a policy."]
+#[doc = "Builder for the [Ism Exists Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nChecks for the existence of a policy."]
 #[derive(Clone, Debug)]
 pub struct IsmExistsPolicy<'a, 'b> {
     transport: &'a Transport,
@@ -592,7 +629,7 @@ pub enum IsmExplainPolicyParts<'b> {
     #[doc = "No parts"]
     None,
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmExplainPolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Explain Policy API"]
@@ -600,8 +637,9 @@ impl<'b> IsmExplainPolicyParts<'b> {
         match self {
             IsmExplainPolicyParts::None => "/_plugins/_ism/explain".into(),
             IsmExplainPolicyParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(23usize + encoded_index.len());
                 p.push_str("/_plugins/_ism/explain/");
                 p.push_str(encoded_index.as_ref());
@@ -610,19 +648,30 @@ impl<'b> IsmExplainPolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Explain Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
+#[doc = "Builder for the [Ism Explain Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
 #[derive(Clone, Debug)]
 pub struct IsmExplainPolicy<'a, 'b, B> {
     transport: &'a Transport,
     parts: IsmExplainPolicyParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
+    from: Option<i64>,
     headers: HeaderMap,
     human: Option<bool>,
+    local: Option<bool>,
+    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
+    querystring: Option<&'b str>,
     request_timeout: Option<Duration>,
+    show_policy: Option<bool>,
+    size: Option<i64>,
+    sortfield: Option<&'b str>,
+    sortorder: Option<SortOrder>,
     source: Option<&'b str>,
+    ty: Option<&'b str>,
+    validate_action: Option<bool>,
 }
 impl<'a, 'b, B> IsmExplainPolicy<'a, 'b, B>
 where
@@ -636,12 +685,23 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
+            from: None,
             human: None,
+            local: None,
+            master_timeout: None,
             pretty: None,
+            querystring: None,
             request_timeout: None,
+            show_policy: None,
+            size: None,
+            sortfield: None,
+            sortorder: None,
             source: None,
+            ty: None,
+            validate_action: None,
         }
     }
     #[doc = "The body for the API call"]
@@ -653,14 +713,30 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
+            from: self.from,
             headers: self.headers,
             human: self.human,
+            local: self.local,
+            master_timeout: self.master_timeout,
             pretty: self.pretty,
+            querystring: self.querystring,
             request_timeout: self.request_timeout,
+            show_policy: self.show_policy,
+            size: self.size,
+            sortfield: self.sortfield,
+            sortorder: self.sortorder,
             source: self.source,
+            ty: self.ty,
+            validate_action: self.validate_action,
         }
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -670,6 +746,11 @@ where
     #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "The starting index of the managed indexes to return."]
+    pub fn from(mut self, from: i64) -> Self {
+        self.from = Some(from);
         self
     }
     #[doc = "Adds a HTTP header"]
@@ -682,9 +763,25 @@ where
         self.human = Some(human);
         self
     }
+    #[doc = "Whether to return information from the local node only instead of from the cluster manager node."]
+    pub fn local(mut self, local: bool) -> Self {
+        self.local = Some(local);
+        self
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    #[deprecated = "Deprecated since OpenSearch 2.3: To promote inclusive language, use `cluster_manager_timeout` instead."]
+    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
+        self.master_timeout = Some(master_timeout);
+        self
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "A query string that filters the managed indexes."]
+    pub fn querystring(mut self, querystring: &'b str) -> Self {
+        self.querystring = Some(querystring);
         self
     }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
@@ -692,9 +789,39 @@ where
         self.request_timeout = Some(timeout);
         self
     }
+    #[doc = "Whether to include the policy of each managed index in the response."]
+    pub fn show_policy(mut self, show_policy: bool) -> Self {
+        self.show_policy = Some(show_policy);
+        self
+    }
+    #[doc = "The number of managed indexes to return."]
+    pub fn size(mut self, size: i64) -> Self {
+        self.size = Some(size);
+        self
+    }
+    #[doc = "The field to sort the managed indexes by."]
+    pub fn sortfield(mut self, sortfield: &'b str) -> Self {
+        self.sortfield = Some(sortfield);
+        self
+    }
+    #[doc = "The sort order of the managed indexes."]
+    pub fn sortorder(mut self, sortorder: SortOrder) -> Self {
+        self.sortorder = Some(sortorder);
+        self
+    }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
     pub fn source(mut self, source: &'b str) -> Self {
         self.source = Some(source);
+        self
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
+    #[doc = "Whether to include the validation result of the current action of each managed index in the response."]
+    pub fn validate_action(mut self, validate_action: bool) -> Self {
+        self.validate_action = Some(validate_action);
         self
     }
     #[doc = "Creates an asynchronous call to the Ism Explain Policy API that can be awaited"]
@@ -710,19 +837,45 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
+                from: Option<i64>,
                 human: Option<bool>,
+                local: Option<bool>,
+                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
+                #[serde(rename = "queryString")]
+                querystring: Option<&'b str>,
+                show_policy: Option<bool>,
+                size: Option<i64>,
+                #[serde(rename = "sortField")]
+                sortfield: Option<&'b str>,
+                #[serde(rename = "sortOrder")]
+                sortorder: Option<SortOrder>,
                 source: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
+                validate_action: Option<bool>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
+                from: self.from,
                 human: self.human,
+                local: self.local,
+                master_timeout: self.master_timeout,
                 pretty: self.pretty,
+                querystring: self.querystring,
+                show_policy: self.show_policy,
+                size: self.size,
+                sortfield: self.sortfield,
+                sortorder: self.sortorder,
                 source: self.source,
+                ty: self.ty,
+                validate_action: self.validate_action,
             };
             Some(query_params)
         };
@@ -748,17 +901,22 @@ impl IsmGetPoliciesParts {
         }
     }
 }
-#[doc = "Builder for the [Ism Get Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
+#[doc = "Builder for the [Ism Get Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
 #[derive(Clone, Debug)]
 pub struct IsmGetPolicies<'a, 'b> {
     transport: &'a Transport,
     parts: IsmGetPoliciesParts,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
+    from: Option<i64>,
     headers: HeaderMap,
     human: Option<bool>,
     pretty: Option<bool>,
+    querystring: Option<&'b str>,
     request_timeout: Option<Duration>,
+    size: Option<i64>,
+    sortfield: Option<&'b str>,
+    sortorder: Option<SortOrder>,
     source: Option<&'b str>,
 }
 impl<'a, 'b> IsmGetPolicies<'a, 'b> {
@@ -771,9 +929,14 @@ impl<'a, 'b> IsmGetPolicies<'a, 'b> {
             headers,
             error_trace: None,
             filter_path: None,
+            from: None,
             human: None,
             pretty: None,
+            querystring: None,
             request_timeout: None,
+            size: None,
+            sortfield: None,
+            sortorder: None,
             source: None,
         }
     }
@@ -785,6 +948,11 @@ impl<'a, 'b> IsmGetPolicies<'a, 'b> {
     #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
     pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
         self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "The starting index of the policies to return."]
+    pub fn from(mut self, from: i64) -> Self {
+        self.from = Some(from);
         self
     }
     #[doc = "Adds a HTTP header"]
@@ -802,9 +970,29 @@ impl<'a, 'b> IsmGetPolicies<'a, 'b> {
         self.pretty = Some(pretty);
         self
     }
+    #[doc = "A query string that filters the policies."]
+    pub fn querystring(mut self, querystring: &'b str) -> Self {
+        self.querystring = Some(querystring);
+        self
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The number of policies to return."]
+    pub fn size(mut self, size: i64) -> Self {
+        self.size = Some(size);
+        self
+    }
+    #[doc = "The field to sort the policies by."]
+    pub fn sortfield(mut self, sortfield: &'b str) -> Self {
+        self.sortfield = Some(sortfield);
+        self
+    }
+    #[doc = "The sort order of the policies."]
+    pub fn sortorder(mut self, sortorder: SortOrder) -> Self {
+        self.sortorder = Some(sortorder);
         self
     }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
@@ -825,15 +1013,28 @@ impl<'a, 'b> IsmGetPolicies<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
+                from: Option<i64>,
                 human: Option<bool>,
                 pretty: Option<bool>,
+                #[serde(rename = "queryString")]
+                querystring: Option<&'b str>,
+                size: Option<i64>,
+                #[serde(rename = "sortField")]
+                sortfield: Option<&'b str>,
+                #[serde(rename = "sortOrder")]
+                sortorder: Option<SortOrder>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
+                from: self.from,
                 human: self.human,
                 pretty: self.pretty,
+                querystring: self.querystring,
+                size: self.size,
+                sortfield: self.sortfield,
+                sortorder: self.sortorder,
                 source: self.source,
             };
             Some(query_params)
@@ -867,7 +1068,7 @@ impl<'b> IsmGetPolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Get Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#put-policy)\n\nRetrieves a specific policy."]
+#[doc = "Builder for the [Ism Get Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves a specific policy."]
 #[derive(Clone, Debug)]
 pub struct IsmGetPolicy<'a, 'b> {
     transport: &'a Transport,
@@ -979,7 +1180,7 @@ impl IsmPutPoliciesParts {
         }
     }
 }
-#[doc = "Builder for the [Ism Put Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
+#[doc = "Builder for the [Ism Put Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
 #[derive(Clone, Debug)]
 pub struct IsmPutPolicies<'a, 'b, B> {
     transport: &'a Transport,
@@ -993,6 +1194,7 @@ pub struct IsmPutPolicies<'a, 'b, B> {
     if_seq_no: Option<i64>,
     policyid: Option<&'b str>,
     pretty: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
@@ -1015,6 +1217,7 @@ where
             if_seq_no: None,
             policyid: None,
             pretty: None,
+            refresh: None,
             request_timeout: None,
             source: None,
         }
@@ -1036,6 +1239,7 @@ where
             if_seq_no: self.if_seq_no,
             policyid: self.policyid,
             pretty: self.pretty,
+            refresh: self.refresh,
             request_timeout: self.request_timeout,
             source: self.source,
         }
@@ -1079,6 +1283,11 @@ where
         self.pretty = Some(pretty);
         self
     }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
+        self.refresh = Some(refresh);
+        self
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
@@ -1108,6 +1317,7 @@ where
                 #[serde(rename = "policyID")]
                 policyid: Option<&'b str>,
                 pretty: Option<bool>,
+                refresh: Option<Refresh>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -1118,6 +1328,7 @@ where
                 if_seq_no: self.if_seq_no,
                 policyid: self.policyid,
                 pretty: self.pretty,
+                refresh: self.refresh,
                 source: self.source,
             };
             Some(query_params)
@@ -1151,7 +1362,7 @@ impl<'b> IsmPutPolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Put Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
+#[doc = "Builder for the [Ism Put Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
 #[derive(Clone, Debug)]
 pub struct IsmPutPolicy<'a, 'b, B> {
     transport: &'a Transport,
@@ -1164,6 +1375,7 @@ pub struct IsmPutPolicy<'a, 'b, B> {
     if_primary_term: Option<i64>,
     if_seq_no: Option<i64>,
     pretty: Option<bool>,
+    refresh: Option<Refresh>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
@@ -1185,6 +1397,7 @@ where
             if_primary_term: None,
             if_seq_no: None,
             pretty: None,
+            refresh: None,
             request_timeout: None,
             source: None,
         }
@@ -1205,6 +1418,7 @@ where
             if_primary_term: self.if_primary_term,
             if_seq_no: self.if_seq_no,
             pretty: self.pretty,
+            refresh: self.refresh,
             request_timeout: self.request_timeout,
             source: self.source,
         }
@@ -1244,6 +1458,11 @@ where
         self.pretty = Some(pretty);
         self
     }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(mut self, refresh: Refresh) -> Self {
+        self.refresh = Some(refresh);
+        self
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(mut self, timeout: Duration) -> Self {
         self.request_timeout = Some(timeout);
@@ -1271,6 +1490,7 @@ where
                 if_primary_term: Option<i64>,
                 if_seq_no: Option<i64>,
                 pretty: Option<bool>,
+                refresh: Option<Refresh>,
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
@@ -1280,6 +1500,7 @@ where
                 if_primary_term: self.if_primary_term,
                 if_seq_no: self.if_seq_no,
                 pretty: self.pretty,
+                refresh: self.refresh,
                 source: self.source,
             };
             Some(query_params)
@@ -1296,15 +1517,16 @@ where
 #[doc = "API parts for the Ism Refresh Search Analyzers API"]
 pub enum IsmRefreshSearchAnalyzersParts<'b> {
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmRefreshSearchAnalyzersParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Refresh Search Analyzers API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
             IsmRefreshSearchAnalyzersParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(36usize + encoded_index.len());
                 p.push_str("/_plugins/_refresh_search_analyzers/");
                 p.push_str(encoded_index.as_ref());
@@ -1313,7 +1535,7 @@ impl<'b> IsmRefreshSearchAnalyzersParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Refresh Search Analyzers API](https://opensearch.org/docs/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
+#[doc = "Builder for the [Ism Refresh Search Analyzers API](https://docs.opensearch.org/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
 #[derive(Clone, Debug)]
 pub struct IsmRefreshSearchAnalyzers<'a, 'b, B> {
     transport: &'a Transport,
@@ -1440,7 +1662,7 @@ pub enum IsmRemovePolicyParts<'b> {
     #[doc = "No parts"]
     None,
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmRemovePolicyParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Remove Policy API"]
@@ -1448,8 +1670,9 @@ impl<'b> IsmRemovePolicyParts<'b> {
         match self {
             IsmRemovePolicyParts::None => "/_plugins/_ism/remove".into(),
             IsmRemovePolicyParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(22usize + encoded_index.len());
                 p.push_str("/_plugins/_ism/remove/");
                 p.push_str(encoded_index.as_ref());
@@ -1458,7 +1681,7 @@ impl<'b> IsmRemovePolicyParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Remove Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#remove-policy)\n\nRemoves a policy from an index."]
+#[doc = "Builder for the [Ism Remove Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#remove-policy-from-index)\n\nRemoves a policy from an index."]
 #[derive(Clone, Debug)]
 pub struct IsmRemovePolicy<'a, 'b, B> {
     transport: &'a Transport,
@@ -1468,10 +1691,11 @@ pub struct IsmRemovePolicy<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    index: Option<&'b str>,
+    index: Option<&'b [&'b str]>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    ty: Option<&'b str>,
 }
 impl<'a, 'b, B> IsmRemovePolicy<'a, 'b, B>
 where
@@ -1492,6 +1716,7 @@ where
             pretty: None,
             request_timeout: None,
             source: None,
+            ty: None,
         }
     }
     #[doc = "The body for the API call"]
@@ -1511,6 +1736,7 @@ where
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
+            ty: self.ty,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -1533,7 +1759,8 @@ where
         self.human = Some(human);
         self
     }
-    pub fn index(mut self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
         self.index = Some(index);
         self
     }
@@ -1552,6 +1779,11 @@ where
         self.source = Some(source);
         self
     }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Ism Remove Policy API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -1566,9 +1798,12 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                index: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -1577,6 +1812,7 @@ where
                 index: self.index,
                 pretty: self.pretty,
                 source: self.source,
+                ty: self.ty,
             };
             Some(query_params)
         };
@@ -1594,7 +1830,7 @@ pub enum IsmRetryIndexParts<'b> {
     #[doc = "No parts"]
     None,
     #[doc = "Index"]
-    Index(&'b str),
+    Index(&'b [&'b str]),
 }
 impl<'b> IsmRetryIndexParts<'b> {
     #[doc = "Builds a relative URL path to the Ism Retry Index API"]
@@ -1602,8 +1838,9 @@ impl<'b> IsmRetryIndexParts<'b> {
         match self {
             IsmRetryIndexParts::None => "/_plugins/_ism/retry".into(),
             IsmRetryIndexParts::Index(index) => {
+                let index_str = index.join(",");
                 let encoded_index: Cow<str> =
-                    percent_encode(index.as_bytes(), PARTS_ENCODED).into();
+                    percent_encode(index_str.as_bytes(), PARTS_ENCODED).into();
                 let mut p = String::with_capacity(21usize + encoded_index.len());
                 p.push_str("/_plugins/_ism/retry/");
                 p.push_str(encoded_index.as_ref());
@@ -1612,20 +1849,23 @@ impl<'b> IsmRetryIndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Ism Retry Index API](https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
+#[doc = "Builder for the [Ism Retry Index API](https://docs.opensearch.org/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
 #[derive(Clone, Debug)]
 pub struct IsmRetryIndex<'a, 'b, B> {
     transport: &'a Transport,
     parts: IsmRetryIndexParts<'b>,
     body: Option<B>,
+    cluster_manager_timeout: Option<&'b str>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
-    index: Option<&'b str>,
+    index: Option<&'b [&'b str]>,
+    master_timeout: Option<&'b str>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    ty: Option<&'b str>,
 }
 impl<'a, 'b, B> IsmRetryIndex<'a, 'b, B>
 where
@@ -1639,13 +1879,16 @@ where
             parts,
             headers,
             body: None,
+            cluster_manager_timeout: None,
             error_trace: None,
             filter_path: None,
             human: None,
             index: None,
+            master_timeout: None,
             pretty: None,
             request_timeout: None,
             source: None,
+            ty: None,
         }
     }
     #[doc = "The body for the API call"]
@@ -1657,15 +1900,23 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            cluster_manager_timeout: self.cluster_manager_timeout,
             error_trace: self.error_trace,
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
             index: self.index,
+            master_timeout: self.master_timeout,
             pretty: self.pretty,
             request_timeout: self.request_timeout,
             source: self.source,
+            ty: self.ty,
         }
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
+        self.cluster_manager_timeout = Some(cluster_manager_timeout);
+        self
     }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(mut self, error_trace: bool) -> Self {
@@ -1687,8 +1938,15 @@ where
         self.human = Some(human);
         self
     }
-    pub fn index(mut self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(mut self, index: &'b [&'b str]) -> Self {
         self.index = Some(index);
+        self
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    #[deprecated = "Deprecated since OpenSearch 2.3: To promote inclusive language, use `cluster_manager_timeout` instead."]
+    pub fn master_timeout(mut self, master_timeout: &'b str) -> Self {
+        self.master_timeout = Some(master_timeout);
         self
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -1706,6 +1964,11 @@ where
         self.source = Some(source);
         self
     }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(mut self, ty: &'b str) -> Self {
+        self.ty = Some(ty);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Ism Retry Index API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -1716,21 +1979,29 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                cluster_manager_timeout: Option<&'b str>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
-                index: Option<&'b str>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                index: Option<&'b [&'b str]>,
+                master_timeout: Option<&'b str>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                #[serde(rename = "type")]
+                ty: Option<&'b str>,
             }
             let query_params = QueryParams {
+                cluster_manager_timeout: self.cluster_manager_timeout,
                 error_trace: self.error_trace,
                 filter_path: self.filter_path,
                 human: self.human,
                 index: self.index,
+                master_timeout: self.master_timeout,
                 pretty: self.pretty,
                 source: self.source,
+                ty: self.ty,
             };
             Some(query_params)
         };
@@ -1754,63 +2025,63 @@ impl<'a> Ism<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ism Add Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
+    #[doc = "[Ism Add Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
     pub fn add_policy<'b>(&'a self, parts: IsmAddPolicyParts<'b>) -> IsmAddPolicy<'a, 'b, ()> {
         IsmAddPolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Change Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
+    #[doc = "[Ism Change Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
     pub fn change_policy<'b>(
         &'a self,
         parts: IsmChangePolicyParts<'b>,
     ) -> IsmChangePolicy<'a, 'b, ()> {
         IsmChangePolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Delete Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
+    #[doc = "[Ism Delete Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
     pub fn delete_policy<'b>(&'a self, parts: IsmDeletePolicyParts<'b>) -> IsmDeletePolicy<'a, 'b> {
         IsmDeletePolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Exists Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy)\n\nChecks for the existence of a policy."]
+    #[doc = "[Ism Exists Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nChecks for the existence of a policy."]
     pub fn exists_policy<'b>(&'a self, parts: IsmExistsPolicyParts<'b>) -> IsmExistsPolicy<'a, 'b> {
         IsmExistsPolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Explain Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
+    #[doc = "[Ism Explain Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
     pub fn explain_policy<'b>(
         &'a self,
         parts: IsmExplainPolicyParts<'b>,
     ) -> IsmExplainPolicy<'a, 'b, ()> {
         IsmExplainPolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Get Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
+    #[doc = "[Ism Get Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
     pub fn get_policies<'b>(&'a self) -> IsmGetPolicies<'a, 'b> {
         IsmGetPolicies::new(self.transport())
     }
-    #[doc = "[Ism Get Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#put-policy)\n\nRetrieves a specific policy."]
+    #[doc = "[Ism Get Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves a specific policy."]
     pub fn get_policy<'b>(&'a self, parts: IsmGetPolicyParts<'b>) -> IsmGetPolicy<'a, 'b> {
         IsmGetPolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Put Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
+    #[doc = "[Ism Put Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
     pub fn put_policies<'b>(&'a self) -> IsmPutPolicies<'a, 'b, ()> {
         IsmPutPolicies::new(self.transport())
     }
-    #[doc = "[Ism Put Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
+    #[doc = "[Ism Put Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
     pub fn put_policy<'b>(&'a self, parts: IsmPutPolicyParts<'b>) -> IsmPutPolicy<'a, 'b, ()> {
         IsmPutPolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Refresh Search Analyzers API](https://opensearch.org/docs/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
+    #[doc = "[Ism Refresh Search Analyzers API](https://docs.opensearch.org/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
     pub fn refresh_search_analyzers<'b>(
         &'a self,
         parts: IsmRefreshSearchAnalyzersParts<'b>,
     ) -> IsmRefreshSearchAnalyzers<'a, 'b, ()> {
         IsmRefreshSearchAnalyzers::new(self.transport(), parts)
     }
-    #[doc = "[Ism Remove Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#remove-policy)\n\nRemoves a policy from an index."]
+    #[doc = "[Ism Remove Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#remove-policy-from-index)\n\nRemoves a policy from an index."]
     pub fn remove_policy<'b>(
         &'a self,
         parts: IsmRemovePolicyParts<'b>,
     ) -> IsmRemovePolicy<'a, 'b, ()> {
         IsmRemovePolicy::new(self.transport(), parts)
     }
-    #[doc = "[Ism Retry Index API](https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
+    #[doc = "[Ism Retry Index API](https://docs.opensearch.org/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
     pub fn retry_index<'b>(&'a self, parts: IsmRetryIndexParts<'b>) -> IsmRetryIndex<'a, 'b, ()> {
         IsmRetryIndex::new(self.transport(), parts)
     }

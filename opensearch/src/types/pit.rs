@@ -30,10 +30,8 @@
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DeletedPit {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub successful: Option<bool>,
+    pub pit_id: crate::types::common::PitId,
+    pub successful: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -42,6 +40,5 @@ pub struct PitDetail {
     pub creation_time: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub keep_alive: Option<i64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<String>,
+    pub pit_id: crate::types::common::PitId,
 }

@@ -65,7 +65,7 @@ impl<'b> BulkParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
+#[doc = "Builder for the [Bulk API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
 #[derive(Clone, Debug)]
 pub struct Bulk<'a, 'b, B> {
     transport: &'a Transport,
@@ -327,7 +327,7 @@ impl<'b> BulkStreamParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Bulk Stream API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
+#[doc = "Builder for the [Bulk Stream API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
 #[derive(Clone, Debug)]
 pub struct BulkStream<'a, 'b, B> {
     transport: &'a Transport,
@@ -600,7 +600,7 @@ impl<'b> ClearScrollParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Clear Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
+#[doc = "Builder for the [Clear Scroll API](https://docs.opensearch.org/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
 #[derive(Clone, Debug)]
 pub struct ClearScroll<'a, 'b, B> {
     transport: &'a Transport,
@@ -747,7 +747,7 @@ impl<'b> CountParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Count API](https://opensearch.org/docs/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
+#[doc = "Builder for the [Count API](https://docs.opensearch.org/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
 #[derive(Clone, Debug)]
 pub struct Count<'a, 'b, B> {
     transport: &'a Transport,
@@ -1036,7 +1036,7 @@ impl<'b> CreateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Create API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
+#[doc = "Builder for the [Create API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
 #[derive(Clone, Debug)]
 pub struct Create<'a, 'b, B> {
     transport: &'a Transport,
@@ -1254,11 +1254,12 @@ impl<'b> CreatePitParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Create Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit)\n\nCreates point in time context."]
+#[doc = "Builder for the [Create Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#create-a-pit)\n\nCreates point in time context.\nDelete the PIT when done. Until then it counts against `search.max_open_pit_context`."]
 #[derive(Clone, Debug)]
 pub struct CreatePit<'a, 'b, B> {
     transport: &'a Transport,
     parts: CreatePitParts<'b>,
+    allow_no_indices: Option<bool>,
     allow_partial_pit_creation: Option<bool>,
     body: Option<B>,
     error_trace: Option<bool>,
@@ -1266,6 +1267,8 @@ pub struct CreatePit<'a, 'b, B> {
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
     human: Option<bool>,
+    ignore_throttled: Option<bool>,
+    ignore_unavailable: Option<bool>,
     keep_alive: Option<&'b str>,
     preference: Option<&'b str>,
     pretty: Option<bool>,
@@ -1284,12 +1287,15 @@ where
             transport,
             parts,
             headers,
+            allow_no_indices: None,
             allow_partial_pit_creation: None,
             body: None,
             error_trace: None,
             expand_wildcards: None,
             filter_path: None,
             human: None,
+            ignore_throttled: None,
+            ignore_unavailable: None,
             keep_alive: None,
             preference: None,
             pretty: None,
@@ -1297,6 +1303,11 @@ where
             routing: None,
             source: None,
         }
+    }
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes."]
+    pub fn allow_no_indices(mut self, allow_no_indices: bool) -> Self {
+        self.allow_no_indices = Some(allow_no_indices);
+        self
     }
     #[doc = "Allow if point in time can be created with partial failures."]
     pub fn allow_partial_pit_creation(mut self, allow_partial_pit_creation: bool) -> Self {
@@ -1312,12 +1323,15 @@ where
             transport: self.transport,
             parts: self.parts,
             body: Some(body.into()),
+            allow_no_indices: self.allow_no_indices,
             allow_partial_pit_creation: self.allow_partial_pit_creation,
             error_trace: self.error_trace,
             expand_wildcards: self.expand_wildcards,
             filter_path: self.filter_path,
             headers: self.headers,
             human: self.human,
+            ignore_throttled: self.ignore_throttled,
+            ignore_unavailable: self.ignore_unavailable,
             keep_alive: self.keep_alive,
             preference: self.preference,
             pretty: self.pretty,
@@ -1351,7 +1365,17 @@ where
         self.human = Some(human);
         self
     }
-    #[doc = "Specify the keep alive for point in time."]
+    #[doc = "If `true`, concrete, expanded or aliased indexes will be ignored when frozen."]
+    pub fn ignore_throttled(mut self, ignore_throttled: bool) -> Self {
+        self.ignore_throttled = Some(ignore_throttled);
+        self
+    }
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
+    pub fn ignore_unavailable(mut self, ignore_unavailable: bool) -> Self {
+        self.ignore_unavailable = Some(ignore_unavailable);
+        self
+    }
+    #[doc = "Specify the keep alive for point in time.\nEach search against the PIT restarts it, and a search cannot shorten it.\nIt cannot exceed the `point_in_time.max_keep_alive` cluster setting (24 hours by default)."]
     pub fn keep_alive(mut self, keep_alive: &'b str) -> Self {
         self.keep_alive = Some(keep_alive);
         self
@@ -1391,6 +1415,7 @@ where
             #[serde_with::skip_serializing_none]
             #[derive(Serialize)]
             struct QueryParams<'b> {
+                allow_no_indices: Option<bool>,
                 allow_partial_pit_creation: Option<bool>,
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
@@ -1398,6 +1423,8 @@ where
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
                 human: Option<bool>,
+                ignore_throttled: Option<bool>,
+                ignore_unavailable: Option<bool>,
                 keep_alive: Option<&'b str>,
                 preference: Option<&'b str>,
                 pretty: Option<bool>,
@@ -1406,11 +1433,14 @@ where
                 source: Option<&'b str>,
             }
             let query_params = QueryParams {
+                allow_no_indices: self.allow_no_indices,
                 allow_partial_pit_creation: self.allow_partial_pit_creation,
                 error_trace: self.error_trace,
                 expand_wildcards: self.expand_wildcards,
                 filter_path: self.filter_path,
                 human: self.human,
+                ignore_throttled: self.ignore_throttled,
+                ignore_unavailable: self.ignore_unavailable,
                 keep_alive: self.keep_alive,
                 preference: self.preference,
                 pretty: self.pretty,
@@ -1451,7 +1481,7 @@ impl<'b> DeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
+#[doc = "Builder for the [Delete API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
 #[derive(Clone, Debug)]
 pub struct Delete<'a, 'b> {
     transport: &'a Transport,
@@ -1639,7 +1669,7 @@ impl DeleteAllPitsParts {
         }
     }
 }
-#[doc = "Builder for the [Delete All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches."]
+#[doc = "Builder for the [Delete All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
 #[derive(Clone, Debug)]
 pub struct DeleteAllPits<'a, 'b> {
     transport: &'a Transport,
@@ -1760,7 +1790,7 @@ impl<'b> DeleteByQueryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
+#[doc = "Builder for the [Delete By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
 #[derive(Clone, Debug)]
 pub struct DeleteByQuery<'a, 'b, B> {
     transport: &'a Transport,
@@ -2242,7 +2272,7 @@ impl<'b> DeleteByQueryRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
+#[doc = "Builder for the [Delete By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
 #[derive(Clone, Debug)]
 pub struct DeleteByQueryRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -2387,7 +2417,7 @@ impl DeletePitParts {
         }
     }
 }
-#[doc = "Builder for the [Delete Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed."]
+#[doc = "Builder for the [Delete Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
 #[derive(Clone, Debug)]
 pub struct DeletePit<'a, 'b, B> {
     transport: &'a Transport,
@@ -2528,7 +2558,7 @@ impl<'b> DeleteScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Delete Script API](https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
+#[doc = "Builder for the [Delete Script API](https://docs.opensearch.org/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
 #[derive(Clone, Debug)]
 pub struct DeleteScript<'a, 'b> {
     transport: &'a Transport,
@@ -2678,7 +2708,7 @@ impl<'b> ExistsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Exists API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
+#[doc = "Builder for the [Exists API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
 #[derive(Clone, Debug)]
 pub struct Exists<'a, 'b> {
     transport: &'a Transport,
@@ -2894,7 +2924,7 @@ impl<'b> ExistsSourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Exists Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
+#[doc = "Builder for the [Exists Source API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
 #[derive(Clone, Debug)]
 pub struct ExistsSource<'a, 'b> {
     transport: &'a Transport,
@@ -3100,7 +3130,7 @@ impl<'b> ExplainParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Explain API](https://opensearch.org/docs/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
+#[doc = "Builder for the [Explain API](https://docs.opensearch.org/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
 #[derive(Clone, Debug)]
 pub struct Explain<'a, 'b, B> {
     transport: &'a Transport,
@@ -3374,7 +3404,7 @@ impl<'b> FieldCapsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Field Caps API](https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
+#[doc = "Builder for the [Field Caps API](https://docs.opensearch.org/latest/mappings/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
 #[derive(Clone, Debug)]
 pub struct FieldCaps<'a, 'b, B> {
     transport: &'a Transport,
@@ -3574,7 +3604,7 @@ impl<'b> GetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
+#[doc = "Builder for the [Get API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
 #[derive(Clone, Debug)]
 pub struct Get<'a, 'b> {
     transport: &'a Transport,
@@ -3780,7 +3810,7 @@ impl GetAllPitsParts {
         }
     }
 }
-#[doc = "Builder for the [Get All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
+#[doc = "Builder for the [Get All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
 #[derive(Clone, Debug)]
 pub struct GetAllPits<'a, 'b> {
     transport: &'a Transport,
@@ -3898,7 +3928,7 @@ impl<'b> GetScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get Script API](https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
+#[doc = "Builder for the [Get Script API](https://docs.opensearch.org/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
 #[derive(Clone, Debug)]
 pub struct GetScript<'a, 'b> {
     transport: &'a Transport,
@@ -4029,7 +4059,7 @@ impl GetScriptContextParts {
         }
     }
 }
-#[doc = "Builder for the [Get Script Context API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
+#[doc = "Builder for the [Get Script Context API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
 #[derive(Clone, Debug)]
 pub struct GetScriptContext<'a, 'b> {
     transport: &'a Transport,
@@ -4141,7 +4171,7 @@ impl GetScriptLanguagesParts {
         }
     }
 }
-#[doc = "Builder for the [Get Script Languages API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
+#[doc = "Builder for the [Get Script Languages API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
 #[derive(Clone, Debug)]
 pub struct GetScriptLanguages<'a, 'b> {
     transport: &'a Transport,
@@ -4263,7 +4293,7 @@ impl<'b> GetSourceParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Get Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
+#[doc = "Builder for the [Get Source API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
 #[derive(Clone, Debug)]
 pub struct GetSource<'a, 'b> {
     transport: &'a Transport,
@@ -4480,7 +4510,7 @@ impl<'b> IndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Index API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
+#[doc = "Builder for the [Index API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
 #[derive(Clone, Debug)]
 pub struct Index<'a, 'b, B> {
     transport: &'a Transport,
@@ -4729,7 +4759,7 @@ impl InfoParts {
         }
     }
 }
-#[doc = "Builder for the [Info API](https://opensearch.org/docs/latest)\n\nReturns basic information about the cluster."]
+#[doc = "Builder for the [Info API](https://docs.opensearch.org/latest/)\n\nReturns basic information about the cluster."]
 #[derive(Clone, Debug)]
 pub struct Info<'a, 'b> {
     transport: &'a Transport,
@@ -4852,7 +4882,7 @@ impl<'b> MgetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Mget API](https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
+#[doc = "Builder for the [Mget API](https://docs.opensearch.org/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
 #[derive(Clone, Debug)]
 pub struct Mget<'a, 'b, B> {
     transport: &'a Transport,
@@ -5086,7 +5116,7 @@ impl<'b> MsearchParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Msearch API](https://opensearch.org/docs/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
+#[doc = "Builder for the [Msearch API](https://docs.opensearch.org/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
 #[derive(Clone, Debug)]
 pub struct Msearch<'a, 'b, B> {
     transport: &'a Transport,
@@ -5316,7 +5346,7 @@ impl<'b> MsearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Msearch Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
+#[doc = "Builder for the [Msearch Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
 #[derive(Clone, Debug)]
 pub struct MsearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -5515,7 +5545,7 @@ impl<'b> MtermvectorsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Mtermvectors API](https://opensearch.org/docs/latest)\n\nReturns multiple termvectors in one request."]
+#[doc = "Builder for the [Mtermvectors API](https://docs.opensearch.org/latest/)\n\nReturns multiple term vectors in one request."]
 #[derive(Clone, Debug)]
 pub struct Mtermvectors<'a, 'b, B> {
     transport: &'a Transport,
@@ -5775,7 +5805,7 @@ impl PingParts {
         }
     }
 }
-#[doc = "Builder for the [Ping API](https://opensearch.org/docs/latest)\n\nReturns whether the cluster is running."]
+#[doc = "Builder for the [Ping API](https://docs.opensearch.org/latest/)\n\nReturns whether the cluster is running."]
 #[derive(Clone, Debug)]
 pub struct Ping<'a, 'b> {
     transport: &'a Transport,
@@ -5907,7 +5937,7 @@ impl<'b> PutScriptParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Put Script API](https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
+#[doc = "Builder for the [Put Script API](https://docs.opensearch.org/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
 #[derive(Clone, Debug)]
 pub struct PutScript<'a, 'b, B> {
     transport: &'a Transport,
@@ -6095,7 +6125,7 @@ impl<'b> RankEvalParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rank Eval API](https://opensearch.org/docs/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
+#[doc = "Builder for the [Rank Eval API](https://docs.opensearch.org/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
 #[derive(Clone, Debug)]
 pub struct RankEval<'a, 'b, B> {
     transport: &'a Transport,
@@ -6274,7 +6304,7 @@ impl ReindexParts {
         }
     }
 }
-#[doc = "Builder for the [Reindex API](https://opensearch.org/docs/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
+#[doc = "Builder for the [Reindex API](https://docs.opensearch.org/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
 #[derive(Clone, Debug)]
 pub struct Reindex<'a, 'b, B> {
     transport: &'a Transport,
@@ -6509,7 +6539,7 @@ impl<'b> ReindexRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Reindex Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular reindex operation."]
+#[doc = "Builder for the [Reindex Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular reindex operation."]
 #[derive(Clone, Debug)]
 pub struct ReindexRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -6663,7 +6693,7 @@ impl<'b> RenderSearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Render Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+#[doc = "Builder for the [Render Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
 #[derive(Clone, Debug)]
 pub struct RenderSearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -6801,7 +6831,7 @@ impl ScriptsPainlessExecuteParts {
         }
     }
 }
-#[doc = "Builder for the [Scripts Painless Execute API](https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
+#[doc = "Builder for the [Scripts Painless Execute API](https://docs.opensearch.org/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
 #[derive(Clone, Debug)]
 pub struct ScriptsPainlessExecute<'a, 'b, B> {
     transport: &'a Transport,
@@ -6949,7 +6979,7 @@ impl<'b> ScrollParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods)\n\nAllows to retrieve a large numbers of results from a single search request."]
+#[doc = "Builder for the [Scroll API](https://docs.opensearch.org/latest/api-reference/search-apis/scroll/#endpoints)\n\nAllows to retrieve a large numbers of results from a single search request."]
 #[derive(Clone, Debug)]
 pub struct Scroll<'a, 'b, B> {
     transport: &'a Transport,
@@ -7130,7 +7160,7 @@ impl<'b> SearchParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search API](https://opensearch.org/docs/latest/api-reference/search/)\n\nReturns results matching a query."]
+#[doc = "Builder for the [Search API](https://docs.opensearch.org/latest/api-reference/search/)\n\nReturns results matching a query."]
 #[derive(Clone, Debug)]
 pub struct Search<'a, 'b, B> {
     transport: &'a Transport,
@@ -7769,7 +7799,7 @@ impl<'b> SearchShardsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search Shards API](https://opensearch.org/docs/latest)\n\nReturns information about the indexes and shards that a search request would be executed against."]
+#[doc = "Builder for the [Search Shards API](https://docs.opensearch.org/latest/)\n\nReturns information about the indexes and shards that a search request would be executed against."]
 #[derive(Clone, Debug)]
 pub struct SearchShards<'a, 'b, B> {
     transport: &'a Transport,
@@ -7981,7 +8011,7 @@ impl<'b> SearchTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+#[doc = "Builder for the [Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
 #[derive(Clone, Debug)]
 pub struct SearchTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -8292,7 +8322,7 @@ impl<'b> TermvectorsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Termvectors API](https://opensearch.org/docs/latest)\n\nReturns information and statistics about terms in the fields of a particular document."]
+#[doc = "Builder for the [Termvectors API](https://docs.opensearch.org/latest/)\n\nReturns information and statistics about terms in the fields of a particular document."]
 #[derive(Clone, Debug)]
 pub struct Termvectors<'a, 'b, B> {
     transport: &'a Transport,
@@ -8551,7 +8581,7 @@ impl<'b> UpdateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update API](https://opensearch.org/docs/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
+#[doc = "Builder for the [Update API](https://docs.opensearch.org/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
 #[derive(Clone, Debug)]
 pub struct Update<'a, 'b, B> {
     transport: &'a Transport,
@@ -8821,7 +8851,7 @@ impl<'b> UpdateByQueryParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
+#[doc = "Builder for the [Update By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
 #[derive(Clone, Debug)]
 pub struct UpdateByQuery<'a, 'b, B> {
     transport: &'a Transport,
@@ -9313,7 +9343,7 @@ impl<'b> UpdateByQueryRethrottleParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Update By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Update By Query operation."]
+#[doc = "Builder for the [Update By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Update By Query operation."]
 #[derive(Clone, Debug)]
 pub struct UpdateByQueryRethrottle<'a, 'b, B> {
     transport: &'a Transport,
@@ -9445,202 +9475,202 @@ where
     }
 }
 impl OpenSearch {
-    #[doc = "[Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
+    #[doc = "[Bulk API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
     pub fn bulk<'a, 'b>(&'a self, parts: BulkParts<'b>) -> Bulk<'a, 'b, ()> {
         Bulk::new(self.transport(), parts)
     }
-    #[doc = "[Bulk Stream API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
+    #[doc = "[Bulk Stream API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
     pub fn bulk_stream<'a, 'b>(&'a self, parts: BulkStreamParts<'b>) -> BulkStream<'a, 'b, ()> {
         BulkStream::new(self.transport(), parts)
     }
-    #[doc = "[Clear Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
+    #[doc = "[Clear Scroll API](https://docs.opensearch.org/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
     pub fn clear_scroll<'a, 'b>(&'a self, parts: ClearScrollParts<'b>) -> ClearScroll<'a, 'b, ()> {
         ClearScroll::new(self.transport(), parts)
     }
-    #[doc = "[Count API](https://opensearch.org/docs/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
+    #[doc = "[Count API](https://docs.opensearch.org/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
     pub fn count<'a, 'b>(&'a self, parts: CountParts<'b>) -> Count<'a, 'b, ()> {
         Count::new(self.transport(), parts)
     }
-    #[doc = "[Create API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
+    #[doc = "[Create API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
     pub fn create<'a, 'b>(&'a self, parts: CreateParts<'b>) -> Create<'a, 'b, ()> {
         Create::new(self.transport(), parts)
     }
-    #[doc = "[Create Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit)\n\nCreates point in time context."]
+    #[doc = "[Create Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#create-a-pit)\n\nCreates point in time context.\nDelete the PIT when done. Until then it counts against `search.max_open_pit_context`."]
     pub fn create_pit<'a, 'b>(&'a self, parts: CreatePitParts<'b>) -> CreatePit<'a, 'b, ()> {
         CreatePit::new(self.transport(), parts)
     }
-    #[doc = "[Delete API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
+    #[doc = "[Delete API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
     pub fn delete<'a, 'b>(&'a self, parts: DeleteParts<'b>) -> Delete<'a, 'b> {
         Delete::new(self.transport(), parts)
     }
-    #[doc = "[Delete All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches."]
+    #[doc = "[Delete All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
     pub fn delete_all_pits<'a, 'b>(&'a self) -> DeleteAllPits<'a, 'b> {
         DeleteAllPits::new(self.transport())
     }
-    #[doc = "[Delete By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
+    #[doc = "[Delete By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
     pub fn delete_by_query<'a, 'b>(
         &'a self,
         parts: DeleteByQueryParts<'b>,
     ) -> DeleteByQuery<'a, 'b, ()> {
         DeleteByQuery::new(self.transport(), parts)
     }
-    #[doc = "[Delete By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
+    #[doc = "[Delete By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
     pub fn delete_by_query_rethrottle<'a, 'b>(
         &'a self,
         parts: DeleteByQueryRethrottleParts<'b>,
     ) -> DeleteByQueryRethrottle<'a, 'b, ()> {
         DeleteByQueryRethrottle::new(self.transport(), parts)
     }
-    #[doc = "[Delete Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed."]
+    #[doc = "[Delete Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
     pub fn delete_pit<'a, 'b>(&'a self) -> DeletePit<'a, 'b, ()> {
         DeletePit::new(self.transport())
     }
-    #[doc = "[Delete Script API](https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
+    #[doc = "[Delete Script API](https://docs.opensearch.org/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
     pub fn delete_script<'a, 'b>(&'a self, parts: DeleteScriptParts<'b>) -> DeleteScript<'a, 'b> {
         DeleteScript::new(self.transport(), parts)
     }
-    #[doc = "[Exists API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
+    #[doc = "[Exists API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document exists in an index."]
     pub fn exists<'a, 'b>(&'a self, parts: ExistsParts<'b>) -> Exists<'a, 'b> {
         Exists::new(self.transport(), parts)
     }
-    #[doc = "[Exists Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
+    #[doc = "[Exists Source API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns information about whether a document source exists in an index."]
     pub fn exists_source<'a, 'b>(&'a self, parts: ExistsSourceParts<'b>) -> ExistsSource<'a, 'b> {
         ExistsSource::new(self.transport(), parts)
     }
-    #[doc = "[Explain API](https://opensearch.org/docs/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
+    #[doc = "[Explain API](https://docs.opensearch.org/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
     pub fn explain<'a, 'b>(&'a self, parts: ExplainParts<'b>) -> Explain<'a, 'b, ()> {
         Explain::new(self.transport(), parts)
     }
-    #[doc = "[Field Caps API](https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
+    #[doc = "[Field Caps API](https://docs.opensearch.org/latest/mappings/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
     pub fn field_caps<'a, 'b>(&'a self, parts: FieldCapsParts<'b>) -> FieldCaps<'a, 'b, ()> {
         FieldCaps::new(self.transport(), parts)
     }
-    #[doc = "[Get API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
+    #[doc = "[Get API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
     pub fn get<'a, 'b>(&'a self, parts: GetParts<'b>) -> Get<'a, 'b> {
         Get::new(self.transport(), parts)
     }
-    #[doc = "[Get All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
+    #[doc = "[Get All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
     pub fn get_all_pits<'a, 'b>(&'a self) -> GetAllPits<'a, 'b> {
         GetAllPits::new(self.transport())
     }
-    #[doc = "[Get Script API](https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
+    #[doc = "[Get Script API](https://docs.opensearch.org/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
     pub fn get_script<'a, 'b>(&'a self, parts: GetScriptParts<'b>) -> GetScript<'a, 'b> {
         GetScript::new(self.transport(), parts)
     }
-    #[doc = "[Get Script Context API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
+    #[doc = "[Get Script Context API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
     pub fn get_script_context<'a, 'b>(&'a self) -> GetScriptContext<'a, 'b> {
         GetScriptContext::new(self.transport())
     }
-    #[doc = "[Get Script Languages API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
+    #[doc = "[Get Script Languages API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
     pub fn get_script_languages<'a, 'b>(&'a self) -> GetScriptLanguages<'a, 'b> {
         GetScriptLanguages::new(self.transport())
     }
-    #[doc = "[Get Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
+    #[doc = "[Get Source API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
     pub fn get_source<'a, 'b>(&'a self, parts: GetSourceParts<'b>) -> GetSource<'a, 'b> {
         GetSource::new(self.transport(), parts)
     }
-    #[doc = "[Index API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
+    #[doc = "[Index API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
     pub fn index<'a, 'b>(&'a self, parts: IndexParts<'b>) -> Index<'a, 'b, ()> {
         Index::new(self.transport(), parts)
     }
-    #[doc = "[Info API](https://opensearch.org/docs/latest)\n\nReturns basic information about the cluster."]
+    #[doc = "[Info API](https://docs.opensearch.org/latest/)\n\nReturns basic information about the cluster."]
     pub fn info<'a, 'b>(&'a self) -> Info<'a, 'b> {
         Info::new(self.transport())
     }
-    #[doc = "[Mget API](https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
+    #[doc = "[Mget API](https://docs.opensearch.org/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
     pub fn mget<'a, 'b>(&'a self, parts: MgetParts<'b>) -> Mget<'a, 'b, ()> {
         Mget::new(self.transport(), parts)
     }
-    #[doc = "[Msearch API](https://opensearch.org/docs/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
+    #[doc = "[Msearch API](https://docs.opensearch.org/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
     pub fn msearch<'a, 'b>(&'a self, parts: MsearchParts<'b>) -> Msearch<'a, 'b, ()> {
         Msearch::new(self.transport(), parts)
     }
-    #[doc = "[Msearch Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
+    #[doc = "[Msearch Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
     pub fn msearch_template<'a, 'b>(
         &'a self,
         parts: MsearchTemplateParts<'b>,
     ) -> MsearchTemplate<'a, 'b, ()> {
         MsearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Mtermvectors API](https://opensearch.org/docs/latest)\n\nReturns multiple termvectors in one request."]
+    #[doc = "[Mtermvectors API](https://docs.opensearch.org/latest/)\n\nReturns multiple term vectors in one request."]
     pub fn mtermvectors<'a, 'b>(
         &'a self,
         parts: MtermvectorsParts<'b>,
     ) -> Mtermvectors<'a, 'b, ()> {
         Mtermvectors::new(self.transport(), parts)
     }
-    #[doc = "[Ping API](https://opensearch.org/docs/latest)\n\nReturns whether the cluster is running."]
+    #[doc = "[Ping API](https://docs.opensearch.org/latest/)\n\nReturns whether the cluster is running."]
     pub fn ping<'a, 'b>(&'a self) -> Ping<'a, 'b> {
         Ping::new(self.transport())
     }
-    #[doc = "[Put Script API](https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
+    #[doc = "[Put Script API](https://docs.opensearch.org/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
     pub fn put_script<'a, 'b>(&'a self, parts: PutScriptParts<'b>) -> PutScript<'a, 'b, ()> {
         PutScript::new(self.transport(), parts)
     }
-    #[doc = "[Rank Eval API](https://opensearch.org/docs/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
+    #[doc = "[Rank Eval API](https://docs.opensearch.org/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
     pub fn rank_eval<'a, 'b>(&'a self, parts: RankEvalParts<'b>) -> RankEval<'a, 'b, ()> {
         RankEval::new(self.transport(), parts)
     }
-    #[doc = "[Reindex API](https://opensearch.org/docs/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
+    #[doc = "[Reindex API](https://docs.opensearch.org/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
     pub fn reindex<'a, 'b>(&'a self) -> Reindex<'a, 'b, ()> {
         Reindex::new(self.transport())
     }
-    #[doc = "[Reindex Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular reindex operation."]
+    #[doc = "[Reindex Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular reindex operation."]
     pub fn reindex_rethrottle<'a, 'b>(
         &'a self,
         parts: ReindexRethrottleParts<'b>,
     ) -> ReindexRethrottle<'a, 'b, ()> {
         ReindexRethrottle::new(self.transport(), parts)
     }
-    #[doc = "[Render Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Render Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     pub fn render_search_template<'a, 'b>(
         &'a self,
         parts: RenderSearchTemplateParts<'b>,
     ) -> RenderSearchTemplate<'a, 'b, ()> {
         RenderSearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Scripts Painless Execute API](https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
+    #[doc = "[Scripts Painless Execute API](https://docs.opensearch.org/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
     pub fn scripts_painless_execute<'a, 'b>(&'a self) -> ScriptsPainlessExecute<'a, 'b, ()> {
         ScriptsPainlessExecute::new(self.transport())
     }
-    #[doc = "[Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods)\n\nAllows to retrieve a large numbers of results from a single search request.\n\n# Examples\n\nTo initiate a scroll, make search API call with a specified `scroll` timeout,\nthen fetch the next set of hits using the `_scroll_id` returned in\nthe response. Once no more hits are returned, clear the scroll.\n\n```rust,no_run\n# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};\n# use serde_json::{json, Value};\n# async fn doc() -> Result<(), Box<dyn std::error::Error>> {\nlet client = OpenSearch::default();\n\nfn print_hits(hits: &[Value]) {\n    for hit in hits {\n        println!(\n            \"id: '{}', source: '{}', score: '{}'\",\n            hit[\"_id\"].as_str().unwrap(),\n            hit[\"_source\"],\n            hit[\"_score\"].as_f64().unwrap()\n        );\n    }\n}\n\nlet scroll = \"1m\";\nlet mut response = client\n    .search(SearchParts::Index(&[\"tweets\"]))\n    .scroll(scroll)\n    .body(json!({\n        \"query\": {\n            \"match\": {\n                \"body\": {\n                    \"query\": \"OpenSearch rust\",\n                    \"operator\": \"AND\"\n                }\n            }\n        }\n    }))\n    .send()\n    .await?;\n\nlet mut response_body = response.json::<Value>().await?;\nlet mut scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\nlet mut hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n\nprint_hits(hits);\n\nwhile hits.len() > 0 {\n    response = client\n        .scroll(ScrollParts::None)\n        .body(json!({\n            \"scroll\": scroll,\n            \"scroll_id\": scroll_id\n        }))\n        .send()\n        .await?;\n\n    response_body = response.json::<Value>().await?;\n    scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\n    hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n    print_hits(hits);\n}\n\nresponse = client\n    .clear_scroll(ClearScrollParts::None)\n    .body(json!({\n        \"scroll_id\": scroll_id\n    }))\n    .send()\n    .await?;\n    \n# Ok(())\n# }\n```"]
+    #[doc = "[Scroll API](https://docs.opensearch.org/latest/api-reference/search-apis/scroll/#endpoints)\n\nAllows to retrieve a large numbers of results from a single search request.\n\n# Examples\n\nTo initiate a scroll, make search API call with a specified `scroll` timeout,\nthen fetch the next set of hits using the `_scroll_id` returned in\nthe response. Once no more hits are returned, clear the scroll.\n\n```rust,no_run\n# use opensearch::{OpenSearch, Error, SearchParts, ScrollParts, ClearScrollParts};\n# use serde_json::{json, Value};\n# async fn doc() -> Result<(), Box<dyn std::error::Error>> {\nlet client = OpenSearch::default();\n\nfn print_hits(hits: &[Value]) {\n    for hit in hits {\n        println!(\n            \"id: '{}', source: '{}', score: '{}'\",\n            hit[\"_id\"].as_str().unwrap(),\n            hit[\"_source\"],\n            hit[\"_score\"].as_f64().unwrap()\n        );\n    }\n}\n\nlet scroll = \"1m\";\nlet mut response = client\n    .search(SearchParts::Index(&[\"tweets\"]))\n    .scroll(scroll)\n    .body(json!({\n        \"query\": {\n            \"match\": {\n                \"body\": {\n                    \"query\": \"OpenSearch rust\",\n                    \"operator\": \"AND\"\n                }\n            }\n        }\n    }))\n    .send()\n    .await?;\n\nlet mut response_body = response.json::<Value>().await?;\nlet mut scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\nlet mut hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n\nprint_hits(hits);\n\nwhile hits.len() > 0 {\n    response = client\n        .scroll(ScrollParts::None)\n        .body(json!({\n            \"scroll\": scroll,\n            \"scroll_id\": scroll_id\n        }))\n        .send()\n        .await?;\n\n    response_body = response.json::<Value>().await?;\n    scroll_id = response_body[\"_scroll_id\"].as_str().unwrap();\n    hits = response_body[\"hits\"][\"hits\"].as_array().unwrap();\n    print_hits(hits);\n}\n\nresponse = client\n    .clear_scroll(ClearScrollParts::None)\n    .body(json!({\n        \"scroll_id\": scroll_id\n    }))\n    .send()\n    .await?;\n    \n# Ok(())\n# }\n```"]
     pub fn scroll<'a, 'b>(&'a self, parts: ScrollParts<'b>) -> Scroll<'a, 'b, ()> {
         Scroll::new(self.transport(), parts)
     }
-    #[doc = "[Search API](https://opensearch.org/docs/latest/api-reference/search/)\n\nReturns results matching a query."]
+    #[doc = "[Search API](https://docs.opensearch.org/latest/api-reference/search/)\n\nReturns results matching a query."]
     pub fn search<'a, 'b>(&'a self, parts: SearchParts<'b>) -> Search<'a, 'b, ()> {
         Search::new(self.transport(), parts)
     }
-    #[doc = "[Search Shards API](https://opensearch.org/docs/latest)\n\nReturns information about the indexes and shards that a search request would be executed against."]
+    #[doc = "[Search Shards API](https://docs.opensearch.org/latest/)\n\nReturns information about the indexes and shards that a search request would be executed against."]
     pub fn search_shards<'a, 'b>(
         &'a self,
         parts: SearchShardsParts<'b>,
     ) -> SearchShards<'a, 'b, ()> {
         SearchShards::new(self.transport(), parts)
     }
-    #[doc = "[Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     pub fn search_template<'a, 'b>(
         &'a self,
         parts: SearchTemplateParts<'b>,
     ) -> SearchTemplate<'a, 'b, ()> {
         SearchTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Termvectors API](https://opensearch.org/docs/latest)\n\nReturns information and statistics about terms in the fields of a particular document."]
+    #[doc = "[Termvectors API](https://docs.opensearch.org/latest/)\n\nReturns information and statistics about terms in the fields of a particular document."]
     pub fn termvectors<'a, 'b>(&'a self, parts: TermvectorsParts<'b>) -> Termvectors<'a, 'b, ()> {
         Termvectors::new(self.transport(), parts)
     }
-    #[doc = "[Update API](https://opensearch.org/docs/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
+    #[doc = "[Update API](https://docs.opensearch.org/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
     pub fn update<'a, 'b>(&'a self, parts: UpdateParts<'b>) -> Update<'a, 'b, ()> {
         Update::new(self.transport(), parts)
     }
-    #[doc = "[Update By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
+    #[doc = "[Update By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
     pub fn update_by_query<'a, 'b>(
         &'a self,
         parts: UpdateByQueryParts<'b>,
     ) -> UpdateByQuery<'a, 'b, ()> {
         UpdateByQuery::new(self.transport(), parts)
     }
-    #[doc = "[Update By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Update By Query operation."]
+    #[doc = "[Update By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Update By Query operation."]
     pub fn update_by_query_rethrottle<'a, 'b>(
         &'a self,
         parts: UpdateByQueryRethrottleParts<'b>,

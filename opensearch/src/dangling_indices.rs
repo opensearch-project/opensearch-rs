@@ -70,7 +70,7 @@ impl<'b> DanglingIndicesDeleteDanglingIndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
+#[doc = "Builder for the [Dangling Indices Delete Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesDeleteDanglingIndex<'a, 'b> {
     transport: &'a Transport,
@@ -229,7 +229,7 @@ impl<'b> DanglingIndicesImportDanglingIndexParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
+#[doc = "Builder for the [Dangling Indices Import Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesImportDanglingIndex<'a, 'b, B> {
     transport: &'a Transport,
@@ -408,7 +408,7 @@ impl DanglingIndicesListDanglingIndicesParts {
         }
     }
 }
-#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
+#[doc = "Builder for the [Dangling Indices List Dangling Indices API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
 #[derive(Clone, Debug)]
 pub struct DanglingIndicesListDanglingIndices<'a, 'b> {
     transport: &'a Transport,
@@ -518,21 +518,21 @@ impl<'a> DanglingIndices<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
+    #[doc = "[Dangling Indices Delete Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
     pub fn delete_dangling_index<'b>(
         &'a self,
         parts: DanglingIndicesDeleteDanglingIndexParts<'b>,
     ) -> DanglingIndicesDeleteDanglingIndex<'a, 'b> {
         DanglingIndicesDeleteDanglingIndex::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
+    #[doc = "[Dangling Indices Import Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
     pub fn import_dangling_index<'b>(
         &'a self,
         parts: DanglingIndicesImportDanglingIndexParts<'b>,
     ) -> DanglingIndicesImportDanglingIndex<'a, 'b, ()> {
         DanglingIndicesImportDanglingIndex::new(self.transport(), parts)
     }
-    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
+    #[doc = "[Dangling Indices List Dangling Indices API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
     pub fn list_dangling_indices<'b>(&'a self) -> DanglingIndicesListDanglingIndices<'a, 'b> {
         DanglingIndicesListDanglingIndices::new(self.transport())
     }

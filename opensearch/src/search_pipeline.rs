@@ -326,7 +326,7 @@ impl<'b> SearchPipelinePutParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Search Pipeline Put API](https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
+#[doc = "Builder for the [Search Pipeline Put API](https://docs.opensearch.org/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
 #[derive(Clone, Debug)]
 pub struct SearchPipelinePut<'a, 'b, B> {
     transport: &'a Transport,
@@ -490,7 +490,7 @@ impl<'a> SearchPipeline<'a> {
     pub fn get<'b>(&'a self, parts: SearchPipelineGetParts<'b>) -> SearchPipelineGet<'a, 'b> {
         SearchPipelineGet::new(self.transport(), parts)
     }
-    #[doc = "[Search Pipeline Put API](https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
+    #[doc = "[Search Pipeline Put API](https://docs.opensearch.org/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
     pub fn put<'b>(&'a self, parts: SearchPipelinePutParts<'b>) -> SearchPipelinePut<'a, 'b, ()> {
         SearchPipelinePut::new(self.transport(), parts)
     }

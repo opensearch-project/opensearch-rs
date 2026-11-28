@@ -82,6 +82,12 @@ pub struct AllocationExplainResponse {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DescribeSettingsResponse {
+    #[doc = "A map of setting names to their definitions. Setting names are returned in ascending order. A requested name is omitted if it is unknown, filtered, or not the canonical name of a setting."]
+    pub settings: std::collections::BTreeMap<String, crate::types::cluster_common::SettingMetadata>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GetComponentTemplateResponse {
     pub component_templates: Vec<crate::types::cluster_common::ComponentTemplate>,
 }

@@ -28,8 +28,6 @@
 
 #![allow(missing_docs)]
 
-pub type GetModelResponse = std::collections::BTreeMap<String, serde_json::Value>;
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SearchModelsResponse {
     #[serde(rename = "_clusters")]
@@ -49,7 +47,7 @@ pub struct SearchModelsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phase_took: Option<crate::types::common::PhaseTook>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<crate::types::common::Id>,
+    pub pit_id: Option<crate::types::common::PitId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processor_results: Option<Vec<crate::types::search::ProcessorExecutionDetail>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -103,6 +101,7 @@ pub struct SearchModelsResponseHitsHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -543,7 +542,7 @@ impl crate::types::TotalHitCount for SearchModelsResponseHitsTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -558,7 +557,7 @@ impl SearchModelsResponseHitsTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 
@@ -610,8 +609,10 @@ impl SearchModelsResponseSuggestValueItem {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SearchModelsResponseSuggestValueItemCompletion {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub options: Option<crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptions>,
+    pub length: i32,
+    pub offset: i32,
+    pub text: String,
+    pub options: crate::types::knn::SearchModelsResponseSuggestValueItemCompletionOptions,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -651,9 +652,31 @@ impl<'de> serde::Deserialize<'de> for SearchModelsResponseSuggestValueItemComple
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
+    #[serde(rename = "_id")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(rename = "_index")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<crate::types::common::IndexName>,
+    #[serde(rename = "_routing")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub routing: Option<crate::types::common::Routing>,
+    #[serde(rename = "_score")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub score: Option<f64>,
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<Box<serde_json::value::RawValue>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub collate_match: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contexts: Option<std::collections::BTreeMap<String, Vec<crate::types::search::Context>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[serde(rename = "score")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub _score: Option<f64>,
+    pub text: String,
 }
 impl SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
     #[doc = "Decodes the document body (`_source`) into `T`.\n\nReturns `Ok(None)` when the response carries no `_source` (`_source: false` in the request, or a mapping that disables it), and an error when the document does not match `T`.\n\n`T` may borrow from the response to avoid copying strings: use `#[serde(borrow)] Cow<'a, str>` fields rather than `&'a str`, which cannot hold a string containing JSON escapes."]
@@ -670,9 +693,31 @@ impl SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SearchModelsResponseSuggestValueItemCompletionOptionsObject {
+    #[serde(rename = "_id")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(rename = "_index")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<crate::types::common::IndexName>,
+    #[serde(rename = "_routing")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub routing: Option<crate::types::common::Routing>,
+    #[serde(rename = "_score")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub score: Option<f64>,
     #[serde(rename = "_source")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<Box<serde_json::value::RawValue>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub collate_match: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contexts: Option<std::collections::BTreeMap<String, Vec<crate::types::search::Context>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[serde(rename = "score")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub _score: Option<f64>,
+    pub text: String,
 }
 impl SearchModelsResponseSuggestValueItemCompletionOptionsObject {
     #[doc = "Decodes the document body (`_source`) into `T`.\n\nReturns `Ok(None)` when the response carries no `_source` (`_source: false` in the request, or a mapping that disables it), and an error when the document does not match `T`.\n\n`T` may borrow from the response to avoid copying strings: use `#[serde(borrow)] Cow<'a, str>` fields rather than `&'a str`, which cannot hold a string containing JSON escapes."]

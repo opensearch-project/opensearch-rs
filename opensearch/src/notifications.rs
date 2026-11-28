@@ -54,7 +54,7 @@ impl NotificationsCreateConfigParts {
         }
     }
 }
-#[doc = "Builder for the [Notifications Create Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
+#[doc = "Builder for the [Notifications Create Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
 #[derive(Clone, Debug)]
 pub struct NotificationsCreateConfig<'a, 'b, B> {
     transport: &'a Transport,
@@ -196,7 +196,7 @@ impl<'b> NotificationsDeleteConfigParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Notifications Delete Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
+#[doc = "Builder for the [Notifications Delete Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
 #[derive(Clone, Debug)]
 pub struct NotificationsDeleteConfig<'a, 'b> {
     transport: &'a Transport,
@@ -308,7 +308,7 @@ impl NotificationsDeleteConfigsParts {
         }
     }
 }
-#[doc = "Builder for the [Notifications Delete Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
+#[doc = "Builder for the [Notifications Delete Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
 #[derive(Clone, Debug)]
 pub struct NotificationsDeleteConfigs<'a, 'b> {
     transport: &'a Transport,
@@ -557,7 +557,7 @@ impl NotificationsGetConfigsParts {
         }
     }
 }
-#[doc = "Builder for the [Notifications Get Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
+#[doc = "Builder for the [Notifications Get Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
 #[derive(Clone, Debug)]
 pub struct NotificationsGetConfigs<'a, 'b, B> {
     transport: &'a Transport,
@@ -1107,7 +1107,7 @@ impl NotificationsListChannelsParts {
         }
     }
 }
-#[doc = "Builder for the [Notifications List Channels API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
+#[doc = "Builder for the [Notifications List Channels API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
 #[derive(Clone, Debug)]
 pub struct NotificationsListChannels<'a, 'b> {
     transport: &'a Transport,
@@ -1219,7 +1219,7 @@ impl NotificationsListFeaturesParts {
         }
     }
 }
-#[doc = "Builder for the [Notifications List Features API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
+#[doc = "Builder for the [Notifications List Features API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
 #[derive(Clone, Debug)]
 pub struct NotificationsListFeatures<'a, 'b> {
     transport: &'a Transport,
@@ -1338,7 +1338,7 @@ impl<'b> NotificationsSendTestParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Notifications Send Test API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
+#[doc = "Builder for the [Notifications Send Test API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
 #[derive(Clone, Debug)]
 pub struct NotificationsSendTest<'a, 'b, B> {
     transport: &'a Transport,
@@ -1483,7 +1483,7 @@ impl<'b> NotificationsUpdateConfigParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Notifications Update Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
+#[doc = "Builder for the [Notifications Update Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
 #[derive(Clone, Debug)]
 pub struct NotificationsUpdateConfig<'a, 'b, B> {
     transport: &'a Transport,
@@ -1616,18 +1616,18 @@ impl<'a> Notifications<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Notifications Create Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
+    #[doc = "[Notifications Create Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
     pub fn create_config<'b>(&'a self) -> NotificationsCreateConfig<'a, 'b, ()> {
         NotificationsCreateConfig::new(self.transport())
     }
-    #[doc = "[Notifications Delete Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
+    #[doc = "[Notifications Delete Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
     pub fn delete_config<'b>(
         &'a self,
         parts: NotificationsDeleteConfigParts<'b>,
     ) -> NotificationsDeleteConfig<'a, 'b> {
         NotificationsDeleteConfig::new(self.transport(), parts)
     }
-    #[doc = "[Notifications Delete Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
+    #[doc = "[Notifications Delete Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
     pub fn delete_configs<'b>(&'a self) -> NotificationsDeleteConfigs<'a, 'b> {
         NotificationsDeleteConfigs::new(self.transport())
     }
@@ -1638,26 +1638,26 @@ impl<'a> Notifications<'a> {
     ) -> NotificationsGetConfig<'a, 'b> {
         NotificationsGetConfig::new(self.transport(), parts)
     }
-    #[doc = "[Notifications Get Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
+    #[doc = "[Notifications Get Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
     pub fn get_configs<'b>(&'a self) -> NotificationsGetConfigs<'a, 'b, ()> {
         NotificationsGetConfigs::new(self.transport())
     }
-    #[doc = "[Notifications List Channels API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
+    #[doc = "[Notifications List Channels API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
     pub fn list_channels<'b>(&'a self) -> NotificationsListChannels<'a, 'b> {
         NotificationsListChannels::new(self.transport())
     }
-    #[doc = "[Notifications List Features API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
+    #[doc = "[Notifications List Features API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
     pub fn list_features<'b>(&'a self) -> NotificationsListFeatures<'a, 'b> {
         NotificationsListFeatures::new(self.transport())
     }
-    #[doc = "[Notifications Send Test API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
+    #[doc = "[Notifications Send Test API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
     pub fn send_test<'b>(
         &'a self,
         parts: NotificationsSendTestParts<'b>,
     ) -> NotificationsSendTest<'a, 'b, ()> {
         NotificationsSendTest::new(self.transport(), parts)
     }
-    #[doc = "[Notifications Update Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
+    #[doc = "[Notifications Update Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
     pub fn update_config<'b>(
         &'a self,
         parts: NotificationsUpdateConfigParts<'b>,

@@ -649,6 +649,12 @@ impl<'a, 'b, B> TypedCreatePit<'a, 'b, B>
 where
     B: Body,
 {
+    #[doc = "If `false`, the request returns an error if any wildcard expression, index alias, or `_all` value targets only missing or closed indexes.\nThis behavior applies even if the request targets other open indexes."]
+    pub fn allow_no_indices(self, allow_no_indices: bool) -> Self {
+        Self {
+            inner: self.inner.allow_no_indices(allow_no_indices),
+        }
+    }
     #[doc = "Allow if point in time can be created with partial failures."]
     pub fn allow_partial_pit_creation(self, allow_partial_pit_creation: bool) -> Self {
         Self {
@@ -690,7 +696,19 @@ where
             inner: self.inner.human(human),
         }
     }
-    #[doc = "Specify the keep alive for point in time."]
+    #[doc = "If `true`, concrete, expanded or aliased indexes will be ignored when frozen."]
+    pub fn ignore_throttled(self, ignore_throttled: bool) -> Self {
+        Self {
+            inner: self.inner.ignore_throttled(ignore_throttled),
+        }
+    }
+    #[doc = "If `false`, the request returns an error if it targets a missing or closed index."]
+    pub fn ignore_unavailable(self, ignore_unavailable: bool) -> Self {
+        Self {
+            inner: self.inner.ignore_unavailable(ignore_unavailable),
+        }
+    }
+    #[doc = "Specify the keep alive for point in time.\nEach search against the PIT restarts it, and a search cannot shorten it.\nIt cannot exceed the `point_in_time.max_keep_alive` cluster setting (24 hours by default)."]
     pub fn keep_alive(self, keep_alive: &'b str) -> Self {
         Self {
             inner: self.inner.keep_alive(keep_alive),
@@ -4540,14 +4558,14 @@ where
     }
 }
 impl TypedOpenSearch {
-    #[doc = "[Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
+    #[doc = "[Bulk API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk/)\n\nAllows to perform multiple index/update/delete operations in a single request."]
     #[allow(deprecated)]
     pub fn bulk<'a, 'b>(&'a self, parts: crate::BulkParts<'b>) -> TypedBulk<'a, 'b, ()> {
         TypedBulk {
             inner: crate::Bulk::new(self.transport(), parts),
         }
     }
-    #[doc = "[Bulk Stream API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
+    #[doc = "[Bulk Stream API](https://docs.opensearch.org/latest/api-reference/document-apis/bulk-streaming/)\n\nAllows to perform multiple index/update/delete operations using request response streaming."]
     #[allow(deprecated)]
     pub fn bulk_stream<'a, 'b>(
         &'a self,
@@ -4557,7 +4575,7 @@ impl TypedOpenSearch {
             inner: crate::BulkStream::new(self.transport(), parts),
         }
     }
-    #[doc = "[Clear Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
+    #[doc = "[Clear Scroll API](https://docs.opensearch.org/latest/api-reference/scroll/)\n\nExplicitly clears the search context for a scroll."]
     #[allow(deprecated)]
     pub fn clear_scroll<'a, 'b>(
         &'a self,
@@ -4567,21 +4585,21 @@ impl TypedOpenSearch {
             inner: crate::ClearScroll::new(self.transport(), parts),
         }
     }
-    #[doc = "[Count API](https://opensearch.org/docs/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
+    #[doc = "[Count API](https://docs.opensearch.org/latest/api-reference/count/)\n\nReturns number of documents matching a query."]
     #[allow(deprecated)]
     pub fn count<'a, 'b>(&'a self, parts: crate::CountParts<'b>) -> TypedCount<'a, 'b, ()> {
         TypedCount {
             inner: crate::Count::new(self.transport(), parts),
         }
     }
-    #[doc = "[Create API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
+    #[doc = "[Create API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates a new document in the index.\n\nReturns a 409 response when a document with a same ID already exists in the index."]
     #[allow(deprecated)]
     pub fn create<'a, 'b>(&'a self, parts: crate::CreateParts<'b>) -> TypedCreate<'a, 'b, ()> {
         TypedCreate {
             inner: crate::Create::new(self.transport(), parts),
         }
     }
-    #[doc = "[Create Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit)\n\nCreates point in time context."]
+    #[doc = "[Create Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#create-a-pit)\n\nCreates point in time context.\nDelete the PIT when done. Until then it counts against `search.max_open_pit_context`."]
     #[allow(deprecated)]
     pub fn create_pit<'a, 'b>(
         &'a self,
@@ -4591,21 +4609,21 @@ impl TypedOpenSearch {
             inner: crate::CreatePit::new(self.transport(), parts),
         }
     }
-    #[doc = "[Delete API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
+    #[doc = "[Delete API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-document/)\n\nRemoves a document from the index."]
     #[allow(deprecated)]
     pub fn delete<'a, 'b>(&'a self, parts: crate::DeleteParts<'b>) -> TypedDelete<'a, 'b> {
         TypedDelete {
             inner: crate::Delete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Delete All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches."]
+    #[doc = "[Delete All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes all active point in time searches.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
     #[allow(deprecated)]
     pub fn delete_all_pits<'a, 'b>(&'a self) -> TypedDeleteAllPits<'a, 'b> {
         TypedDeleteAllPits {
             inner: crate::DeleteAllPits::new(self.transport()),
         }
     }
-    #[doc = "[Delete By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
+    #[doc = "[Delete By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/delete-by-query/)\n\nDeletes documents matching the provided query."]
     #[allow(deprecated)]
     pub fn delete_by_query<'a, 'b>(
         &'a self,
@@ -4615,7 +4633,7 @@ impl TypedOpenSearch {
             inner: crate::DeleteByQuery::new(self.transport(), parts),
         }
     }
-    #[doc = "[Delete By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
+    #[doc = "[Delete By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Delete By Query operation."]
     #[allow(deprecated)]
     pub fn delete_by_query_rethrottle<'a, 'b>(
         &'a self,
@@ -4625,14 +4643,14 @@ impl TypedOpenSearch {
             inner: crate::DeleteByQueryRethrottle::new(self.transport(), parts),
         }
     }
-    #[doc = "[Delete Pit API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed."]
+    #[doc = "[Delete Pit API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#delete-pits)\n\nDeletes one or more point in time searches based on the IDs passed.\nThe response lists each PIT with `successful`. The server can answer 200 while some entries report `successful: false`.\nThose PITs were not deleted and stay open until their `keep_alive` runs out."]
     #[allow(deprecated)]
     pub fn delete_pit<'a, 'b>(&'a self) -> TypedDeletePit<'a, 'b, ()> {
         TypedDeletePit {
             inner: crate::DeletePit::new(self.transport()),
         }
     }
-    #[doc = "[Delete Script API](https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
+    #[doc = "[Delete Script API](https://docs.opensearch.org/latest/api-reference/script-apis/delete-script/)\n\nDeletes a script."]
     #[allow(deprecated)]
     pub fn delete_script<'a, 'b>(
         &'a self,
@@ -4642,14 +4660,14 @@ impl TypedOpenSearch {
             inner: crate::DeleteScript::new(self.transport(), parts),
         }
     }
-    #[doc = "[Explain API](https://opensearch.org/docs/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
+    #[doc = "[Explain API](https://docs.opensearch.org/latest/api-reference/explain/)\n\nReturns information about why a specific document matches (or doesn't match) a query."]
     #[allow(deprecated)]
     pub fn explain<'a, 'b>(&'a self, parts: crate::ExplainParts<'b>) -> TypedExplain<'a, 'b, ()> {
         TypedExplain {
             inner: crate::Explain::new(self.transport(), parts),
         }
     }
-    #[doc = "[Field Caps API](https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
+    #[doc = "[Field Caps API](https://docs.opensearch.org/latest/mappings/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations)\n\nReturns the information about the capabilities of fields among multiple indexes."]
     #[allow(deprecated)]
     pub fn field_caps<'a, 'b>(
         &'a self,
@@ -4659,21 +4677,21 @@ impl TypedOpenSearch {
             inner: crate::FieldCaps::new(self.transport(), parts),
         }
     }
-    #[doc = "[Get API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
+    #[doc = "[Get API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns a document."]
     #[allow(deprecated)]
     pub fn get<'a, 'b>(&'a self, parts: crate::GetParts<'b>) -> TypedGet<'a, 'b> {
         TypedGet {
             inner: crate::Get::new(self.transport(), parts),
         }
     }
-    #[doc = "[Get All Pits API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
+    #[doc = "[Get All Pits API](https://docs.opensearch.org/latest/api-reference/search-apis/point-in-time-api/#list-all-pits)\n\nLists all active point in time searches."]
     #[allow(deprecated)]
     pub fn get_all_pits<'a, 'b>(&'a self) -> TypedGetAllPits<'a, 'b> {
         TypedGetAllPits {
             inner: crate::GetAllPits::new(self.transport()),
         }
     }
-    #[doc = "[Get Script API](https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
+    #[doc = "[Get Script API](https://docs.opensearch.org/latest/api-reference/script-apis/get-stored-script/)\n\nReturns a script."]
     #[allow(deprecated)]
     pub fn get_script<'a, 'b>(
         &'a self,
@@ -4683,21 +4701,21 @@ impl TypedOpenSearch {
             inner: crate::GetScript::new(self.transport(), parts),
         }
     }
-    #[doc = "[Get Script Context API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
+    #[doc = "[Get Script Context API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-contexts/)\n\nReturns all script contexts."]
     #[allow(deprecated)]
     pub fn get_script_context<'a, 'b>(&'a self) -> TypedGetScriptContext<'a, 'b> {
         TypedGetScriptContext {
             inner: crate::GetScriptContext::new(self.transport()),
         }
     }
-    #[doc = "[Get Script Languages API](https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
+    #[doc = "[Get Script Languages API](https://docs.opensearch.org/latest/api-reference/script-apis/get-script-language/)\n\nReturns available script types, languages and contexts."]
     #[allow(deprecated)]
     pub fn get_script_languages<'a, 'b>(&'a self) -> TypedGetScriptLanguages<'a, 'b> {
         TypedGetScriptLanguages {
             inner: crate::GetScriptLanguages::new(self.transport()),
         }
     }
-    #[doc = "[Get Source API](https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
+    #[doc = "[Get Source API](https://docs.opensearch.org/latest/api-reference/document-apis/get-documents/)\n\nReturns the source of a document."]
     #[allow(deprecated)]
     pub fn get_source<'a, 'b>(
         &'a self,
@@ -4707,35 +4725,35 @@ impl TypedOpenSearch {
             inner: crate::GetSource::new(self.transport(), parts),
         }
     }
-    #[doc = "[Index API](https://opensearch.org/docs/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
+    #[doc = "[Index API](https://docs.opensearch.org/latest/api-reference/document-apis/index-document/)\n\nCreates or updates a document in an index."]
     #[allow(deprecated)]
     pub fn index<'a, 'b>(&'a self, parts: crate::IndexParts<'b>) -> TypedIndex<'a, 'b, ()> {
         TypedIndex {
             inner: crate::Index::new(self.transport(), parts),
         }
     }
-    #[doc = "[Info API](https://opensearch.org/docs/latest)\n\nReturns basic information about the cluster."]
+    #[doc = "[Info API](https://docs.opensearch.org/latest/)\n\nReturns basic information about the cluster."]
     #[allow(deprecated)]
     pub fn info<'a, 'b>(&'a self) -> TypedInfo<'a, 'b> {
         TypedInfo {
             inner: crate::Info::new(self.transport()),
         }
     }
-    #[doc = "[Mget API](https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
+    #[doc = "[Mget API](https://docs.opensearch.org/latest/api-reference/document-apis/multi-get/)\n\nAllows to get multiple documents in one request."]
     #[allow(deprecated)]
     pub fn mget<'a, 'b>(&'a self, parts: crate::MgetParts<'b>) -> TypedMget<'a, 'b, ()> {
         TypedMget {
             inner: crate::Mget::new(self.transport(), parts),
         }
     }
-    #[doc = "[Msearch API](https://opensearch.org/docs/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
+    #[doc = "[Msearch API](https://docs.opensearch.org/latest/api-reference/multi-search/)\n\nAllows to execute several search operations in one request."]
     #[allow(deprecated)]
     pub fn msearch<'a, 'b>(&'a self, parts: crate::MsearchParts<'b>) -> TypedMsearch<'a, 'b, ()> {
         TypedMsearch {
             inner: crate::Msearch::new(self.transport(), parts),
         }
     }
-    #[doc = "[Msearch Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
+    #[doc = "[Msearch Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to execute several search template operations in one request."]
     #[allow(deprecated)]
     pub fn msearch_template<'a, 'b>(
         &'a self,
@@ -4745,7 +4763,7 @@ impl TypedOpenSearch {
             inner: crate::MsearchTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Mtermvectors API](https://opensearch.org/docs/latest)\n\nReturns multiple termvectors in one request."]
+    #[doc = "[Mtermvectors API](https://docs.opensearch.org/latest/)\n\nReturns multiple term vectors in one request."]
     #[allow(deprecated)]
     pub fn mtermvectors<'a, 'b>(
         &'a self,
@@ -4755,7 +4773,7 @@ impl TypedOpenSearch {
             inner: crate::Mtermvectors::new(self.transport(), parts),
         }
     }
-    #[doc = "[Put Script API](https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
+    #[doc = "[Put Script API](https://docs.opensearch.org/latest/api-reference/script-apis/create-stored-script/)\n\nCreates or updates a script."]
     #[allow(deprecated)]
     pub fn put_script<'a, 'b>(
         &'a self,
@@ -4765,7 +4783,7 @@ impl TypedOpenSearch {
             inner: crate::PutScript::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rank Eval API](https://opensearch.org/docs/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
+    #[doc = "[Rank Eval API](https://docs.opensearch.org/latest/api-reference/rank-eval/)\n\nAllows to evaluate the quality of ranked search results over a set of typical search queries."]
     #[allow(deprecated)]
     pub fn rank_eval<'a, 'b>(
         &'a self,
@@ -4775,14 +4793,14 @@ impl TypedOpenSearch {
             inner: crate::RankEval::new(self.transport(), parts),
         }
     }
-    #[doc = "[Reindex API](https://opensearch.org/docs/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
+    #[doc = "[Reindex API](https://docs.opensearch.org/latest/im-plugin/reindex-data/)\n\nAllows to copy documents from one index to another, optionally filtering the source\ndocuments by a query, changing the destination index settings, or fetching the\ndocuments from a remote cluster."]
     #[allow(deprecated)]
     pub fn reindex<'a, 'b>(&'a self) -> TypedReindex<'a, 'b, ()> {
         TypedReindex {
             inner: crate::Reindex::new(self.transport()),
         }
     }
-    #[doc = "[Reindex Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular reindex operation."]
+    #[doc = "[Reindex Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular reindex operation."]
     #[allow(deprecated)]
     pub fn reindex_rethrottle<'a, 'b>(
         &'a self,
@@ -4792,7 +4810,7 @@ impl TypedOpenSearch {
             inner: crate::ReindexRethrottle::new(self.transport(), parts),
         }
     }
-    #[doc = "[Render Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Render Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     #[allow(deprecated)]
     pub fn render_search_template<'a, 'b>(
         &'a self,
@@ -4802,28 +4820,28 @@ impl TypedOpenSearch {
             inner: crate::RenderSearchTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Scripts Painless Execute API](https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
+    #[doc = "[Scripts Painless Execute API](https://docs.opensearch.org/latest/api-reference/script-apis/exec-script/)\n\nAllows an arbitrary script to be executed and a result to be returned."]
     #[allow(deprecated)]
     pub fn scripts_painless_execute<'a, 'b>(&'a self) -> TypedScriptsPainlessExecute<'a, 'b, ()> {
         TypedScriptsPainlessExecute {
             inner: crate::ScriptsPainlessExecute::new(self.transport()),
         }
     }
-    #[doc = "[Scroll API](https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods)\n\nAllows to retrieve a large numbers of results from a single search request."]
+    #[doc = "[Scroll API](https://docs.opensearch.org/latest/api-reference/search-apis/scroll/#endpoints)\n\nAllows to retrieve a large numbers of results from a single search request."]
     #[allow(deprecated)]
     pub fn scroll<'a, 'b>(&'a self, parts: crate::ScrollParts<'b>) -> TypedScroll<'a, 'b, ()> {
         TypedScroll {
             inner: crate::Scroll::new(self.transport(), parts),
         }
     }
-    #[doc = "[Search API](https://opensearch.org/docs/latest/api-reference/search/)\n\nReturns results matching a query."]
+    #[doc = "[Search API](https://docs.opensearch.org/latest/api-reference/search/)\n\nReturns results matching a query."]
     #[allow(deprecated)]
     pub fn search<'a, 'b>(&'a self, parts: crate::SearchParts<'b>) -> TypedSearch<'a, 'b, ()> {
         TypedSearch {
             inner: crate::Search::new(self.transport(), parts),
         }
     }
-    #[doc = "[Search Shards API](https://opensearch.org/docs/latest)\n\nReturns information about the indexes and shards that a search request would be executed against."]
+    #[doc = "[Search Shards API](https://docs.opensearch.org/latest/)\n\nReturns information about the indexes and shards that a search request would be executed against."]
     #[allow(deprecated)]
     pub fn search_shards<'a, 'b>(
         &'a self,
@@ -4833,7 +4851,7 @@ impl TypedOpenSearch {
             inner: crate::SearchShards::new(self.transport(), parts),
         }
     }
-    #[doc = "[Search Template API](https://opensearch.org/docs/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
+    #[doc = "[Search Template API](https://docs.opensearch.org/latest/search-plugins/search-template/)\n\nAllows to use the Mustache language to pre-render a search definition."]
     #[allow(deprecated)]
     pub fn search_template<'a, 'b>(
         &'a self,
@@ -4843,7 +4861,7 @@ impl TypedOpenSearch {
             inner: crate::SearchTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Termvectors API](https://opensearch.org/docs/latest)\n\nReturns information and statistics about terms in the fields of a particular document."]
+    #[doc = "[Termvectors API](https://docs.opensearch.org/latest/)\n\nReturns information and statistics about terms in the fields of a particular document."]
     #[allow(deprecated)]
     pub fn termvectors<'a, 'b>(
         &'a self,
@@ -4853,14 +4871,14 @@ impl TypedOpenSearch {
             inner: crate::Termvectors::new(self.transport(), parts),
         }
     }
-    #[doc = "[Update API](https://opensearch.org/docs/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
+    #[doc = "[Update API](https://docs.opensearch.org/latest/api-reference/document-apis/update-document/)\n\nUpdates a document with a script or partial document."]
     #[allow(deprecated)]
     pub fn update<'a, 'b>(&'a self, parts: crate::UpdateParts<'b>) -> TypedUpdate<'a, 'b, ()> {
         TypedUpdate {
             inner: crate::Update::new(self.transport(), parts),
         }
     }
-    #[doc = "[Update By Query API](https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
+    #[doc = "[Update By Query API](https://docs.opensearch.org/latest/api-reference/document-apis/update-by-query/)\n\nPerforms an update on every document in the index without changing the source,\nfor example to pick up a mapping change."]
     #[allow(deprecated)]
     pub fn update_by_query<'a, 'b>(
         &'a self,
@@ -4870,7 +4888,7 @@ impl TypedOpenSearch {
             inner: crate::UpdateByQuery::new(self.transport(), parts),
         }
     }
-    #[doc = "[Update By Query Rethrottle API](https://opensearch.org/docs/latest)\n\nChanges the number of requests per second for a particular Update By Query operation."]
+    #[doc = "[Update By Query Rethrottle API](https://docs.opensearch.org/latest/)\n\nChanges the number of requests per second for a particular Update By Query operation."]
     #[allow(deprecated)]
     pub fn update_by_query_rethrottle<'a, 'b>(
         &'a self,
@@ -5147,7 +5165,7 @@ impl<'a> TypedAsynchronousSearch<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Asynchronous Search Delete API](https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
+    #[doc = "[Asynchronous Search Delete API](https://docs.opensearch.org/latest/search-plugins/async/index/#delete-searches-and-results)\n\nDeletes any responses from an asynchronous search."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -5160,7 +5178,7 @@ impl<'a> TypedAsynchronousSearch<'a> {
             ),
         }
     }
-    #[doc = "[Asynchronous Search Get API](https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
+    #[doc = "[Asynchronous Search Get API](https://docs.opensearch.org/latest/search-plugins/async/index/#get-partial-results)\n\nGets partial responses from an asynchronous search."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -5170,14 +5188,14 @@ impl<'a> TypedAsynchronousSearch<'a> {
             inner: crate::asynchronous_search::AsynchronousSearchGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Asynchronous Search Search API](https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
+    #[doc = "[Asynchronous Search Search API](https://docs.opensearch.org/latest/search-plugins/async/index/#rest-api)\n\nPerforms an asynchronous search."]
     #[allow(deprecated)]
     pub fn search<'b>(&'a self) -> TypedAsynchronousSearchSearch<'a, 'b, ()> {
         TypedAsynchronousSearchSearch {
             inner: crate::asynchronous_search::AsynchronousSearchSearch::new(self.transport()),
         }
     }
-    #[doc = "[Asynchronous Search Stats API](https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
+    #[doc = "[Asynchronous Search Stats API](https://docs.opensearch.org/latest/search-plugins/async/index/#monitor-stats)\n\nMonitors any asynchronous searches that are `running`, `completed`, or `persisted`."]
     #[allow(deprecated)]
     pub fn stats<'b>(&'a self) -> TypedAsynchronousSearchStats<'a, 'b> {
         TypedAsynchronousSearchStats {
@@ -5234,6 +5252,12 @@ impl<'a, 'b> TypedCatAliases<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Whether to return information from the local node only instead of from the cluster manager node."]
@@ -5325,6 +5349,12 @@ impl<'a, 'b> TypedCatAllPitSegments<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
@@ -5414,6 +5444,12 @@ impl<'a, 'b> TypedCatAllocation<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from cluster-manager node."]
@@ -5512,6 +5548,12 @@ impl<'a, 'b> TypedCatClusterManager<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(self, local: bool) -> Self {
         Self {
@@ -5604,6 +5646,12 @@ impl<'a, 'b> TypedCatCount<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
@@ -5693,6 +5741,12 @@ impl<'a, 'b> TypedCatFielddata<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
@@ -5768,6 +5822,12 @@ impl<'a, 'b> TypedCatHealth<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -5890,6 +5950,12 @@ impl<'a, 'b> TypedCatIndices<'a, 'b> {
                 .include_unloaded_segments(include_unloaded_segments),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(self, local: bool) -> Self {
         Self {
@@ -5999,6 +6065,12 @@ impl<'a, 'b> TypedCatMaster<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(self, local: bool) -> Self {
         Self {
@@ -6093,6 +6165,12 @@ impl<'a, 'b> TypedCatNodeattrs<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -6203,6 +6281,12 @@ impl<'a, 'b> TypedCatNodes<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     #[deprecated = "Deprecated since OpenSearch 1.0: This parameter does not cause this API to act locally."]
     pub fn local(self, local: bool) -> Self {
@@ -6241,7 +6325,7 @@ impl<'a, 'b> TypedCatNodes<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -6306,6 +6390,12 @@ impl<'a, 'b> TypedCatPendingTasks<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(self, local: bool) -> Self {
         Self {
@@ -6343,7 +6433,7 @@ impl<'a, 'b> TypedCatPendingTasks<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -6420,6 +6510,12 @@ where
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -6503,6 +6599,12 @@ impl<'a, 'b> TypedCatPlugins<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -6619,6 +6721,12 @@ impl<'a, 'b> TypedCatRecovery<'a, 'b> {
             inner: self.inner.index(index),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
@@ -6643,7 +6751,7 @@ impl<'a, 'b> TypedCatRecovery<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -6706,6 +6814,12 @@ impl<'a, 'b> TypedCatRepositories<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -6851,6 +6965,12 @@ impl<'a, 'b> TypedCatSegmentReplication<'a, 'b> {
             inner: self.inner.index(index),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
@@ -6881,7 +7001,7 @@ impl<'a, 'b> TypedCatSegmentReplication<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -6961,6 +7081,12 @@ impl<'a, 'b> TypedCatSegments<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
@@ -7057,6 +7183,12 @@ impl<'a, 'b> TypedCatShards<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -7166,6 +7298,12 @@ impl<'a, 'b> TypedCatSnapshots<'a, 'b> {
             inner: self.inner.ignore_unavailable(ignore_unavailable),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "The amount of time allowed to establish a connection to the cluster manager node."]
     #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use `cluster_manager_timeout` instead."]
     pub fn master_timeout(self, master_timeout: &'b str) -> Self {
@@ -7203,7 +7341,7 @@ impl<'a, 'b> TypedCatSnapshots<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -7274,6 +7412,12 @@ impl<'a, 'b> TypedCatTasks<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "A comma-separated list of node IDs or names used to limit the returned information. \nUse `_local` to return information from the node to which you're connecting, specify a specific node from which to get information, or keep the parameter empty to get information from all nodes."]
     pub fn nodes(self, nodes: &'b [&'b str]) -> Self {
         Self {
@@ -7310,7 +7454,7 @@ impl<'a, 'b> TypedCatTasks<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://opensearch.org/docs/latest/api-reference/units/)."]
+    #[doc = "Specifies the time units, for example, `5d` or `7h`. For more information, see [Supported units](https://docs.opensearch.org/latest/api-reference/units/)."]
     pub fn time(self, time: Time) -> Self {
         Self {
             inner: self.inner.time(time),
@@ -7373,6 +7517,12 @@ impl<'a, 'b> TypedCatTemplates<'a, 'b> {
     pub fn human(self, human: bool) -> Self {
         Self {
             inner: self.inner.human(human),
+        }
+    }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
         }
     }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
@@ -7471,6 +7621,12 @@ impl<'a, 'b> TypedCatThreadPool<'a, 'b> {
             inner: self.inner.human(human),
         }
     }
+    #[doc = "The maximum number of rows to return. Must be greater than 0. Applied after sorting (`s`)."]
+    pub fn limit(self, limit: i64) -> Self {
+        Self {
+            inner: self.inner.limit(limit),
+        }
+    }
     #[doc = "Returns local information but does not retrieve the state from the cluster manager node."]
     pub fn local(self, local: bool) -> Self {
         Self {
@@ -7539,196 +7695,219 @@ impl<'a> TypedCat<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Cat Aliases API](https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
+    #[doc = "[Cat Aliases API](https://docs.opensearch.org/latest/api-reference/cat/cat-aliases/)\n\nShows information about aliases currently configured to indexes, including filter and routing information."]
     #[allow(deprecated)]
     pub fn aliases<'b>(
         &'a self,
         parts: crate::cat::CatAliasesParts<'b>,
     ) -> TypedCatAliases<'a, 'b> {
         TypedCatAliases {
-            inner: crate::cat::CatAliases::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatAliases::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat All Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
+    #[doc = "[Cat All Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists all active CAT point-in-time segments."]
     #[allow(deprecated)]
     pub fn all_pit_segments<'b>(&'a self) -> TypedCatAllPitSegments<'a, 'b> {
         TypedCatAllPitSegments {
-            inner: crate::cat::CatAllPitSegments::new(self.transport()).format("json"),
+            inner: crate::cat::CatAllPitSegments::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Allocation API](https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
+    #[doc = "[Cat Allocation API](https://docs.opensearch.org/latest/api-reference/cat/cat-allocation/)\n\nProvides a snapshot of how many shards are allocated to each data node and how much disk space they are using."]
     #[allow(deprecated)]
     pub fn allocation<'b>(
         &'a self,
         parts: crate::cat::CatAllocationParts<'b>,
     ) -> TypedCatAllocation<'a, 'b> {
         TypedCatAllocation {
-            inner: crate::cat::CatAllocation::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatAllocation::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Cluster Manager API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[doc = "[Cat Cluster Manager API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
     #[allow(deprecated)]
     pub fn cluster_manager<'b>(&'a self) -> TypedCatClusterManager<'a, 'b> {
         TypedCatClusterManager {
-            inner: crate::cat::CatClusterManager::new(self.transport()).format("json"),
+            inner: crate::cat::CatClusterManager::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Count API](https://opensearch.org/docs/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
+    #[doc = "[Cat Count API](https://docs.opensearch.org/latest/api-reference/cat/cat-count/)\n\nProvides quick access to the document count of the entire cluster or of an individual index."]
     #[allow(deprecated)]
     pub fn count<'b>(&'a self, parts: crate::cat::CatCountParts<'b>) -> TypedCatCount<'a, 'b> {
         TypedCatCount {
-            inner: crate::cat::CatCount::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatCount::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Fielddata API](https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
+    #[doc = "[Cat Fielddata API](https://docs.opensearch.org/latest/api-reference/cat/cat-field-data/)\n\nShows how much heap memory is currently being used by field data on every data node in the cluster."]
     #[allow(deprecated)]
     pub fn fielddata<'b>(
         &'a self,
         parts: crate::cat::CatFielddataParts<'b>,
     ) -> TypedCatFielddata<'a, 'b> {
         TypedCatFielddata {
-            inner: crate::cat::CatFielddata::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatFielddata::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Health API](https://opensearch.org/docs/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
+    #[doc = "[Cat Health API](https://docs.opensearch.org/latest/api-reference/cat/cat-health/)\n\nReturns a concise representation of the cluster health."]
     #[allow(deprecated)]
     pub fn health<'b>(&'a self) -> TypedCatHealth<'a, 'b> {
         TypedCatHealth {
-            inner: crate::cat::CatHealth::new(self.transport()).format("json"),
+            inner: crate::cat::CatHealth::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Indices API](https://opensearch.org/docs/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
+    #[doc = "[Cat Indices API](https://docs.opensearch.org/latest/api-reference/cat/cat-indices/)\n\nLists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on."]
     #[allow(deprecated)]
     pub fn indices<'b>(
         &'a self,
         parts: crate::cat::CatIndicesParts<'b>,
     ) -> TypedCatIndices<'a, 'b> {
         TypedCatIndices {
-            inner: crate::cat::CatIndices::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatIndices::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Master API](https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
+    #[doc = "[Cat Master API](https://docs.opensearch.org/latest/api-reference/cat/cat-cluster_manager/)\n\nReturns information about the cluster-manager node."]
     #[deprecated = "Deprecated since OpenSearch 2.0: To promote inclusive language, use '/_cat/cluster_manager' instead."]
     #[allow(deprecated)]
     pub fn master<'b>(&'a self) -> TypedCatMaster<'a, 'b> {
         TypedCatMaster {
-            inner: crate::cat::CatMaster::new(self.transport()).format("json"),
+            inner: crate::cat::CatMaster::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Nodeattrs API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
+    #[doc = "[Cat Nodeattrs API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodeattrs/)\n\nReturns information about custom node attributes."]
     #[allow(deprecated)]
     pub fn nodeattrs<'b>(&'a self) -> TypedCatNodeattrs<'a, 'b> {
         TypedCatNodeattrs {
-            inner: crate::cat::CatNodeattrs::new(self.transport()).format("json"),
+            inner: crate::cat::CatNodeattrs::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Nodes API](https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
+    #[doc = "[Cat Nodes API](https://docs.opensearch.org/latest/api-reference/cat/cat-nodes/)\n\nReturns basic statistics about the performance of cluster nodes."]
     #[allow(deprecated)]
     pub fn nodes<'b>(&'a self) -> TypedCatNodes<'a, 'b> {
         TypedCatNodes {
-            inner: crate::cat::CatNodes::new(self.transport()).format("json"),
+            inner: crate::cat::CatNodes::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Pending Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
+    #[doc = "[Cat Pending Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-pending-tasks/)\n\nReturns a concise representation of the cluster's pending tasks."]
     #[allow(deprecated)]
     pub fn pending_tasks<'b>(&'a self) -> TypedCatPendingTasks<'a, 'b> {
         TypedCatPendingTasks {
-            inner: crate::cat::CatPendingTasks::new(self.transport()).format("json"),
+            inner: crate::cat::CatPendingTasks::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Pit Segments API](https://opensearch.org/docs/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
+    #[doc = "[Cat Pit Segments API](https://docs.opensearch.org/latest/search-plugins/point-in-time-api/)\n\nLists one or several CAT point-in-time segments."]
     #[allow(deprecated)]
     pub fn pit_segments<'b>(&'a self) -> TypedCatPitSegments<'a, 'b, ()> {
         TypedCatPitSegments {
-            inner: crate::cat::CatPitSegments::new(self.transport()).format("json"),
+            inner: crate::cat::CatPitSegments::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Plugins API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
+    #[doc = "[Cat Plugins API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns information about the names, components, and versions of the installed plugins."]
     #[allow(deprecated)]
     pub fn plugins<'b>(&'a self) -> TypedCatPlugins<'a, 'b> {
         TypedCatPlugins {
-            inner: crate::cat::CatPlugins::new(self.transport()).format("json"),
+            inner: crate::cat::CatPlugins::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Recovery API](https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
+    #[doc = "[Cat Recovery API](https://docs.opensearch.org/latest/api-reference/cat/cat-plugins/)\n\nReturns all completed and ongoing index and shard recoveries."]
     #[allow(deprecated)]
     pub fn recovery<'b>(
         &'a self,
         parts: crate::cat::CatRecoveryParts<'b>,
     ) -> TypedCatRecovery<'a, 'b> {
         TypedCatRecovery {
-            inner: crate::cat::CatRecovery::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatRecovery::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Repositories API](https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
+    #[doc = "[Cat Repositories API](https://docs.opensearch.org/latest/api-reference/cat/cat-repositories/)\n\nReturns information about all snapshot repositories for a cluster."]
     #[allow(deprecated)]
     pub fn repositories<'b>(&'a self) -> TypedCatRepositories<'a, 'b> {
         TypedCatRepositories {
-            inner: crate::cat::CatRepositories::new(self.transport()).format("json"),
+            inner: crate::cat::CatRepositories::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Segment Replication API](https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
+    #[doc = "[Cat Segment Replication API](https://docs.opensearch.org/latest/api-reference/cat/cat-segment-replication/)\n\nReturns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. \nThese metrics provide information about how far behind the primary shard the replicas are lagging."]
     #[allow(deprecated)]
     pub fn segment_replication<'b>(
         &'a self,
         parts: crate::cat::CatSegmentReplicationParts<'b>,
     ) -> TypedCatSegmentReplication<'a, 'b> {
         TypedCatSegmentReplication {
-            inner: crate::cat::CatSegmentReplication::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatSegmentReplication::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Segments API](https://opensearch.org/docs/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
+    #[doc = "[Cat Segments API](https://docs.opensearch.org/latest/api-reference/cat/cat-segments/)\n\nProvides low-level information about the segments in the shards of an index."]
     #[allow(deprecated)]
     pub fn segments<'b>(
         &'a self,
         parts: crate::cat::CatSegmentsParts<'b>,
     ) -> TypedCatSegments<'a, 'b> {
         TypedCatSegments {
-            inner: crate::cat::CatSegments::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatSegments::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Shards API](https://opensearch.org/docs/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
+    #[doc = "[Cat Shards API](https://docs.opensearch.org/latest/api-reference/cat/cat-shards/)\n\nLists the states of all primary and replica shards and how they are distributed."]
     #[allow(deprecated)]
     pub fn shards<'b>(&'a self, parts: crate::cat::CatShardsParts<'b>) -> TypedCatShards<'a, 'b> {
         TypedCatShards {
-            inner: crate::cat::CatShards::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatShards::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Snapshots API](https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
+    #[doc = "[Cat Snapshots API](https://docs.opensearch.org/latest/api-reference/cat/cat-snapshots/)\n\nLists all of the snapshots stored in a specific repository."]
     #[allow(deprecated)]
     pub fn snapshots<'b>(
         &'a self,
         parts: crate::cat::CatSnapshotsParts<'b>,
     ) -> TypedCatSnapshots<'a, 'b> {
         TypedCatSnapshots {
-            inner: crate::cat::CatSnapshots::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatSnapshots::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Tasks API](https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
+    #[doc = "[Cat Tasks API](https://docs.opensearch.org/latest/api-reference/cat/cat-tasks/)\n\nLists the progress of all tasks currently running on the cluster."]
     #[allow(deprecated)]
     pub fn tasks<'b>(&'a self) -> TypedCatTasks<'a, 'b> {
         TypedCatTasks {
-            inner: crate::cat::CatTasks::new(self.transport()).format("json"),
+            inner: crate::cat::CatTasks::new(self.transport())
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Templates API](https://opensearch.org/docs/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
+    #[doc = "[Cat Templates API](https://docs.opensearch.org/latest/api-reference/cat/cat-templates/)\n\nLists the names, patterns, order numbers, and version numbers of index templates."]
     #[allow(deprecated)]
     pub fn templates<'b>(
         &'a self,
         parts: crate::cat::CatTemplatesParts<'b>,
     ) -> TypedCatTemplates<'a, 'b> {
         TypedCatTemplates {
-            inner: crate::cat::CatTemplates::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatTemplates::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[Cat Thread Pool API](https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
+    #[doc = "[Cat Thread Pool API](https://docs.opensearch.org/latest/api-reference/cat/cat-thread-pool/)\n\nReturns cluster-wide thread pool statistics per node.\nBy default the active, queued, and rejected statistics are returned for all thread pools."]
     #[allow(deprecated)]
     pub fn thread_pool<'b>(
         &'a self,
         parts: crate::cat::CatThreadPoolParts<'b>,
     ) -> TypedCatThreadPool<'a, 'b> {
         TypedCatThreadPool {
-            inner: crate::cat::CatThreadPool::new(self.transport(), parts).format("json"),
+            inner: crate::cat::CatThreadPool::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
 }
@@ -7830,7 +8009,7 @@ pub struct TypedClusterDeleteComponentTemplate<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedClusterDeleteComponentTemplate<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8032,6 +8211,70 @@ where
             .await
     }
 }
+#[doc = "Typed builder for the Cluster Describe Settings API: [`send`](Self::send) returns [`types::cluster_describe_settings::DescribeSettingsResponse`](crate::types::cluster_describe_settings::DescribeSettingsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`ClusterDescribeSettings`](crate::cluster::ClusterDescribeSettings) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedClusterDescribeSettings<'a, 'b> {
+    inner: crate::cluster::ClusterDescribeSettings<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedClusterDescribeSettings<'a, 'b> {
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "A comma-separated list of setting names to describe. Each entry is either an exact setting name or a prefix ending in `.*`, such as `cluster.routing.allocation.*`, which expands to every registered setting under it at any depth. Exact names and prefixes can be mixed. Other wildcard forms are rejected. Affix and group setting templates and secure (keystore) settings are not listed under a prefix; their concrete names can still be requested exactly. At least one entry is required."]
+    pub fn settings(self, settings: &'b [&'b str]) -> Self {
+        Self {
+            inner: self.inner.settings(settings),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::cluster_describe_settings::DescribeSettingsResponse`](crate::types::cluster_describe_settings::DescribeSettingsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::cluster_describe_settings::DescribeSettingsResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::cluster_describe_settings::DescribeSettingsResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Cluster Get Component Template API: [`send`](Self::send) returns [`types::cluster_get_component_template::GetComponentTemplateResponse`](crate::types::cluster_get_component_template::GetComponentTemplateResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`ClusterGetComponentTemplate`](crate::cluster::ClusterGetComponentTemplate) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -8040,7 +8283,7 @@ pub struct TypedClusterGetComponentTemplate<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedClusterGetComponentTemplate<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8184,7 +8427,7 @@ pub struct TypedClusterGetSettings<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedClusterGetSettings<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8332,7 +8575,7 @@ impl<'a, 'b> TypedClusterHealth<'a, 'b> {
             inner: self.inner.awareness_attribute(awareness_attribute),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8396,7 +8639,7 @@ impl<'a, 'b> TypedClusterHealth<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn timeout(self, timeout: &'b str) -> Self {
         Self {
             inner: self.inner.timeout(timeout),
@@ -8463,7 +8706,7 @@ pub struct TypedClusterPendingTasks<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedClusterPendingTasks<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8548,7 +8791,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8715,7 +8958,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -8930,7 +9173,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -9030,7 +9273,7 @@ impl<'a, 'b> TypedClusterState<'a, 'b> {
             inner: self.inner.allow_no_indices(allow_no_indices),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -9199,14 +9442,14 @@ impl<'a> TypedCluster<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Cluster Allocation Explain API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
+    #[doc = "[Cluster Allocation Explain API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
     #[allow(deprecated)]
     pub fn allocation_explain<'b>(&'a self) -> TypedClusterAllocationExplain<'a, 'b, ()> {
         TypedClusterAllocationExplain {
             inner: crate::cluster::ClusterAllocationExplain::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Delete Component Template API](https://opensearch.org/docs/latest)\n\nDeletes a component template."]
+    #[doc = "[Cluster Delete Component Template API](https://docs.opensearch.org/latest/)\n\nDeletes a component template."]
     #[allow(deprecated)]
     pub fn delete_component_template<'b>(
         &'a self,
@@ -9216,7 +9459,7 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterDeleteComponentTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Delete Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
+    #[doc = "[Cluster Delete Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
     #[allow(deprecated)]
     pub fn delete_decommission_awareness<'b>(
         &'a self,
@@ -9225,14 +9468,21 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterDeleteDecommissionAwareness::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Delete Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-deleting-weights)\n\nDelete weighted shard routing weights."]
+    #[doc = "[Cluster Delete Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-deleting-the-configuration)\n\nDelete weighted shard routing weights."]
     #[allow(deprecated)]
     pub fn delete_weighted_routing<'b>(&'a self) -> TypedClusterDeleteWeightedRouting<'a, 'b, ()> {
         TypedClusterDeleteWeightedRouting {
             inner: crate::cluster::ClusterDeleteWeightedRouting::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Get Component Template API](https://opensearch.org/docs/latest)\n\nReturns one or more component templates."]
+    #[doc = "[Cluster Describe Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/describe-cluster-settings/)\n\nReturns the definition of each requested cluster setting: whether it is dynamic, its declared default, its value type and bounds, and its description. Accepts exact setting names and prefixes ending in `.*`. Does not return configured values."]
+    #[allow(deprecated)]
+    pub fn describe_settings<'b>(&'a self) -> TypedClusterDescribeSettings<'a, 'b> {
+        TypedClusterDescribeSettings {
+            inner: crate::cluster::ClusterDescribeSettings::new(self.transport()),
+        }
+    }
+    #[doc = "[Cluster Get Component Template API](https://docs.opensearch.org/latest/)\n\nReturns one or more component templates."]
     #[allow(deprecated)]
     pub fn get_component_template<'b>(
         &'a self,
@@ -9242,7 +9492,7 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterGetComponentTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Get Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
+    #[doc = "[Cluster Get Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
     #[allow(deprecated)]
     pub fn get_decommission_awareness<'b>(
         &'a self,
@@ -9252,14 +9502,14 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterGetDecommissionAwareness::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Get Settings API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
+    #[doc = "[Cluster Get Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
     #[allow(deprecated)]
     pub fn get_settings<'b>(&'a self) -> TypedClusterGetSettings<'a, 'b> {
         TypedClusterGetSettings {
             inner: crate::cluster::ClusterGetSettings::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Get Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-getting-weights-for-all-zones)\n\nFetches weighted shard routing weights."]
+    #[doc = "[Cluster Get Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-viewing-the-configuration)\n\nFetches weighted shard routing weights."]
     #[allow(deprecated)]
     pub fn get_weighted_routing<'b>(
         &'a self,
@@ -9269,7 +9519,7 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterGetWeightedRouting::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Health API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
+    #[doc = "[Cluster Health API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
     #[allow(deprecated)]
     pub fn health<'b>(
         &'a self,
@@ -9279,14 +9529,14 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterHealth::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Pending Tasks API](https://opensearch.org/docs/latest)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
+    #[doc = "[Cluster Pending Tasks API](https://docs.opensearch.org/latest/)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
     #[allow(deprecated)]
     pub fn pending_tasks<'b>(&'a self) -> TypedClusterPendingTasks<'a, 'b> {
         TypedClusterPendingTasks {
             inner: crate::cluster::ClusterPendingTasks::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Put Component Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
+    #[doc = "[Cluster Put Component Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
     #[allow(deprecated)]
     pub fn put_component_template<'b>(
         &'a self,
@@ -9296,7 +9546,7 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterPutComponentTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Put Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
+    #[doc = "[Cluster Put Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
     #[allow(deprecated)]
     pub fn put_decommission_awareness<'b>(
         &'a self,
@@ -9306,14 +9556,14 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterPutDecommissionAwareness::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Put Settings API](https://opensearch.org/docs/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
+    #[doc = "[Cluster Put Settings API](https://docs.opensearch.org/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
     #[allow(deprecated)]
     pub fn put_settings<'b>(&'a self) -> TypedClusterPutSettings<'a, 'b, ()> {
         TypedClusterPutSettings {
             inner: crate::cluster::ClusterPutSettings::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Put Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-weighted-round-robin-search)\n\nUpdates weighted shard routing weights."]
+    #[doc = "[Cluster Put Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-updating-the-configuration)\n\nUpdates weighted shard routing weights."]
     #[allow(deprecated)]
     pub fn put_weighted_routing<'b>(
         &'a self,
@@ -9323,21 +9573,21 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterPutWeightedRouting::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Remote Info API](https://opensearch.org/docs/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
+    #[doc = "[Cluster Remote Info API](https://docs.opensearch.org/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
     #[allow(deprecated)]
     pub fn remote_info<'b>(&'a self) -> TypedClusterRemoteInfo<'a, 'b> {
         TypedClusterRemoteInfo {
             inner: crate::cluster::ClusterRemoteInfo::new(self.transport()),
         }
     }
-    #[doc = "[Cluster Reroute API](https://opensearch.org/docs/latest)\n\nAllows to manually change the allocation of individual shards in the cluster."]
+    #[doc = "[Cluster Reroute API](https://docs.opensearch.org/latest/)\n\nAllows to manually change the allocation of individual shards in the cluster."]
     #[allow(deprecated)]
     pub fn reroute<'b>(&'a self) -> TypedClusterReroute<'a, 'b, ()> {
         TypedClusterReroute {
             inner: crate::cluster::ClusterReroute::new(self.transport()),
         }
     }
-    #[doc = "[Cluster State API](https://opensearch.org/docs/latest)\n\nReturns comprehensive information about the state of the cluster."]
+    #[doc = "[Cluster State API](https://docs.opensearch.org/latest/)\n\nReturns comprehensive information about the state of the cluster."]
     #[allow(deprecated)]
     pub fn state<'b>(
         &'a self,
@@ -9347,7 +9597,7 @@ impl<'a> TypedCluster<'a> {
             inner: crate::cluster::ClusterState::new(self.transport(), parts),
         }
     }
-    #[doc = "[Cluster Stats API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
+    #[doc = "[Cluster Stats API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
     #[allow(deprecated)]
     pub fn stats<'b>(
         &'a self,
@@ -9621,7 +9871,7 @@ impl<'a> TypedDanglingIndices<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Dangling Indices Delete Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
+    #[doc = "[Dangling Indices Delete Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nDeletes the specified dangling index."]
     #[allow(deprecated)]
     pub fn delete_dangling_index<'b>(
         &'a self,
@@ -9634,7 +9884,7 @@ impl<'a> TypedDanglingIndices<'a> {
             ),
         }
     }
-    #[doc = "[Dangling Indices Import Dangling Index API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
+    #[doc = "[Dangling Indices Import Dangling Index API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nImports the specified dangling index."]
     #[allow(deprecated)]
     pub fn import_dangling_index<'b>(
         &'a self,
@@ -9647,7 +9897,7 @@ impl<'a> TypedDanglingIndices<'a> {
             ),
         }
     }
-    #[doc = "[Dangling Indices List Dangling Indices API](https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
+    #[doc = "[Dangling Indices List Dangling Indices API](https://docs.opensearch.org/latest/api-reference/index-apis/dangling-index/)\n\nReturns all dangling indexes."]
     #[allow(deprecated)]
     pub fn list_dangling_indices<'b>(&'a self) -> TypedDanglingIndicesListDanglingIndices<'a, 'b> {
         TypedDanglingIndicesListDanglingIndices {
@@ -10366,14 +10616,14 @@ impl<'a> TypedFlowFramework<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Flow Framework Create API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
+    #[doc = "[Flow Framework Create API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
     #[allow(deprecated)]
     pub fn create<'b>(&'a self) -> TypedFlowFrameworkCreate<'a, 'b, ()> {
         TypedFlowFrameworkCreate {
             inner: crate::flow_framework::FlowFrameworkCreate::new(self.transport()),
         }
     }
-    #[doc = "[Flow Framework Delete API](https://opensearch.org/docs/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
+    #[doc = "[Flow Framework Delete API](https://docs.opensearch.org/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -10383,7 +10633,7 @@ impl<'a> TypedFlowFramework<'a> {
             inner: crate::flow_framework::FlowFrameworkDelete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Flow Framework Deprovision API](https://opensearch.org/docs/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
+    #[doc = "[Flow Framework Deprovision API](https://docs.opensearch.org/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
     #[allow(deprecated)]
     pub fn deprovision<'b>(
         &'a self,
@@ -10393,7 +10643,7 @@ impl<'a> TypedFlowFramework<'a> {
             inner: crate::flow_framework::FlowFrameworkDeprovision::new(self.transport(), parts),
         }
     }
-    #[doc = "[Flow Framework Get API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
+    #[doc = "[Flow Framework Get API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -10403,7 +10653,7 @@ impl<'a> TypedFlowFramework<'a> {
             inner: crate::flow_framework::FlowFrameworkGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Flow Framework Get Status API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
+    #[doc = "[Flow Framework Get Status API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
     #[allow(deprecated)]
     pub fn get_status<'b>(
         &'a self,
@@ -10413,14 +10663,14 @@ impl<'a> TypedFlowFramework<'a> {
             inner: crate::flow_framework::FlowFrameworkGetStatus::new(self.transport(), parts),
         }
     }
-    #[doc = "[Flow Framework Get Steps API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
+    #[doc = "[Flow Framework Get Steps API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
     #[allow(deprecated)]
     pub fn get_steps<'b>(&'a self) -> TypedFlowFrameworkGetSteps<'a, 'b> {
         TypedFlowFrameworkGetSteps {
             inner: crate::flow_framework::FlowFrameworkGetSteps::new(self.transport()),
         }
     }
-    #[doc = "[Flow Framework Provision API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
+    #[doc = "[Flow Framework Provision API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
     #[allow(deprecated)]
     pub fn provision<'b>(
         &'a self,
@@ -10430,21 +10680,21 @@ impl<'a> TypedFlowFramework<'a> {
             inner: crate::flow_framework::FlowFrameworkProvision::new(self.transport(), parts),
         }
     }
-    #[doc = "[Flow Framework Search API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
+    #[doc = "[Flow Framework Search API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
     #[allow(deprecated)]
     pub fn search<'b>(&'a self) -> TypedFlowFrameworkSearch<'a, 'b, ()> {
         TypedFlowFrameworkSearch {
             inner: crate::flow_framework::FlowFrameworkSearch::new(self.transport()),
         }
     }
-    #[doc = "[Flow Framework Search State API](https://opensearch.org/docs/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
+    #[doc = "[Flow Framework Search State API](https://docs.opensearch.org/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
     #[allow(deprecated)]
     pub fn search_state<'b>(&'a self) -> TypedFlowFrameworkSearchState<'a, 'b, ()> {
         TypedFlowFrameworkSearchState {
             inner: crate::flow_framework::FlowFrameworkSearchState::new(self.transport()),
         }
     }
-    #[doc = "[Flow Framework Update API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
+    #[doc = "[Flow Framework Update API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
     #[allow(deprecated)]
     pub fn update<'b>(
         &'a self,
@@ -10923,7 +11173,7 @@ impl<'a> TypedGeospatial<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
+    #[doc = "[Geospatial Delete Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source)\n\nDelete a specific IP2Geo data source."]
     #[allow(deprecated)]
     pub fn delete_ip2geo_datasource<'b>(
         &'a self,
@@ -10950,7 +11200,7 @@ impl<'a> TypedGeospatial<'a> {
             inner: crate::geospatial::GeospatialGeojsonUploadPut::new(self.transport()),
         }
     }
-    #[doc = "[Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
+    #[doc = "[Geospatial Get Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request)\n\nGet one or more IP2Geo data sources, defaulting to returning all if no names specified."]
     #[allow(deprecated)]
     pub fn get_ip2geo_datasource<'b>(
         &'a self,
@@ -10967,7 +11217,7 @@ impl<'a> TypedGeospatial<'a> {
             inner: crate::geospatial::GeospatialGetUploadStats::new(self.transport()),
         }
     }
-    #[doc = "[Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
+    #[doc = "[Geospatial Put Ip2 Geo Datasource API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#data-source-options)\n\nCreate a specific IP2Geo data source.\nDefault values:\n  - `endpoint`: `\"https://geoip.maps.opensearch.org/v1/geolite2-city/manifest.json\"`\n  - `update_interval_in_days`: 3."]
     #[allow(deprecated)]
     pub fn put_ip2geo_datasource<'b>(
         &'a self,
@@ -10977,7 +11227,7 @@ impl<'a> TypedGeospatial<'a> {
             inner: crate::geospatial::GeospatialPutIp2GeoDatasource::new(self.transport(), parts),
         }
     }
-    #[doc = "[Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
+    #[doc = "[Geospatial Put Ip2 Geo Datasource Settings API](https://docs.opensearch.org/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source)\n\nUpdate a specific IP2Geo data source."]
     #[allow(deprecated)]
     pub fn put_ip2geo_datasource_settings<'b>(
         &'a self,
@@ -13075,6 +13325,88 @@ impl<'a, 'b> TypedIndicesGetUpgrade<'a, 'b> {
             .await
     }
 }
+#[doc = "Typed builder for the Indices Modify Data Stream API: [`send`](Self::send) returns [`types::indices_modify_data_stream::ModifyDataStreamResponse`](crate::types::indices_modify_data_stream::ModifyDataStreamResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`IndicesModifyDataStream`](crate::indices::IndicesModifyDataStream) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedIndicesModifyDataStream<'a, 'b, B> {
+    inner: crate::indices::IndicesModifyDataStream<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedIndicesModifyDataStream<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedIndicesModifyDataStream<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedIndicesModifyDataStream {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Period to wait for a response.\nIf no response is received before the timeout expires, the request fails and returns an error."]
+    pub fn timeout(self, timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.timeout(timeout),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::indices_modify_data_stream::ModifyDataStreamResponse`](crate::types::indices_modify_data_stream::ModifyDataStreamResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::indices_modify_data_stream::ModifyDataStreamResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::indices_modify_data_stream::ModifyDataStreamResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Indices Open API: [`send`](Self::send) returns [`types::indices_open::OpenResponse`](crate::types::indices_open::OpenResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`IndicesOpen`](crate::indices::IndicesOpen) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -15001,7 +15333,7 @@ impl<'a> TypedIndices<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Indices Add Block API](https://opensearch.org/docs/latest)\n\nAdds a block to an index."]
+    #[doc = "[Indices Add Block API](https://docs.opensearch.org/latest/)\n\nAdds a block to an index."]
     #[allow(deprecated)]
     pub fn add_block<'b>(
         &'a self,
@@ -15011,7 +15343,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesAddBlock::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Analyze API](https://opensearch.org/docs/latest/api-reference/analyze-apis/perform-text-analysis/)\n\nPerforms the analysis process on a text and return the tokens breakdown of the text."]
+    #[doc = "[Indices Analyze API](https://docs.opensearch.org/latest/api-reference/analyze-apis/perform-text-analysis/)\n\nPerforms the analysis process on a text and return the tokens breakdown of the text."]
     #[allow(deprecated)]
     pub fn analyze<'b>(
         &'a self,
@@ -15021,7 +15353,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesAnalyze::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Clear Cache API](https://opensearch.org/docs/latest/api-reference/index-apis/clear-index-cache/)\n\nClears all or specific caches for one or more indexes."]
+    #[doc = "[Indices Clear Cache API](https://docs.opensearch.org/latest/api-reference/index-apis/clear-index-cache/)\n\nClears all or specific caches for one or more indexes."]
     #[allow(deprecated)]
     pub fn clear_cache<'b>(
         &'a self,
@@ -15031,7 +15363,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesClearCache::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Clone API](https://opensearch.org/docs/latest/api-reference/index-apis/clone/)\n\nClones an index."]
+    #[doc = "[Indices Clone API](https://docs.opensearch.org/latest/api-reference/index-apis/clone/)\n\nClones an index."]
     #[allow(deprecated)]
     pub fn clone<'b>(
         &'a self,
@@ -15041,7 +15373,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesClone::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Close API](https://opensearch.org/docs/latest/api-reference/index-apis/close-index/)\n\nCloses an index."]
+    #[doc = "[Indices Close API](https://docs.opensearch.org/latest/api-reference/index-apis/close-index/)\n\nCloses an index."]
     #[allow(deprecated)]
     pub fn close<'b>(
         &'a self,
@@ -15051,7 +15383,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesClose::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Create API](https://opensearch.org/docs/latest/api-reference/index-apis/create-index/)\n\nCreates an index with optional settings and mappings."]
+    #[doc = "[Indices Create API](https://docs.opensearch.org/latest/api-reference/index-apis/create-index/)\n\nCreates an index with optional settings and mappings."]
     #[allow(deprecated)]
     pub fn create<'b>(
         &'a self,
@@ -15061,7 +15393,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesCreate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Create Data Stream API](https://opensearch.org/docs/latest/im-plugin/data-streams/)\n\nCreates or updates a data stream."]
+    #[doc = "[Indices Create Data Stream API](https://docs.opensearch.org/latest/im-plugin/data-streams/)\n\nCreates or updates a data stream."]
     #[allow(deprecated)]
     pub fn create_data_stream<'b>(
         &'a self,
@@ -15071,7 +15403,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesCreateDataStream::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Data Streams Stats API](https://opensearch.org/docs/latest/im-plugin/data-streams/)\n\nProvides statistics on operations happening in a data stream."]
+    #[doc = "[Indices Data Streams Stats API](https://docs.opensearch.org/latest/im-plugin/data-streams/)\n\nProvides statistics on operations happening in a data stream."]
     #[allow(deprecated)]
     pub fn data_streams_stats<'b>(
         &'a self,
@@ -15081,7 +15413,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDataStreamsStats::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Delete API](https://opensearch.org/docs/latest/api-reference/index-apis/delete-index/)\n\nDeletes an index."]
+    #[doc = "[Indices Delete API](https://docs.opensearch.org/latest/api-reference/index-apis/delete-index/)\n\nDeletes an index."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -15091,7 +15423,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDelete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Delete Alias API](https://opensearch.org/docs/latest/im-plugin/index-alias/#delete-aliases)\n\nDeletes an alias."]
+    #[doc = "[Indices Delete Alias API](https://docs.opensearch.org/latest/api-reference/alias/delete-alias/)\n\nDeletes an alias."]
     #[allow(deprecated)]
     pub fn delete_alias<'b>(
         &'a self,
@@ -15101,7 +15433,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDeleteAlias::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Delete Data Stream API](https://opensearch.org/docs/latest/im-plugin/data-streams/)\n\nDeletes a data stream."]
+    #[doc = "[Indices Delete Data Stream API](https://docs.opensearch.org/latest/im-plugin/data-streams/)\n\nDeletes a data stream."]
     #[allow(deprecated)]
     pub fn delete_data_stream<'b>(
         &'a self,
@@ -15111,7 +15443,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDeleteDataStream::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Delete Index Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/#delete-a-template)\n\nDeletes an index template."]
+    #[doc = "[Indices Delete Index Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/#delete-a-template)\n\nDeletes an index template."]
     #[allow(deprecated)]
     pub fn delete_index_template<'b>(
         &'a self,
@@ -15121,7 +15453,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDeleteIndexTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Delete Template API](https://opensearch.org/docs/latest)\n\nDeletes an index template."]
+    #[doc = "[Indices Delete Template API](https://docs.opensearch.org/latest/)\n\nDeletes an index template."]
     #[allow(deprecated)]
     pub fn delete_template<'b>(
         &'a self,
@@ -15131,7 +15463,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesDeleteTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Flush API](https://opensearch.org/docs/latest)\n\nPerforms the flush operation on one or more indexes."]
+    #[doc = "[Indices Flush API](https://docs.opensearch.org/latest/)\n\nPerforms the flush operation on one or more indexes."]
     #[allow(deprecated)]
     pub fn flush<'b>(
         &'a self,
@@ -15141,7 +15473,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesFlush::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Forcemerge API](https://opensearch.org/docs/latest)\n\nPerforms the force merge operation on one or more indexes."]
+    #[doc = "[Indices Forcemerge API](https://docs.opensearch.org/latest/)\n\nPerforms the force merge operation on one or more indexes."]
     #[allow(deprecated)]
     pub fn forcemerge<'b>(
         &'a self,
@@ -15151,7 +15483,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesForcemerge::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get API](https://opensearch.org/docs/latest/api-reference/index-apis/get-index/)\n\nReturns information about one or more indexes."]
+    #[doc = "[Indices Get API](https://docs.opensearch.org/latest/api-reference/index-apis/get-index/)\n\nReturns information about one or more indexes."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -15161,7 +15493,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Alias API](https://opensearch.org/docs/latest/im-plugin/index-alias/)\n\nReturns an alias."]
+    #[doc = "[Indices Get Alias API](https://docs.opensearch.org/latest/im-plugin/index-alias/)\n\nReturns an alias."]
     #[allow(deprecated)]
     pub fn get_alias<'b>(
         &'a self,
@@ -15171,7 +15503,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetAlias::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Data Stream API](https://opensearch.org/docs/latest/im-plugin/data-streams/)\n\nReturns data streams."]
+    #[doc = "[Indices Get Data Stream API](https://docs.opensearch.org/latest/im-plugin/data-streams/)\n\nReturns data streams."]
     #[allow(deprecated)]
     pub fn get_data_stream<'b>(
         &'a self,
@@ -15181,7 +15513,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetDataStream::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Field Mapping API](https://opensearch.org/docs/latest/field-types/index/)\n\nReturns mapping for one or more fields."]
+    #[doc = "[Indices Get Field Mapping API](https://docs.opensearch.org/latest/field-types/index/)\n\nReturns mapping for one or more fields."]
     #[allow(deprecated)]
     pub fn get_field_mapping<'b>(
         &'a self,
@@ -15191,7 +15523,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetFieldMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Index Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/)\n\nReturns an index template."]
+    #[doc = "[Indices Get Index Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/)\n\nReturns an index template."]
     #[allow(deprecated)]
     pub fn get_index_template<'b>(
         &'a self,
@@ -15201,7 +15533,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetIndexTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Mapping API](https://opensearch.org/docs/latest/field-types/index/#get-a-mapping)\n\nReturns mappings for one or more indexes."]
+    #[doc = "[Indices Get Mapping API](https://docs.opensearch.org/latest/api-reference/index-apis/get-mapping/)\n\nReturns mappings for one or more indexes."]
     #[allow(deprecated)]
     pub fn get_mapping<'b>(
         &'a self,
@@ -15211,7 +15543,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Settings API](https://opensearch.org/docs/latest/api-reference/index-apis/get-settings/)\n\nReturns settings for one or more indexes."]
+    #[doc = "[Indices Get Settings API](https://docs.opensearch.org/latest/api-reference/index-apis/get-settings/)\n\nReturns settings for one or more indexes."]
     #[allow(deprecated)]
     pub fn get_settings<'b>(
         &'a self,
@@ -15221,7 +15553,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetSettings::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Template API](https://opensearch.org/docs/latest)\n\nReturns an index template."]
+    #[doc = "[Indices Get Template API](https://docs.opensearch.org/latest/)\n\nReturns an index template."]
     #[allow(deprecated)]
     pub fn get_template<'b>(
         &'a self,
@@ -15231,7 +15563,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Get Upgrade API](https://opensearch.org/docs/latest)\n\nThe `_upgrade` API is no longer useful and will be removed."]
+    #[doc = "[Indices Get Upgrade API](https://docs.opensearch.org/latest/)\n\nThe `_upgrade` API is no longer useful and will be removed."]
     #[allow(deprecated)]
     pub fn get_upgrade<'b>(
         &'a self,
@@ -15241,7 +15573,14 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesGetUpgrade::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Open API](https://opensearch.org/docs/latest/api-reference/index-apis/open-index/)\n\nOpens an index."]
+    #[doc = "[Indices Modify Data Stream API](https://docs.opensearch.org/latest/im-plugin/data-streams/)\n\nAdds or removes backing indexes of a data stream with metadata-only actions.\nThis is an experimental API."]
+    #[allow(deprecated)]
+    pub fn modify_data_stream<'b>(&'a self) -> TypedIndicesModifyDataStream<'a, 'b, ()> {
+        TypedIndicesModifyDataStream {
+            inner: crate::indices::IndicesModifyDataStream::new(self.transport()),
+        }
+    }
+    #[doc = "[Indices Open API](https://docs.opensearch.org/latest/api-reference/index-apis/open-index/)\n\nOpens an index."]
     #[allow(deprecated)]
     pub fn open<'b>(
         &'a self,
@@ -15251,7 +15590,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesOpen::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Put Alias API](https://opensearch.org/docs/latest/api-reference/index-apis/update-alias/)\n\nCreates or updates an alias."]
+    #[doc = "[Indices Put Alias API](https://docs.opensearch.org/latest/api-reference/index-apis/update-alias/)\n\nCreates or updates an alias."]
     #[allow(deprecated)]
     pub fn put_alias<'b>(
         &'a self,
@@ -15261,7 +15600,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesPutAlias::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Put Index Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/)\n\nCreates or updates an index template."]
+    #[doc = "[Indices Put Index Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/)\n\nCreates or updates an index template."]
     #[allow(deprecated)]
     pub fn put_index_template<'b>(
         &'a self,
@@ -15271,7 +15610,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesPutIndexTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Put Mapping API](https://opensearch.org/docs/latest/api-reference/index-apis/put-mapping/)\n\nUpdates the index mappings."]
+    #[doc = "[Indices Put Mapping API](https://docs.opensearch.org/latest/api-reference/index-apis/put-mapping/)\n\nUpdates the index mappings."]
     #[allow(deprecated)]
     pub fn put_mapping<'b>(
         &'a self,
@@ -15281,7 +15620,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesPutMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Put Settings API](https://opensearch.org/docs/latest/api-reference/index-apis/update-settings/)\n\nUpdates the index settings."]
+    #[doc = "[Indices Put Settings API](https://docs.opensearch.org/latest/api-reference/index-apis/update-settings/)\n\nUpdates the index settings."]
     #[allow(deprecated)]
     pub fn put_settings<'b>(
         &'a self,
@@ -15291,7 +15630,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesPutSettings::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Put Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/)\n\nCreates or updates an index template."]
+    #[doc = "[Indices Put Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/)\n\nCreates or updates an index template."]
     #[allow(deprecated)]
     pub fn put_template<'b>(
         &'a self,
@@ -15301,7 +15640,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesPutTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Recovery API](https://opensearch.org/docs/latest)\n\nReturns information about ongoing index shard recoveries."]
+    #[doc = "[Indices Recovery API](https://docs.opensearch.org/latest/)\n\nReturns information about ongoing index shard recoveries."]
     #[allow(deprecated)]
     pub fn recovery<'b>(
         &'a self,
@@ -15311,7 +15650,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesRecovery::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Refresh API](https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#refresh-level-and-request-level-durability)\n\nPerforms the refresh operation in one or more indexes."]
+    #[doc = "[Indices Refresh API](https://docs.opensearch.org/latest/api-reference/index-apis/refresh/)\n\nPerforms the refresh operation in one or more indexes."]
     #[allow(deprecated)]
     pub fn refresh<'b>(
         &'a self,
@@ -15321,7 +15660,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesRefresh::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Resolve Index API](https://opensearch.org/docs/latest)\n\nReturns information about any matching indexes, aliases, and data streams."]
+    #[doc = "[Indices Resolve Index API](https://docs.opensearch.org/latest/)\n\nReturns information about any matching indexes, aliases, and data streams."]
     #[allow(deprecated)]
     pub fn resolve_index<'b>(
         &'a self,
@@ -15331,7 +15670,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesResolveIndex::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Rollover API](https://opensearch.org/docs/latest/dashboards/im-dashboards/rollover/)\n\nUpdates an alias to point to a new index when the existing index\nis considered to be too large or too old."]
+    #[doc = "[Indices Rollover API](https://docs.opensearch.org/latest/dashboards/im-dashboards/rollover/)\n\nUpdates an alias to point to a new index when the existing index\nis considered to be too large or too old."]
     #[allow(deprecated)]
     pub fn rollover<'b>(
         &'a self,
@@ -15341,7 +15680,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesRollover::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Segments API](https://opensearch.org/docs/latest)\n\nProvides low-level information about segments in a Lucene index."]
+    #[doc = "[Indices Segments API](https://docs.opensearch.org/latest/)\n\nProvides low-level information about segments in a Lucene index."]
     #[allow(deprecated)]
     pub fn segments<'b>(
         &'a self,
@@ -15351,7 +15690,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesSegments::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Shard Stores API](https://opensearch.org/docs/latest)\n\nProvides store information for shard copies of indexes."]
+    #[doc = "[Indices Shard Stores API](https://docs.opensearch.org/latest/)\n\nProvides store information for shard copies of indexes."]
     #[allow(deprecated)]
     pub fn shard_stores<'b>(
         &'a self,
@@ -15361,7 +15700,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesShardStores::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Shrink API](https://opensearch.org/docs/latest/api-reference/index-apis/shrink-index/)\n\nAllow to shrink an existing index into a new index with fewer primary shards."]
+    #[doc = "[Indices Shrink API](https://docs.opensearch.org/latest/api-reference/index-apis/shrink-index/)\n\nAllow to shrink an existing index into a new index with fewer primary shards."]
     #[allow(deprecated)]
     pub fn shrink<'b>(
         &'a self,
@@ -15371,7 +15710,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesShrink::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Simulate Index Template API](https://opensearch.org/docs/latest)\n\nSimulate matching the given index name against the index templates in the system."]
+    #[doc = "[Indices Simulate Index Template API](https://docs.opensearch.org/latest/)\n\nSimulate matching the given index name against the index templates in the system."]
     #[allow(deprecated)]
     pub fn simulate_index_template<'b>(
         &'a self,
@@ -15381,7 +15720,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesSimulateIndexTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Simulate Template API](https://opensearch.org/docs/latest)\n\nSimulate resolving the given template name or body."]
+    #[doc = "[Indices Simulate Template API](https://docs.opensearch.org/latest/)\n\nSimulate resolving the given template name or body."]
     #[allow(deprecated)]
     pub fn simulate_template<'b>(
         &'a self,
@@ -15391,7 +15730,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesSimulateTemplate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Split API](https://opensearch.org/docs/latest/api-reference/index-apis/split/)\n\nAllows you to split an existing index into a new index with more primary shards."]
+    #[doc = "[Indices Split API](https://docs.opensearch.org/latest/api-reference/index-apis/split/)\n\nAllows you to split an existing index into a new index with more primary shards."]
     #[allow(deprecated)]
     pub fn split<'b>(
         &'a self,
@@ -15401,7 +15740,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesSplit::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Stats API](https://opensearch.org/docs/latest)\n\nProvides statistics on operations happening in an index."]
+    #[doc = "[Indices Stats API](https://docs.opensearch.org/latest/)\n\nProvides statistics on operations happening in an index."]
     #[allow(deprecated)]
     pub fn stats<'b>(
         &'a self,
@@ -15411,14 +15750,14 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesStats::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Update Aliases API](https://opensearch.org/docs/latest/api-reference/index-apis/alias/)\n\nUpdates index aliases."]
+    #[doc = "[Indices Update Aliases API](https://docs.opensearch.org/latest/api-reference/index-apis/alias/)\n\nUpdates index aliases."]
     #[allow(deprecated)]
     pub fn update_aliases<'b>(&'a self) -> TypedIndicesUpdateAliases<'a, 'b, ()> {
         TypedIndicesUpdateAliases {
             inner: crate::indices::IndicesUpdateAliases::new(self.transport()),
         }
     }
-    #[doc = "[Indices Upgrade API](https://opensearch.org/docs/latest)\n\nThe `_upgrade` API is no longer useful and will be removed."]
+    #[doc = "[Indices Upgrade API](https://docs.opensearch.org/latest/)\n\nThe `_upgrade` API is no longer useful and will be removed."]
     #[allow(deprecated)]
     pub fn upgrade<'b>(
         &'a self,
@@ -15428,7 +15767,7 @@ impl<'a> TypedIndices<'a> {
             inner: crate::indices::IndicesUpgrade::new(self.transport(), parts),
         }
     }
-    #[doc = "[Indices Validate Query API](https://opensearch.org/docs/latest)\n\nAllows a user to validate a potentially expensive query without executing it."]
+    #[doc = "[Indices Validate Query API](https://docs.opensearch.org/latest/)\n\nAllows a user to validate a potentially expensive query without executing it."]
     #[allow(deprecated)]
     pub fn validate_query<'b>(
         &'a self,
@@ -15817,7 +16156,7 @@ impl<'a> TypedIngest<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingest Delete Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
+    #[doc = "[Ingest Delete Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/delete-ingest/)\n\nDeletes an ingest pipeline."]
     #[allow(deprecated)]
     pub fn delete_pipeline<'b>(
         &'a self,
@@ -15827,7 +16166,7 @@ impl<'a> TypedIngest<'a> {
             inner: crate::ingest::IngestDeletePipeline::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ingest Get Pipeline API](https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
+    #[doc = "[Ingest Get Pipeline API](https://docs.opensearch.org/latest/api-reference/ingest-apis/get-ingest/)\n\nReturns an ingest pipeline."]
     #[allow(deprecated)]
     pub fn get_pipeline<'b>(
         &'a self,
@@ -15837,7 +16176,7 @@ impl<'a> TypedIngest<'a> {
             inner: crate::ingest::IngestGetPipeline::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ingest Processor Grok API](https://opensearch.org/docs/latest)\n\nReturns a list of built-in grok patterns."]
+    #[doc = "[Ingest Processor Grok API](https://docs.opensearch.org/latest/)\n\nReturns a list of built-in grok patterns."]
     #[allow(deprecated)]
     pub fn processor_grok<'b>(&'a self) -> TypedIngestProcessorGrok<'a, 'b> {
         TypedIngestProcessorGrok {
@@ -15854,7 +16193,7 @@ impl<'a> TypedIngest<'a> {
             inner: crate::ingest::IngestPutPipeline::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ingest Simulate API](https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
+    #[doc = "[Ingest Simulate API](https://docs.opensearch.org/latest/api-reference/ingest-apis/simulate-ingest/)\n\nSimulates an ingest pipeline with example documents."]
     #[allow(deprecated)]
     pub fn simulate<'b>(
         &'a self,
@@ -16108,7 +16447,7 @@ impl<'a> TypedIngestion<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ingestion Get State API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
+    #[doc = "[Ingestion Get State API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to retrieve the ingestion state for a given index."]
     #[allow(deprecated)]
     pub fn get_state<'b>(
         &'a self,
@@ -16118,7 +16457,7 @@ impl<'a> TypedIngestion<'a> {
             inner: crate::ingestion::IngestionGetState::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ingestion Pause API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
+    #[doc = "[Ingestion Pause API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to pause ingestion for a given index."]
     #[allow(deprecated)]
     pub fn pause<'b>(
         &'a self,
@@ -16128,7 +16467,7 @@ impl<'a> TypedIngestion<'a> {
             inner: crate::ingestion::IngestionPause::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ingestion Resume API](https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
+    #[doc = "[Ingestion Resume API](https://docs.opensearch.org/latest/api-reference/document-apis/pull-based-ingestion-management/)\n\nUse this API to resume ingestion for the given index."]
     #[allow(deprecated)]
     pub fn resume<'b>(
         &'a self,
@@ -16272,7 +16611,8 @@ where
             inner: self.inner.human(human),
         }
     }
-    pub fn index(self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(self, index: &'b [&'b str]) -> Self {
         Self {
             inner: self.inner.index(index),
         }
@@ -16293,6 +16633,12 @@ where
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(self, ty: &'b str) -> Self {
+        Self {
+            inner: self.inner.ty(ty),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::ism_add_policy::AddPolicyResponse`](crate::types::ism_add_policy::AddPolicyResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -16342,7 +16688,8 @@ where
             inner: self.inner.human(human),
         }
     }
-    pub fn index(self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(self, index: &'b [&'b str]) -> Self {
         Self {
             inner: self.inner.index(index),
         }
@@ -16363,6 +16710,12 @@ where
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(self, ty: &'b str) -> Self {
+        Self {
+            inner: self.inner.ty(ty),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::ism_change_policy::ChangePolicyResponse`](crate::types::ism_change_policy::ChangePolicyResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -16408,6 +16761,12 @@ impl<'a, 'b> TypedIsmDeletePolicy<'a, 'b> {
             inner: self.inner.pretty(pretty),
         }
     }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(self, refresh: Refresh) -> Self {
+        Self {
+            inner: self.inner.refresh(refresh),
+        }
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(self, timeout: Duration) -> Self {
         Self {
@@ -16451,10 +16810,22 @@ where
             inner: self.inner.body(body),
         }
     }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
+        }
+    }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(self, error_trace: bool) -> Self {
         Self {
             inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "The starting index of the managed indexes to return."]
+    pub fn from(self, from: i64) -> Self {
+        Self {
+            inner: self.inner.from(from),
         }
     }
     #[doc = "Adds a HTTP header"]
@@ -16469,10 +16840,29 @@ where
             inner: self.inner.human(human),
         }
     }
+    #[doc = "Whether to return information from the local node only instead of from the cluster manager node."]
+    pub fn local(self, local: bool) -> Self {
+        Self {
+            inner: self.inner.local(local),
+        }
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    #[deprecated = "Deprecated since OpenSearch 2.3: To promote inclusive language, use `cluster_manager_timeout` instead."]
+    pub fn master_timeout(self, master_timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.master_timeout(master_timeout),
+        }
+    }
     #[doc = "Whether to pretty-format the returned JSON response."]
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
             inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "A query string that filters the managed indexes."]
+    pub fn querystring(self, querystring: &'b str) -> Self {
+        Self {
+            inner: self.inner.querystring(querystring),
         }
     }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
@@ -16481,10 +16871,46 @@ where
             inner: self.inner.request_timeout(timeout),
         }
     }
+    #[doc = "Whether to include the policy of each managed index in the response."]
+    pub fn show_policy(self, show_policy: bool) -> Self {
+        Self {
+            inner: self.inner.show_policy(show_policy),
+        }
+    }
+    #[doc = "The number of managed indexes to return."]
+    pub fn size(self, size: i64) -> Self {
+        Self {
+            inner: self.inner.size(size),
+        }
+    }
+    #[doc = "The field to sort the managed indexes by."]
+    pub fn sortfield(self, sortfield: &'b str) -> Self {
+        Self {
+            inner: self.inner.sortfield(sortfield),
+        }
+    }
+    #[doc = "The sort order of the managed indexes."]
+    pub fn sortorder(self, sortorder: SortOrder) -> Self {
+        Self {
+            inner: self.inner.sortorder(sortorder),
+        }
+    }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(self, ty: &'b str) -> Self {
+        Self {
+            inner: self.inner.ty(ty),
+        }
+    }
+    #[doc = "Whether to include the validation result of the current action of each managed index in the response."]
+    pub fn validate_action(self, validate_action: bool) -> Self {
+        Self {
+            inner: self.inner.validate_action(validate_action),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::ism_explain_policy::ExplainPolicyResponse`](crate::types::ism_explain_policy::ExplainPolicyResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -16512,6 +16938,12 @@ impl<'a, 'b> TypedIsmGetPolicies<'a, 'b> {
             inner: self.inner.error_trace(error_trace),
         }
     }
+    #[doc = "The starting index of the policies to return."]
+    pub fn from(self, from: i64) -> Self {
+        Self {
+            inner: self.inner.from(from),
+        }
+    }
     #[doc = "Adds a HTTP header"]
     pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
         Self {
@@ -16530,10 +16962,34 @@ impl<'a, 'b> TypedIsmGetPolicies<'a, 'b> {
             inner: self.inner.pretty(pretty),
         }
     }
+    #[doc = "A query string that filters the policies."]
+    pub fn querystring(self, querystring: &'b str) -> Self {
+        Self {
+            inner: self.inner.querystring(querystring),
+        }
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(self, timeout: Duration) -> Self {
         Self {
             inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The number of policies to return."]
+    pub fn size(self, size: i64) -> Self {
+        Self {
+            inner: self.inner.size(size),
+        }
+    }
+    #[doc = "The field to sort the policies by."]
+    pub fn sortfield(self, sortfield: &'b str) -> Self {
+        Self {
+            inner: self.inner.sortfield(sortfield),
+        }
+    }
+    #[doc = "The sort order of the policies."]
+    pub fn sortorder(self, sortorder: SortOrder) -> Self {
+        Self {
+            inner: self.inner.sortorder(sortorder),
         }
     }
     #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
@@ -16665,6 +17121,12 @@ where
             inner: self.inner.pretty(pretty),
         }
     }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(self, refresh: Refresh) -> Self {
+        Self {
+            inner: self.inner.refresh(refresh),
+        }
+    }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
     pub fn request_timeout(self, timeout: Duration) -> Self {
         Self {
@@ -16740,6 +17202,12 @@ where
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
             inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Whether to refresh the affected shards to make this operation visible to search. Default is `true`."]
+    pub fn refresh(self, refresh: Refresh) -> Self {
+        Self {
+            inner: self.inner.refresh(refresh),
         }
     }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
@@ -16872,7 +17340,8 @@ where
             inner: self.inner.human(human),
         }
     }
-    pub fn index(self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(self, index: &'b [&'b str]) -> Self {
         Self {
             inner: self.inner.index(index),
         }
@@ -16893,6 +17362,12 @@ where
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(self, ty: &'b str) -> Self {
+        Self {
+            inner: self.inner.ty(ty),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::ism_remove_policy::RemovePolicyResponse`](crate::types::ism_remove_policy::RemovePolicyResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -16926,6 +17401,12 @@ where
             inner: self.inner.body(body),
         }
     }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
+        }
+    }
     #[doc = "Whether to include the stack trace of returned errors."]
     pub fn error_trace(self, error_trace: bool) -> Self {
         Self {
@@ -16944,9 +17425,17 @@ where
             inner: self.inner.human(human),
         }
     }
-    pub fn index(self, index: &'b str) -> Self {
+    #[doc = "Comma-separated list of indexes. Required when no index is given in the path; ignored when it is."]
+    pub fn index(self, index: &'b [&'b str]) -> Self {
         Self {
             inner: self.inner.index(index),
+        }
+    }
+    #[doc = "Operation timeout for connection to cluster-manager node."]
+    #[deprecated = "Deprecated since OpenSearch 2.3: To promote inclusive language, use `cluster_manager_timeout` instead."]
+    pub fn master_timeout(self, master_timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.master_timeout(master_timeout),
         }
     }
     #[doc = "Whether to pretty-format the returned JSON response."]
@@ -16965,6 +17454,12 @@ where
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The type of the index metadata provider."]
+    pub fn ty(self, ty: &'b str) -> Self {
+        Self {
+            inner: self.inner.ty(ty),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::ism_retry_index::RetryIndexResponse`](crate::types::ism_retry_index::RetryIndexResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -16986,7 +17481,7 @@ impl<'a> TypedIsm<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ism Add Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
+    #[doc = "[Ism Add Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#add-policy)\n\nAdds a policy to an index."]
     #[allow(deprecated)]
     pub fn add_policy<'b>(
         &'a self,
@@ -16996,7 +17491,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmAddPolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Change Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
+    #[doc = "[Ism Change Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#update-managed-index-policy)\n\nUpdates the managed index policy to a new policy."]
     #[allow(deprecated)]
     pub fn change_policy<'b>(
         &'a self,
@@ -17006,7 +17501,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmChangePolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Delete Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
+    #[doc = "[Ism Delete Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#delete-policy)\n\nDeletes a policy."]
     #[allow(deprecated)]
     pub fn delete_policy<'b>(
         &'a self,
@@ -17016,7 +17511,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmDeletePolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Explain Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
+    #[doc = "[Ism Explain Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#explain-index)\n\nRetrieves the currently applied policy on the specified indexes."]
     #[allow(deprecated)]
     pub fn explain_policy<'b>(
         &'a self,
@@ -17026,14 +17521,14 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmExplainPolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Get Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
+    #[doc = "[Ism Get Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves the policies."]
     #[allow(deprecated)]
     pub fn get_policies<'b>(&'a self) -> TypedIsmGetPolicies<'a, 'b> {
         TypedIsmGetPolicies {
             inner: crate::ism::IsmGetPolicies::new(self.transport()),
         }
     }
-    #[doc = "[Ism Get Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#put-policy)\n\nRetrieves a specific policy."]
+    #[doc = "[Ism Get Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#get-policy)\n\nRetrieves a specific policy."]
     #[allow(deprecated)]
     pub fn get_policy<'b>(
         &'a self,
@@ -17043,14 +17538,14 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmGetPolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Put Policies API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
+    #[doc = "[Ism Put Policies API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates policies."]
     #[allow(deprecated)]
     pub fn put_policies<'b>(&'a self) -> TypedIsmPutPolicies<'a, 'b, ()> {
         TypedIsmPutPolicies {
             inner: crate::ism::IsmPutPolicies::new(self.transport()),
         }
     }
-    #[doc = "[Ism Put Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
+    #[doc = "[Ism Put Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#create-policy)\n\nCreates or updates a policy."]
     #[allow(deprecated)]
     pub fn put_policy<'b>(
         &'a self,
@@ -17060,7 +17555,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmPutPolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Refresh Search Analyzers API](https://opensearch.org/docs/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
+    #[doc = "[Ism Refresh Search Analyzers API](https://docs.opensearch.org/latest/im-plugin/refresh-analyzer/)\n\nRefreshes search analyzers in real time."]
     #[allow(deprecated)]
     pub fn refresh_search_analyzers<'b>(
         &'a self,
@@ -17070,7 +17565,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmRefreshSearchAnalyzers::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Remove Policy API](https://opensearch.org/docs/latest/im-plugin/ism/api/#remove-policy)\n\nRemoves a policy from an index."]
+    #[doc = "[Ism Remove Policy API](https://docs.opensearch.org/latest/im-plugin/ism/api/#remove-policy-from-index)\n\nRemoves a policy from an index."]
     #[allow(deprecated)]
     pub fn remove_policy<'b>(
         &'a self,
@@ -17080,7 +17575,7 @@ impl<'a> TypedIsm<'a> {
             inner: crate::ism::IsmRemovePolicy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Ism Retry Index API](https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
+    #[doc = "[Ism Retry Index API](https://docs.opensearch.org/latest/im-plugin/ism/api/#retry-failed-index)\n\nRetries the failed action for an index."]
     #[allow(deprecated)]
     pub fn retry_index<'b>(
         &'a self,
@@ -17901,7 +18396,7 @@ impl<'a, 'b> TypedListIndices<'a, 'b> {
         }
     }
     #[doc = "Defines order in which indexes will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created indexes would be displayed first."]
-    pub fn sort(self, sort: Sort) -> Self {
+    pub fn sort(self, sort: SortOrder) -> Self {
         Self {
             inner: self.inner.sort(sort),
         }
@@ -18027,7 +18522,7 @@ impl<'a, 'b> TypedListShards<'a, 'b> {
         }
     }
     #[doc = "Defines order in which shards will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created shards would be displayed first."]
-    pub fn sort(self, sort: Sort) -> Self {
+    pub fn sort(self, sort: SortOrder) -> Self {
         Self {
             inner: self.inner.sort(sort),
         }
@@ -18059,6 +18554,95 @@ impl<'a, 'b> TypedListShards<'a, 'b> {
             .await
     }
 }
+#[doc = "Typed builder for the List Wlm Stats API: [`send`](Self::send) returns [`types::list_wlm_stats::WlmStatsResponse`](crate::types::list_wlm_stats::WlmStatsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`, `format` (always `json`). Use the generic [`ListWlmStats`](crate::list::ListWlmStats) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedListWlmStats<'a, 'b> {
+    inner: crate::list::ListWlmStats<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedListWlmStats<'a, 'b> {
+    #[doc = "When `true`, returns only workload groups that have breached their resource limits."]
+    pub fn breach(self, breach: bool) -> Self {
+        Self {
+            inner: self.inner.breach(breach),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Token used to retrieve the next page of workload management statistics."]
+    pub fn next_token(self, next_token: &'b str) -> Self {
+        Self {
+            inner: self.inner.next_token(next_token),
+        }
+    }
+    #[doc = "The sort direction of the page. Allowed values are `asc` and `desc`. Defaults to `asc`."]
+    pub fn order(self, order: Order) -> Self {
+        Self {
+            inner: self.inner.order(order),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The maximum number of node and workload group combinations to return in a page. Allowed range is 1 to 100."]
+    pub fn size(self, size: i64) -> Self {
+        Self {
+            inner: self.inner.size(size),
+        }
+    }
+    #[doc = "The field used to sort results. Allowed values are `node_id` and `workload_group`. Defaults to `node_id`."]
+    pub fn sort(self, sort: WlmStatsSortBy) -> Self {
+        Self {
+            inner: self.inner.sort(sort),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Verbose mode. Display column headers."]
+    pub fn v(self, v: bool) -> Self {
+        Self {
+            inner: self.inner.v(v),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::list_wlm_stats::WlmStatsResponse`](crate::types::list_wlm_stats::WlmStatsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(self) -> Result<crate::types::list_wlm_stats::WlmStatsResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed("types::list_wlm_stats::WlmStatsResponse", &[])
+            .await
+    }
+}
 #[doc = "Typed namespace client for List APIs: the APIs with a response type"]
 #[derive(Clone, Debug)]
 pub struct TypedList<'a> {
@@ -18069,24 +18653,37 @@ impl<'a> TypedList<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[List Indices API](https://opensearch.org/docs/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
+    #[doc = "[List Indices API](https://docs.opensearch.org/latest/api-reference/list/list-indices/)\n\nReturns paginated information about indexes including number of primaries and replicas, document counts, disk size."]
     #[allow(deprecated)]
     pub fn indices<'b>(
         &'a self,
         parts: crate::list::ListIndicesParts<'b>,
     ) -> TypedListIndices<'a, 'b> {
         TypedListIndices {
-            inner: crate::list::ListIndices::new(self.transport(), parts).format("json"),
+            inner: crate::list::ListIndices::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
-    #[doc = "[List Shards API](https://opensearch.org/docs/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
+    #[doc = "[List Shards API](https://docs.opensearch.org/latest/api-reference/list/list-shards/)\n\nReturns paginated details of shard allocation on nodes."]
     #[allow(deprecated)]
     pub fn shards<'b>(
         &'a self,
         parts: crate::list::ListShardsParts<'b>,
     ) -> TypedListShards<'a, 'b> {
         TypedListShards {
-            inner: crate::list::ListShards::new(self.transport(), parts).format("json"),
+            inner: crate::list::ListShards::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
+        }
+    }
+    #[doc = "List Wlm Stats API\n\nReturns paginated workload management statistics in tabular form."]
+    #[allow(deprecated)]
+    pub fn wlm_stats<'b>(
+        &'a self,
+        parts: crate::list::ListWlmStatsParts<'b>,
+    ) -> TypedListWlmStats<'a, 'b> {
+        TypedListWlmStats {
+            inner: crate::list::ListWlmStats::new(self.transport(), parts)
+                .format(crate::params::CatResponseFormat::Json),
         }
     }
 }
@@ -25738,14 +26335,14 @@ impl<'a> TypedNodes<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Nodes Info API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
+    #[doc = "[Nodes Info API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
     #[allow(deprecated)]
     pub fn info<'b>(&'a self, parts: crate::nodes::NodesInfoParts<'b>) -> TypedNodesInfo<'a, 'b> {
         TypedNodesInfo {
             inner: crate::nodes::NodesInfo::new(self.transport(), parts),
         }
     }
-    #[doc = "[Nodes Reload Secure Settings API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
+    #[doc = "[Nodes Reload Secure Settings API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
     #[allow(deprecated)]
     pub fn reload_secure_settings<'b>(
         &'a self,
@@ -25755,7 +26352,7 @@ impl<'a> TypedNodes<'a> {
             inner: crate::nodes::NodesReloadSecureSettings::new(self.transport(), parts),
         }
     }
-    #[doc = "[Nodes Stats API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
+    #[doc = "[Nodes Stats API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
     #[allow(deprecated)]
     pub fn stats<'b>(
         &'a self,
@@ -25765,7 +26362,7 @@ impl<'a> TypedNodes<'a> {
             inner: crate::nodes::NodesStats::new(self.transport(), parts),
         }
     }
-    #[doc = "[Nodes Usage API](https://opensearch.org/docs/latest)\n\nReturns low-level information about REST actions usage on nodes."]
+    #[doc = "[Nodes Usage API](https://docs.opensearch.org/latest/)\n\nReturns low-level information about REST actions usage on nodes."]
     #[allow(deprecated)]
     pub fn usage<'b>(
         &'a self,
@@ -26609,14 +27206,14 @@ impl<'a> TypedNotifications<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Notifications Create Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
+    #[doc = "[Notifications Create Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#create-channel-configuration)\n\nCreate channel configuration."]
     #[allow(deprecated)]
     pub fn create_config<'b>(&'a self) -> TypedNotificationsCreateConfig<'a, 'b, ()> {
         TypedNotificationsCreateConfig {
             inner: crate::notifications::NotificationsCreateConfig::new(self.transport()),
         }
     }
-    #[doc = "[Notifications Delete Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
+    #[doc = "[Notifications Delete Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete a channel configuration."]
     #[allow(deprecated)]
     pub fn delete_config<'b>(
         &'a self,
@@ -26626,7 +27223,7 @@ impl<'a> TypedNotifications<'a> {
             inner: crate::notifications::NotificationsDeleteConfig::new(self.transport(), parts),
         }
     }
-    #[doc = "[Notifications Delete Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
+    #[doc = "[Notifications Delete Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#delete-channel-configuration)\n\nDelete multiple channel configurations."]
     #[allow(deprecated)]
     pub fn delete_configs<'b>(&'a self) -> TypedNotificationsDeleteConfigs<'a, 'b> {
         TypedNotificationsDeleteConfigs {
@@ -26643,28 +27240,28 @@ impl<'a> TypedNotifications<'a> {
             inner: crate::notifications::NotificationsGetConfig::new(self.transport(), parts),
         }
     }
-    #[doc = "[Notifications Get Configs API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
+    #[doc = "[Notifications Get Configs API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-configurations)\n\nGet multiple channel configurations with filtering."]
     #[allow(deprecated)]
     pub fn get_configs<'b>(&'a self) -> TypedNotificationsGetConfigs<'a, 'b, ()> {
         TypedNotificationsGetConfigs {
             inner: crate::notifications::NotificationsGetConfigs::new(self.transport()),
         }
     }
-    #[doc = "[Notifications List Channels API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
+    #[doc = "[Notifications List Channels API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-all-notification-channels)\n\nList created notification channels."]
     #[allow(deprecated)]
     pub fn list_channels<'b>(&'a self) -> TypedNotificationsListChannels<'a, 'b> {
         TypedNotificationsListChannels {
             inner: crate::notifications::NotificationsListChannels::new(self.transport()),
         }
     }
-    #[doc = "[Notifications List Features API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
+    #[doc = "[Notifications List Features API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#list-supported-channel-configurations)\n\nList supported channel configurations."]
     #[allow(deprecated)]
     pub fn list_features<'b>(&'a self) -> TypedNotificationsListFeatures<'a, 'b> {
         TypedNotificationsListFeatures {
             inner: crate::notifications::NotificationsListFeatures::new(self.transport()),
         }
     }
-    #[doc = "[Notifications Send Test API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
+    #[doc = "[Notifications Send Test API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#send-test-notification)\n\nSend a test notification."]
     #[allow(deprecated)]
     pub fn send_test<'b>(
         &'a self,
@@ -26674,7 +27271,7 @@ impl<'a> TypedNotifications<'a> {
             inner: crate::notifications::NotificationsSendTest::new(self.transport(), parts),
         }
     }
-    #[doc = "[Notifications Update Config API](https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
+    #[doc = "[Notifications Update Config API](https://docs.opensearch.org/latest/observing-your-data/notifications/api/#update-channel-configuration)\n\nUpdate channel configuration."]
     #[allow(deprecated)]
     pub fn update_config<'b>(
         &'a self,
@@ -27171,7 +27768,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON, YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -27248,7 +27845,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON OR YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -27308,14 +27905,14 @@ impl<'a> TypedPpl<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Ppl Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a PPL query."]
+    #[doc = "[Ppl Explain API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a PPL query."]
     #[allow(deprecated)]
     pub fn explain<'b>(&'a self) -> TypedPplExplain<'a, 'b, ()> {
         TypedPplExplain {
             inner: crate::ppl::PplExplain::new(self.transport()),
         }
     }
-    #[doc = "[Ppl Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes a PPL query against OpenSearch indexes."]
+    #[doc = "[Ppl Query API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes a PPL query against OpenSearch indexes."]
     #[allow(deprecated)]
     pub fn query<'b>(&'a self) -> TypedPplQuery<'a, 'b, ()> {
         TypedPplQuery {
@@ -27724,7 +28321,7 @@ impl<'a> TypedRemoteStore<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Remote Store Restore API](https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup)\n\nRestores from remote store."]
+    #[doc = "[Remote Store Restore API](https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#restoring-from-a-backup)\n\nRestores from remote store."]
     #[allow(deprecated)]
     pub fn restore<'b>(&'a self) -> TypedRemoteStoreRestore<'a, 'b, ()> {
         TypedRemoteStoreRestore {
@@ -28450,14 +29047,14 @@ impl<'a> TypedReplication<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Replication Autofollow Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
+    #[doc = "[Replication Autofollow Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
     #[allow(deprecated)]
     pub fn autofollow_stats<'b>(&'a self) -> TypedReplicationAutofollowStats<'a, 'b> {
         TypedReplicationAutofollowStats {
             inner: crate::replication::ReplicationAutofollowStats::new(self.transport()),
         }
     }
-    #[doc = "[Replication Create Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
+    #[doc = "[Replication Create Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
     #[allow(deprecated)]
     pub fn create_replication_rule<'b>(
         &'a self,
@@ -28466,7 +29063,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationCreateReplicationRule::new(self.transport()),
         }
     }
-    #[doc = "[Replication Delete Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
+    #[doc = "[Replication Delete Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
     #[allow(deprecated)]
     pub fn delete_replication_rule<'b>(
         &'a self,
@@ -28475,21 +29072,21 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationDeleteReplicationRule::new(self.transport()),
         }
     }
-    #[doc = "[Replication Follower Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
+    #[doc = "[Replication Follower Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
     #[allow(deprecated)]
     pub fn follower_stats<'b>(&'a self) -> TypedReplicationFollowerStats<'a, 'b> {
         TypedReplicationFollowerStats {
             inner: crate::replication::ReplicationFollowerStats::new(self.transport()),
         }
     }
-    #[doc = "[Replication Leader Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
+    #[doc = "[Replication Leader Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
     #[allow(deprecated)]
     pub fn leader_stats<'b>(&'a self) -> TypedReplicationLeaderStats<'a, 'b> {
         TypedReplicationLeaderStats {
             inner: crate::replication::ReplicationLeaderStats::new(self.transport()),
         }
     }
-    #[doc = "[Replication Pause API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
+    #[doc = "[Replication Pause API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
     #[allow(deprecated)]
     pub fn pause<'b>(
         &'a self,
@@ -28499,7 +29096,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationPause::new(self.transport(), parts),
         }
     }
-    #[doc = "[Replication Resume API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
+    #[doc = "[Replication Resume API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
     #[allow(deprecated)]
     pub fn resume<'b>(
         &'a self,
@@ -28509,7 +29106,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationResume::new(self.transport(), parts),
         }
     }
-    #[doc = "[Replication Start API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
+    #[doc = "[Replication Start API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
     #[allow(deprecated)]
     pub fn start<'b>(
         &'a self,
@@ -28519,7 +29116,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationStart::new(self.transport(), parts),
         }
     }
-    #[doc = "[Replication Status API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
+    #[doc = "[Replication Status API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
     #[allow(deprecated)]
     pub fn status<'b>(
         &'a self,
@@ -28529,7 +29126,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationStatus::new(self.transport(), parts),
         }
     }
-    #[doc = "[Replication Stop API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
+    #[doc = "[Replication Stop API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
     #[allow(deprecated)]
     pub fn stop<'b>(
         &'a self,
@@ -28539,7 +29136,7 @@ impl<'a> TypedReplication<'a> {
             inner: crate::replication::ReplicationStop::new(self.transport(), parts),
         }
     }
-    #[doc = "[Replication Update Settings API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
+    #[doc = "[Replication Update Settings API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
     #[allow(deprecated)]
     pub fn update_settings<'b>(
         &'a self,
@@ -28934,7 +29531,7 @@ impl<'a> TypedRollups<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Rollups Delete API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
+    #[doc = "[Rollups Delete API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -28944,7 +29541,7 @@ impl<'a> TypedRollups<'a> {
             inner: crate::rollups::RollupsDelete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rollups Explain API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
+    #[doc = "[Rollups Explain API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
     #[allow(deprecated)]
     pub fn explain<'b>(
         &'a self,
@@ -28954,7 +29551,7 @@ impl<'a> TypedRollups<'a> {
             inner: crate::rollups::RollupsExplain::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rollups Get API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
+    #[doc = "[Rollups Get API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -28964,7 +29561,7 @@ impl<'a> TypedRollups<'a> {
             inner: crate::rollups::RollupsGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rollups Put API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
+    #[doc = "[Rollups Put API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
     #[allow(deprecated)]
     pub fn put<'b>(
         &'a self,
@@ -28974,7 +29571,7 @@ impl<'a> TypedRollups<'a> {
             inner: crate::rollups::RollupsPut::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rollups Start API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
+    #[doc = "[Rollups Start API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
     #[allow(deprecated)]
     pub fn start<'b>(
         &'a self,
@@ -28984,7 +29581,7 @@ impl<'a> TypedRollups<'a> {
             inner: crate::rollups::RollupsStart::new(self.transport(), parts),
         }
     }
-    #[doc = "[Rollups Stop API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
+    #[doc = "[Rollups Stop API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
     #[allow(deprecated)]
     pub fn stop<'b>(
         &'a self,
@@ -29234,7 +29831,7 @@ impl<'a> TypedSearchPipeline<'a> {
             inner: crate::search_pipeline::SearchPipelineGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Search Pipeline Put API](https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
+    #[doc = "[Search Pipeline Put API](https://docs.opensearch.org/latest/search-plugins/search-pipelines/creating-search-pipeline/)\n\nCreates or replaces the specified search pipeline."]
     #[allow(deprecated)]
     pub fn put<'b>(
         &'a self,
@@ -29526,6 +30123,77 @@ impl<'a, 'b> TypedSearchRelevanceDeleteSearchConfigurations<'a, 'b> {
         self . inner . send () . await ? . typed ("types::search_relevance_delete_search_configurations::DeleteSearchConfigurationsResponse" , & []) . await
     }
 }
+#[doc = "Typed builder for the Search Relevance Experiments Search API: [`send`](Self::send) returns [`types::search_relevance_experiments_search::ExperimentsSearchResponse`](crate::types::search_relevance_experiments_search::ExperimentsSearchResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceExperimentsSearch`](crate::search_relevance::SearchRelevanceExperimentsSearch) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceExperimentsSearch<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceExperimentsSearch<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceExperimentsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevanceExperimentsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceExperimentsSearch {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_experiments_search::ExperimentsSearchResponse`](crate::types::search_relevance_experiments_search::ExperimentsSearchResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::search_relevance_experiments_search::ExperimentsSearchResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_experiments_search::ExperimentsSearchResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Search Relevance Get Experiments API: [`send`](Self::send) returns [`types::search_relevance_get_experiments::GetExperimentsResponse`](crate::types::search_relevance_get_experiments::GetExperimentsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceGetExperiments`](crate::search_relevance::SearchRelevanceGetExperiments) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -29556,6 +30224,12 @@ impl<'a, 'b> TypedSearchRelevanceGetExperiments<'a, 'b> {
     pub fn pretty(self, pretty: bool) -> Self {
         Self {
             inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "A query text for visualizing experiment results. Accepted but currently does not change the response."]
+    pub fn query_text(self, query_text: &'b str) -> Self {
+        Self {
+            inner: self.inner.query_text(query_text),
         }
     }
     #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
@@ -29657,7 +30331,7 @@ impl<'a, 'b> TypedSearchRelevanceGetNodeStats<'a, 'b> {
         }
     }
     #[doc = "Requests flattened stat paths as keys"]
-    pub fn flat_stat_paths(self, flat_stat_paths: &'b str) -> Self {
+    pub fn flat_stat_paths(self, flat_stat_paths: bool) -> Self {
         Self {
             inner: self.inner.flat_stat_paths(flat_stat_paths),
         }
@@ -29675,13 +30349,13 @@ impl<'a, 'b> TypedSearchRelevanceGetNodeStats<'a, 'b> {
         }
     }
     #[doc = "Whether to include all nodes"]
-    pub fn include_all_nodes(self, include_all_nodes: &'b str) -> Self {
+    pub fn include_all_nodes(self, include_all_nodes: bool) -> Self {
         Self {
             inner: self.inner.include_all_nodes(include_all_nodes),
         }
     }
     #[doc = "Whether to include individual nodes"]
-    pub fn include_individual_nodes(self, include_individual_nodes: &'b str) -> Self {
+    pub fn include_individual_nodes(self, include_individual_nodes: bool) -> Self {
         Self {
             inner: self
                 .inner
@@ -29689,13 +30363,13 @@ impl<'a, 'b> TypedSearchRelevanceGetNodeStats<'a, 'b> {
         }
     }
     #[doc = "Whether to include info"]
-    pub fn include_info(self, include_info: &'b str) -> Self {
+    pub fn include_info(self, include_info: bool) -> Self {
         Self {
             inner: self.inner.include_info(include_info),
         }
     }
     #[doc = "Whether to include metadata"]
-    pub fn include_metadata(self, include_metadata: &'b str) -> Self {
+    pub fn include_metadata(self, include_metadata: bool) -> Self {
         Self {
             inner: self.inner.include_metadata(include_metadata),
         }
@@ -29716,6 +30390,12 @@ impl<'a, 'b> TypedSearchRelevanceGetNodeStats<'a, 'b> {
     pub fn source(self, source: &'b str) -> Self {
         Self {
             inner: self.inner.source(source),
+        }
+    }
+    #[doc = "The amount of time to wait for a response."]
+    pub fn timeout(self, timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.timeout(timeout),
         }
     }
     #[doc = "Sends the request and decodes the response body as [`types::search_relevance_get_node_stats::GetNodeStatsResponse`](crate::types::search_relevance_get_node_stats::GetNodeStatsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
@@ -29913,7 +30593,7 @@ impl<'a, 'b> TypedSearchRelevanceGetStats<'a, 'b> {
         }
     }
     #[doc = "Requests flattened stat paths as keys"]
-    pub fn flat_stat_paths(self, flat_stat_paths: &'b str) -> Self {
+    pub fn flat_stat_paths(self, flat_stat_paths: bool) -> Self {
         Self {
             inner: self.inner.flat_stat_paths(flat_stat_paths),
         }
@@ -29931,13 +30611,13 @@ impl<'a, 'b> TypedSearchRelevanceGetStats<'a, 'b> {
         }
     }
     #[doc = "Whether to include all nodes"]
-    pub fn include_all_nodes(self, include_all_nodes: &'b str) -> Self {
+    pub fn include_all_nodes(self, include_all_nodes: bool) -> Self {
         Self {
             inner: self.inner.include_all_nodes(include_all_nodes),
         }
     }
     #[doc = "Whether to include individual nodes"]
-    pub fn include_individual_nodes(self, include_individual_nodes: &'b str) -> Self {
+    pub fn include_individual_nodes(self, include_individual_nodes: bool) -> Self {
         Self {
             inner: self
                 .inner
@@ -29945,13 +30625,13 @@ impl<'a, 'b> TypedSearchRelevanceGetStats<'a, 'b> {
         }
     }
     #[doc = "Whether to include info"]
-    pub fn include_info(self, include_info: &'b str) -> Self {
+    pub fn include_info(self, include_info: bool) -> Self {
         Self {
             inner: self.inner.include_info(include_info),
         }
     }
     #[doc = "Whether to include metadata"]
-    pub fn include_metadata(self, include_metadata: &'b str) -> Self {
+    pub fn include_metadata(self, include_metadata: bool) -> Self {
         Self {
             inner: self.inner.include_metadata(include_metadata),
         }
@@ -29974,6 +30654,12 @@ impl<'a, 'b> TypedSearchRelevanceGetStats<'a, 'b> {
             inner: self.inner.source(source),
         }
     }
+    #[doc = "The amount of time to wait for a response."]
+    pub fn timeout(self, timeout: &'b str) -> Self {
+        Self {
+            inner: self.inner.timeout(timeout),
+        }
+    }
     #[doc = "Sends the request and decodes the response body as [`types::search_relevance_get_stats::GetStatsResponse`](crate::types::search_relevance_get_stats::GetStatsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
     pub async fn send(
         self,
@@ -29982,6 +30668,148 @@ impl<'a, 'b> TypedSearchRelevanceGetStats<'a, 'b> {
             .send()
             .await?
             .typed("types::search_relevance_get_stats::GetStatsResponse", &[])
+            .await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Judgments Search API: [`send`](Self::send) returns [`types::search_relevance_judgments_search::JudgmentsSearchResponse`](crate::types::search_relevance_judgments_search::JudgmentsSearchResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceJudgmentsSearch`](crate::search_relevance::SearchRelevanceJudgmentsSearch) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceJudgmentsSearch<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceJudgmentsSearch<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceJudgmentsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevanceJudgmentsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceJudgmentsSearch {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_judgments_search::JudgmentsSearchResponse`](crate::types::search_relevance_judgments_search::JudgmentsSearchResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::search_relevance_judgments_search::JudgmentsSearchResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_judgments_search::JudgmentsSearchResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Patch Experiment API: [`send`](Self::send) returns [`types::search_relevance_patch_experiment::PatchExperimentResponse`](crate::types::search_relevance_patch_experiment::PatchExperimentResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevancePatchExperiment`](crate::search_relevance::SearchRelevancePatchExperiment) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevancePatchExperiment<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevancePatchExperiment<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevancePatchExperiment<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevancePatchExperiment<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevancePatchExperiment {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_patch_experiment::PatchExperimentResponse`](crate::types::search_relevance_patch_experiment::PatchExperimentResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::search_relevance_patch_experiment::PatchExperimentResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_patch_experiment::PatchExperimentResponse",
+                &[],
+            )
             .await
     }
 }
@@ -30403,6 +31231,344 @@ where
         self . inner . send () . await ? . typed ("types::search_relevance_put_search_configurations::PutSearchConfigurationsResponse" , & []) . await
     }
 }
+#[doc = "Typed builder for the Search Relevance Query Sets Search API: [`send`](Self::send) returns [`types::search_relevance_query_sets_search::QuerySetsSearchResponse`](crate::types::search_relevance_query_sets_search::QuerySetsSearchResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceQuerySetsSearch`](crate::search_relevance::SearchRelevanceQuerySetsSearch) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceQuerySetsSearch<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceQuerySetsSearch<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceQuerySetsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevanceQuerySetsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceQuerySetsSearch {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_query_sets_search::QuerySetsSearchResponse`](crate::types::search_relevance_query_sets_search::QuerySetsSearchResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::search_relevance_query_sets_search::QuerySetsSearchResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_query_sets_search::QuerySetsSearchResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Retry Judgments API: [`send`](Self::send) returns [`types::search_relevance_retry_judgments::RetryJudgmentsResponse`](crate::types::search_relevance_retry_judgments::RetryJudgmentsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceRetryJudgments`](crate::search_relevance::SearchRelevanceRetryJudgments) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceRetryJudgments<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceRetryJudgments<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceRetryJudgments<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevanceRetryJudgments<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceRetryJudgments {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_retry_judgments::RetryJudgmentsResponse`](crate::types::search_relevance_retry_judgments::RetryJudgmentsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::search_relevance_retry_judgments::RetryJudgmentsResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_retry_judgments::RetryJudgmentsResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Search Configurations Search API: [`send`](Self::send) returns [`types::search_relevance_search_configurations_search::SearchConfigurationsSearchResponse`](crate::types::search_relevance_search_configurations_search::SearchConfigurationsSearchResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceSearchConfigurationsSearch`](crate::search_relevance::SearchRelevanceSearchConfigurationsSearch) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceSearchConfigurationsSearch<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceSearchConfigurationsSearch<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceSearchConfigurationsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(
+        self,
+        body: T,
+    ) -> TypedSearchRelevanceSearchConfigurationsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceSearchConfigurationsSearch {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_search_configurations_search::SearchConfigurationsSearchResponse`](crate::types::search_relevance_search_configurations_search::SearchConfigurationsSearchResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]    pub async fn send (self) -> Result < crate :: types :: search_relevance_search_configurations_search :: SearchConfigurationsSearchResponse , Error >{
+        self . inner . send () . await ? . typed ("types::search_relevance_search_configurations_search::SearchConfigurationsSearchResponse" , & []) . await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Update Judgment Ratings API: [`send`](Self::send) returns [`types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse`](crate::types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceUpdateJudgmentRatings`](crate::search_relevance::SearchRelevanceUpdateJudgmentRatings) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceUpdateJudgmentRatings<'a, 'b, B> {
+    inner: crate::search_relevance::SearchRelevanceUpdateJudgmentRatings<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSearchRelevanceUpdateJudgmentRatings<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSearchRelevanceUpdateJudgmentRatings<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSearchRelevanceUpdateJudgmentRatings {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse`](crate::types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<
+        crate::types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse,
+        Error,
+    > {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_update_judgment_ratings::UpdateJudgmentRatingsResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Search Relevance Validate Experiments API: [`send`](Self::send) returns [`types::search_relevance_validate_experiments::ValidateExperimentsResponse`](crate::types::search_relevance_validate_experiments::ValidateExperimentsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SearchRelevanceValidateExperiments`](crate::search_relevance::SearchRelevanceValidateExperiments) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSearchRelevanceValidateExperiments<'a, 'b> {
+    inner: crate::search_relevance::SearchRelevanceValidateExperiments<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedSearchRelevanceValidateExperiments<'a, 'b> {
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::search_relevance_validate_experiments::ValidateExperimentsResponse`](crate::types::search_relevance_validate_experiments::ValidateExperimentsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<
+        crate::types::search_relevance_validate_experiments::ValidateExperimentsResponse,
+        Error,
+    > {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::search_relevance_validate_experiments::ValidateExperimentsResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed namespace client for SearchRelevance APIs: the APIs with a response type"]
 #[derive(Clone, Debug)]
 pub struct TypedSearchRelevance<'a> {
@@ -30476,6 +31642,13 @@ impl<'a> TypedSearchRelevance<'a> {
                 self.transport(),
                 parts,
             ),
+        }
+    }
+    #[doc = "Search Relevance Experiments Search API\n\nSearches for experiments."]
+    #[allow(deprecated)]
+    pub fn experiments_search<'b>(&'a self) -> TypedSearchRelevanceExperimentsSearch<'a, 'b, ()> {
+        TypedSearchRelevanceExperimentsSearch {
+            inner: crate::search_relevance::SearchRelevanceExperimentsSearch::new(self.transport()),
         }
     }
     #[doc = "Search Relevance Get Experiments API\n\nGets experiments."]
@@ -30566,6 +31739,26 @@ impl<'a> TypedSearchRelevance<'a> {
             inner: crate::search_relevance::SearchRelevanceGetStats::new(self.transport(), parts),
         }
     }
+    #[doc = "Search Relevance Judgments Search API\n\nSearches for judgments."]
+    #[allow(deprecated)]
+    pub fn judgments_search<'b>(&'a self) -> TypedSearchRelevanceJudgmentsSearch<'a, 'b, ()> {
+        TypedSearchRelevanceJudgmentsSearch {
+            inner: crate::search_relevance::SearchRelevanceJudgmentsSearch::new(self.transport()),
+        }
+    }
+    #[doc = "Search Relevance Patch Experiment API\n\nPartially updates an experiment's name or description."]
+    #[allow(deprecated)]
+    pub fn patch_experiment<'b>(
+        &'a self,
+        parts: crate::search_relevance::SearchRelevancePatchExperimentParts<'b>,
+    ) -> TypedSearchRelevancePatchExperiment<'a, 'b, ()> {
+        TypedSearchRelevancePatchExperiment {
+            inner: crate::search_relevance::SearchRelevancePatchExperiment::new(
+                self.transport(),
+                parts,
+            ),
+        }
+    }
     #[doc = "Search Relevance Post Query Sets API\n\nCreates a new query set by sampling queries from the user behavior data."]
     #[allow(deprecated)]
     pub fn post_query_sets<'b>(&'a self) -> TypedSearchRelevancePostQuerySets<'a, 'b, ()> {
@@ -30613,6 +31806,63 @@ impl<'a> TypedSearchRelevance<'a> {
         TypedSearchRelevancePutSearchConfigurations {
             inner: crate::search_relevance::SearchRelevancePutSearchConfigurations::new(
                 self.transport(),
+            ),
+        }
+    }
+    #[doc = "Search Relevance Query Sets Search API\n\nSearches for queries in the query sets."]
+    #[allow(deprecated)]
+    pub fn query_sets_search<'b>(&'a self) -> TypedSearchRelevanceQuerySetsSearch<'a, 'b, ()> {
+        TypedSearchRelevanceQuerySetsSearch {
+            inner: crate::search_relevance::SearchRelevanceQuerySetsSearch::new(self.transport()),
+        }
+    }
+    #[doc = "Search Relevance Retry Judgments API\n\nRetries the failed documents in an existing LLM judgment."]
+    #[allow(deprecated)]
+    pub fn retry_judgments<'b>(
+        &'a self,
+        parts: crate::search_relevance::SearchRelevanceRetryJudgmentsParts<'b>,
+    ) -> TypedSearchRelevanceRetryJudgments<'a, 'b, ()> {
+        TypedSearchRelevanceRetryJudgments {
+            inner: crate::search_relevance::SearchRelevanceRetryJudgments::new(
+                self.transport(),
+                parts,
+            ),
+        }
+    }
+    #[doc = "Search Relevance Search Configurations Search API\n\nSearches for search configurations."]
+    #[allow(deprecated)]
+    pub fn search_configurations_search<'b>(
+        &'a self,
+    ) -> TypedSearchRelevanceSearchConfigurationsSearch<'a, 'b, ()> {
+        TypedSearchRelevanceSearchConfigurationsSearch {
+            inner: crate::search_relevance::SearchRelevanceSearchConfigurationsSearch::new(
+                self.transport(),
+            ),
+        }
+    }
+    #[doc = "Search Relevance Update Judgment Ratings API\n\nAdjusts one or more ratings on an existing LLM judgment in place. Only the listed (`query`, `docId`) pairs are updated; all other ratings are left unchanged."]
+    #[allow(deprecated)]
+    pub fn update_judgment_ratings<'b>(
+        &'a self,
+        parts: crate::search_relevance::SearchRelevanceUpdateJudgmentRatingsParts<'b>,
+    ) -> TypedSearchRelevanceUpdateJudgmentRatings<'a, 'b, ()> {
+        TypedSearchRelevanceUpdateJudgmentRatings {
+            inner: crate::search_relevance::SearchRelevanceUpdateJudgmentRatings::new(
+                self.transport(),
+                parts,
+            ),
+        }
+    }
+    #[doc = "Search Relevance Validate Experiments API\n\nValidates whether an experiment's inputs have drifted from the fingerprint recorded at execution time."]
+    #[allow(deprecated)]
+    pub fn validate_experiments<'b>(
+        &'a self,
+        parts: crate::search_relevance::SearchRelevanceValidateExperimentsParts<'b>,
+    ) -> TypedSearchRelevanceValidateExperiments<'a, 'b> {
+        TypedSearchRelevanceValidateExperiments {
+            inner: crate::search_relevance::SearchRelevanceValidateExperiments::new(
+                self.transport(),
+                parts,
             ),
         }
     }
@@ -31037,6 +32287,77 @@ where
             .await
     }
 }
+#[doc = "Typed builder for the Security Create Action Groups API: [`send`](Self::send) returns [`types::security_create_action_groups::CreateActionGroupsResponse`](crate::types::security_create_action_groups::CreateActionGroupsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SecurityCreateActionGroups`](crate::security::SecurityCreateActionGroups) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSecurityCreateActionGroups<'a, 'b, B> {
+    inner: crate::security::SecurityCreateActionGroups<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSecurityCreateActionGroups<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSecurityCreateActionGroups<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSecurityCreateActionGroups {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::security_create_action_groups::CreateActionGroupsResponse`](crate::types::security_create_action_groups::CreateActionGroupsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::security_create_action_groups::CreateActionGroupsResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::security_create_action_groups::CreateActionGroupsResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Security Create Allowlist API: [`send`](Self::send) returns [`types::security_create_allowlist::CreateAllowlistResponse`](crate::types::security_create_allowlist::CreateAllowlistResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SecurityCreateAllowlist`](crate::security::SecurityCreateAllowlist) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -31239,6 +32560,83 @@ where
             .await?
             .typed(
                 "types::security_create_role_mapping::CreateRoleMappingResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Security Create Role Mappings API: [`send`](Self::send) returns [`types::security_create_role_mappings::CreateRoleMappingsResponse`](crate::types::security_create_role_mappings::CreateRoleMappingsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`SecurityCreateRoleMappings`](crate::security::SecurityCreateRoleMappings) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedSecurityCreateRoleMappings<'a, 'b, B> {
+    inner: crate::security::SecurityCreateRoleMappings<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedSecurityCreateRoleMappings<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedSecurityCreateRoleMappings<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedSecurityCreateRoleMappings {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "If false, returns a task ID after validation and runs the configuration write and reload asynchronously."]
+    pub fn wait_for_completion(self, wait_for_completion: bool) -> Self {
+        Self {
+            inner: self.inner.wait_for_completion(wait_for_completion),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::security_create_role_mappings::CreateRoleMappingsResponse`](crate::types::security_create_role_mappings::CreateRoleMappingsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::security_create_role_mappings::CreateRoleMappingsResponse, Error>
+    {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::security_create_role_mappings::CreateRoleMappingsResponse",
                 &[],
             )
             .await
@@ -35453,28 +36851,28 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityAuthtoken::new(self.transport()),
         }
     }
-    #[doc = "[Security Change Password API](https://opensearch.org/docs/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
+    #[doc = "[Security Change Password API](https://docs.opensearch.org/latest/security/access-control/api/#change-password)\n\nChanges the password for the current user."]
     #[allow(deprecated)]
     pub fn change_password<'b>(&'a self) -> TypedSecurityChangePassword<'a, 'b, ()> {
         TypedSecurityChangePassword {
             inner: crate::security::SecurityChangePassword::new(self.transport()),
         }
     }
-    #[doc = "[Security Config Upgrade Check API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
+    #[doc = "[Security Config Upgrade Check API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade-check)\n\nChecks whether or not an upgrade can be performed and which security resources can be updated."]
     #[allow(deprecated)]
     pub fn config_upgrade_check<'b>(&'a self) -> TypedSecurityConfigUpgradeCheck<'a, 'b> {
         TypedSecurityConfigUpgradeCheck {
             inner: crate::security::SecurityConfigUpgradeCheck::new(self.transport()),
         }
     }
-    #[doc = "[Security Config Upgrade Perform API](https://opensearch.org/docs/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
+    #[doc = "[Security Config Upgrade Perform API](https://docs.opensearch.org/latest/security/access-control/api/#configuration-upgrade)\n\nAssists the cluster operator with upgrading missing default values and stale default definitions."]
     #[allow(deprecated)]
     pub fn config_upgrade_perform<'b>(&'a self) -> TypedSecurityConfigUpgradePerform<'a, 'b, ()> {
         TypedSecurityConfigUpgradePerform {
             inner: crate::security::SecurityConfigUpgradePerform::new(self.transport()),
         }
     }
-    #[doc = "[Security Create Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
+    #[doc = "[Security Create Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#create-action-group)\n\nCreates or replaces the specified action group."]
     #[allow(deprecated)]
     pub fn create_action_group<'b>(
         &'a self,
@@ -35484,14 +36882,21 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateActionGroup::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Create Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
+    #[doc = "[Security Create Action Groups API](https://docs.opensearch.org/latest/security/api/action-groups/create-action-group/)\n\nCreates or replaces multiple action groups. Action groups omitted from the request are unchanged. All entries are validated before any changes are written."]
+    #[allow(deprecated)]
+    pub fn create_action_groups<'b>(&'a self) -> TypedSecurityCreateActionGroups<'a, 'b, ()> {
+        TypedSecurityCreateActionGroups {
+            inner: crate::security::SecurityCreateActionGroups::new(self.transport()),
+        }
+    }
+    #[doc = "[Security Create Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nCreates or replaces APIs permitted for users on the allow list. Requires a super admin certificate or REST API permissions."]
     #[allow(deprecated)]
     pub fn create_allowlist<'b>(&'a self) -> TypedSecurityCreateAllowlist<'a, 'b, ()> {
         TypedSecurityCreateAllowlist {
             inner: crate::security::SecurityCreateAllowlist::new(self.transport()),
         }
     }
-    #[doc = "[Security Create Role API](https://opensearch.org/docs/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
+    #[doc = "[Security Create Role API](https://docs.opensearch.org/latest/security/access-control/api/#create-role)\n\nCreates or replaces the specified role."]
     #[allow(deprecated)]
     pub fn create_role<'b>(
         &'a self,
@@ -35501,7 +36906,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateRole::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Create Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
+    #[doc = "[Security Create Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#create-role-mapping)\n\nCreates or replaces the specified role mapping."]
     #[allow(deprecated)]
     pub fn create_role_mapping<'b>(
         &'a self,
@@ -35511,7 +36916,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateRoleMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Create Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
+    #[doc = "[Security Create Role Mappings API](https://docs.opensearch.org/latest/security/api/role-mappings/create-role-mapping/)\n\nCreates or replaces multiple role mappings. Role mappings omitted from the request are unchanged. Every named role must exist, and all entries are validated before any changes are written."]
+    #[allow(deprecated)]
+    pub fn create_role_mappings<'b>(&'a self) -> TypedSecurityCreateRoleMappings<'a, 'b, ()> {
+        TypedSecurityCreateRoleMappings {
+            inner: crate::security::SecurityCreateRoleMappings::new(self.transport()),
+        }
+    }
+    #[doc = "[Security Create Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#create-tenant)\n\nCreates or replaces the specified tenant."]
     #[allow(deprecated)]
     pub fn create_tenant<'b>(
         &'a self,
@@ -35521,7 +36933,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateTenant::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Create Update Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Create Update Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nCreates or replaces the multi-tenancy configuration. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn create_update_tenancy_config<'b>(
         &'a self,
@@ -35530,7 +36942,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateUpdateTenancyConfig::new(self.transport()),
         }
     }
-    #[doc = "[Security Create User API](https://opensearch.org/docs/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
+    #[doc = "[Security Create User API](https://docs.opensearch.org/latest/security/access-control/api/#create-user)\n\nCreates or replaces the specified user."]
     #[allow(deprecated)]
     pub fn create_user<'b>(
         &'a self,
@@ -35550,7 +36962,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityCreateUserLegacy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
+    #[doc = "[Security Delete Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified action group."]
     #[allow(deprecated)]
     pub fn delete_action_group<'b>(
         &'a self,
@@ -35560,7 +36972,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteActionGroup::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
+    #[doc = "[Security Delete Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#delete-distinguished-names)\n\nDeletes all distinguished names in the specified cluster or node allowlist. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn delete_distinguished_name<'b>(
         &'a self,
@@ -35570,7 +36982,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteDistinguishedName::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete Role API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
+    #[doc = "[Security Delete Role API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role)\n\nDeletes the specified role."]
     #[allow(deprecated)]
     pub fn delete_role<'b>(
         &'a self,
@@ -35580,7 +36992,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteRole::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
+    #[doc = "[Security Delete Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#delete-role-mapping)\n\nDeletes the specified role mapping."]
     #[allow(deprecated)]
     pub fn delete_role_mapping<'b>(
         &'a self,
@@ -35590,7 +37002,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteRoleMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
+    #[doc = "[Security Delete Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#delete-action-group)\n\nDeletes the specified tenant."]
     #[allow(deprecated)]
     pub fn delete_tenant<'b>(
         &'a self,
@@ -35600,7 +37012,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteTenant::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Delete User API](https://opensearch.org/docs/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
+    #[doc = "[Security Delete User API](https://docs.opensearch.org/latest/security/access-control/api/#delete-user)\n\nDeletes the specified internal user."]
     #[allow(deprecated)]
     pub fn delete_user<'b>(
         &'a self,
@@ -35620,14 +37032,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityDeleteUserLegacy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Flush Cache API](https://opensearch.org/docs/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
+    #[doc = "[Security Flush Cache API](https://docs.opensearch.org/latest/security/access-control/api/#flush-cache)\n\nFlushes the Security plugin's user, authentication, and authorization cache."]
     #[allow(deprecated)]
     pub fn flush_cache<'b>(&'a self) -> TypedSecurityFlushCache<'a, 'b> {
         TypedSecurityFlushCache {
             inner: crate::security::SecurityFlushCache::new(self.transport()),
         }
     }
-    #[doc = "[Security Generate Obo Token API](https://opensearch.org/docs/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
+    #[doc = "[Security Generate Obo Token API](https://docs.opensearch.org/latest/security/access-control/authentication-tokens/#api-endpoint)\n\nGenerates a `On-Behalf-Of` token for the current user."]
     #[allow(deprecated)]
     pub fn generate_obo_token<'b>(&'a self) -> TypedSecurityGenerateOboToken<'a, 'b, ()> {
         TypedSecurityGenerateOboToken {
@@ -35644,14 +37056,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGenerateUserToken::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Account Details API](https://opensearch.org/docs/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
+    #[doc = "[Security Get Account Details API](https://docs.opensearch.org/latest/security/access-control/api/#get-account-details)\n\nReturns account information for the current user."]
     #[allow(deprecated)]
     pub fn get_account_details<'b>(&'a self) -> TypedSecurityGetAccountDetails<'a, 'b> {
         TypedSecurityGetAccountDetails {
             inner: crate::security::SecurityGetAccountDetails::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
+    #[doc = "[Security Get Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-group)\n\nRetrieves one action group."]
     #[allow(deprecated)]
     pub fn get_action_group<'b>(
         &'a self,
@@ -35661,7 +37073,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetActionGroup::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
+    #[doc = "[Security Get Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#get-action-groups)\n\nRetrieves all action groups."]
     #[allow(deprecated)]
     pub fn get_action_groups<'b>(&'a self) -> TypedSecurityGetActionGroups<'a, 'b> {
         TypedSecurityGetActionGroups {
@@ -35675,28 +37087,28 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetAllCertificates::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
+    #[doc = "[Security Get Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nRetrieves the current list of allowed APIs accessible to a normal user."]
     #[allow(deprecated)]
     pub fn get_allowlist<'b>(&'a self) -> TypedSecurityGetAllowlist<'a, 'b> {
         TypedSecurityGetAllowlist {
             inner: crate::security::SecurityGetAllowlist::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
+    #[doc = "[Security Get Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nRetrieves the audit configuration."]
     #[allow(deprecated)]
     pub fn get_audit_configuration<'b>(&'a self) -> TypedSecurityGetAuditConfiguration<'a, 'b> {
         TypedSecurityGetAuditConfiguration {
             inner: crate::security::SecurityGetAuditConfiguration::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
+    #[doc = "[Security Get Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#get-certificates)\n\nRetrieves the cluster security certificates."]
     #[allow(deprecated)]
     pub fn get_certificates<'b>(&'a self) -> TypedSecurityGetCertificates<'a, 'b> {
         TypedSecurityGetCertificates {
             inner: crate::security::SecurityGetCertificates::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
+    #[doc = "[Security Get Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#get-configuration)\n\nReturns the current Security plugin configuration in a JSON format."]
     #[allow(deprecated)]
     pub fn get_configuration<'b>(&'a self) -> TypedSecurityGetConfiguration<'a, 'b> {
         TypedSecurityGetConfiguration {
@@ -35710,7 +37122,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetDashboardsInfo::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn get_distinguished_name<'b>(
         &'a self,
@@ -35720,7 +37132,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetDistinguishedName::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#get-distinguished-names)\n\nRetrieves all node distinguished names. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn get_distinguished_names<'b>(&'a self) -> TypedSecurityGetDistinguishedNames<'a, 'b> {
         TypedSecurityGetDistinguishedNames {
@@ -35744,7 +37156,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetPermissionsInfo::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Role API](https://opensearch.org/docs/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
+    #[doc = "[Security Get Role API](https://docs.opensearch.org/latest/security/access-control/api/#get-role)\n\nRetrieves one role."]
     #[allow(deprecated)]
     pub fn get_role<'b>(
         &'a self,
@@ -35754,7 +37166,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetRole::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
+    #[doc = "[Security Get Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mapping)\n\nRetrieves the specified role mapping."]
     #[allow(deprecated)]
     pub fn get_role_mapping<'b>(
         &'a self,
@@ -35764,14 +37176,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetRoleMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
+    #[doc = "[Security Get Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#get-role-mappings)\n\nRetrieves all role mappings."]
     #[allow(deprecated)]
     pub fn get_role_mappings<'b>(&'a self) -> TypedSecurityGetRoleMappings<'a, 'b> {
         TypedSecurityGetRoleMappings {
             inner: crate::security::SecurityGetRoleMappings::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Roles API](https://opensearch.org/docs/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
+    #[doc = "[Security Get Roles API](https://docs.opensearch.org/latest/security/access-control/api/#get-roles)\n\nRetrieves all roles."]
     #[allow(deprecated)]
     pub fn get_roles<'b>(&'a self) -> TypedSecurityGetRoles<'a, 'b> {
         TypedSecurityGetRoles {
@@ -35785,14 +37197,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetSslinfo::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Tenancy Config API](https://opensearch.org/docs/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Get Tenancy Config API](https://docs.opensearch.org/latest/security/multi-tenancy/dynamic-config/#configuring-multi-tenancy-with-the-rest-api)\n\nRetrieves the multi-tenancy configuration. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn get_tenancy_config<'b>(&'a self) -> TypedSecurityGetTenancyConfig<'a, 'b> {
         TypedSecurityGetTenancyConfig {
             inner: crate::security::SecurityGetTenancyConfig::new(self.transport()),
         }
     }
-    #[doc = "[Security Get Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
+    #[doc = "[Security Get Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenant)\n\nRetrieves the specified tenant."]
     #[allow(deprecated)]
     pub fn get_tenant<'b>(
         &'a self,
@@ -35802,14 +37214,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetTenant::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
+    #[doc = "[Security Get Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#get-tenants)\n\nRetrieves all tenants."]
     #[allow(deprecated)]
     pub fn get_tenants<'b>(&'a self) -> TypedSecurityGetTenants<'a, 'b> {
         TypedSecurityGetTenants {
             inner: crate::security::SecurityGetTenants::new(self.transport()),
         }
     }
-    #[doc = "[Security Get User API](https://opensearch.org/docs/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
+    #[doc = "[Security Get User API](https://docs.opensearch.org/latest/security/access-control/api/#get-user)\n\nRetrieve information about the specified internal user."]
     #[allow(deprecated)]
     pub fn get_user<'b>(
         &'a self,
@@ -35829,7 +37241,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetUserLegacy::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Get Users API](https://opensearch.org/docs/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
+    #[doc = "[Security Get Users API](https://docs.opensearch.org/latest/security/access-control/api/#get-users)\n\nRetrieve all internal users."]
     #[allow(deprecated)]
     pub fn get_users<'b>(&'a self) -> TypedSecurityGetUsers<'a, 'b> {
         TypedSecurityGetUsers {
@@ -35843,7 +37255,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityGetUsersLegacy::new(self.transport()),
         }
     }
-    #[doc = "[Security Health API](https://opensearch.org/docs/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
+    #[doc = "[Security Health API](https://docs.opensearch.org/latest/security/access-control/api/#health-check)\n\nChecks to see if the Security plugin is running."]
     #[allow(deprecated)]
     pub fn health<'b>(&'a self) -> TypedSecurityHealth<'a, 'b, ()> {
         TypedSecurityHealth {
@@ -35857,7 +37269,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityMigrate::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Action Group API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
+    #[doc = "[Security Patch Action Group API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-group)\n\nUpdates the individual attributes of an action group."]
     #[allow(deprecated)]
     pub fn patch_action_group<'b>(
         &'a self,
@@ -35867,21 +37279,21 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchActionGroup::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Action Groups API](https://opensearch.org/docs/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
+    #[doc = "[Security Patch Action Groups API](https://docs.opensearch.org/latest/security/access-control/api/#patch-action-groups)\n\nCreates, updates, or deletes multiple action groups in a single request."]
     #[allow(deprecated)]
     pub fn patch_action_groups<'b>(&'a self) -> TypedSecurityPatchActionGroups<'a, 'b, ()> {
         TypedSecurityPatchActionGroups {
             inner: crate::security::SecurityPatchActionGroups::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Allowlist API](https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
+    #[doc = "[Security Patch Allowlist API](https://docs.opensearch.org/latest/security/access-control/api/#access-control-for-the-api)\n\nUpdates the current list of APIs accessible for users on the allow list."]
     #[allow(deprecated)]
     pub fn patch_allowlist<'b>(&'a self) -> TypedSecurityPatchAllowlist<'a, 'b, ()> {
         TypedSecurityPatchAllowlist {
             inner: crate::security::SecurityPatchAllowlist::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
+    #[doc = "[Security Patch Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the specified fields in the audit configuration."]
     #[allow(deprecated)]
     pub fn patch_audit_configuration<'b>(
         &'a self,
@@ -35890,7 +37302,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchAuditConfiguration::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
+    #[doc = "[Security Patch Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#patch-configuration)\n\nUpdates the existing security configuration using the REST API. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn patch_configuration<'b>(&'a self) -> TypedSecurityPatchConfiguration<'a, 'b, ()> {
         TypedSecurityPatchConfiguration {
@@ -35907,7 +37319,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchDistinguishedName::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Distinguished Names API](https://opensearch.org/docs/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
+    #[doc = "[Security Patch Distinguished Names API](https://docs.opensearch.org/latest/security/access-control/api/#update-all-distinguished-names)\n\nBulk updates specified node distinguished names. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn patch_distinguished_names<'b>(
         &'a self,
@@ -35916,7 +37328,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchDistinguishedNames::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Role API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
+    #[doc = "[Security Patch Role API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role)\n\nUpdates the individual attributes of a role."]
     #[allow(deprecated)]
     pub fn patch_role<'b>(
         &'a self,
@@ -35926,7 +37338,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchRole::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Role Mapping API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
+    #[doc = "[Security Patch Role Mapping API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mapping)\n\nUpdates the individual attributes of a role mapping."]
     #[allow(deprecated)]
     pub fn patch_role_mapping<'b>(
         &'a self,
@@ -35936,21 +37348,21 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchRoleMapping::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Role Mappings API](https://opensearch.org/docs/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
+    #[doc = "[Security Patch Role Mappings API](https://docs.opensearch.org/latest/security/access-control/api/#patch-role-mappings)\n\nCreates or updates multiple role mappings in a single request."]
     #[allow(deprecated)]
     pub fn patch_role_mappings<'b>(&'a self) -> TypedSecurityPatchRoleMappings<'a, 'b, ()> {
         TypedSecurityPatchRoleMappings {
             inner: crate::security::SecurityPatchRoleMappings::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Roles API](https://opensearch.org/docs/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
+    #[doc = "[Security Patch Roles API](https://docs.opensearch.org/latest/security/access-control/api/#patch-roles)\n\nCreates, updates, or deletes multiple roles in a single call."]
     #[allow(deprecated)]
     pub fn patch_roles<'b>(&'a self) -> TypedSecurityPatchRoles<'a, 'b, ()> {
         TypedSecurityPatchRoles {
             inner: crate::security::SecurityPatchRoles::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch Tenant API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
+    #[doc = "[Security Patch Tenant API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenant)\n\nAdds, deletes, or modifies a single tenant."]
     #[allow(deprecated)]
     pub fn patch_tenant<'b>(
         &'a self,
@@ -35960,14 +37372,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchTenant::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Tenants API](https://opensearch.org/docs/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
+    #[doc = "[Security Patch Tenants API](https://docs.opensearch.org/latest/security/access-control/api/#patch-tenants)\n\nAdds, deletes, or modifies multiple tenants in a single request."]
     #[allow(deprecated)]
     pub fn patch_tenants<'b>(&'a self) -> TypedSecurityPatchTenants<'a, 'b, ()> {
         TypedSecurityPatchTenants {
             inner: crate::security::SecurityPatchTenants::new(self.transport()),
         }
     }
-    #[doc = "[Security Patch User API](https://opensearch.org/docs/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
+    #[doc = "[Security Patch User API](https://docs.opensearch.org/latest/security/access-control/api/#patch-user)\n\nUpdates individual attributes for an internal user."]
     #[allow(deprecated)]
     pub fn patch_user<'b>(
         &'a self,
@@ -35977,7 +37389,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPatchUser::new(self.transport(), parts),
         }
     }
-    #[doc = "[Security Patch Users API](https://opensearch.org/docs/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
+    #[doc = "[Security Patch Users API](https://docs.opensearch.org/latest/security/access-control/api/#patch-users)\n\nCreates, updates, or deletes multiple internal users in a single request."]
     #[allow(deprecated)]
     pub fn patch_users<'b>(&'a self) -> TypedSecurityPatchUsers<'a, 'b, ()> {
         TypedSecurityPatchUsers {
@@ -35991,7 +37403,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityPostDashboardsInfo::new(self.transport()),
         }
     }
-    #[doc = "[Security Reload Http Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
+    #[doc = "[Security Reload Http Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-http-certificates)\n\nReloads the HTTP communication certificates."]
     #[allow(deprecated)]
     pub fn reload_http_certificates<'b>(
         &'a self,
@@ -36000,7 +37412,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityReloadHttpCertificates::new(self.transport()),
         }
     }
-    #[doc = "[Security Reload Transport Certificates API](https://opensearch.org/docs/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
+    #[doc = "[Security Reload Transport Certificates API](https://docs.opensearch.org/latest/security/access-control/api/#reload-transport-certificates)\n\nReloads the transport communication certificates."]
     #[allow(deprecated)]
     pub fn reload_transport_certificates<'b>(
         &'a self,
@@ -36016,7 +37428,7 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityTenantInfo::new(self.transport()),
         }
     }
-    #[doc = "[Security Update Audit Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
+    #[doc = "[Security Update Audit Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#audit-logs)\n\nUpdates the audit configuration."]
     #[allow(deprecated)]
     pub fn update_audit_configuration<'b>(
         &'a self,
@@ -36025,14 +37437,14 @@ impl<'a> TypedSecurity<'a> {
             inner: crate::security::SecurityUpdateAuditConfiguration::new(self.transport()),
         }
     }
-    #[doc = "[Security Update Configuration API](https://opensearch.org/docs/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
+    #[doc = "[Security Update Configuration API](https://docs.opensearch.org/latest/security/access-control/api/#update-configuration)\n\nUpdates the settings for an existing security configuration. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn update_configuration<'b>(&'a self) -> TypedSecurityUpdateConfiguration<'a, 'b, ()> {
         TypedSecurityUpdateConfiguration {
             inner: crate::security::SecurityUpdateConfiguration::new(self.transport()),
         }
     }
-    #[doc = "[Security Update Distinguished Name API](https://opensearch.org/docs/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
+    #[doc = "[Security Update Distinguished Name API](https://docs.opensearch.org/latest/security/access-control/api/#update-distinguished-names)\n\nAdds or updates the specified distinguished names in the cluster or node allowlist. Requires super admin or REST API permissions."]
     #[allow(deprecated)]
     pub fn update_distinguished_name<'b>(
         &'a self,
@@ -36420,21 +37832,21 @@ impl<'a> TypedSecurityAnalytics<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Security Analytics Get Alerts API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
+    #[doc = "[Security Analytics Get Alerts API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
     #[allow(deprecated)]
     pub fn get_alerts<'b>(&'a self) -> TypedSecurityAnalyticsGetAlerts<'a, 'b> {
         TypedSecurityAnalyticsGetAlerts {
             inner: crate::security_analytics::SecurityAnalyticsGetAlerts::new(self.transport()),
         }
     }
-    #[doc = "[Security Analytics Get Findings API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
+    #[doc = "[Security Analytics Get Findings API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
     #[allow(deprecated)]
     pub fn get_findings<'b>(&'a self) -> TypedSecurityAnalyticsGetFindings<'a, 'b> {
         TypedSecurityAnalyticsGetFindings {
             inner: crate::security_analytics::SecurityAnalyticsGetFindings::new(self.transport()),
         }
     }
-    #[doc = "[Security Analytics Search Finding Correlations API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
+    #[doc = "[Security Analytics Search Finding Correlations API](https://docs.opensearch.org/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
     #[allow(deprecated)]
     pub fn search_finding_correlations<'b>(
         &'a self,
@@ -37086,7 +38498,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37175,7 +38587,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37253,7 +38665,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37337,7 +38749,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37420,7 +38832,7 @@ pub struct TypedSnapshotDelete<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedSnapshotDelete<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37486,7 +38898,7 @@ pub struct TypedSnapshotDeleteRepository<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedSnapshotDeleteRepository<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37563,7 +38975,7 @@ pub struct TypedSnapshotGet<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedSnapshotGet<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37641,7 +39053,7 @@ pub struct TypedSnapshotGetRepository<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedSnapshotGetRepository<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37727,7 +39139,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37799,7 +39211,7 @@ pub struct TypedSnapshotStatus<'a, 'b> {
 }
 #[allow(deprecated)]
 impl<'a, 'b> TypedSnapshotStatus<'a, 'b> {
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37883,7 +39295,7 @@ where
             inner: self.inner.body(body),
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(self, cluster_manager_timeout: &'b str) -> Self {
         Self {
             inner: self.inner.cluster_manager_timeout(cluster_manager_timeout),
@@ -37962,7 +39374,7 @@ impl<'a> TypedSnapshot<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Snapshot Cleanup Repository API](https://opensearch.org/docs/latest)\n\nRemoves any stale data from a snapshot repository."]
+    #[doc = "[Snapshot Cleanup Repository API](https://docs.opensearch.org/latest/)\n\nRemoves any stale data from a snapshot repository."]
     #[allow(deprecated)]
     pub fn cleanup_repository<'b>(
         &'a self,
@@ -37972,7 +39384,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotCleanupRepository::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Clone API](https://opensearch.org/docs/latest)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
+    #[doc = "[Snapshot Clone API](https://docs.opensearch.org/latest/)\n\nCreates a clone of all or part of a snapshot in the same repository as the original snapshot."]
     #[allow(deprecated)]
     pub fn clone<'b>(
         &'a self,
@@ -37982,7 +39394,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotClone::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Create API](https://opensearch.org/docs/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
+    #[doc = "[Snapshot Create API](https://docs.opensearch.org/latest/api-reference/snapshots/create-snapshot/)\n\nCreates a snapshot within an existing repository."]
     #[allow(deprecated)]
     pub fn create<'b>(
         &'a self,
@@ -37992,7 +39404,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotCreate::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Create Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
+    #[doc = "[Snapshot Create Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/create-repository/)\n\nCreates a snapshot repository."]
     #[allow(deprecated)]
     pub fn create_repository<'b>(
         &'a self,
@@ -38002,7 +39414,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotCreateRepository::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Delete API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
+    #[doc = "[Snapshot Delete API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot/)\n\nDeletes a snapshot."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -38012,7 +39424,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotDelete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Delete Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
+    #[doc = "[Snapshot Delete Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/delete-snapshot-repository/)\n\nDeletes a snapshot repository."]
     #[allow(deprecated)]
     pub fn delete_repository<'b>(
         &'a self,
@@ -38022,7 +39434,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotDeleteRepository::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Get API](https://opensearch.org/docs/latest)\n\nReturns information about a snapshot."]
+    #[doc = "[Snapshot Get API](https://docs.opensearch.org/latest/)\n\nReturns information about a snapshot."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -38032,7 +39444,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Get Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
+    #[doc = "[Snapshot Get Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-repository/)\n\nReturns information about a snapshot repository."]
     #[allow(deprecated)]
     pub fn get_repository<'b>(
         &'a self,
@@ -38042,7 +39454,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotGetRepository::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Restore API](https://opensearch.org/docs/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
+    #[doc = "[Snapshot Restore API](https://docs.opensearch.org/latest/api-reference/snapshots/restore-snapshot/)\n\nRestores a snapshot."]
     #[allow(deprecated)]
     pub fn restore<'b>(
         &'a self,
@@ -38052,7 +39464,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotRestore::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Status API](https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
+    #[doc = "[Snapshot Status API](https://docs.opensearch.org/latest/api-reference/snapshots/get-snapshot-status/)\n\nReturns information about the status of a snapshot."]
     #[allow(deprecated)]
     pub fn status<'b>(
         &'a self,
@@ -38062,7 +39474,7 @@ impl<'a> TypedSnapshot<'a> {
             inner: crate::snapshot::SnapshotStatus::new(self.transport(), parts),
         }
     }
-    #[doc = "[Snapshot Verify Repository API](https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
+    #[doc = "[Snapshot Verify Repository API](https://docs.opensearch.org/latest/api-reference/snapshots/verify-snapshot-repository/)\n\nVerifies a repository."]
     #[allow(deprecated)]
     pub fn verify_repository<'b>(
         &'a self,
@@ -38108,7 +39520,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -38185,7 +39597,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -38262,7 +39674,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -38339,7 +39751,7 @@ where
         }
     }
     #[doc = "Specifies the response format (JSON or YAML)."]
-    pub fn format(self, format: &'b str) -> Self {
+    pub fn format(self, format: PplResponseFormat) -> Self {
         Self {
             inner: self.inner.format(format),
         }
@@ -38393,28 +39805,28 @@ impl<'a> TypedSql<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Sql Close API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
+    #[doc = "[Sql Close API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nCloses an open cursor to free server-side resources."]
     #[allow(deprecated)]
     pub fn close<'b>(&'a self) -> TypedSqlClose<'a, 'b, ()> {
         TypedSqlClose {
             inner: crate::sql::SqlClose::new(self.transport()),
         }
     }
-    #[doc = "[Sql Explain API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
+    #[doc = "[Sql Explain API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nReturns the execution plan for a SQL or PPL query."]
     #[allow(deprecated)]
     pub fn explain<'b>(&'a self) -> TypedSqlExplain<'a, 'b, ()> {
         TypedSqlExplain {
             inner: crate::sql::SqlExplain::new(self.transport()),
         }
     }
-    #[doc = "[Sql Query API](https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
+    #[doc = "[Sql Query API](https://docs.opensearch.org/latest/search-plugins/sql/sql-ppl-api/)\n\nExecutes SQL or PPL queries against OpenSearch indexes."]
     #[allow(deprecated)]
     pub fn query<'b>(&'a self) -> TypedSqlQuery<'a, 'b, ()> {
         TypedSqlQuery {
             inner: crate::sql::SqlQuery::new(self.transport()),
         }
     }
-    #[doc = "[Sql Settings API](https://opensearch.org/docs/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
+    #[doc = "[Sql Settings API](https://docs.opensearch.org/latest/search-plugins/sql/settings/)\n\nUpdates SQL plugin settings in the OpenSearch cluster configuration."]
     #[allow(deprecated)]
     pub fn settings<'b>(&'a self) -> TypedSqlSettings<'a, 'b, ()> {
         TypedSqlSettings {
@@ -38516,6 +39928,59 @@ where
             .send()
             .await?
             .typed("types::tasks_cancel::CancelResponse", &[])
+            .await
+    }
+}
+#[doc = "Typed builder for the Tasks Delete API: [`send`](Self::send) returns [`types::tasks_delete::DeleteResponse`](crate::types::tasks_delete::DeleteResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`TasksDelete`](crate::tasks::TasksDelete) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedTasksDelete<'a, 'b> {
+    inner: crate::tasks::TasksDelete<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedTasksDelete<'a, 'b> {
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::tasks_delete::DeleteResponse`](crate::types::tasks_delete::DeleteResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(self) -> Result<crate::types::tasks_delete::DeleteResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed("types::tasks_delete::DeleteResponse", &[])
             .await
     }
 }
@@ -38689,7 +40154,7 @@ impl<'a> TypedTasks<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Tasks Cancel API](https://opensearch.org/docs/latest/api-reference/tasks/#task-canceling)\n\nCancels a task, if it can be cancelled through an API."]
+    #[doc = "[Tasks Cancel API](https://docs.opensearch.org/latest/api-reference/tasks/cancel-tasks/)\n\nCancels a task, if it can be cancelled through an API."]
     #[allow(deprecated)]
     pub fn cancel<'b>(
         &'a self,
@@ -38699,14 +40164,24 @@ impl<'a> TypedTasks<'a> {
             inner: crate::tasks::TasksCancel::new(self.transport(), parts),
         }
     }
-    #[doc = "[Tasks Get API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns information about a task."]
+    #[doc = "[Tasks Delete API](https://docs.opensearch.org/latest/api-reference/tasks/delete-task/)\n\nDeletes a stored completed task result."]
+    #[allow(deprecated)]
+    pub fn delete<'b>(
+        &'a self,
+        parts: crate::tasks::TasksDeleteParts<'b>,
+    ) -> TypedTasksDelete<'a, 'b> {
+        TypedTasksDelete {
+            inner: crate::tasks::TasksDelete::new(self.transport(), parts),
+        }
+    }
+    #[doc = "[Tasks Get API](https://docs.opensearch.org/latest/api-reference/tasks/)\n\nReturns information about a task."]
     #[allow(deprecated)]
     pub fn get<'b>(&'a self, parts: crate::tasks::TasksGetParts<'b>) -> TypedTasksGet<'a, 'b> {
         TypedTasksGet {
             inner: crate::tasks::TasksGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Tasks List API](https://opensearch.org/docs/latest/api-reference/tasks/)\n\nReturns a list of tasks."]
+    #[doc = "[Tasks List API](https://docs.opensearch.org/latest/api-reference/tasks/)\n\nReturns a list of tasks."]
     #[allow(deprecated)]
     pub fn list<'b>(&'a self) -> TypedTasksList<'a, 'b> {
         TypedTasksList {
@@ -39246,7 +40721,7 @@ impl<'a> TypedTransforms<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Transforms Delete API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
+    #[doc = "[Transforms Delete API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job)\n\nDelete an index transform."]
     #[allow(deprecated)]
     pub fn delete<'b>(
         &'a self,
@@ -39256,7 +40731,7 @@ impl<'a> TypedTransforms<'a> {
             inner: crate::transforms::TransformsDelete::new(self.transport(), parts),
         }
     }
-    #[doc = "[Transforms Explain API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
+    #[doc = "[Transforms Explain API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job)\n\nReturns the status and metadata of a transform job."]
     #[allow(deprecated)]
     pub fn explain<'b>(
         &'a self,
@@ -39266,7 +40741,7 @@ impl<'a> TypedTransforms<'a> {
             inner: crate::transforms::TransformsExplain::new(self.transport(), parts),
         }
     }
-    #[doc = "[Transforms Get API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
+    #[doc = "[Transforms Get API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the status and metadata of a transform job."]
     #[allow(deprecated)]
     pub fn get<'b>(
         &'a self,
@@ -39276,14 +40751,14 @@ impl<'a> TypedTransforms<'a> {
             inner: crate::transforms::TransformsGet::new(self.transport(), parts),
         }
     }
-    #[doc = "[Transforms Preview API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
+    #[doc = "[Transforms Preview API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results)\n\nReturns a preview of what a transformed index would look like."]
     #[allow(deprecated)]
     pub fn preview<'b>(&'a self) -> TypedTransformsPreview<'a, 'b, ()> {
         TypedTransformsPreview {
             inner: crate::transforms::TransformsPreview::new(self.transport()),
         }
     }
-    #[doc = "[Transforms Put API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
+    #[doc = "[Transforms Put API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job)\n\nCreate an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided."]
     #[allow(deprecated)]
     pub fn put<'b>(
         &'a self,
@@ -39293,14 +40768,14 @@ impl<'a> TypedTransforms<'a> {
             inner: crate::transforms::TransformsPut::new(self.transport(), parts),
         }
     }
-    #[doc = "[Transforms Search API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
+    #[doc = "[Transforms Search API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details)\n\nReturns the details of all transform jobs."]
     #[allow(deprecated)]
     pub fn search<'b>(&'a self) -> TypedTransformsSearch<'a, 'b> {
         TypedTransformsSearch {
             inner: crate::transforms::TransformsSearch::new(self.transport()),
         }
     }
-    #[doc = "[Transforms Start API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
+    #[doc = "[Transforms Start API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job)\n\nStart transform."]
     #[allow(deprecated)]
     pub fn start<'b>(
         &'a self,
@@ -39310,7 +40785,7 @@ impl<'a> TypedTransforms<'a> {
             inner: crate::transforms::TransformsStart::new(self.transport(), parts),
         }
     }
-    #[doc = "[Transforms Stop API](https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
+    #[doc = "[Transforms Stop API](https://docs.opensearch.org/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job)\n\nStop transform."]
     #[allow(deprecated)]
     pub fn stop<'b>(
         &'a self,
@@ -39399,6 +40874,76 @@ where
             .await
     }
 }
+#[doc = "Typed builder for the Wlm Create Workload Group API: [`send`](Self::send) returns [`types::wlm_create_workload_group::CreateWorkloadGroupResponse`](crate::types::wlm_create_workload_group::CreateWorkloadGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmCreateWorkloadGroup`](crate::wlm::WlmCreateWorkloadGroup) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedWlmCreateWorkloadGroup<'a, 'b, B> {
+    inner: crate::wlm::WlmCreateWorkloadGroup<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedWlmCreateWorkloadGroup<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedWlmCreateWorkloadGroup<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedWlmCreateWorkloadGroup {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::wlm_create_workload_group::CreateWorkloadGroupResponse`](crate::types::wlm_create_workload_group::CreateWorkloadGroupResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::wlm_create_workload_group::CreateWorkloadGroupResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::wlm_create_workload_group::CreateWorkloadGroupResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Wlm Delete Query Group API: [`send`](Self::send) returns [`types::wlm_delete_query_group::DeleteQueryGroupResponse`](crate::types::wlm_delete_query_group::DeleteQueryGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmDeleteQueryGroup`](crate::wlm::WlmDeleteQueryGroup) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -39457,6 +41002,64 @@ impl<'a, 'b> TypedWlmDeleteQueryGroup<'a, 'b> {
             .await
     }
 }
+#[doc = "Typed builder for the Wlm Delete Workload Group API: [`send`](Self::send) returns [`types::wlm_delete_workload_group::DeleteWorkloadGroupResponse`](crate::types::wlm_delete_workload_group::DeleteWorkloadGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmDeleteWorkloadGroup`](crate::wlm::WlmDeleteWorkloadGroup) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedWlmDeleteWorkloadGroup<'a, 'b> {
+    inner: crate::wlm::WlmDeleteWorkloadGroup<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedWlmDeleteWorkloadGroup<'a, 'b> {
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::wlm_delete_workload_group::DeleteWorkloadGroupResponse`](crate::types::wlm_delete_workload_group::DeleteWorkloadGroupResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::wlm_delete_workload_group::DeleteWorkloadGroupResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::wlm_delete_workload_group::DeleteWorkloadGroupResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed builder for the Wlm Get Query Group API: [`send`](Self::send) returns [`types::wlm_get_query_group::GetQueryGroupResponse`](crate::types::wlm_get_query_group::GetQueryGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmGetQueryGroup`](crate::wlm::WlmGetQueryGroup) builder for them."]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
@@ -39509,6 +41112,123 @@ impl<'a, 'b> TypedWlmGetQueryGroup<'a, 'b> {
             .send()
             .await?
             .typed("types::wlm_get_query_group::GetQueryGroupResponse", &[])
+            .await
+    }
+}
+#[doc = "Typed builder for the Wlm Get Workload Group API: [`send`](Self::send) returns [`types::wlm_get_workload_group::GetWorkloadGroupResponse`](crate::types::wlm_get_workload_group::GetWorkloadGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmGetWorkloadGroup`](crate::wlm::WlmGetWorkloadGroup) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedWlmGetWorkloadGroup<'a, 'b> {
+    inner: crate::wlm::WlmGetWorkloadGroup<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedWlmGetWorkloadGroup<'a, 'b> {
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::wlm_get_workload_group::GetWorkloadGroupResponse`](crate::types::wlm_get_workload_group::GetWorkloadGroupResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::wlm_get_workload_group::GetWorkloadGroupResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::wlm_get_workload_group::GetWorkloadGroupResponse",
+                &[],
+            )
+            .await
+    }
+}
+#[doc = "Typed builder for the Wlm Stats API: [`send`](Self::send) returns [`types::wlm_stats::StatsResponse`](crate::types::wlm_stats::StatsResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmStats`](crate::wlm::WlmStats) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedWlmStats<'a, 'b> {
+    inner: crate::wlm::WlmStats<'a, 'b>,
+}
+#[allow(deprecated)]
+impl<'a, 'b> TypedWlmStats<'a, 'b> {
+    #[doc = "When `true`, returns only workload groups that have breached their resource limits."]
+    pub fn breach(self, breach: bool) -> Self {
+        Self {
+            inner: self.inner.breach(breach),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::wlm_stats::StatsResponse`](crate::types::wlm_stats::StatsResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(self) -> Result<crate::types::wlm_stats::StatsResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed("types::wlm_stats::StatsResponse", &[])
             .await
     }
 }
@@ -39582,6 +41302,76 @@ where
             .await
     }
 }
+#[doc = "Typed builder for the Wlm Update Workload Group API: [`send`](Self::send) returns [`types::wlm_update_workload_group::UpdateWorkloadGroupResponse`](crate::types::wlm_update_workload_group::UpdateWorkloadGroupResponse).\n\nOptions that change the shape of the response are not available here: `filter_path`. Use the generic [`WlmUpdateWorkloadGroup`](crate::wlm::WlmUpdateWorkloadGroup) builder for them."]
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct TypedWlmUpdateWorkloadGroup<'a, 'b, B> {
+    inner: crate::wlm::WlmUpdateWorkloadGroup<'a, 'b, B>,
+}
+#[allow(deprecated)]
+impl<'a, 'b, B> TypedWlmUpdateWorkloadGroup<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> TypedWlmUpdateWorkloadGroup<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        TypedWlmUpdateWorkloadGroup {
+            inner: self.inner.body(body),
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(self, error_trace: bool) -> Self {
+        Self {
+            inner: self.inner.error_trace(error_trace),
+        }
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(self, key: HeaderName, value: HeaderValue) -> Self {
+        Self {
+            inner: self.inner.header(key, value),
+        }
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(self, human: bool) -> Self {
+        Self {
+            inner: self.inner.human(human),
+        }
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(self, pretty: bool) -> Self {
+        Self {
+            inner: self.inner.pretty(pretty),
+        }
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(self, timeout: Duration) -> Self {
+        Self {
+            inner: self.inner.request_timeout(timeout),
+        }
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(self, source: &'b str) -> Self {
+        Self {
+            inner: self.inner.source(source),
+        }
+    }
+    #[doc = "Sends the request and decodes the response body as [`types::wlm_update_workload_group::UpdateWorkloadGroupResponse`](crate::types::wlm_update_workload_group::UpdateWorkloadGroupResponse).\n\nThe body is decoded for a success status. Any other status is an error, whose details are available from [`Error::api_error`](crate::Error::api_error). To read the status code or the headers, use the generic client instead."]
+    pub async fn send(
+        self,
+    ) -> Result<crate::types::wlm_update_workload_group::UpdateWorkloadGroupResponse, Error> {
+        self.inner
+            .send()
+            .await?
+            .typed(
+                "types::wlm_update_workload_group::UpdateWorkloadGroupResponse",
+                &[],
+            )
+            .await
+    }
+}
 #[doc = "Typed namespace client for Wlm APIs: the APIs with a response type"]
 #[derive(Clone, Debug)]
 pub struct TypedWlm<'a> {
@@ -39599,6 +41389,13 @@ impl<'a> TypedWlm<'a> {
             inner: crate::wlm::WlmCreateQueryGroup::new(self.transport()),
         }
     }
+    #[doc = "Wlm Create Workload Group API\n\nCreates a new workload group and sets the resource limits for the new workload group."]
+    #[allow(deprecated)]
+    pub fn create_workload_group<'b>(&'a self) -> TypedWlmCreateWorkloadGroup<'a, 'b, ()> {
+        TypedWlmCreateWorkloadGroup {
+            inner: crate::wlm::WlmCreateWorkloadGroup::new(self.transport()),
+        }
+    }
     #[doc = "Wlm Delete Query Group API\n\nDeletes the specified query group."]
     #[allow(deprecated)]
     pub fn delete_query_group<'b>(
@@ -39607,6 +41404,16 @@ impl<'a> TypedWlm<'a> {
     ) -> TypedWlmDeleteQueryGroup<'a, 'b> {
         TypedWlmDeleteQueryGroup {
             inner: crate::wlm::WlmDeleteQueryGroup::new(self.transport(), parts),
+        }
+    }
+    #[doc = "Wlm Delete Workload Group API\n\nDeletes the specified workload group."]
+    #[allow(deprecated)]
+    pub fn delete_workload_group<'b>(
+        &'a self,
+        parts: crate::wlm::WlmDeleteWorkloadGroupParts<'b>,
+    ) -> TypedWlmDeleteWorkloadGroup<'a, 'b> {
+        TypedWlmDeleteWorkloadGroup {
+            inner: crate::wlm::WlmDeleteWorkloadGroup::new(self.transport(), parts),
         }
     }
     #[doc = "Wlm Get Query Group API\n\nRetrieves the specified query group. If no query group is specified, all query groups in the cluster are retrieved."]
@@ -39619,6 +41426,23 @@ impl<'a> TypedWlm<'a> {
             inner: crate::wlm::WlmGetQueryGroup::new(self.transport(), parts),
         }
     }
+    #[doc = "Wlm Get Workload Group API\n\nRetrieves the specified workload group. If no workload group is specified, all workload groups in the cluster are retrieved."]
+    #[allow(deprecated)]
+    pub fn get_workload_group<'b>(
+        &'a self,
+        parts: crate::wlm::WlmGetWorkloadGroupParts<'b>,
+    ) -> TypedWlmGetWorkloadGroup<'a, 'b> {
+        TypedWlmGetWorkloadGroup {
+            inner: crate::wlm::WlmGetWorkloadGroup::new(self.transport(), parts),
+        }
+    }
+    #[doc = "[Wlm Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/)\n\nRetrieves workload management statistics for workload groups on one or more nodes."]
+    #[allow(deprecated)]
+    pub fn stats<'b>(&'a self, parts: crate::wlm::WlmStatsParts<'b>) -> TypedWlmStats<'a, 'b> {
+        TypedWlmStats {
+            inner: crate::wlm::WlmStats::new(self.transport(), parts),
+        }
+    }
     #[doc = "Wlm Update Query Group API\n\nUpdates the specified query group."]
     #[allow(deprecated)]
     pub fn update_query_group<'b>(
@@ -39627,6 +41451,16 @@ impl<'a> TypedWlm<'a> {
     ) -> TypedWlmUpdateQueryGroup<'a, 'b, ()> {
         TypedWlmUpdateQueryGroup {
             inner: crate::wlm::WlmUpdateQueryGroup::new(self.transport(), parts),
+        }
+    }
+    #[doc = "Wlm Update Workload Group API\n\nUpdates the specified workload group."]
+    #[allow(deprecated)]
+    pub fn update_workload_group<'b>(
+        &'a self,
+        parts: crate::wlm::WlmUpdateWorkloadGroupParts<'b>,
+    ) -> TypedWlmUpdateWorkloadGroup<'a, 'b, ()> {
+        TypedWlmUpdateWorkloadGroup {
+            inner: crate::wlm::WlmUpdateWorkloadGroup::new(self.transport(), parts),
         }
     }
 }

@@ -94,7 +94,9 @@ pub struct AllocationStore {
     pub in_sync: bool,
     pub matching_size_in_bytes: crate::types::common::ByteCount,
     pub matching_sync_id: bool,
-    pub store_exception: String,
+    #[doc = "The exception raised when the node failed to open the shard's on-disk index."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub store_exception: Option<crate::types::common::ErrorCause>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -257,7 +259,14 @@ pub struct NodeDiskUsage {
     pub least_available: crate::types::cluster_allocation_explain::DiskUsage,
     pub most_available: crate::types::cluster_allocation_explain::DiskUsage,
     pub node_name: crate::types::common::Name,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub node_resource_usage_stats:
+        Option<crate::types::cluster_allocation_explain::NodeResourceUsageStats>,
 }
+
+#[doc = "Per-node resource usage statistics. Structure is version-dependent."]
+pub type NodeResourceUsageStats =
+    std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ReservedSize {

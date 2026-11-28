@@ -31,10 +31,7 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CreatePitResponse {
     #[serde(rename = "_shards")]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub shards: Option<crate::types::common::ShardStatistics>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub creation_time: Option<i64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<String>,
+    pub shards: crate::types::common::ShardStatistics,
+    pub creation_time: i64,
+    pub pit_id: crate::types::common::PitId,
 }

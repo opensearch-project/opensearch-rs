@@ -169,6 +169,38 @@ pub struct ShardsRecord {
     #[serde(rename = "merges.total_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub merges_total_time: Option<String>,
+    #[doc = "The number of currently ongoing merge warmer operations."]
+    #[serde(rename = "merges.warmer.ongoing_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_ongoing_count: Option<String>,
+    #[doc = "The total number of bytes received during merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_bytes_received")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_bytes_received: Option<String>,
+    #[doc = "The total number of bytes sent during merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_bytes_sent")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_bytes_sent: Option<String>,
+    #[doc = "The total number of failed merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_failure_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_failure_count: Option<String>,
+    #[doc = "The total number of merge warmer invocations."]
+    #[serde(rename = "merges.warmer.total_invocations")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_invocations: Option<String>,
+    #[doc = "The total time spent receiving data during merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_receive_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_receive_time: Option<String>,
+    #[doc = "The total time spent sending data during merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_send_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_send_time: Option<String>,
+    #[doc = "The total time spent on merge warmer operations."]
+    #[serde(rename = "merges.warmer.total_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_time: Option<String>,
     #[doc = "The name of node."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node: Option<String>,
@@ -256,6 +288,10 @@ pub struct ShardsRecord {
     #[serde(rename = "search.query_current")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_query_current: Option<String>,
+    #[doc = "The total number of failed query phase operations."]
+    #[serde(rename = "search.query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_query_failed: Option<String>,
     #[doc = "The time spent in query phase."]
     #[serde(rename = "search.query_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -279,6 +315,22 @@ pub struct ShardsRecord {
     #[serde(rename = "search.search_idle_reactivate_count_total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_search_idle_reactivate_count_total: Option<String>,
+    #[doc = "The number of currently running star-tree query operations."]
+    #[serde(rename = "search.startree_query_current")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_current: Option<String>,
+    #[doc = "The total number of failed star-tree query operations."]
+    #[serde(rename = "search.startree_query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_failed: Option<String>,
+    #[doc = "The time spent in star-tree queries."]
+    #[serde(rename = "search.startree_query_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_time: Option<String>,
+    #[doc = "The total number of star-tree query operations."]
+    #[serde(rename = "search.startree_query_total")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_total: Option<String>,
     #[doc = "The number of segments."]
     #[serde(rename = "segments.count")]
     #[serde(default, skip_serializing_if = "Option::is_none")]

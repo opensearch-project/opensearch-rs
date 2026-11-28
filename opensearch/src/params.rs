@@ -37,6 +37,20 @@ use serde::{de, de::Visitor, Deserializer, Serializer};
 // Generated code - do not edit until the next GENERATED-END marker
 
 use serde::{Deserialize, Serialize};
+#[doc = "A short version of the `Accept` header, such as `json` or `yaml`."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum CatResponseFormat {
+    #[serde(rename = "cbor")]
+    Cbor,
+    #[serde(rename = "json")]
+    Json,
+    #[serde(rename = "smile")]
+    Smile,
+    #[serde(rename = "text")]
+    Text,
+    #[serde(rename = "yaml")]
+    Yaml,
+}
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
 pub enum ClusterHealthLevel {
     #[serde(rename = "awareness_attributes")]
@@ -68,6 +82,30 @@ pub enum MetricType {
     #[serde(rename = "memory")]
     Memory,
 }
+#[doc = "Specifies the response format (JSON, YAML)."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum PplResponseFormat {
+    #[serde(rename = "cost")]
+    Cost,
+    #[serde(rename = "csv")]
+    Csv,
+    #[serde(rename = "extended")]
+    Extended,
+    #[serde(rename = "jdbc")]
+    Jdbc,
+    #[serde(rename = "json")]
+    Json,
+    #[serde(rename = "raw")]
+    Raw,
+    #[serde(rename = "simple")]
+    Simple,
+    #[serde(rename = "standard")]
+    Standard,
+    #[serde(rename = "viz")]
+    Viz,
+    #[serde(rename = "yaml")]
+    Yaml,
+}
 #[doc = "The type to sample."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
 pub enum SampleType {
@@ -77,6 +115,22 @@ pub enum SampleType {
     Cpu,
     #[serde(rename = "wait")]
     Wait,
+}
+#[doc = "The sort order of the managed indexes."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum SortOrder {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+#[doc = "The field used to sort results. Allowed values are `node_id` and `workload_group`. Defaults to `node_id`."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum WlmStatsSortBy {
+    #[serde(rename = "node_id")]
+    NodeId,
+    #[serde(rename = "workload_group")]
+    WorkloadGroup,
 }
 #[doc = "Used to filter by alert state. Optional."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
@@ -227,6 +281,14 @@ pub enum OpType {
     #[serde(rename = "index")]
     Index,
 }
+#[doc = "The sort direction of the page. Allowed values are `asc` and `desc`. Defaults to `asc`."]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
+pub enum Order {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
 #[doc = "If `true`, OpenSearch refreshes the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` do nothing with refreshes.\nValid values: `true`, `false`, `wait_for`."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
 pub enum Refresh {
@@ -256,22 +318,6 @@ pub enum Severity {
     Low,
     #[serde(rename = "medium")]
     Medium,
-}
-#[doc = "Defines order in which indexes will be displayed. Accepted values are `asc` and `desc`. If `desc`, most recently created indexes would be displayed first."]
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
-pub enum Sort {
-    #[serde(rename = "asc")]
-    Asc,
-    #[serde(rename = "desc")]
-    Desc,
-}
-#[doc = "The order used to sort the list of findings. Possible values are `asc` or `desc`. Optional."]
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]
-pub enum SortOrder {
-    #[serde(rename = "asc")]
-    Asc,
-    #[serde(rename = "desc")]
-    Desc,
 }
 #[doc = "A list of shard health statuses used to limit the request."]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone, Copy)]

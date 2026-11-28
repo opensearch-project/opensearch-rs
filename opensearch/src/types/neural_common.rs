@@ -64,6 +64,14 @@ pub struct FlatNeuralInfoStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_ingest_text_image_embedding_processors:
         Option<crate::types::neural_common::InfoCounterStat>,
+    #[serde(rename = "processors.search.agentic.agentic_context_processors")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_search_agentic_agentic_context_processors:
+        Option<crate::types::neural_common::InfoCounterStat>,
+    #[serde(rename = "processors.search.agentic.agentic_query_translator_processors")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_search_agentic_agentic_query_translator_processors:
+        Option<crate::types::neural_common::InfoCounterStat>,
     #[serde(rename = "processors.search.hybrid.comb_arithmetic_processors")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_search_hybrid_comb_arithmetic_processors:
@@ -120,6 +128,19 @@ pub struct FlatNeuralInfoStats {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FlatNeuralNodeStats {
+    #[serde(rename = "memory.sparse.clustered_posting_usage")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_sparse_clustered_posting_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(rename = "memory.sparse.forward_index_usage")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_sparse_forward_index_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(rename = "memory.sparse.sparse_memory_usage")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_sparse_sparse_memory_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(rename = "memory.sparse.sparse_memory_usage_percentage")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_sparse_sparse_memory_usage_percentage:
+        Option<crate::types::neural_common::MemoryStat>,
     #[serde(rename = "processors.ingest.semantic_field_chunking_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_ingest_semantic_field_chunking_executions:
@@ -135,6 +156,10 @@ pub struct FlatNeuralNodeStats {
     #[serde(rename = "processors.ingest.sparse_encoding_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_ingest_sparse_encoding_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "processors.ingest.sparse_encoding_seismic_executions")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_ingest_sparse_encoding_seismic_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(rename = "processors.ingest.text_chunking_delimiter_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -159,6 +184,14 @@ pub struct FlatNeuralNodeStats {
     #[serde(rename = "processors.ingest.text_image_embedding_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_ingest_text_image_embedding_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "processors.search.agentic.agentic_context_executions")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_search_agentic_agentic_context_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "processors.search.agentic.agentic_query_translator_executions")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_search_agentic_agentic_query_translator_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(rename = "processors.search.hybrid.comb_arithmetic_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -196,6 +229,10 @@ pub struct FlatNeuralNodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_search_hybrid_rank_based_normalization_processor_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "processors.search.mmr_neural_query_transformer_executions")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub processors_search_mmr_neural_query_transformer_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(rename = "processors.search.neural_query_enricher_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_search_neural_query_enricher_executions:
@@ -211,6 +248,10 @@ pub struct FlatNeuralNodeStats {
     #[serde(rename = "processors.search.rerank_ml_executions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors_search_rerank_ml_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "query.agentic.agentic_query_requests")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query_agentic_agentic_query_requests:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(rename = "query.hybrid.hybrid_query_requests")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -247,6 +288,14 @@ pub struct FlatNeuralNodeStats {
     #[serde(rename = "query.neural_sparse.neural_sparse_query_requests")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query_neural_sparse_neural_sparse_query_requests:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "query.neural_sparse.seismic_query_requests")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub query_neural_sparse_seismic_query_requests:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(rename = "semantic_highlighting.semantic_highlighting_batch_request_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub semantic_highlighting_semantic_highlighting_batch_request_count:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(rename = "semantic_highlighting.semantic_highlighting_request_count")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -351,38 +400,32 @@ impl<'de> serde::Deserialize<'de> for InfoCounterStatObjectStatType {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum InfoCounterStatObjectValue {
-    Integer(i64),
-    String(String),
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct InfoCounterStatObjectValue {
+    raw: Box<serde_json::value::RawValue>,
 }
-impl<'de> serde::Deserialize<'de> for InfoCounterStatObjectValue {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b'-') | Some(b'0'..=b'9') => {
-                serde_json::from_str(text).map(InfoCounterStatObjectValue::Integer)
-            }
-            Some(b'"') => serde_json::from_str(text).map(InfoCounterStatObjectValue::String),
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "InfoCounterStatObjectValue"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
+impl InfoCounterStatObjectValue {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `integer` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_integer(&self) -> std::result::Result<i64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "integer")
+    }
+    #[doc = "Parses the value as the `number` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_number(&self) -> std::result::Result<f64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "number")
+    }
+    #[doc = "Parses the value as the `string` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_string(&self) -> std::result::Result<String, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "string")
     }
 }
 
@@ -462,13 +505,42 @@ impl<'de> serde::Deserialize<'de> for InfoStringStatObjectStatType {
     }
 }
 
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct InfoStringStatObjectValue {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl InfoStringStatObjectValue {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `integer` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_integer(&self) -> std::result::Result<i64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "integer")
+    }
+    #[doc = "Parses the value as the `number` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_number(&self) -> std::result::Result<f64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "number")
+    }
+    #[doc = "Parses the value as the `string` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_string(&self) -> std::result::Result<String, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "string")
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
-pub enum InfoStringStatObjectValue {
-    Integer(i64),
-    String(String),
+pub enum MemoryStat {
+    Number(f64),
+    Object(crate::types::neural_common::MemoryStatObject),
 }
-impl<'de> serde::Deserialize<'de> for InfoStringStatObjectValue {
+impl<'de> serde::Deserialize<'de> for MemoryStat {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -479,21 +551,91 @@ impl<'de> serde::Deserialize<'de> for InfoStringStatObjectValue {
         let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
         let text = raw.get().trim_start();
         let parsed = match text.as_bytes().first() {
-            Some(b'-') | Some(b'0'..=b'9') => {
-                serde_json::from_str(text).map(InfoStringStatObjectValue::Integer)
-            }
-            Some(b'"') => serde_json::from_str(text).map(InfoStringStatObjectValue::String),
+            Some(b'-') | Some(b'0'..=b'9') => serde_json::from_str(text).map(MemoryStat::Number),
+            Some(b'{') => serde_json::from_str(text).map(MemoryStat::Object),
             other => {
                 // the type name is an argument, not part of the literal, so
                 // that rustfmt can wrap the line for long names
                 return Err(serde::de::Error::custom(format_args!(
                     "invalid type: {}, expected a {} value",
                     crate::types::union::json_kind_name(other.copied()),
-                    "InfoStringStatObjectValue"
+                    "MemoryStat"
                 )));
             }
         };
         parsed.map_err(serde::de::Error::custom)
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MemoryStatObject {
+    pub stat_type: crate::types::neural_common::MemoryStatObjectStatType,
+    pub value: crate::types::neural_common::MemoryStatObjectValue,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MemoryStatObjectStatType {
+    #[doc = "`memory`"]
+    Memory,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl MemoryStatObjectStatType {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            MemoryStatObjectStatType::Memory => "memory",
+            MemoryStatObjectStatType::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for MemoryStatObjectStatType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for MemoryStatObjectStatType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "memory" => MemoryStatObjectStatType::Memory,
+            _ => MemoryStatObjectStatType::Unknown(s),
+        })
+    }
+}
+
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct MemoryStatObjectValue {
+    raw: Box<serde_json::value::RawValue>,
+}
+impl MemoryStatObjectValue {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `integer` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_integer(&self) -> std::result::Result<i64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "integer")
+    }
+    #[doc = "Parses the value as the `number` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_number(&self) -> std::result::Result<f64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "number")
+    }
+    #[doc = "Parses the value as the `string` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_string(&self) -> std::result::Result<String, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "string")
     }
 }
 
@@ -539,6 +681,8 @@ pub struct NestedNeuralInfoStatsProcessorsIngest {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNeuralInfoStatsProcessorsSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic: Option<crate::types::neural_common::NestedNeuralInfoStatsProcessorsSearchAgentic>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralInfoStatsProcessorsSearchHybrid>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_query_enricher_processors: Option<crate::types::neural_common::InfoCounterStat>,
@@ -548,6 +692,14 @@ pub struct NestedNeuralInfoStatsProcessorsSearch {
     pub rerank_by_field_processors: Option<crate::types::neural_common::InfoCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rerank_ml_processors: Option<crate::types::neural_common::InfoCounterStat>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NestedNeuralInfoStatsProcessorsSearchAgentic {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic_context_processors: Option<crate::types::neural_common::InfoCounterStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic_query_translator_processors: Option<crate::types::neural_common::InfoCounterStat>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -576,12 +728,32 @@ pub struct NestedNeuralInfoStatsProcessorsSearchHybrid {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNeuralNodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory: Option<crate::types::neural_common::NestedNeuralNodeStatsMemory>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processors: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessors>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub query: Option<crate::types::neural_common::NestedNeuralNodeStatsQuery>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_highlighting:
         Option<crate::types::neural_common::NestedNeuralNodeStatsSemanticHighlighting>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NestedNeuralNodeStatsMemory {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sparse: Option<crate::types::neural_common::NestedNeuralNodeStatsMemorySparse>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NestedNeuralNodeStatsMemorySparse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub clustered_posting_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forward_index_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sparse_memory_usage: Option<crate::types::neural_common::MemoryStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sparse_memory_usage_percentage: Option<crate::types::neural_common::MemoryStat>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -605,6 +777,9 @@ pub struct NestedNeuralNodeStatsProcessorsIngest {
     pub sparse_encoding_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sparse_encoding_seismic_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub text_chunking_delimiter_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -625,7 +800,12 @@ pub struct NestedNeuralNodeStatsProcessorsIngest {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNeuralNodeStatsProcessorsSearch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessorsSearchAgentic>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralNodeStatsProcessorsSearchHybrid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mmr_neural_query_transformer_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_query_enricher_executions:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
@@ -637,6 +817,16 @@ pub struct NestedNeuralNodeStatsProcessorsSearch {
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rerank_ml_executions: Option<crate::types::neural_common::TimestampedEventCounterStat>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NestedNeuralNodeStatsProcessorsSearchAgentic {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic_context_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic_query_translator_executions:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -668,11 +858,19 @@ pub struct NestedNeuralNodeStatsProcessorsSearchHybrid {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNeuralNodeStatsQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic: Option<crate::types::neural_common::NestedNeuralNodeStatsQueryAgentic>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hybrid: Option<crate::types::neural_common::NestedNeuralNodeStatsQueryHybrid>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural: Option<crate::types::neural_common::NestedNeuralNodeStatsQueryNeural>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_sparse: Option<crate::types::neural_common::NestedNeuralNodeStatsQueryNeuralSparse>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NestedNeuralNodeStatsQueryAgentic {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agentic_query_requests: Option<crate::types::neural_common::TimestampedEventCounterStat>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -710,10 +908,15 @@ pub struct NestedNeuralNodeStatsQueryNeuralSparse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub neural_sparse_query_requests:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seismic_query_requests: Option<crate::types::neural_common::TimestampedEventCounterStat>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNeuralNodeStatsSemanticHighlighting {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub semantic_highlighting_batch_request_count:
+        Option<crate::types::neural_common::TimestampedEventCounterStat>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_highlighting_request_count:
         Option<crate::types::neural_common::TimestampedEventCounterStat>,
@@ -859,39 +1062,31 @@ impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStatObjectStatType 
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
-pub enum TimestampedEventCounterStatObjectValue {
-    Integer(i64),
-    String(String),
+#[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct TimestampedEventCounterStatObjectValue {
+    raw: Box<serde_json::value::RawValue>,
 }
-impl<'de> serde::Deserialize<'de> for TimestampedEventCounterStatObjectValue {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // dispatch on the first byte of the raw JSON text: unlike the value
-        // kind reported by `deserialize_any`, it does not depend on serde_json's
-        // `arbitrary_precision` feature
-        let raw: Box<serde_json::value::RawValue> = serde::Deserialize::deserialize(deserializer)?;
-        let text = raw.get().trim_start();
-        let parsed = match text.as_bytes().first() {
-            Some(b'-') | Some(b'0'..=b'9') => {
-                serde_json::from_str(text).map(TimestampedEventCounterStatObjectValue::Integer)
-            }
-            Some(b'"') => {
-                serde_json::from_str(text).map(TimestampedEventCounterStatObjectValue::String)
-            }
-            other => {
-                // the type name is an argument, not part of the literal, so
-                // that rustfmt can wrap the line for long names
-                return Err(serde::de::Error::custom(format_args!(
-                    "invalid type: {}, expected a {} value",
-                    crate::types::union::json_kind_name(other.copied()),
-                    "TimestampedEventCounterStatObjectValue"
-                )));
-            }
-        };
-        parsed.map_err(serde::de::Error::custom)
+impl TimestampedEventCounterStatObjectValue {
+    #[doc = "The raw JSON of the value"]
+    pub fn raw(&self) -> &serde_json::value::RawValue {
+        &self.raw
+    }
+    #[doc = "Whether the value is an explicit null"]
+    pub fn is_null(&self) -> bool {
+        self.raw.get() == "null"
+    }
+    #[doc = "Parses the value as the `integer` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_integer(&self) -> std::result::Result<i64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "integer")
+    }
+    #[doc = "Parses the value as the `number` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_number(&self) -> std::result::Result<f64, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "number")
+    }
+    #[doc = "Parses the value as the `string` branch. Fails when the value is a different branch: the raw JSON stays accessible through [`raw`](Self::raw)."]
+    pub fn as_string(&self) -> std::result::Result<String, crate::types::UnionBranchError> {
+        crate::types::union::parse_branch(&self.raw, "string")
     }
 }

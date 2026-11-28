@@ -115,6 +115,14 @@ pub struct BytesProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ChunkingAlgorithm {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delimiter: Option<crate::types::ingest_common::DelimiterChunkingAlgorithm>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fixed_token_length: Option<crate::types::ingest_common::FixedTokenLengthChunkingAlgorithm>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CircleProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -332,6 +340,15 @@ pub struct DateProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DelimiterChunkingAlgorithm {
+    #[doc = "The string delimiter to split on."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delimiter: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_chunk_limit: Option<i32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DissectProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -420,6 +437,21 @@ pub struct FailProcessor {
     pub tag: Option<String>,
     #[doc = "The error message thrown by the processor. Supports template snippets."]
     pub message: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct FixedTokenLengthChunkingAlgorithm {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_chunk_limit: Option<i32>,
+    #[doc = "Fraction of tokens to overlap between consecutive chunks. Value between 0 and 0.5."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub overlap_rate: Option<f64>,
+    #[doc = "Maximum number of tokens per chunk."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub token_limit: Option<i32>,
+    #[doc = "The tokenizer to use, for example \"standard\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tokenizer: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -750,6 +782,7 @@ pub struct PipelineProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
 pub struct ProcessorContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub append: Option<crate::types::ingest_common::AppendProcessor>,
@@ -806,9 +839,15 @@ pub struct ProcessorContainer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sort: Option<crate::types::ingest_common::SortProcessor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sparse_encoding: Option<crate::types::ingest_common::SparseEncodingProcessor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub split: Option<crate::types::ingest_common::SplitProcessor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text_chunking: Option<crate::types::ingest_common::TextChunkingProcessor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub text_embedding: Option<crate::types::ingest_common::TextEmbeddingProcessor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text_image_embedding: Option<crate::types::ingest_common::TextImageEmbeddingProcessor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trim: Option<crate::types::ingest_common::TrimProcessor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -989,6 +1028,30 @@ pub struct SortProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SparseEncodingProcessor {
+    #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[doc = "Conditionally execute the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#if: Option<String>,
+    #[doc = "Ignore failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ignore_failure: Option<bool>,
+    #[doc = "Handle failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub on_failure: Option<Vec<crate::types::ingest_common::ProcessorContainer>>,
+    #[doc = "Identifier for the processor. Useful for debugging and metrics."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_size: Option<i32>,
+    #[doc = "Contains key-value pairs that specify the mapping of a text field to a sparse vector field."]
+    pub field_map: std::collections::BTreeMap<String, String>,
+    pub model_id: crate::types::common::Id,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SplitProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1019,6 +1082,31 @@ pub struct SplitProcessor {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TextChunkingProcessor {
+    #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[doc = "Conditionally execute the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#if: Option<String>,
+    #[doc = "Ignore failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ignore_failure: Option<bool>,
+    #[doc = "Handle failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub on_failure: Option<Vec<crate::types::ingest_common::ProcessorContainer>>,
+    #[doc = "Identifier for the processor. Useful for debugging and metrics."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    pub algorithm: crate::types::ingest_common::ChunkingAlgorithm,
+    #[doc = "Contains key-value pairs that specify the mapping of a source text field to a target chunked field."]
+    pub field_map: std::collections::BTreeMap<String, String>,
+    #[doc = "Maximum number of chunks a document field can be split into. Defaults to 100."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_chunk_limit: Option<i32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TextEmbeddingProcessor {
     #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1038,6 +1126,28 @@ pub struct TextEmbeddingProcessor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub batch_size: Option<i32>,
     #[doc = "Contains key-value pairs that specify the mapping of a text field to a vector field."]
+    pub field_map: std::collections::BTreeMap<String, String>,
+    pub model_id: crate::types::common::Id,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TextImageEmbeddingProcessor {
+    #[doc = "Description of the processor. Useful for describing the purpose of the processor or its configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[doc = "Conditionally execute the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#if: Option<String>,
+    #[doc = "Ignore failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ignore_failure: Option<bool>,
+    #[doc = "Handle failures for the processor."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub on_failure: Option<Vec<crate::types::ingest_common::ProcessorContainer>>,
+    #[doc = "Identifier for the processor. Useful for debugging and metrics."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    #[doc = "Contains key-value pairs that specify the mapping of text/image fields to a vector field."]
     pub field_map: std::collections::BTreeMap<String, String>,
     pub model_id: crate::types::common::Id,
 }

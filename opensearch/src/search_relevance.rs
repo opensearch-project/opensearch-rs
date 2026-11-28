@@ -644,36 +644,27 @@ impl<'a, 'b> SearchRelevanceDeleteSearchConfigurations<'a, 'b> {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[doc = "API parts for the Search Relevance Get Experiments API"]
-pub enum SearchRelevanceGetExperimentsParts<'b> {
+#[doc = "API parts for the Search Relevance Experiments Search API"]
+pub enum SearchRelevanceExperimentsSearchParts {
     #[doc = "No parts"]
     None,
-    #[doc = "ExperimentId"]
-    ExperimentId(&'b str),
 }
-impl<'b> SearchRelevanceGetExperimentsParts<'b> {
-    #[doc = "Builds a relative URL path to the Search Relevance Get Experiments API"]
+impl SearchRelevanceExperimentsSearchParts {
+    #[doc = "Builds a relative URL path to the Search Relevance Experiments Search API"]
     pub fn url(self) -> Cow<'static, str> {
         match self {
-            SearchRelevanceGetExperimentsParts::None => {
-                "/_plugins/_search_relevance/experiments".into()
-            }
-            SearchRelevanceGetExperimentsParts::ExperimentId(experiment_id) => {
-                let encoded_experiment_id: Cow<str> =
-                    percent_encode(experiment_id.as_bytes(), PARTS_ENCODED).into();
-                let mut p = String::with_capacity(40usize + encoded_experiment_id.len());
-                p.push_str("/_plugins/_search_relevance/experiments/");
-                p.push_str(encoded_experiment_id.as_ref());
-                p.into()
+            SearchRelevanceExperimentsSearchParts::None => {
+                "/_plugins/_search_relevance/experiments/_search".into()
             }
         }
     }
 }
-#[doc = "Builder for the Search Relevance Get Experiments API\n\nGets experiments."]
+#[doc = "Builder for the Search Relevance Experiments Search API\n\nSearches for experiments."]
 #[derive(Clone, Debug)]
-pub struct SearchRelevanceGetExperiments<'a, 'b> {
+pub struct SearchRelevanceExperimentsSearch<'a, 'b, B> {
     transport: &'a Transport,
-    parts: SearchRelevanceGetExperimentsParts<'b>,
+    parts: SearchRelevanceExperimentsSearchParts,
+    body: Option<B>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
     headers: HeaderMap,
@@ -682,20 +673,42 @@ pub struct SearchRelevanceGetExperiments<'a, 'b> {
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
 }
-impl<'a, 'b> SearchRelevanceGetExperiments<'a, 'b> {
-    #[doc = "Creates a new instance of [SearchRelevanceGetExperiments] with the specified API parts"]
-    pub fn new(transport: &'a Transport, parts: SearchRelevanceGetExperimentsParts<'b>) -> Self {
+impl<'a, 'b, B> SearchRelevanceExperimentsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceExperimentsSearch]"]
+    pub fn new(transport: &'a Transport) -> Self {
         let headers = HeaderMap::new();
-        SearchRelevanceGetExperiments {
+        SearchRelevanceExperimentsSearch {
             transport,
-            parts,
+            parts: SearchRelevanceExperimentsSearchParts::None,
             headers,
+            body: None,
             error_trace: None,
             filter_path: None,
             human: None,
             pretty: None,
             request_timeout: None,
             source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceExperimentsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceExperimentsSearch {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -733,10 +746,13 @@ impl<'a, 'b> SearchRelevanceGetExperiments<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "Creates an asynchronous call to the Search Relevance Get Experiments API that can be awaited"]
+    #[doc = "Creates an asynchronous call to the Search Relevance Experiments Search API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
-        let method = Method::Get;
+        let method = match self.body {
+            Some(_) => Method::Post,
+            None => Method::Get,
+        };
         let headers = self.headers;
         let timeout = self.request_timeout;
         let query_string = {
@@ -755,6 +771,139 @@ impl<'a, 'b> SearchRelevanceGetExperiments<'a, 'b> {
                 filter_path: self.filter_path,
                 human: self.human,
                 pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Get Experiments API"]
+pub enum SearchRelevanceGetExperimentsParts<'b> {
+    #[doc = "No parts"]
+    None,
+    #[doc = "ExperimentId"]
+    ExperimentId(&'b str),
+}
+impl<'b> SearchRelevanceGetExperimentsParts<'b> {
+    #[doc = "Builds a relative URL path to the Search Relevance Get Experiments API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceGetExperimentsParts::None => {
+                "/_plugins/_search_relevance/experiments".into()
+            }
+            SearchRelevanceGetExperimentsParts::ExperimentId(experiment_id) => {
+                let encoded_experiment_id: Cow<str> =
+                    percent_encode(experiment_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(40usize + encoded_experiment_id.len());
+                p.push_str("/_plugins/_search_relevance/experiments/");
+                p.push_str(encoded_experiment_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Get Experiments API\n\nGets experiments."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceGetExperiments<'a, 'b> {
+    transport: &'a Transport,
+    parts: SearchRelevanceGetExperimentsParts<'b>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    query_text: Option<&'b str>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> SearchRelevanceGetExperiments<'a, 'b> {
+    #[doc = "Creates a new instance of [SearchRelevanceGetExperiments] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: SearchRelevanceGetExperimentsParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceGetExperiments {
+            transport,
+            parts,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            query_text: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "A query text for visualizing experiment results. Accepted but currently does not change the response."]
+    pub fn query_text(mut self, query_text: &'b str) -> Self {
+        self.query_text = Some(query_text);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Get Experiments API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                query_text: Option<&'b str>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                query_text: self.query_text,
                 source: self.source,
             };
             Some(query_params)
@@ -934,16 +1083,17 @@ pub struct SearchRelevanceGetNodeStats<'a, 'b> {
     parts: SearchRelevanceGetNodeStatsParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    flat_stat_paths: Option<&'b str>,
+    flat_stat_paths: Option<bool>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_all_nodes: Option<&'b str>,
-    include_individual_nodes: Option<&'b str>,
-    include_info: Option<&'b str>,
-    include_metadata: Option<&'b str>,
+    include_all_nodes: Option<bool>,
+    include_individual_nodes: Option<bool>,
+    include_info: Option<bool>,
+    include_metadata: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    timeout: Option<&'b str>,
 }
 impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
     #[doc = "Creates a new instance of [SearchRelevanceGetNodeStats] with the specified API parts"]
@@ -964,6 +1114,7 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
             pretty: None,
             request_timeout: None,
             source: None,
+            timeout: None,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -977,7 +1128,7 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
         self
     }
     #[doc = "Requests flattened stat paths as keys"]
-    pub fn flat_stat_paths(mut self, flat_stat_paths: &'b str) -> Self {
+    pub fn flat_stat_paths(mut self, flat_stat_paths: bool) -> Self {
         self.flat_stat_paths = Some(flat_stat_paths);
         self
     }
@@ -992,22 +1143,22 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
         self
     }
     #[doc = "Whether to include all nodes"]
-    pub fn include_all_nodes(mut self, include_all_nodes: &'b str) -> Self {
+    pub fn include_all_nodes(mut self, include_all_nodes: bool) -> Self {
         self.include_all_nodes = Some(include_all_nodes);
         self
     }
     #[doc = "Whether to include individual nodes"]
-    pub fn include_individual_nodes(mut self, include_individual_nodes: &'b str) -> Self {
+    pub fn include_individual_nodes(mut self, include_individual_nodes: bool) -> Self {
         self.include_individual_nodes = Some(include_individual_nodes);
         self
     }
     #[doc = "Whether to include info"]
-    pub fn include_info(mut self, include_info: &'b str) -> Self {
+    pub fn include_info(mut self, include_info: bool) -> Self {
         self.include_info = Some(include_info);
         self
     }
     #[doc = "Whether to include metadata"]
-    pub fn include_metadata(mut self, include_metadata: &'b str) -> Self {
+    pub fn include_metadata(mut self, include_metadata: bool) -> Self {
         self.include_metadata = Some(include_metadata);
         self
     }
@@ -1026,6 +1177,11 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
         self.source = Some(source);
         self
     }
+    #[doc = "The amount of time to wait for a response."]
+    pub fn timeout(mut self, timeout: &'b str) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Search Relevance Get Node Stats API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -1039,14 +1195,15 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                flat_stat_paths: Option<&'b str>,
+                flat_stat_paths: Option<bool>,
                 human: Option<bool>,
-                include_all_nodes: Option<&'b str>,
-                include_individual_nodes: Option<&'b str>,
-                include_info: Option<&'b str>,
-                include_metadata: Option<&'b str>,
+                include_all_nodes: Option<bool>,
+                include_individual_nodes: Option<bool>,
+                include_info: Option<bool>,
+                include_metadata: Option<bool>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -1059,6 +1216,7 @@ impl<'a, 'b> SearchRelevanceGetNodeStats<'a, 'b> {
                 include_metadata: self.include_metadata,
                 pretty: self.pretty,
                 source: self.source,
+                timeout: self.timeout,
             };
             Some(query_params)
         };
@@ -1480,16 +1638,17 @@ pub struct SearchRelevanceGetStats<'a, 'b> {
     parts: SearchRelevanceGetStatsParts<'b>,
     error_trace: Option<bool>,
     filter_path: Option<&'b [&'b str]>,
-    flat_stat_paths: Option<&'b str>,
+    flat_stat_paths: Option<bool>,
     headers: HeaderMap,
     human: Option<bool>,
-    include_all_nodes: Option<&'b str>,
-    include_individual_nodes: Option<&'b str>,
-    include_info: Option<&'b str>,
-    include_metadata: Option<&'b str>,
+    include_all_nodes: Option<bool>,
+    include_individual_nodes: Option<bool>,
+    include_info: Option<bool>,
+    include_metadata: Option<bool>,
     pretty: Option<bool>,
     request_timeout: Option<Duration>,
     source: Option<&'b str>,
+    timeout: Option<&'b str>,
 }
 impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
     #[doc = "Creates a new instance of [SearchRelevanceGetStats] with the specified API parts"]
@@ -1510,6 +1669,7 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
             pretty: None,
             request_timeout: None,
             source: None,
+            timeout: None,
         }
     }
     #[doc = "Whether to include the stack trace of returned errors."]
@@ -1523,7 +1683,7 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
         self
     }
     #[doc = "Requests flattened stat paths as keys"]
-    pub fn flat_stat_paths(mut self, flat_stat_paths: &'b str) -> Self {
+    pub fn flat_stat_paths(mut self, flat_stat_paths: bool) -> Self {
         self.flat_stat_paths = Some(flat_stat_paths);
         self
     }
@@ -1538,22 +1698,22 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
         self
     }
     #[doc = "Whether to include all nodes"]
-    pub fn include_all_nodes(mut self, include_all_nodes: &'b str) -> Self {
+    pub fn include_all_nodes(mut self, include_all_nodes: bool) -> Self {
         self.include_all_nodes = Some(include_all_nodes);
         self
     }
     #[doc = "Whether to include individual nodes"]
-    pub fn include_individual_nodes(mut self, include_individual_nodes: &'b str) -> Self {
+    pub fn include_individual_nodes(mut self, include_individual_nodes: bool) -> Self {
         self.include_individual_nodes = Some(include_individual_nodes);
         self
     }
     #[doc = "Whether to include info"]
-    pub fn include_info(mut self, include_info: &'b str) -> Self {
+    pub fn include_info(mut self, include_info: bool) -> Self {
         self.include_info = Some(include_info);
         self
     }
     #[doc = "Whether to include metadata"]
-    pub fn include_metadata(mut self, include_metadata: &'b str) -> Self {
+    pub fn include_metadata(mut self, include_metadata: bool) -> Self {
         self.include_metadata = Some(include_metadata);
         self
     }
@@ -1572,6 +1732,11 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
         self.source = Some(source);
         self
     }
+    #[doc = "The amount of time to wait for a response."]
+    pub fn timeout(mut self, timeout: &'b str) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
     #[doc = "Creates an asynchronous call to the Search Relevance Get Stats API that can be awaited"]
     pub async fn send(self) -> Result<Response, Error> {
         let path = self.parts.url();
@@ -1585,14 +1750,15 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
                 error_trace: Option<bool>,
                 #[serde(serialize_with = "crate::client::serialize_coll_qs")]
                 filter_path: Option<&'b [&'b str]>,
-                flat_stat_paths: Option<&'b str>,
+                flat_stat_paths: Option<bool>,
                 human: Option<bool>,
-                include_all_nodes: Option<&'b str>,
-                include_individual_nodes: Option<&'b str>,
-                include_info: Option<&'b str>,
-                include_metadata: Option<&'b str>,
+                include_all_nodes: Option<bool>,
+                include_individual_nodes: Option<bool>,
+                include_info: Option<bool>,
+                include_metadata: Option<bool>,
                 pretty: Option<bool>,
                 source: Option<&'b str>,
+                timeout: Option<&'b str>,
             }
             let query_params = QueryParams {
                 error_trace: self.error_trace,
@@ -1605,10 +1771,293 @@ impl<'a, 'b> SearchRelevanceGetStats<'a, 'b> {
                 include_metadata: self.include_metadata,
                 pretty: self.pretty,
                 source: self.source,
+                timeout: self.timeout,
             };
             Some(query_params)
         };
         let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Judgments Search API"]
+pub enum SearchRelevanceJudgmentsSearchParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SearchRelevanceJudgmentsSearchParts {
+    #[doc = "Builds a relative URL path to the Search Relevance Judgments Search API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceJudgmentsSearchParts::None => {
+                "/_plugins/_search_relevance/judgments/_search".into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Judgments Search API\n\nSearches for judgments."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceJudgmentsSearch<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevanceJudgmentsSearchParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevanceJudgmentsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceJudgmentsSearch]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceJudgmentsSearch {
+            transport,
+            parts: SearchRelevanceJudgmentsSearchParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceJudgmentsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceJudgmentsSearch {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Judgments Search API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = match self.body {
+            Some(_) => Method::Post,
+            None => Method::Get,
+        };
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Patch Experiment API"]
+pub enum SearchRelevancePatchExperimentParts<'b> {
+    #[doc = "ExperimentId"]
+    ExperimentId(&'b str),
+}
+impl<'b> SearchRelevancePatchExperimentParts<'b> {
+    #[doc = "Builds a relative URL path to the Search Relevance Patch Experiment API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevancePatchExperimentParts::ExperimentId(experiment_id) => {
+                let encoded_experiment_id: Cow<str> =
+                    percent_encode(experiment_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(40usize + encoded_experiment_id.len());
+                p.push_str("/_plugins/_search_relevance/experiments/");
+                p.push_str(encoded_experiment_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Patch Experiment API\n\nPartially updates an experiment's name or description."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevancePatchExperiment<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevancePatchExperimentParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevancePatchExperiment<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevancePatchExperiment] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: SearchRelevancePatchExperimentParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevancePatchExperiment {
+            transport,
+            parts,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevancePatchExperiment<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevancePatchExperiment {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Patch Experiment API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Patch;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
         let response = self
             .transport
             .send(method, &path, headers, query_string.as_ref(), body, timeout)
@@ -2438,6 +2887,697 @@ where
         Ok(response)
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Query Sets Search API"]
+pub enum SearchRelevanceQuerySetsSearchParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SearchRelevanceQuerySetsSearchParts {
+    #[doc = "Builds a relative URL path to the Search Relevance Query Sets Search API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceQuerySetsSearchParts::None => {
+                "/_plugins/_search_relevance/query_sets/_search".into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Query Sets Search API\n\nSearches for queries in the query sets."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceQuerySetsSearch<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevanceQuerySetsSearchParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevanceQuerySetsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceQuerySetsSearch]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceQuerySetsSearch {
+            transport,
+            parts: SearchRelevanceQuerySetsSearchParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceQuerySetsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceQuerySetsSearch {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Query Sets Search API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = match self.body {
+            Some(_) => Method::Post,
+            None => Method::Get,
+        };
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Retry Judgments API"]
+pub enum SearchRelevanceRetryJudgmentsParts<'b> {
+    #[doc = "JudgmentId"]
+    JudgmentId(&'b str),
+}
+impl<'b> SearchRelevanceRetryJudgmentsParts<'b> {
+    #[doc = "Builds a relative URL path to the Search Relevance Retry Judgments API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceRetryJudgmentsParts::JudgmentId(judgment_id) => {
+                let encoded_judgment_id: Cow<str> =
+                    percent_encode(judgment_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(45usize + encoded_judgment_id.len());
+                p.push_str("/_plugins/_search_relevance/judgments/");
+                p.push_str(encoded_judgment_id.as_ref());
+                p.push_str("/_retry");
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Retry Judgments API\n\nRetries the failed documents in an existing LLM judgment."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceRetryJudgments<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevanceRetryJudgmentsParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevanceRetryJudgments<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceRetryJudgments] with the specified API parts"]
+    pub fn new(transport: &'a Transport, parts: SearchRelevanceRetryJudgmentsParts<'b>) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceRetryJudgments {
+            transport,
+            parts,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceRetryJudgments<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceRetryJudgments {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Retry Judgments API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Post;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Search Configurations Search API"]
+pub enum SearchRelevanceSearchConfigurationsSearchParts {
+    #[doc = "No parts"]
+    None,
+}
+impl SearchRelevanceSearchConfigurationsSearchParts {
+    #[doc = "Builds a relative URL path to the Search Relevance Search Configurations Search API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceSearchConfigurationsSearchParts::None => {
+                "/_plugins/_search_relevance/search_configurations/_search".into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Search Configurations Search API\n\nSearches for search configurations."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceSearchConfigurationsSearch<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevanceSearchConfigurationsSearchParts,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevanceSearchConfigurationsSearch<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceSearchConfigurationsSearch]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceSearchConfigurationsSearch {
+            transport,
+            parts: SearchRelevanceSearchConfigurationsSearchParts::None,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceSearchConfigurationsSearch<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceSearchConfigurationsSearch {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Search Configurations Search API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = match self.body {
+            Some(_) => Method::Post,
+            None => Method::Get,
+        };
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Update Judgment Ratings API"]
+pub enum SearchRelevanceUpdateJudgmentRatingsParts<'b> {
+    #[doc = "JudgmentId"]
+    JudgmentId(&'b str),
+}
+impl<'b> SearchRelevanceUpdateJudgmentRatingsParts<'b> {
+    #[doc = "Builds a relative URL path to the Search Relevance Update Judgment Ratings API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceUpdateJudgmentRatingsParts::JudgmentId(judgment_id) => {
+                let encoded_judgment_id: Cow<str> =
+                    percent_encode(judgment_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(38usize + encoded_judgment_id.len());
+                p.push_str("/_plugins/_search_relevance/judgments/");
+                p.push_str(encoded_judgment_id.as_ref());
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Update Judgment Ratings API\n\nAdjusts one or more ratings on an existing LLM judgment in place. Only the listed (`query`, `docId`) pairs are updated; all other ratings are left unchanged."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceUpdateJudgmentRatings<'a, 'b, B> {
+    transport: &'a Transport,
+    parts: SearchRelevanceUpdateJudgmentRatingsParts<'b>,
+    body: Option<B>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b, B> SearchRelevanceUpdateJudgmentRatings<'a, 'b, B>
+where
+    B: Body,
+{
+    #[doc = "Creates a new instance of [SearchRelevanceUpdateJudgmentRatings] with the specified API parts"]
+    pub fn new(
+        transport: &'a Transport,
+        parts: SearchRelevanceUpdateJudgmentRatingsParts<'b>,
+    ) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceUpdateJudgmentRatings {
+            transport,
+            parts,
+            headers,
+            body: None,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "The body for the API call"]
+    pub fn body<T>(self, body: T) -> SearchRelevanceUpdateJudgmentRatings<'a, 'b, JsonBody<T>>
+    where
+        T: Serialize,
+    {
+        SearchRelevanceUpdateJudgmentRatings {
+            transport: self.transport,
+            parts: self.parts,
+            body: Some(body.into()),
+            error_trace: self.error_trace,
+            filter_path: self.filter_path,
+            headers: self.headers,
+            human: self.human,
+            pretty: self.pretty,
+            request_timeout: self.request_timeout,
+            source: self.source,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Update Judgment Ratings API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Put;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = self.body;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Search Relevance Validate Experiments API"]
+pub enum SearchRelevanceValidateExperimentsParts<'b> {
+    #[doc = "ExperimentId"]
+    ExperimentId(&'b str),
+}
+impl<'b> SearchRelevanceValidateExperimentsParts<'b> {
+    #[doc = "Builds a relative URL path to the Search Relevance Validate Experiments API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            SearchRelevanceValidateExperimentsParts::ExperimentId(experiment_id) => {
+                let encoded_experiment_id: Cow<str> =
+                    percent_encode(experiment_id.as_bytes(), PARTS_ENCODED).into();
+                let mut p = String::with_capacity(49usize + encoded_experiment_id.len());
+                p.push_str("/_plugins/_search_relevance/experiments/");
+                p.push_str(encoded_experiment_id.as_ref());
+                p.push_str("/validate");
+                p.into()
+            }
+        }
+    }
+}
+#[doc = "Builder for the Search Relevance Validate Experiments API\n\nValidates whether an experiment's inputs have drifted from the fingerprint recorded at execution time."]
+#[derive(Clone, Debug)]
+pub struct SearchRelevanceValidateExperiments<'a, 'b> {
+    transport: &'a Transport,
+    parts: SearchRelevanceValidateExperimentsParts<'b>,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> SearchRelevanceValidateExperiments<'a, 'b> {
+    #[doc = "Creates a new instance of [SearchRelevanceValidateExperiments] with the specified API parts"]
+    pub fn new(
+        transport: &'a Transport,
+        parts: SearchRelevanceValidateExperimentsParts<'b>,
+    ) -> Self {
+        let headers = HeaderMap::new();
+        SearchRelevanceValidateExperiments {
+            transport,
+            parts,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Search Relevance Validate Experiments API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
 #[doc = "Namespace client for SearchRelevance APIs"]
 pub struct SearchRelevance<'a> {
     transport: &'a Transport,
@@ -2484,6 +3624,10 @@ impl<'a> SearchRelevance<'a> {
         parts: SearchRelevanceDeleteSearchConfigurationsParts<'b>,
     ) -> SearchRelevanceDeleteSearchConfigurations<'a, 'b> {
         SearchRelevanceDeleteSearchConfigurations::new(self.transport(), parts)
+    }
+    #[doc = "Search Relevance Experiments Search API\n\nSearches for experiments."]
+    pub fn experiments_search<'b>(&'a self) -> SearchRelevanceExperimentsSearch<'a, 'b, ()> {
+        SearchRelevanceExperimentsSearch::new(self.transport())
     }
     #[doc = "Search Relevance Get Experiments API\n\nGets experiments."]
     pub fn get_experiments<'b>(
@@ -2534,6 +3678,17 @@ impl<'a> SearchRelevance<'a> {
     ) -> SearchRelevanceGetStats<'a, 'b> {
         SearchRelevanceGetStats::new(self.transport(), parts)
     }
+    #[doc = "Search Relevance Judgments Search API\n\nSearches for judgments."]
+    pub fn judgments_search<'b>(&'a self) -> SearchRelevanceJudgmentsSearch<'a, 'b, ()> {
+        SearchRelevanceJudgmentsSearch::new(self.transport())
+    }
+    #[doc = "Search Relevance Patch Experiment API\n\nPartially updates an experiment's name or description."]
+    pub fn patch_experiment<'b>(
+        &'a self,
+        parts: SearchRelevancePatchExperimentParts<'b>,
+    ) -> SearchRelevancePatchExperiment<'a, 'b, ()> {
+        SearchRelevancePatchExperiment::new(self.transport(), parts)
+    }
     #[doc = "Search Relevance Post Query Sets API\n\nCreates a new query set by sampling queries from the user behavior data."]
     pub fn post_query_sets<'b>(&'a self) -> SearchRelevancePostQuerySets<'a, 'b, ()> {
         SearchRelevancePostQuerySets::new(self.transport())
@@ -2561,6 +3716,37 @@ impl<'a> SearchRelevance<'a> {
         &'a self,
     ) -> SearchRelevancePutSearchConfigurations<'a, 'b, ()> {
         SearchRelevancePutSearchConfigurations::new(self.transport())
+    }
+    #[doc = "Search Relevance Query Sets Search API\n\nSearches for queries in the query sets."]
+    pub fn query_sets_search<'b>(&'a self) -> SearchRelevanceQuerySetsSearch<'a, 'b, ()> {
+        SearchRelevanceQuerySetsSearch::new(self.transport())
+    }
+    #[doc = "Search Relevance Retry Judgments API\n\nRetries the failed documents in an existing LLM judgment."]
+    pub fn retry_judgments<'b>(
+        &'a self,
+        parts: SearchRelevanceRetryJudgmentsParts<'b>,
+    ) -> SearchRelevanceRetryJudgments<'a, 'b, ()> {
+        SearchRelevanceRetryJudgments::new(self.transport(), parts)
+    }
+    #[doc = "Search Relevance Search Configurations Search API\n\nSearches for search configurations."]
+    pub fn search_configurations_search<'b>(
+        &'a self,
+    ) -> SearchRelevanceSearchConfigurationsSearch<'a, 'b, ()> {
+        SearchRelevanceSearchConfigurationsSearch::new(self.transport())
+    }
+    #[doc = "Search Relevance Update Judgment Ratings API\n\nAdjusts one or more ratings on an existing LLM judgment in place. Only the listed (`query`, `docId`) pairs are updated; all other ratings are left unchanged."]
+    pub fn update_judgment_ratings<'b>(
+        &'a self,
+        parts: SearchRelevanceUpdateJudgmentRatingsParts<'b>,
+    ) -> SearchRelevanceUpdateJudgmentRatings<'a, 'b, ()> {
+        SearchRelevanceUpdateJudgmentRatings::new(self.transport(), parts)
+    }
+    #[doc = "Search Relevance Validate Experiments API\n\nValidates whether an experiment's inputs have drifted from the fingerprint recorded at execution time."]
+    pub fn validate_experiments<'b>(
+        &'a self,
+        parts: SearchRelevanceValidateExperimentsParts<'b>,
+    ) -> SearchRelevanceValidateExperiments<'a, 'b> {
+        SearchRelevanceValidateExperiments::new(self.transport(), parts)
     }
 }
 impl OpenSearch {

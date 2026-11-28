@@ -56,7 +56,7 @@ impl ReplicationAutofollowStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Replication Autofollow Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
+#[doc = "Builder for the [Replication Autofollow Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
 #[derive(Clone, Debug)]
 pub struct ReplicationAutofollowStats<'a, 'b> {
     transport: &'a Transport,
@@ -170,7 +170,7 @@ impl ReplicationCreateReplicationRuleParts {
         }
     }
 }
-#[doc = "Builder for the [Replication Create Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
+#[doc = "Builder for the [Replication Create Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
 #[derive(Clone, Debug)]
 pub struct ReplicationCreateReplicationRule<'a, 'b, B> {
     transport: &'a Transport,
@@ -307,7 +307,7 @@ impl ReplicationDeleteReplicationRuleParts {
         }
     }
 }
-#[doc = "Builder for the [Replication Delete Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
+#[doc = "Builder for the [Replication Delete Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
 #[derive(Clone, Debug)]
 pub struct ReplicationDeleteReplicationRule<'a, 'b, B> {
     transport: &'a Transport,
@@ -442,7 +442,7 @@ impl ReplicationFollowerStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Replication Follower Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
+#[doc = "Builder for the [Replication Follower Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
 #[derive(Clone, Debug)]
 pub struct ReplicationFollowerStats<'a, 'b> {
     transport: &'a Transport,
@@ -554,7 +554,7 @@ impl ReplicationLeaderStatsParts {
         }
     }
 }
-#[doc = "Builder for the [Replication Leader Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
+#[doc = "Builder for the [Replication Leader Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
 #[derive(Clone, Debug)]
 pub struct ReplicationLeaderStats<'a, 'b> {
     transport: &'a Transport,
@@ -674,7 +674,7 @@ impl<'b> ReplicationPauseParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Pause API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
+#[doc = "Builder for the [Replication Pause API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
 #[derive(Clone, Debug)]
 pub struct ReplicationPause<'a, 'b, B> {
     transport: &'a Transport,
@@ -817,7 +817,7 @@ impl<'b> ReplicationResumeParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Resume API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
+#[doc = "Builder for the [Replication Resume API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
 #[derive(Clone, Debug)]
 pub struct ReplicationResume<'a, 'b, B> {
     transport: &'a Transport,
@@ -960,7 +960,7 @@ impl<'b> ReplicationStartParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Start API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
+#[doc = "Builder for the [Replication Start API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
 #[derive(Clone, Debug)]
 pub struct ReplicationStart<'a, 'b, B> {
     transport: &'a Transport,
@@ -1103,7 +1103,7 @@ impl<'b> ReplicationStatusParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Status API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
+#[doc = "Builder for the [Replication Status API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
 #[derive(Clone, Debug)]
 pub struct ReplicationStatus<'a, 'b> {
     transport: &'a Transport,
@@ -1223,7 +1223,7 @@ impl<'b> ReplicationStopParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Stop API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
+#[doc = "Builder for the [Replication Stop API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
 #[derive(Clone, Debug)]
 pub struct ReplicationStop<'a, 'b, B> {
     transport: &'a Transport,
@@ -1366,7 +1366,7 @@ impl<'b> ReplicationUpdateSettingsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Replication Update Settings API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
+#[doc = "Builder for the [Replication Update Settings API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
 #[derive(Clone, Debug)]
 pub struct ReplicationUpdateSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -1499,50 +1499,50 @@ impl<'a> Replication<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Replication Autofollow Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
+    #[doc = "[Replication Autofollow Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats)\n\nRetrieves information about any auto-follow activity and any replication rules configured on the specified cluster."]
     pub fn autofollow_stats<'b>(&'a self) -> ReplicationAutofollowStats<'a, 'b> {
         ReplicationAutofollowStats::new(self.transport())
     }
-    #[doc = "[Replication Create Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
+    #[doc = "[Replication Create Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule)\n\nAutomatically starts the replication on indexes matching a specified pattern."]
     pub fn create_replication_rule<'b>(&'a self) -> ReplicationCreateReplicationRule<'a, 'b, ()> {
         ReplicationCreateReplicationRule::new(self.transport())
     }
-    #[doc = "[Replication Delete Replication Rule API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
+    #[doc = "[Replication Delete Replication Rule API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule)\n\nDeletes the specified replication rule."]
     pub fn delete_replication_rule<'b>(&'a self) -> ReplicationDeleteReplicationRule<'a, 'b, ()> {
         ReplicationDeleteReplicationRule::new(self.transport())
     }
-    #[doc = "[Replication Follower Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
+    #[doc = "[Replication Follower Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats)\n\nRetrieves information about any follower (syncing) indexes on a specified cluster."]
     pub fn follower_stats<'b>(&'a self) -> ReplicationFollowerStats<'a, 'b> {
         ReplicationFollowerStats::new(self.transport())
     }
-    #[doc = "[Replication Leader Stats API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
+    #[doc = "[Replication Leader Stats API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats)\n\nRetrieves information about any replicated leader indexes on a specified cluster."]
     pub fn leader_stats<'b>(&'a self) -> ReplicationLeaderStats<'a, 'b> {
         ReplicationLeaderStats::new(self.transport())
     }
-    #[doc = "[Replication Pause API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
+    #[doc = "[Replication Pause API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#pause-replication)\n\nPauses the replication of the leader index."]
     pub fn pause<'b>(&'a self, parts: ReplicationPauseParts<'b>) -> ReplicationPause<'a, 'b, ()> {
         ReplicationPause::new(self.transport(), parts)
     }
-    #[doc = "[Replication Resume API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
+    #[doc = "[Replication Resume API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#resume-replication)\n\nResumes replication of the leader index."]
     pub fn resume<'b>(
         &'a self,
         parts: ReplicationResumeParts<'b>,
     ) -> ReplicationResume<'a, 'b, ()> {
         ReplicationResume::new(self.transport(), parts)
     }
-    #[doc = "[Replication Start API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
+    #[doc = "[Replication Start API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#start-replication)\n\nInitiates the replication of an index from the leader cluster to the follower cluster."]
     pub fn start<'b>(&'a self, parts: ReplicationStartParts<'b>) -> ReplicationStart<'a, 'b, ()> {
         ReplicationStart::new(self.transport(), parts)
     }
-    #[doc = "[Replication Status API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
+    #[doc = "[Replication Status API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status)\n\nRetrieves the the status of an index replication."]
     pub fn status<'b>(&'a self, parts: ReplicationStatusParts<'b>) -> ReplicationStatus<'a, 'b> {
         ReplicationStatus::new(self.transport(), parts)
     }
-    #[doc = "[Replication Stop API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
+    #[doc = "[Replication Stop API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#stop-replication)\n\nTerminates the replication and converts the follower index to a standard index."]
     pub fn stop<'b>(&'a self, parts: ReplicationStopParts<'b>) -> ReplicationStop<'a, 'b, ()> {
         ReplicationStop::new(self.transport(), parts)
     }
-    #[doc = "[Replication Update Settings API](https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
+    #[doc = "[Replication Update Settings API](https://docs.opensearch.org/latest/tuning-your-cluster/replication-plugin/api/#update-settings)\n\nUpdates any settings on the follower index."]
     pub fn update_settings<'b>(
         &'a self,
         parts: ReplicationUpdateSettingsParts<'b>,

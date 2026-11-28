@@ -36,12 +36,16 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("_common.query_dsl:KnnQuery/method_parameters", OpenObject, "engine/method-specific query parameters: the set depends on the chosen method"),
     // bare
     raw("_common.query_dsl:LikeDocument/doc", NoType, "query input document: user-defined shape"),
+    // map<bare> open-object
+    raw("_common.query_dsl:NeuralQuery/method_parameters", OpenObject, "engine/method-specific query parameters: the set depends on the chosen method"),
     // bare
     raw("_common.query_dsl:PercolateQuery/document", NoType, "query input document: user-defined shape"),
     // list<bare>
     raw("_common.query_dsl:PercolateQuery/documents", NoType, "query input document: user-defined shape"),
     // map<bare>
     raw("_common.query_dsl:QueryContainer/template", OpenObject, "template query: placeholders resolved by search request processors, arbitrary query DSL"),
+    // map<bare> open-object
+    raw("_common.query_dsl:StoredLtrQuery/params", OpenObject, "parameters of the stored features: user-defined names and values"),
     // list<bare>
     raw("_common.query_dsl:XyShape/coordinates", UntypedItems, "GeoJSON coordinates: nesting depth depends on the geometry type (point, polygon, ...)"),
     // --- _common ---
@@ -118,8 +122,6 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("_core.search:HitsMetadataJsonValueHitsItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("_core.search:HitsMetadataJsonValueHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
-    // map<bare>
-    raw("_core.search:PhraseSuggestCollate/params", OpenObject, "script parameters: user-defined names and values"),
     // bare
     raw("_core.search:ProcessorExecutionDetail/input_data", NoType, "search pipeline processor input/output: request, response or document fragments depending on the processor"),
     // bare
@@ -151,6 +153,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("_core.search_template:SearchTemplateResponseHitsHitsItem/_source", GenericParameter, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // map<bare>
     raw("_core.search_template:SearchTemplateResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
+    // --- cluster.allocation_explain ---
+    // bare open-object
+    raw("cluster.allocation_explain:NodeResourceUsageStats/[additional]", OpenObject, "per-node resource usage statistics: the structure depends on the version"),
     // --- cluster ---
     // map<bare>
     raw("cluster:GetSettingsResponse/defaults", OpenObject, "settings: open key space (flat or nested setting names, plugin settings), values of any JSON type"),
@@ -167,11 +172,25 @@ pub const RAW_FIELDS: &[RawField] = &[
     // bare
     raw("cluster:StateResponse/-", NoType, "SPEC GAP: cluster.state response is declared as `{}`; its top-level sections (metadata, routing_table, nodes, ...) could be typed"),
     // --- flow_framework.common ---
+    // map<bare> open-object
+    raw("flow_framework.common:FlowFrameworkGetResponse/ui_metadata", OpenObject, "SPEC GAP: UI metadata declared as an untyped object; its content is defined by the UI"),
     // map<bare>
     raw("flow_framework.common:FlowFrameworkGetResponse/workflows", OpenObject, "SPEC GAP: workflow name -> workflow definition, value schema missing"),
+    // bare no-type
+    raw("flow_framework.common:StateItems/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    // map<bare> open-object
+    raw("flow_framework.common:StateItems/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
+    // map<bare> open-object
+    raw("flow_framework.common:WorkFlowStatusFullResponse/user_outputs", OpenObject, "essential API responses of the steps, for backend use and lookup: the keys depend on the workflow"),
+    // bare no-type
+    raw("flow_framework.common:itemsObject/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    // map<bare> open-object
+    raw("flow_framework.common:itemsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // --- indices._common ---
     // bare
     raw("indices._common:IndexSettings/[additional]", NoType, "custom index settings (plugin and user-defined `index.*` keys)"),
+    // map<bare> open-object
+    raw("indices._common:IngestionSource/mapper_settings", OpenObject, "settings of the selected mapper type: the set depends on the mapper"),
     // map<bare>
     raw("indices._common:IngestionSource/param", OpenObject, "ingestion-source-specific parameters (kafka, kinesis, ...)"),
     // map<bare>
@@ -188,16 +207,8 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ingest.simulate:DocumentSimulation/_source", OpenObject, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
     // --- insights._common ---
     // map<bare>
-    raw("insights._common:Source/aggregations", OpenObject, "recorded search request source: aggregation DSL as sent by the client"),
-    // map<map<bare>>
-    raw("insights._common:Source/ext", OpenObject, "search extensions defined by plugins: open set"),
-    // map<bare>
     raw("insights._common:TopQuery/labels", OpenObject, "user-defined query labels"),
-    // map<bare>
-    raw("insights._common:TopQuery/phase_latency_map", OpenObject, "SPEC GAP: phase name -> latency map, values are numbers (additionalProperties should be number)"),
     // --- ism._common ---
-    // map<bare>
-    raw("ism._common:ActionAlias/actions", OpenObject, "alias actions as in the indices.update_aliases request: action-specific objects"),
     // map<bare>
     raw("ism._common:ActionAllocation/exclude", OpenObject, "SPEC GAP: node attribute -> value map, values are strings (additionalProperties should be string)"),
     // map<bare>
@@ -206,25 +217,17 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ism._common:ActionAllocation/require", OpenObject, "SPEC GAP: node attribute -> value map, values are strings (additionalProperties should be string)"),
     // bare
     raw("ism._common:ActionCustom/[additional]", OpenObject, "ISM action configuration: plugin- and version-specific extra options"),
-    // bare
-    raw("ism._common:ActionNotification/[additional]", OpenObject, "ISM action configuration: plugin- and version-specific extra options"),
-    // bare
-    raw("ism._common:ActionRollup/[additional]", OpenObject, "ISM action configuration: plugin- and version-specific extra options"),
-    // bare
-    raw("ism._common:ActionShrink/[additional]", OpenObject, "ISM action configuration: plugin- and version-specific extra options"),
-    // map<bare>
-    raw("ism._common:ActionTimeout/timeout", OpenObject, "SPEC GAP: action timeout is declared as an untyped object (OpenSearch documents it as a time value string)"),
-    // bare
-    raw("ism._common:ActionTransform/[additional]", OpenObject, "ISM action configuration: plugin- and version-specific extra options"),
-    // map<bare>
-    raw("ism._common:ErrorNotification/message_template", OpenObject, "SPEC GAP: mustache template object with a known `source` field"),
-    // map<bare>
-    raw("ism._common:SlackCustomWebhook/header_params", OpenObject, "SPEC GAP: name -> value maps, values are strings (additionalProperties should be string)"),
-    // map<bare>
-    raw("ism._common:SlackCustomWebhook/query_params", OpenObject, "SPEC GAP: name -> value maps, values are strings (additionalProperties should be string)"),
-    // map<bare>
-    raw("ism._common:Transition/conditions", OpenObject, "SPEC GAP: known condition keys (min_index_age, min_doc_count, min_size, min_rollover_age, cron) could be typed"),
+    // map<bare> open-object
+    raw("ism._common:ActionRollup/ism_rollup", OpenObject, "the rollup job to run, as in the rollups API: a job definition with its own options"),
+    // map<bare> open-object
+    raw("ism._common:ActionTransform/ism_transform", OpenObject, "the transform job to run, as in the transforms API: a job definition with its own options"),
+    // map<bare> open-object
+    raw("ism._common:ExplainActionMetadata/action_properties", OpenObject, "action-specific properties: the set depends on the action type"),
+    // map<bare> open-object
+    raw("ism._common:ExplainPolicy/info", OpenObject, "additional information about the status of the managed index: free-form, depends on the state"),
     // --- knn._common ---
+    // map<bare> open-object
+    raw("knn._common:ModelResponse/model_definition", OpenObject, "engine-specific model definition: the set depends on the engine"),
     // map<bare>
     raw("knn._common:NodeStats/indices_in_cache", OpenObject, "SPEC GAP: index name -> per-index cache stats, value schema missing"),
     // --- knn ---
@@ -236,8 +239,12 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("knn:SearchModelsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("knn:SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("knn:SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("knn:SearchModelsResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("knn:SearchModelsResponseSuggestValueItemCompletionOptionsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // --- ltr._common ---
     // map<bare>
     raw("ltr._common:CacheStatsResponse/stores", OpenObject, "SPEC GAP: store name -> cache stats, value schema missing"),
@@ -258,8 +265,12 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ltr:SearchFeaturesResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchFeaturesResponseSuggestValueItemCompletionOptionsArrayItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchFeaturesResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchFeaturesResponseSuggestValueItemCompletionOptionsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchFeaturesetsResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
@@ -268,8 +279,12 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ltr:SearchFeaturesetsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchFeaturesetsResponseSuggestValueItemCompletionOptionsArrayItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchFeaturesetsResponseSuggestValueItemCompletionOptionsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchModelsResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
     // bare
@@ -278,8 +293,12 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ltr:SearchModelsResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchModelsResponseSuggestValueItemCompletionOptionsArrayItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ltr:SearchModelsResponseSuggestValueItemCompletionOptionsObject/_source", NoType, "document body: its shape is user-defined (decode with serde_json or a caller type)"),
+    // map<bare> open-object
+    raw("ltr:SearchModelsResponseSuggestValueItemCompletionOptionsObject/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // --- ml._common ---
     // bare
     raw("ml._common:AdditionalInfo/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
@@ -303,6 +322,10 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("ml._common:Namespace/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
     // bare
     raw("ml._common:Parameters/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
+    // bare no-type
+    raw("ml._common:SearchResponseHitsHitsItem/[additional]", NoType, "unknown metadata fields: plugins and future versions add `_`-prefixed hit/document metadata"),
+    // map<bare> open-object
+    raw("ml._common:SearchResponseHitsHitsItem/fields", OpenObject, "stored/docvalue fields requested per query: names and value types depend on the mapping"),
     // bare
     raw("ml._common:Source/[additional]", OpenObject, "ML connector/model/agent configuration: provider-specific open set of keys"),
     // bare
@@ -318,6 +341,8 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("nodes.info:NodeInfoSettingsNode/attr", OpenObject, "custom node attributes: user-defined names (values are strings in practice)"),
     // bare
     raw("nodes.info:NodeInfoSettingsPlugins/[additional]", OpenObject, "plugin settings: open key space"),
+    // map<bare> open-object
+    raw("nodes.info:NodeInfoSettingsTransport/ssl", OpenObject, "SPEC GAP: transport-layer SSL settings declared as an untyped object"),
     // --- nodes.usage ---
     // map<bare>
     raw("nodes.usage:NodeUsage/aggregations", OpenObject, "aggregation usage counters keyed by aggregation and value-source type: open set"),
@@ -339,6 +364,9 @@ pub const RAW_FIELDS: &[RawField] = &[
     raw("rollups._common:MetricsConfigMetrics/sum", OpenObject, "rollup metric marker: an empty object (`\"avg\": {}`) by design"),
     // map<bare>
     raw("rollups._common:MetricsConfigMetrics/value_count", OpenObject, "rollup metric marker: an empty object (`\"avg\": {}`) by design"),
+    // --- search_pipeline._common ---
+    // map<bare> open-object
+    raw("search_pipeline._common:MLInferenceRequestProcessor/model_config", OpenObject, "model configuration: the set depends on the model"),
     // --- search_relevance ---
     // map<bare>
     raw("search_relevance:GetNodeStatsResponse/all_nodes", OpenObject, "SPEC GAP: search relevance stats sections declared as untyped objects"),

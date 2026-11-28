@@ -54,7 +54,7 @@ impl SecurityAnalyticsGetAlertsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Analytics Get Alerts API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
+#[doc = "Builder for the [Security Analytics Get Alerts API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
 #[derive(Clone, Debug)]
 pub struct SecurityAnalyticsGetAlerts<'a, 'b> {
     transport: &'a Transport,
@@ -285,7 +285,7 @@ impl SecurityAnalyticsGetFindingsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Analytics Get Findings API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
+#[doc = "Builder for the [Security Analytics Get Findings API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
 #[derive(Clone, Debug)]
 pub struct SecurityAnalyticsGetFindings<'a, 'b> {
     transport: &'a Transport,
@@ -525,7 +525,7 @@ impl SecurityAnalyticsSearchFindingCorrelationsParts {
         }
     }
 }
-#[doc = "Builder for the [Security Analytics Search Finding Correlations API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
+#[doc = "Builder for the [Security Analytics Search Finding Correlations API](https://docs.opensearch.org/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
 #[derive(Clone, Debug)]
 pub struct SecurityAnalyticsSearchFindingCorrelations<'a, 'b> {
     transport: &'a Transport,
@@ -671,15 +671,15 @@ impl<'a> SecurityAnalytics<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Security Analytics Get Alerts API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
+    #[doc = "[Security Analytics Get Alerts API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-alerts)\n\nRetrieve alerts related to a specific detector type or detector ID."]
     pub fn get_alerts<'b>(&'a self) -> SecurityAnalyticsGetAlerts<'a, 'b> {
         SecurityAnalyticsGetAlerts::new(self.transport())
     }
-    #[doc = "[Security Analytics Get Findings API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
+    #[doc = "[Security Analytics Get Findings API](https://docs.opensearch.org/latest/security-analytics/api-tools/alert-finding-api/#get-findings)\n\nRetrieve findings related to a specific detector type or detector ID."]
     pub fn get_findings<'b>(&'a self) -> SecurityAnalyticsGetFindings<'a, 'b> {
         SecurityAnalyticsGetFindings::new(self.transport())
     }
-    #[doc = "[Security Analytics Search Finding Correlations API](https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
+    #[doc = "[Security Analytics Search Finding Correlations API](https://docs.opensearch.org/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type)\n\nList correlations for a finding."]
     pub fn search_finding_correlations<'b>(
         &'a self,
     ) -> SecurityAnalyticsSearchFindingCorrelations<'a, 'b> {

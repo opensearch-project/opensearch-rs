@@ -183,14 +183,8 @@ impl<'de> serde::Deserialize<'de> for ShardStoreAllocation {
     }
 }
 
-#[doc = "The exception information for a shard store."]
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ShardStoreException {
-    #[doc = "The reason for the store exception."]
-    pub reason: String,
-    #[doc = "The type of store exception."]
-    pub r#type: String,
-}
+#[doc = "The exception raised when the node failed to open the shard's on-disk index."]
+pub type ShardStoreException = crate::types::common::ErrorCause;
 
 #[doc = "The wrapper containing store information for a shard."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

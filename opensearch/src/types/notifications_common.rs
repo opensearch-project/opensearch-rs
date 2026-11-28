@@ -152,12 +152,12 @@ pub struct GetConfigsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub start_index: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub total_hit_relation: Option<crate::types::notifications_common::TotalHitRelation>,
+    pub total_hit_relation: Option<crate::types::common::TotalHitsRelation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_hits: Option<i64>,
 }
 
-pub type HeaderParamsMap = std::collections::BTreeMap<String, i32>;
+pub type HeaderParamsMap = std::collections::BTreeMap<String, String>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HttpMethodType {
@@ -477,47 +477,6 @@ pub struct SnsItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role_arn: Option<String>,
     pub topic_arn: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TotalHitRelation {
-    #[doc = "`eq`"]
-    Eq,
-    #[doc = "`gte`"]
-    Gte,
-    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
-    Unknown(String),
-}
-impl TotalHitRelation {
-    #[doc = "The JSON string of the value"]
-    pub fn as_str(&self) -> &str {
-        match self {
-            TotalHitRelation::Eq => "eq",
-            TotalHitRelation::Gte => "gte",
-            TotalHitRelation::Unknown(s) => s.as_str(),
-        }
-    }
-}
-impl serde::Serialize for TotalHitRelation {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-impl<'de> serde::Deserialize<'de> for TotalHitRelation {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "eq" => TotalHitRelation::Eq,
-            "gte" => TotalHitRelation::Gte,
-            _ => TotalHitRelation::Unknown(s),
-        })
-    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

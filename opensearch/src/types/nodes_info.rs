@@ -124,7 +124,7 @@ pub struct NodeInfoClient {
 pub struct NodeInfoDiscovery {
     #[doc = "The configured seed hosts for node discovery."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub seed_hosts: Option<String>,
+    pub seed_hosts: Option<crate::types::common::StringOrStringArray>,
     #[doc = "The discovery mechanism type."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub r#type: Option<String>,
@@ -273,7 +273,8 @@ pub struct NodeInfoScript {
 #[doc = "The search operation configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSearch {
-    pub remote: crate::types::nodes_info::NodeInfoSearchRemote,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub remote: Option<crate::types::nodes_info::NodeInfoSearchRemote>,
 }
 
 #[doc = "The search pipeline processor configuration."]
@@ -302,7 +303,8 @@ pub struct NodeInfoSearchPipelines {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSearchRemote {
     #[doc = "The remote connection settings."]
-    pub connect: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub connect: Option<String>,
 }
 
 #[doc = "The configuration settings for the node."]
@@ -349,13 +351,72 @@ pub struct NodeInfoSettingsCluster {
     pub initial_master_nodes: Option<crate::types::common::StringOrStringArray>,
     pub name: crate::types::common::Name,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub routing: Option<crate::types::indices_common::IndexRouting>,
+    pub routing: Option<crate::types::nodes_info::NodeInfoSettingsClusterRouting>,
 }
 
 #[doc = "The cluster election strategy configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSettingsClusterElection {
     pub strategy: crate::types::common::Name,
+}
+
+#[doc = "The cluster-level routing configuration."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NodeInfoSettingsClusterRouting {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allocation: Option<crate::types::nodes_info::NodeInfoSettingsClusterRoutingAllocation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rebalance: Option<crate::types::indices_common::IndexRoutingRebalance>,
+}
+
+#[doc = "The cluster-level shard allocation configuration."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NodeInfoSettingsClusterRoutingAllocation {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub disk: Option<crate::types::indices_common::IndexRoutingAllocationDisk>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enable: Option<crate::types::indices_common::IndexRoutingAllocationOptions>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub include: Option<crate::types::indices_common::IndexRoutingAllocationInclude>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub initial_recovery:
+        Option<crate::types::indices_common::IndexRoutingAllocationInitialRecovery>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_primary_shards_per_node: Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_remote_capable_primary_shards_per_node:
+        Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_remote_capable_shards_per_node: Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_shards_per_node: Option<crate::types::common::StringifiedInteger>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub awareness:
+        Option<crate::types::nodes_info::NodeInfoSettingsClusterRoutingAllocationAwareness>,
+}
+
+#[doc = "The shard allocation awareness configuration."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NodeInfoSettingsClusterRoutingAllocationAwareness {
+    #[doc = "The node attributes used for shard allocation awareness."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attributes: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The forced awareness configuration, keyed by node attribute name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub force: Option<
+        std::collections::BTreeMap<
+            String,
+            crate::types::nodes_info::NodeInfoSettingsClusterRoutingAllocationAwarenessForce,
+        >,
+    >,
+}
+
+#[doc = "The forced awareness values for a node attribute."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NodeInfoSettingsClusterRoutingAllocationAwarenessForce {
+    #[doc = "The attribute values across which shards are forced to be spread."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub values: Option<crate::types::common::StringOrStringArray>,
 }
 
 #[doc = "Controls deprecation notice indexing behavior."]
@@ -367,10 +428,23 @@ pub struct NodeInfoSettingsDeprecationIndexing {
 #[doc = "The HTTP server configuration."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSettingsHttp {
+    #[doc = "The host addresses the HTTP server binds to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bind_host: Option<crate::types::common::StringOrStringArray>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compression: Option<crate::types::common::StringifiedBoolean>,
+    #[doc = "The host addresses the HTTP server binds to and publishes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub port: Option<crate::types::common::StringifiedInteger>,
+    pub host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The port or port range (for example, `9200-9300`) the HTTP server binds to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub port: Option<String>,
+    #[doc = "The host addresses the HTTP server publishes to clients."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The port the HTTP server publishes to clients."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_port: Option<crate::types::common::StringifiedInteger>,
     pub r#type: crate::types::nodes_info::NodeInfoSettingsHttpType,
     #[doc = "The default HTTP server type."]
     #[serde(rename = "type.default")]
@@ -525,7 +599,15 @@ pub struct NodeInfoSettingsIngest {
 #[doc = "The network configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSettingsNetwork {
-    pub host: crate::types::common::Host,
+    #[doc = "The host addresses the node binds to for all network services."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bind_host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The host addresses the node binds to and publishes for all network services."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The host addresses the node publishes for all network services."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_host: Option<crate::types::common::StringOrStringArray>,
 }
 
 #[doc = "The node-specific configuration settings."]
@@ -538,6 +620,9 @@ pub struct NodeInfoSettingsNode {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_local_storage_nodes: Option<String>,
     pub name: crate::types::common::Name,
+    #[doc = "The roles assigned to the node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub roles: Option<crate::types::common::StringOrStringArray>,
 }
 
 #[doc = "The plugin-specific settings."]
@@ -547,6 +632,24 @@ pub type NodeInfoSettingsPlugins =
 #[doc = "The transport layer configuration settings."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeInfoSettingsTransport {
+    #[doc = "The host addresses the transport layer binds to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bind_host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The host addresses the transport layer binds to and publishes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The port or port range (for example, `9300-9400`) the transport layer binds to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub port: Option<String>,
+    #[doc = "The host addresses the transport layer publishes to other nodes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_host: Option<crate::types::common::StringOrStringArray>,
+    #[doc = "The port the transport layer publishes to other nodes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publish_port: Option<crate::types::common::StringifiedInteger>,
+    #[doc = "The transport-layer SSL settings."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ssl: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub r#type: crate::types::nodes_info::NodeInfoSettingsTransportType,
     #[doc = "The default transport type."]
     #[serde(rename = "type.default")]

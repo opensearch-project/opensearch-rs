@@ -65,6 +65,9 @@ pub struct ThreadPoolRecord {
     #[doc = "The node name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_name: Option<String>,
+    #[doc = "The parallelism level of the thread pool; `null` for non-resizable pools."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parallelism: Option<String>,
     #[doc = "The process identifier."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pid: Option<String>,

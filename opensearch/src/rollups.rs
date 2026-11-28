@@ -60,7 +60,7 @@ impl<'b> RollupsDeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Delete API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
+#[doc = "Builder for the [Rollups Delete API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
 #[derive(Clone, Debug)]
 pub struct RollupsDelete<'a, 'b> {
     transport: &'a Transport,
@@ -179,7 +179,7 @@ impl<'b> RollupsExplainParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Explain API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
+#[doc = "Builder for the [Rollups Explain API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
 #[derive(Clone, Debug)]
 pub struct RollupsExplain<'a, 'b> {
     transport: &'a Transport,
@@ -297,7 +297,7 @@ impl<'b> RollupsGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Get API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
+#[doc = "Builder for the [Rollups Get API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
 #[derive(Clone, Debug)]
 pub struct RollupsGet<'a, 'b> {
     transport: &'a Transport,
@@ -415,7 +415,7 @@ impl<'b> RollupsPutParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Put API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
+#[doc = "Builder for the [Rollups Put API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
 #[derive(Clone, Debug)]
 pub struct RollupsPut<'a, 'b, B> {
     transport: &'a Transport,
@@ -577,7 +577,7 @@ impl<'b> RollupsStartParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Start API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
+#[doc = "Builder for the [Rollups Start API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
 #[derive(Clone, Debug)]
 pub struct RollupsStart<'a, 'b, B> {
     transport: &'a Transport,
@@ -719,7 +719,7 @@ impl<'b> RollupsStopParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Rollups Stop API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
+#[doc = "Builder for the [Rollups Stop API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
 #[derive(Clone, Debug)]
 pub struct RollupsStop<'a, 'b, B> {
     transport: &'a Transport,
@@ -852,27 +852,27 @@ impl<'a> Rollups<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Rollups Delete API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
+    #[doc = "[Rollups Delete API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job)\n\nDeletes an index rollup job configuration."]
     pub fn delete<'b>(&'a self, parts: RollupsDeleteParts<'b>) -> RollupsDelete<'a, 'b> {
         RollupsDelete::new(self.transport(), parts)
     }
-    #[doc = "[Rollups Explain API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
+    #[doc = "[Rollups Explain API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job)\n\nRetrieves the execution status information for an index rollup job."]
     pub fn explain<'b>(&'a self, parts: RollupsExplainParts<'b>) -> RollupsExplain<'a, 'b> {
         RollupsExplain::new(self.transport(), parts)
     }
-    #[doc = "[Rollups Get API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
+    #[doc = "[Rollups Get API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job)\n\nRetrieves an index rollup job configuration by ID."]
     pub fn get<'b>(&'a self, parts: RollupsGetParts<'b>) -> RollupsGet<'a, 'b> {
         RollupsGet::new(self.transport(), parts)
     }
-    #[doc = "[Rollups Put API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
+    #[doc = "[Rollups Put API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job)\n\nCreates or updates an index rollup job configuration."]
     pub fn put<'b>(&'a self, parts: RollupsPutParts<'b>) -> RollupsPut<'a, 'b, ()> {
         RollupsPut::new(self.transport(), parts)
     }
-    #[doc = "[Rollups Start API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
+    #[doc = "[Rollups Start API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStarts the execution of an index rollup job."]
     pub fn start<'b>(&'a self, parts: RollupsStartParts<'b>) -> RollupsStart<'a, 'b, ()> {
         RollupsStart::new(self.transport(), parts)
     }
-    #[doc = "[Rollups Stop API](https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
+    #[doc = "[Rollups Stop API](https://docs.opensearch.org/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job)\n\nStops the execution of an index rollup job."]
     pub fn stop<'b>(&'a self, parts: RollupsStopParts<'b>) -> RollupsStop<'a, 'b, ()> {
         RollupsStop::new(self.transport(), parts)
     }

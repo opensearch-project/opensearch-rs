@@ -71,7 +71,7 @@ impl<'b> NodesHotThreadsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Hot Threads API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
+#[doc = "Builder for the [Nodes Hot Threads API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesHotThreads<'a, 'b> {
     transport: &'a Transport,
@@ -265,7 +265,7 @@ impl<'b> NodesInfoParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Info API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
+#[doc = "Builder for the [Nodes Info API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesInfo<'a, 'b> {
     transport: &'a Transport,
@@ -407,7 +407,7 @@ impl<'b> NodesReloadSecureSettingsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Reload Secure Settings API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
+#[doc = "Builder for the [Nodes Reload Secure Settings API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
 #[derive(Clone, Debug)]
 pub struct NodesReloadSecureSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -636,7 +636,7 @@ impl<'b> NodesStatsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Stats API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
+#[doc = "Builder for the [Nodes Stats API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
 #[derive(Clone, Debug)]
 pub struct NodesStats<'a, 'b> {
     transport: &'a Transport,
@@ -865,7 +865,7 @@ impl<'b> NodesUsageParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Nodes Usage API](https://opensearch.org/docs/latest)\n\nReturns low-level information about REST actions usage on nodes."]
+#[doc = "Builder for the [Nodes Usage API](https://docs.opensearch.org/latest/)\n\nReturns low-level information about REST actions usage on nodes."]
 #[derive(Clone, Debug)]
 pub struct NodesUsage<'a, 'b> {
     transport: &'a Transport,
@@ -984,26 +984,26 @@ impl<'a> Nodes<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Nodes Hot Threads API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
+    #[doc = "[Nodes Hot Threads API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-hot-threads/)\n\nReturns information about hot threads on each node in the cluster."]
     pub fn hot_threads<'b>(&'a self, parts: NodesHotThreadsParts<'b>) -> NodesHotThreads<'a, 'b> {
         NodesHotThreads::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Info API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
+    #[doc = "[Nodes Info API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-info/)\n\nReturns information about nodes in the cluster."]
     pub fn info<'b>(&'a self, parts: NodesInfoParts<'b>) -> NodesInfo<'a, 'b> {
         NodesInfo::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Reload Secure Settings API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
+    #[doc = "[Nodes Reload Secure Settings API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-reload-secure/)\n\nReloads secure settings."]
     pub fn reload_secure_settings<'b>(
         &'a self,
         parts: NodesReloadSecureSettingsParts<'b>,
     ) -> NodesReloadSecureSettings<'a, 'b, ()> {
         NodesReloadSecureSettings::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Stats API](https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
+    #[doc = "[Nodes Stats API](https://docs.opensearch.org/latest/api-reference/nodes-apis/nodes-usage/)\n\nReturns statistical information about nodes in the cluster."]
     pub fn stats<'b>(&'a self, parts: NodesStatsParts<'b>) -> NodesStats<'a, 'b> {
         NodesStats::new(self.transport(), parts)
     }
-    #[doc = "[Nodes Usage API](https://opensearch.org/docs/latest)\n\nReturns low-level information about REST actions usage on nodes."]
+    #[doc = "[Nodes Usage API](https://docs.opensearch.org/latest/)\n\nReturns low-level information about REST actions usage on nodes."]
     pub fn usage<'b>(&'a self, parts: NodesUsageParts<'b>) -> NodesUsage<'a, 'b> {
         NodesUsage::new(self.transport(), parts)
     }

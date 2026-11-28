@@ -31,6 +31,7 @@
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
+#[non_exhaustive]
 pub struct Analyzer {
     raw: Box<serde_json::value::RawValue>,
 }
@@ -286,6 +287,7 @@ impl CharFilter {
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
+#[non_exhaustive]
 pub struct CharFilterDefinition {
     raw: Box<serde_json::value::RawValue>,
 }
@@ -5478,6 +5480,7 @@ impl TokenFilter {
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
+#[non_exhaustive]
 pub struct TokenFilterDefinition {
     raw: Box<serde_json::value::RawValue>,
 }
@@ -5975,6 +5978,7 @@ impl Tokenizer {
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
+#[non_exhaustive]
 pub struct TokenizerDefinition {
     raw: Box<serde_json::value::RawValue>,
 }

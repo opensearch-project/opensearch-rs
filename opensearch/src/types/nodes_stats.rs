@@ -590,6 +590,49 @@ pub struct MemoryStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NativeMemory {
+    #[doc = "Native memory tracked by the `jemalloc` allocator of the analytics backend. Present only when the `native_memory` metric is requested and an analytics backend plugin reports it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analytics_backend: Option<crate::types::nodes_stats::NativeMemoryAnalyticsBackend>,
+    #[doc = "Native allocator pool statistics. Present only when the `native_allocator` metric is requested and a plugin that owns a native allocator reports them."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_allocator: Option<crate::types::nodes_stats::NativeMemoryAllocator>,
+    #[doc = "Estimated process native memory, calculated as anonymous resident memory minus committed JVM heap and non-heap memory, floored at `0`. `-1` if the estimate is unavailable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_estimated_bytes: Option<crate::types::common::ByteCount>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NativeMemoryAllocator {
+    #[doc = "Statistics for each allocator pool, keyed by pool name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pools: Option<
+        std::collections::BTreeMap<String, crate::types::nodes_stats::NativeMemoryAllocatorPool>,
+    >,
+    #[doc = "Statistics for the root allocator."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub root: Option<crate::types::nodes_stats::NativeMemoryAllocatorPool>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NativeMemoryAllocatorPool {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allocated_bytes: Option<crate::types::common::ByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit_bytes: Option<crate::types::common::ByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub peak_bytes: Option<crate::types::common::ByteCount>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NativeMemoryAnalyticsBackend {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allocated_bytes: Option<crate::types::common::ByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resident_bytes: Option<crate::types::common::ByteCount>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeBufferPool {
     #[doc = "Number of buffer pools."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -698,6 +741,16 @@ pub struct NodeIndicesStats {
             Vec<std::collections::BTreeMap<String, crate::types::nodes_stats::NodeIndexShardStats>>,
         >,
     >,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status_counter: Option<crate::types::nodes_stats::NodeIndicesStatusCounter>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NodeIndicesStatusCounter {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub doc_status: Option<crate::types::nodes_stats::StatusCounterStats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_response_status: Option<crate::types::nodes_stats::StatusCounterStats>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -925,6 +978,8 @@ pub struct ShardAdmissionControlStats {
     pub global_cpu_usage: Option<crate::types::nodes_stats::UsageStats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub global_io_usage: Option<crate::types::nodes_stats::UsageStats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub global_native_memory_usage: Option<crate::types::nodes_stats::UsageStats>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1091,6 +1146,8 @@ pub struct ShardResourceUsageStatsDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memory_utilization_percent: Option<crate::types::common::PercentageString>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_memory_utilization_percent: Option<crate::types::common::PercentageString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub timestamp: Option<crate::types::common::EpochTimeUnitMillis>,
 }
 
@@ -1214,6 +1271,20 @@ pub struct ShardSearchBackpressureTaskResourceTrackerHeapUsageTrackerStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ShardSearchBackpressureTaskResourceTrackerNativeMemoryUsageTrackerStats {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cancellation_count: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_avg: Option<crate::types::common::HumanReadableByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_avg_bytes: Option<crate::types::common::ByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_max: Option<crate::types::common::HumanReadableByteCount>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_max_bytes: Option<crate::types::common::ByteCount>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardSearchBackpressureTaskResourceTrackerStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu_usage_tracker: Option<crate::types::nodes_stats::ShardSearchBackpressureTaskResourceTrackerCpuUsageTrackerStats>,
@@ -1221,6 +1292,8 @@ pub struct ShardSearchBackpressureTaskResourceTrackerStats {
     pub elapsed_time_tracker: Option<crate::types::nodes_stats::ShardSearchBackpressureTaskResourceTrackerElapsedTimeTrackerStats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub heap_usage_tracker: Option<crate::types::nodes_stats::ShardSearchBackpressureTaskResourceTrackerHeapUsageTrackerStats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_memory_usage_tracker: Option<crate::types::nodes_stats::ShardSearchBackpressureTaskResourceTrackerNativeMemoryUsageTrackerStats>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1236,6 +1309,19 @@ pub struct ShardSearchBackpressureTaskStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ShardSearchPipelineFactoryStats {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evaluation_stats: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generation_stats: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<String>,
+}
+
+pub type ShardSearchPipelineFactoryStatsByType =
+    std::collections::BTreeMap<String, crate::types::nodes_stats::ShardSearchPipelineFactoryStats>;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardSearchPipelineOperationStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub count: Option<i64>,
@@ -1245,6 +1331,8 @@ pub struct ShardSearchPipelineOperationStats {
     pub failed: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub time: Option<crate::types::common::Duration>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub time_in_micros: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub time_in_millis: Option<crate::types::common::DurationValueUnitMillis>,
 }
@@ -1262,8 +1350,14 @@ pub struct ShardSearchPipelinePerPipelineStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub request_processors:
-        Option<Vec<crate::types::nodes_stats::ShardSearchPipelinePerPipelineProcessorStats>>,
+    pub request_processors: Option<
+        Vec<
+            std::collections::BTreeMap<
+                String,
+                crate::types::nodes_stats::ShardSearchPipelinePerPipelineProcessorStats,
+            >,
+        >,
+    >,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1277,6 +1371,11 @@ pub struct ShardSearchPipelinePerPipelineStats {
     >,
 }
 
+pub type ShardSearchPipelineProcessorStatsByName = std::collections::BTreeMap<
+    String,
+    crate::types::nodes_stats::ShardSearchPipelinePerPipelineProcessorStats,
+>;
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ShardSearchPipelineStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1287,9 +1386,35 @@ pub struct ShardSearchPipelineStats {
         >,
     >,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_generated_factories:
+        Option<crate::types::nodes_stats::ShardSearchPipelineSystemGeneratedFactories>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_generated_processors:
+        Option<crate::types::nodes_stats::ShardSearchPipelineSystemGeneratedProcessors>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_request: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_response: Option<crate::types::nodes_stats::ShardSearchPipelineOperationStats>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ShardSearchPipelineSystemGeneratedFactories {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_processor_factories:
+        Option<Vec<crate::types::nodes_stats::ShardSearchPipelineFactoryStatsByType>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_processor_factories:
+        Option<Vec<crate::types::nodes_stats::ShardSearchPipelineFactoryStatsByType>>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ShardSearchPipelineSystemGeneratedProcessors {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_processors:
+        Option<Vec<crate::types::nodes_stats::ShardSearchPipelineProcessorStatsByName>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_processors:
+        Option<Vec<crate::types::nodes_stats::ShardSearchPipelineProcessorStatsByName>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -1366,6 +1491,9 @@ pub struct Stats {
     pub jvm: Option<crate::types::nodes_stats::Jvm>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<crate::types::common::Name>,
+    #[doc = "Native (off-heap) memory statistics. Always present, regardless of the requested metrics."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_memory: Option<crate::types::nodes_stats::NativeMemory>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub os: Option<crate::types::nodes_stats::OperatingSystem>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1443,6 +1571,16 @@ impl<'de> serde::Deserialize<'de> for StatsIp {
 
 #[doc = "The response of the `nodes.stats` API"]
 pub type StatsResponse = crate::types::nodes::StatsResponse;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StatusCounterStats {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub success: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_failure: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_error: Option<i64>,
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ThreadCount {

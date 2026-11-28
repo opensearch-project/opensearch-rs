@@ -128,6 +128,12 @@ pub struct IndicesRecord {
     #[serde(rename = "indexing.index_total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indexing_index_total: Option<String>,
+    #[doc = "epoch timestamp in milliseconds of the most recent indexing request"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_index_request_timestamp: Option<String>,
+    #[doc = "human-readable timestamp of the most recent indexing request"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_index_request_timestamp_string: Option<String>,
     #[doc = "total used memory"]
     #[serde(rename = "memory.total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -160,6 +166,38 @@ pub struct IndicesRecord {
     #[serde(rename = "merges.total_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub merges_total_time: Option<String>,
+    #[doc = "number of currently ongoing merge warmer operations"]
+    #[serde(rename = "merges.warmer.ongoing_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_ongoing_count: Option<String>,
+    #[doc = "total bytes received during merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_bytes_received")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_bytes_received: Option<String>,
+    #[doc = "total bytes sent during merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_bytes_sent")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_bytes_sent: Option<String>,
+    #[doc = "total failed merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_failure_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_failure_count: Option<String>,
+    #[doc = "total merge warmer invocations"]
+    #[serde(rename = "merges.warmer.total_invocations")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_invocations: Option<String>,
+    #[doc = "total time spent receiving data during merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_receive_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_receive_time: Option<String>,
+    #[doc = "total time spent sending data during merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_send_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_send_time: Option<String>,
+    #[doc = "total time spent on merge warmer operations"]
+    #[serde(rename = "merges.warmer.total_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merges_warmer_total_time: Option<String>,
     #[doc = "number of primary shards"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pri: Option<String>,
@@ -271,6 +309,38 @@ pub struct IndicesRecord {
     #[serde(rename = "pri.merges.total_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pri_merges_total_time: Option<String>,
+    #[doc = "number of currently ongoing merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.ongoing_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_ongoing_count: Option<String>,
+    #[doc = "total bytes received during merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_bytes_received")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_bytes_received: Option<String>,
+    #[doc = "total bytes sent during merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_bytes_sent")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_bytes_sent: Option<String>,
+    #[doc = "total failed merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_failure_count")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_failure_count: Option<String>,
+    #[doc = "total merge warmer invocations"]
+    #[serde(rename = "pri.merges.warmer.total_invocations")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_invocations: Option<String>,
+    #[doc = "total time spent receiving data during merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_receive_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_receive_time: Option<String>,
+    #[doc = "total time spent sending data during merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_send_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_send_time: Option<String>,
+    #[doc = "total time spent on merge warmer operations"]
+    #[serde(rename = "pri.merges.warmer.total_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_merges_warmer_total_time: Option<String>,
     #[doc = "query cache evictions"]
     #[serde(rename = "pri.query_cache.evictions")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -356,6 +426,10 @@ pub struct IndicesRecord {
     #[serde(rename = "pri.search.query_current")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pri_search_query_current: Option<String>,
+    #[doc = "total failed query phase ops"]
+    #[serde(rename = "pri.search.query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_search_query_failed: Option<String>,
     #[doc = "time spent in query phase"]
     #[serde(rename = "pri.search.query_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -376,6 +450,22 @@ pub struct IndicesRecord {
     #[serde(rename = "pri.search.scroll_total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pri_search_scroll_total: Option<String>,
+    #[doc = "number of currently running star-tree query ops"]
+    #[serde(rename = "pri.search.startree.query_current")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_search_startree_query_current: Option<String>,
+    #[doc = "time spent in star-tree queries"]
+    #[serde(rename = "pri.search.startree.query_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_search_startree_query_time: Option<String>,
+    #[doc = "total star-tree query ops"]
+    #[serde(rename = "pri.search.startree.query_total")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_search_startree_query_total: Option<String>,
+    #[doc = "total failed star-tree query ops"]
+    #[serde(rename = "pri.search.startree_query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pri_search_startree_query_failed: Option<String>,
     #[doc = "number of segments"]
     #[serde(rename = "pri.segments.count")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -512,6 +602,10 @@ pub struct IndicesRecord {
     #[serde(rename = "search.query_current")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_query_current: Option<String>,
+    #[doc = "total failed query phase ops"]
+    #[serde(rename = "search.query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_query_failed: Option<String>,
     #[doc = "time spent in query phase"]
     #[serde(rename = "search.query_time")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -532,6 +626,22 @@ pub struct IndicesRecord {
     #[serde(rename = "search.scroll_total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub search_scroll_total: Option<String>,
+    #[doc = "number of currently running star-tree query ops"]
+    #[serde(rename = "search.startree_query_current")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_current: Option<String>,
+    #[doc = "total failed star-tree query ops"]
+    #[serde(rename = "search.startree_query_failed")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_failed: Option<String>,
+    #[doc = "time spent in star-tree queries"]
+    #[serde(rename = "search.startree_query_time")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_time: Option<String>,
+    #[doc = "total star-tree query ops"]
+    #[serde(rename = "search.startree_query_total")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_startree_query_total: Option<String>,
     #[doc = "indicates if the index is search throttled"]
     #[serde(rename = "search.throttled")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -575,6 +685,13 @@ pub struct IndicesRecord {
     #[serde(rename = "suggest.total")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub suggest_total: Option<String>,
+    #[doc = "whether the index is a system index"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system: Option<String>,
+    #[doc = "description from the matching system index descriptor"]
+    #[serde(rename = "system.description")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_description: Option<String>,
     #[doc = "index UUID"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub uuid: Option<String>,

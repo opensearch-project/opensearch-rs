@@ -41,7 +41,7 @@ pub struct ListChannelsResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub start_index: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub total_hit_relation: Option<crate::types::notifications_common::TotalHitRelation>,
+    pub total_hit_relation: Option<crate::types::common::TotalHitsRelation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_hits: Option<i64>,
 }

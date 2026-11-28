@@ -77,6 +77,7 @@ fn mark_non_exhaustive(rust_name: &str, source: String) -> String {
 pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>, String)> {
     let boxed = boxed_edges(model);
     let total_hits_unions = total_hits_unions(model);
+    let relation_path = total_hits_relation_path(model);
     let str_enums: BTreeSet<String> = model
         .types
         .iter()
@@ -104,7 +105,7 @@ pub fn generate(model: &ResponseModel) -> anyhow::Result<(Vec<(String, String)>,
                     param_scope.contains(type_key),
                 );
                 if total_hits_unions.contains(type_key) {
-                    render_total_hit_count(&mut out, &rust_name, u);
+                    render_total_hit_count(&mut out, &rust_name, u, &relation_path);
                 }
                 out
             }
@@ -393,6 +394,26 @@ fn total_hits_unions(model: &ResponseModel) -> BTreeSet<String> {
         .collect()
 }
 
+/// The Rust path of the relation (`eq`, `gte`) of the total hit count, which the
+/// specification may declare in another namespace than the count itself
+fn total_hits_relation_path(model: &ResponseModel) -> String {
+    let key = match model.types.get(TOTAL_HITS) {
+        Some(TypeModel::Struct(s)) => s.fields.iter().find_map(|f| match &f.ty {
+            TypeRef::Named(key) if f.json_name == "relation" => Some(key),
+            _ => None,
+        }),
+        _ => None,
+    };
+    match key {
+        Some(key) => format!(
+            "crate::types::{}::{}",
+            module_name(namespace(key)),
+            rust_type_name(key)
+        ),
+        None => "crate::types::search::TotalHitsRelation".to_string(),
+    }
+}
+
 fn is_total_hits_union(u: &UnionModel) -> bool {
     if u.nullable || u.variants.len() != 2 {
         return false;
@@ -412,7 +433,7 @@ fn is_total_hits_union(u: &UnionModel) -> bool {
 /// `opensearch::types::TotalHitCount` implementation, shared by every such
 /// union, and the same methods as inherent methods, callable without
 /// importing the trait
-fn render_total_hit_count(out: &mut String, rust_name: &str, u: &UnionModel) {
+fn render_total_hit_count(out: &mut String, rust_name: &str, u: &UnionModel, relation: &str) {
     let variant = |object: bool| {
         u.variants
             .iter()
@@ -431,7 +452,7 @@ fn render_total_hit_count(out: &mut String, rust_name: &str, u: &UnionModel) {
         }}
     }}
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {{
+    fn relation(&self) -> &{relation} {{
         match self {{
             Self::{object}(total) => &total.relation,
             Self::{integer}(_) => &crate::types::total_hits::ACCURATE,
@@ -446,7 +467,7 @@ impl {name} {{
     }}
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {{
+    pub fn relation(&self) -> &{relation} {{
         crate::types::TotalHitCount::relation(self)
     }}
 
@@ -457,7 +478,8 @@ impl {name} {{
 }}"#,
         name = rust_name,
         object = object,
-        integer = integer
+        integer = integer,
+        relation = relation
     );
 }
 
@@ -1360,7 +1382,7 @@ mod tests {
         ] {
             assert!(found.contains(name), "{} not found in {:?}", name, found);
         }
-        assert_eq!(found.len(), 10, "{:?}", found);
+        assert_eq!(found.len(), 11, "{:?}", found);
     }
 
     #[test]

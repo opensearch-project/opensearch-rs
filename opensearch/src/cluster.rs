@@ -59,7 +59,7 @@ impl ClusterAllocationExplainParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Allocation Explain API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
+#[doc = "Builder for the [Cluster Allocation Explain API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
 #[derive(Clone, Debug)]
 pub struct ClusterAllocationExplain<'a, 'b, B> {
     transport: &'a Transport,
@@ -223,7 +223,7 @@ impl<'b> ClusterDeleteComponentTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Delete Component Template API](https://opensearch.org/docs/latest)\n\nDeletes a component template."]
+#[doc = "Builder for the [Cluster Delete Component Template API](https://docs.opensearch.org/latest/)\n\nDeletes a component template."]
 #[derive(Clone, Debug)]
 pub struct ClusterDeleteComponentTemplate<'a, 'b> {
     transport: &'a Transport,
@@ -258,7 +258,7 @@ impl<'a, 'b> ClusterDeleteComponentTemplate<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -363,7 +363,7 @@ impl ClusterDeleteDecommissionAwarenessParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Delete Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
+#[doc = "Builder for the [Cluster Delete Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
 #[derive(Clone, Debug)]
 pub struct ClusterDeleteDecommissionAwareness<'a, 'b> {
     transport: &'a Transport,
@@ -477,7 +477,7 @@ impl ClusterDeleteVotingConfigExclusionsParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Delete Voting Config Exclusions API](https://opensearch.org/docs/latest)\n\nClears any cluster voting configuration exclusions."]
+#[doc = "Builder for the [Cluster Delete Voting Config Exclusions API](https://docs.opensearch.org/latest/)\n\nClears any cluster voting configuration exclusions."]
 #[derive(Clone, Debug)]
 pub struct ClusterDeleteVotingConfigExclusions<'a, 'b> {
     transport: &'a Transport,
@@ -598,7 +598,7 @@ impl ClusterDeleteWeightedRoutingParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Delete Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-deleting-weights)\n\nDelete weighted shard routing weights."]
+#[doc = "Builder for the [Cluster Delete Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-deleting-the-configuration)\n\nDelete weighted shard routing weights."]
 #[derive(Clone, Debug)]
 pub struct ClusterDeleteWeightedRouting<'a, 'b, B> {
     transport: &'a Transport,
@@ -720,6 +720,128 @@ where
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[doc = "API parts for the Cluster Describe Settings API"]
+pub enum ClusterDescribeSettingsParts {
+    #[doc = "No parts"]
+    None,
+}
+impl ClusterDescribeSettingsParts {
+    #[doc = "Builds a relative URL path to the Cluster Describe Settings API"]
+    pub fn url(self) -> Cow<'static, str> {
+        match self {
+            ClusterDescribeSettingsParts::None => "/_cluster/settings/_describe".into(),
+        }
+    }
+}
+#[doc = "Builder for the [Cluster Describe Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/describe-cluster-settings/)\n\nReturns the definition of each requested cluster setting: whether it is dynamic, its declared default, its value type and bounds, and its description. Accepts exact setting names and prefixes ending in `.*`. Does not return configured values."]
+#[derive(Clone, Debug)]
+pub struct ClusterDescribeSettings<'a, 'b> {
+    transport: &'a Transport,
+    parts: ClusterDescribeSettingsParts,
+    error_trace: Option<bool>,
+    filter_path: Option<&'b [&'b str]>,
+    headers: HeaderMap,
+    human: Option<bool>,
+    pretty: Option<bool>,
+    request_timeout: Option<Duration>,
+    settings: Option<&'b [&'b str]>,
+    source: Option<&'b str>,
+}
+impl<'a, 'b> ClusterDescribeSettings<'a, 'b> {
+    #[doc = "Creates a new instance of [ClusterDescribeSettings]"]
+    pub fn new(transport: &'a Transport) -> Self {
+        let headers = HeaderMap::new();
+        ClusterDescribeSettings {
+            transport,
+            parts: ClusterDescribeSettingsParts::None,
+            headers,
+            error_trace: None,
+            filter_path: None,
+            human: None,
+            pretty: None,
+            request_timeout: None,
+            settings: None,
+            source: None,
+        }
+    }
+    #[doc = "Whether to include the stack trace of returned errors."]
+    pub fn error_trace(mut self, error_trace: bool) -> Self {
+        self.error_trace = Some(error_trace);
+        self
+    }
+    #[doc = "A comma-separated list of filters used to filter the response. Use wildcards to match any field or part of a field's name. To exclude fields, use `-`."]
+    pub fn filter_path(mut self, filter_path: &'b [&'b str]) -> Self {
+        self.filter_path = Some(filter_path);
+        self
+    }
+    #[doc = "Adds a HTTP header"]
+    pub fn header(mut self, key: HeaderName, value: HeaderValue) -> Self {
+        self.headers.insert(key, value);
+        self
+    }
+    #[doc = "Whether to return human-readable values for statistics."]
+    pub fn human(mut self, human: bool) -> Self {
+        self.human = Some(human);
+        self
+    }
+    #[doc = "Whether to pretty-format the returned JSON response."]
+    pub fn pretty(mut self, pretty: bool) -> Self {
+        self.pretty = Some(pretty);
+        self
+    }
+    #[doc = "Sets a request timeout for this API call.\n\nThe timeout is applied from when the request starts connecting until the response body has finished."]
+    pub fn request_timeout(mut self, timeout: Duration) -> Self {
+        self.request_timeout = Some(timeout);
+        self
+    }
+    #[doc = "A comma-separated list of setting names to describe. Each entry is either an exact setting name or a prefix ending in `.*`, such as `cluster.routing.allocation.*`, which expands to every registered setting under it at any depth. Exact names and prefixes can be mixed. Other wildcard forms are rejected. Affix and group setting templates and secure (keystore) settings are not listed under a prefix; their concrete names can still be requested exactly. At least one entry is required."]
+    pub fn settings(mut self, settings: &'b [&'b str]) -> Self {
+        self.settings = Some(settings);
+        self
+    }
+    #[doc = "The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests."]
+    pub fn source(mut self, source: &'b str) -> Self {
+        self.source = Some(source);
+        self
+    }
+    #[doc = "Creates an asynchronous call to the Cluster Describe Settings API that can be awaited"]
+    pub async fn send(self) -> Result<Response, Error> {
+        let path = self.parts.url();
+        let method = Method::Get;
+        let headers = self.headers;
+        let timeout = self.request_timeout;
+        let query_string = {
+            #[serde_with::skip_serializing_none]
+            #[derive(Serialize)]
+            struct QueryParams<'b> {
+                error_trace: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                filter_path: Option<&'b [&'b str]>,
+                human: Option<bool>,
+                pretty: Option<bool>,
+                #[serde(serialize_with = "crate::client::serialize_coll_qs")]
+                settings: Option<&'b [&'b str]>,
+                source: Option<&'b str>,
+            }
+            let query_params = QueryParams {
+                error_trace: self.error_trace,
+                filter_path: self.filter_path,
+                human: self.human,
+                pretty: self.pretty,
+                settings: self.settings,
+                source: self.source,
+            };
+            Some(query_params)
+        };
+        let body = Option::<()>::None;
+        let response = self
+            .transport
+            .send(method, &path, headers, query_string.as_ref(), body, timeout)
+            .await?;
+        Ok(response)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[doc = "API parts for the Cluster Exists Component Template API"]
 pub enum ClusterExistsComponentTemplateParts<'b> {
     #[doc = "Name"]
@@ -739,7 +861,7 @@ impl<'b> ClusterExistsComponentTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Exists Component Template API](https://opensearch.org/docs/latest)\n\nReturns information about whether a particular component template exist."]
+#[doc = "Builder for the [Cluster Exists Component Template API](https://docs.opensearch.org/latest/)\n\nReturns information about whether a particular component template exist."]
 #[derive(Clone, Debug)]
 pub struct ClusterExistsComponentTemplate<'a, 'b> {
     transport: &'a Transport,
@@ -774,7 +896,7 @@ impl<'a, 'b> ClusterExistsComponentTemplate<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -887,7 +1009,7 @@ impl<'b> ClusterGetComponentTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Get Component Template API](https://opensearch.org/docs/latest)\n\nReturns one or more component templates."]
+#[doc = "Builder for the [Cluster Get Component Template API](https://docs.opensearch.org/latest/)\n\nReturns one or more component templates."]
 #[derive(Clone, Debug)]
 pub struct ClusterGetComponentTemplate<'a, 'b> {
     transport: &'a Transport,
@@ -924,7 +1046,7 @@ impl<'a, 'b> ClusterGetComponentTemplate<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1045,7 +1167,7 @@ impl<'b> ClusterGetDecommissionAwarenessParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Get Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
+#[doc = "Builder for the [Cluster Get Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
 #[derive(Clone, Debug)]
 pub struct ClusterGetDecommissionAwareness<'a, 'b> {
     transport: &'a Transport,
@@ -1157,7 +1279,7 @@ impl ClusterGetSettingsParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Get Settings API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
+#[doc = "Builder for the [Cluster Get Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
 #[derive(Clone, Debug)]
 pub struct ClusterGetSettings<'a, 'b> {
     transport: &'a Transport,
@@ -1196,7 +1318,7 @@ impl<'a, 'b> ClusterGetSettings<'a, 'b> {
             timeout: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1321,7 +1443,7 @@ impl<'b> ClusterGetWeightedRoutingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Get Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-getting-weights-for-all-zones)\n\nFetches weighted shard routing weights."]
+#[doc = "Builder for the [Cluster Get Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-viewing-the-configuration)\n\nFetches weighted shard routing weights."]
 #[derive(Clone, Debug)]
 pub struct ClusterGetWeightedRouting<'a, 'b> {
     transport: &'a Transport,
@@ -1444,7 +1566,7 @@ impl<'b> ClusterHealthParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Health API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
+#[doc = "Builder for the [Cluster Health API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
 #[derive(Clone, Debug)]
 pub struct ClusterHealth<'a, 'b> {
     transport: &'a Transport,
@@ -1504,7 +1626,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self.awareness_attribute = Some(awareness_attribute);
         self
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1562,7 +1684,7 @@ impl<'a, 'b> ClusterHealth<'a, 'b> {
         self.source = Some(source);
         self
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn timeout(mut self, timeout: &'b str) -> Self {
         self.timeout = Some(timeout);
         self
@@ -1679,7 +1801,7 @@ impl ClusterPendingTasksParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Pending Tasks API](https://opensearch.org/docs/latest)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
+#[doc = "Builder for the [Cluster Pending Tasks API](https://docs.opensearch.org/latest/)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
 #[derive(Clone, Debug)]
 pub struct ClusterPendingTasks<'a, 'b> {
     transport: &'a Transport,
@@ -1714,7 +1836,7 @@ impl<'a, 'b> ClusterPendingTasks<'a, 'b> {
             source: None,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -1820,7 +1942,7 @@ impl ClusterPostVotingConfigExclusionsParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Post Voting Config Exclusions API](https://opensearch.org/docs/latest)\n\nUpdates the cluster voting configuration by excluding certain node IDs or names."]
+#[doc = "Builder for the [Cluster Post Voting Config Exclusions API](https://docs.opensearch.org/latest/)\n\nUpdates the cluster voting configuration by excluding certain node IDs or names."]
 #[derive(Clone, Debug)]
 pub struct ClusterPostVotingConfigExclusions<'a, 'b, B> {
     transport: &'a Transport,
@@ -1993,7 +2115,7 @@ impl<'b> ClusterPutComponentTemplateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Put Component Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
+#[doc = "Builder for the [Cluster Put Component Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
 #[derive(Clone, Debug)]
 pub struct ClusterPutComponentTemplate<'a, 'b, B> {
     transport: &'a Transport,
@@ -2057,7 +2179,7 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -2185,7 +2307,7 @@ impl<'b> ClusterPutDecommissionAwarenessParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Put Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
+#[doc = "Builder for the [Cluster Put Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
 #[derive(Clone, Debug)]
 pub struct ClusterPutDecommissionAwareness<'a, 'b, B> {
     transport: &'a Transport,
@@ -2320,7 +2442,7 @@ impl ClusterPutSettingsParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Put Settings API](https://opensearch.org/docs/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
+#[doc = "Builder for the [Cluster Put Settings API](https://docs.opensearch.org/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
 #[derive(Clone, Debug)]
 pub struct ClusterPutSettings<'a, 'b, B> {
     transport: &'a Transport,
@@ -2384,7 +2506,7 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -2502,7 +2624,7 @@ impl<'b> ClusterPutWeightedRoutingParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Put Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-weighted-round-robin-search)\n\nUpdates weighted shard routing weights."]
+#[doc = "Builder for the [Cluster Put Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-updating-the-configuration)\n\nUpdates weighted shard routing weights."]
 #[derive(Clone, Debug)]
 pub struct ClusterPutWeightedRouting<'a, 'b, B> {
     transport: &'a Transport,
@@ -2637,7 +2759,7 @@ impl ClusterRemoteInfoParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Remote Info API](https://opensearch.org/docs/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
+#[doc = "Builder for the [Cluster Remote Info API](https://docs.opensearch.org/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
 #[derive(Clone, Debug)]
 pub struct ClusterRemoteInfo<'a, 'b> {
     transport: &'a Transport,
@@ -2749,7 +2871,7 @@ impl ClusterRerouteParts {
         }
     }
 }
-#[doc = "Builder for the [Cluster Reroute API](https://opensearch.org/docs/latest)\n\nAllows to manually change the allocation of individual shards in the cluster."]
+#[doc = "Builder for the [Cluster Reroute API](https://docs.opensearch.org/latest/)\n\nAllows to manually change the allocation of individual shards in the cluster."]
 #[derive(Clone, Debug)]
 pub struct ClusterReroute<'a, 'b, B> {
     transport: &'a Transport,
@@ -2822,7 +2944,7 @@ where
             timeout: self.timeout,
         }
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -2981,7 +3103,7 @@ impl<'b> ClusterStateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster State API](https://opensearch.org/docs/latest)\n\nReturns comprehensive information about the state of the cluster."]
+#[doc = "Builder for the [Cluster State API](https://docs.opensearch.org/latest/)\n\nReturns comprehensive information about the state of the cluster."]
 #[derive(Clone, Debug)]
 pub struct ClusterState<'a, 'b> {
     transport: &'a Transport,
@@ -3033,7 +3155,7 @@ impl<'a, 'b> ClusterState<'a, 'b> {
         self.allow_no_indices = Some(allow_no_indices);
         self
     }
-    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://opensearch.org/docs/latest/api-reference/common-parameters/#time-units)."]
+    #[doc = "The amount of time to wait for a response from the cluster manager node. For more information about supported time units, see [Common parameters](https://docs.opensearch.org/latest/api-reference/common-parameters/#time-units)."]
     pub fn cluster_manager_timeout(mut self, cluster_manager_timeout: &'b str) -> Self {
         self.cluster_manager_timeout = Some(cluster_manager_timeout);
         self
@@ -3228,7 +3350,7 @@ impl<'b> ClusterStatsParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Cluster Stats API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
+#[doc = "Builder for the [Cluster Stats API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
 #[derive(Clone, Debug)]
 pub struct ClusterStats<'a, 'b> {
     transport: &'a Transport,
@@ -3356,117 +3478,121 @@ impl<'a> Cluster<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Cluster Allocation Explain API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
+    #[doc = "[Cluster Allocation Explain API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-allocation/)\n\nExplains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node."]
     pub fn allocation_explain<'b>(&'a self) -> ClusterAllocationExplain<'a, 'b, ()> {
         ClusterAllocationExplain::new(self.transport())
     }
-    #[doc = "[Cluster Delete Component Template API](https://opensearch.org/docs/latest)\n\nDeletes a component template."]
+    #[doc = "[Cluster Delete Component Template API](https://docs.opensearch.org/latest/)\n\nDeletes a component template."]
     pub fn delete_component_template<'b>(
         &'a self,
         parts: ClusterDeleteComponentTemplateParts<'b>,
     ) -> ClusterDeleteComponentTemplate<'a, 'b> {
         ClusterDeleteComponentTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Delete Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
+    #[doc = "[Cluster Delete Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nRecommissions a decommissioned zone."]
     pub fn delete_decommission_awareness<'b>(
         &'a self,
     ) -> ClusterDeleteDecommissionAwareness<'a, 'b> {
         ClusterDeleteDecommissionAwareness::new(self.transport())
     }
-    #[doc = "[Cluster Delete Voting Config Exclusions API](https://opensearch.org/docs/latest)\n\nClears any cluster voting configuration exclusions."]
+    #[doc = "[Cluster Delete Voting Config Exclusions API](https://docs.opensearch.org/latest/)\n\nClears any cluster voting configuration exclusions."]
     pub fn delete_voting_config_exclusions<'b>(
         &'a self,
     ) -> ClusterDeleteVotingConfigExclusions<'a, 'b> {
         ClusterDeleteVotingConfigExclusions::new(self.transport())
     }
-    #[doc = "[Cluster Delete Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-deleting-weights)\n\nDelete weighted shard routing weights."]
+    #[doc = "[Cluster Delete Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-deleting-the-configuration)\n\nDelete weighted shard routing weights."]
     pub fn delete_weighted_routing<'b>(&'a self) -> ClusterDeleteWeightedRouting<'a, 'b, ()> {
         ClusterDeleteWeightedRouting::new(self.transport())
     }
-    #[doc = "[Cluster Exists Component Template API](https://opensearch.org/docs/latest)\n\nReturns information about whether a particular component template exist."]
+    #[doc = "[Cluster Describe Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/describe-cluster-settings/)\n\nReturns the definition of each requested cluster setting: whether it is dynamic, its declared default, its value type and bounds, and its description. Accepts exact setting names and prefixes ending in `.*`. Does not return configured values."]
+    pub fn describe_settings<'b>(&'a self) -> ClusterDescribeSettings<'a, 'b> {
+        ClusterDescribeSettings::new(self.transport())
+    }
+    #[doc = "[Cluster Exists Component Template API](https://docs.opensearch.org/latest/)\n\nReturns information about whether a particular component template exist."]
     pub fn exists_component_template<'b>(
         &'a self,
         parts: ClusterExistsComponentTemplateParts<'b>,
     ) -> ClusterExistsComponentTemplate<'a, 'b> {
         ClusterExistsComponentTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Get Component Template API](https://opensearch.org/docs/latest)\n\nReturns one or more component templates."]
+    #[doc = "[Cluster Get Component Template API](https://docs.opensearch.org/latest/)\n\nReturns one or more component templates."]
     pub fn get_component_template<'b>(
         &'a self,
         parts: ClusterGetComponentTemplateParts<'b>,
     ) -> ClusterGetComponentTemplate<'a, 'b> {
         ClusterGetComponentTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Get Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
+    #[doc = "[Cluster Get Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#getting-zone-decommission-status)\n\nRetrieves the decommission status for all zones."]
     pub fn get_decommission_awareness<'b>(
         &'a self,
         parts: ClusterGetDecommissionAwarenessParts<'b>,
     ) -> ClusterGetDecommissionAwareness<'a, 'b> {
         ClusterGetDecommissionAwareness::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Get Settings API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
+    #[doc = "[Cluster Get Settings API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-settings/)\n\nReturns cluster settings."]
     pub fn get_settings<'b>(&'a self) -> ClusterGetSettings<'a, 'b> {
         ClusterGetSettings::new(self.transport())
     }
-    #[doc = "[Cluster Get Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-getting-weights-for-all-zones)\n\nFetches weighted shard routing weights."]
+    #[doc = "[Cluster Get Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-viewing-the-configuration)\n\nFetches weighted shard routing weights."]
     pub fn get_weighted_routing<'b>(
         &'a self,
         parts: ClusterGetWeightedRoutingParts<'b>,
     ) -> ClusterGetWeightedRouting<'a, 'b> {
         ClusterGetWeightedRouting::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Health API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
+    #[doc = "[Cluster Health API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-health/)\n\nReturns basic information about the health of the cluster."]
     pub fn health<'b>(&'a self, parts: ClusterHealthParts<'b>) -> ClusterHealth<'a, 'b> {
         ClusterHealth::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Pending Tasks API](https://opensearch.org/docs/latest)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
+    #[doc = "[Cluster Pending Tasks API](https://docs.opensearch.org/latest/)\n\nReturns a list of pending cluster-level tasks, such as index creation, mapping updates,\nor new allocations."]
     pub fn pending_tasks<'b>(&'a self) -> ClusterPendingTasks<'a, 'b> {
         ClusterPendingTasks::new(self.transport())
     }
-    #[doc = "[Cluster Post Voting Config Exclusions API](https://opensearch.org/docs/latest)\n\nUpdates the cluster voting configuration by excluding certain node IDs or names."]
+    #[doc = "[Cluster Post Voting Config Exclusions API](https://docs.opensearch.org/latest/)\n\nUpdates the cluster voting configuration by excluding certain node IDs or names."]
     pub fn post_voting_config_exclusions<'b>(
         &'a self,
     ) -> ClusterPostVotingConfigExclusions<'a, 'b, ()> {
         ClusterPostVotingConfigExclusions::new(self.transport())
     }
-    #[doc = "[Cluster Put Component Template API](https://opensearch.org/docs/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
+    #[doc = "[Cluster Put Component Template API](https://docs.opensearch.org/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template)\n\nCreates or updates a component template."]
     pub fn put_component_template<'b>(
         &'a self,
         parts: ClusterPutComponentTemplateParts<'b>,
     ) -> ClusterPutComponentTemplate<'a, 'b, ()> {
         ClusterPutComponentTemplate::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Put Decommission Awareness API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
+    #[doc = "[Cluster Put Decommission Awareness API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-decommission/#decommissioning-and-recommissioning-a-zone)\n\nDecommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion."]
     pub fn put_decommission_awareness<'b>(
         &'a self,
         parts: ClusterPutDecommissionAwarenessParts<'b>,
     ) -> ClusterPutDecommissionAwareness<'a, 'b, ()> {
         ClusterPutDecommissionAwareness::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Put Settings API](https://opensearch.org/docs/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
+    #[doc = "[Cluster Put Settings API](https://docs.opensearch.org/latest/api-reference/cluster-settings/)\n\nUpdates the cluster settings."]
     pub fn put_settings<'b>(&'a self) -> ClusterPutSettings<'a, 'b, ()> {
         ClusterPutSettings::new(self.transport())
     }
-    #[doc = "[Cluster Put Weighted Routing API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-weighted-round-robin-search)\n\nUpdates weighted shard routing weights."]
+    #[doc = "[Cluster Put Weighted Routing API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-awareness/#example-request-updating-the-configuration)\n\nUpdates weighted shard routing weights."]
     pub fn put_weighted_routing<'b>(
         &'a self,
         parts: ClusterPutWeightedRoutingParts<'b>,
     ) -> ClusterPutWeightedRouting<'a, 'b, ()> {
         ClusterPutWeightedRouting::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Remote Info API](https://opensearch.org/docs/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
+    #[doc = "[Cluster Remote Info API](https://docs.opensearch.org/latest/api-reference/remote-info/)\n\nReturns the information about configured remote clusters."]
     pub fn remote_info<'b>(&'a self) -> ClusterRemoteInfo<'a, 'b> {
         ClusterRemoteInfo::new(self.transport())
     }
-    #[doc = "[Cluster Reroute API](https://opensearch.org/docs/latest)\n\nAllows to manually change the allocation of individual shards in the cluster."]
+    #[doc = "[Cluster Reroute API](https://docs.opensearch.org/latest/)\n\nAllows to manually change the allocation of individual shards in the cluster."]
     pub fn reroute<'b>(&'a self) -> ClusterReroute<'a, 'b, ()> {
         ClusterReroute::new(self.transport())
     }
-    #[doc = "[Cluster State API](https://opensearch.org/docs/latest)\n\nReturns comprehensive information about the state of the cluster."]
+    #[doc = "[Cluster State API](https://docs.opensearch.org/latest/)\n\nReturns comprehensive information about the state of the cluster."]
     pub fn state<'b>(&'a self, parts: ClusterStateParts<'b>) -> ClusterState<'a, 'b> {
         ClusterState::new(self.transport(), parts)
     }
-    #[doc = "[Cluster Stats API](https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
+    #[doc = "[Cluster Stats API](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-stats/)\n\nReturns a high-level overview of cluster statistics."]
     pub fn stats<'b>(&'a self, parts: ClusterStatsParts<'b>) -> ClusterStats<'a, 'b> {
         ClusterStats::new(self.transport(), parts)
     }

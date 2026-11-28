@@ -79,6 +79,16 @@ pub struct AllowListConfig {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ApiTokensConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_duration_seconds: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<i64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AuditConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub audit: Option<crate::types::security_common::AuditLogsConfig>,
@@ -99,6 +109,8 @@ pub struct AuditConfigWithReadOnly {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AuditLogsConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub disabled_categories: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub disabled_rest_categories: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -222,6 +234,12 @@ pub struct CertificateTypes {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CertificatesDetail {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alias: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub format: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_private_key: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub issuer_dn: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub not_after: Option<String>,
@@ -229,6 +247,8 @@ pub struct CertificatesDetail {
     pub not_before: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub san: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub serial_number: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subject_dn: Option<String>,
 }
@@ -269,9 +289,15 @@ pub struct ComplianceConfig {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DashboardsInfo {
+    #[doc = "Indicates whether API tokens are enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_tokens_enabled: Option<bool>,
     #[doc = "The default tenant setting for the dashboard."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_tenant: Option<String>,
+    #[doc = "The maximum duration, in seconds, for an API token."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_duration_seconds: Option<i64>,
     #[doc = "Indicates whether multi-tenancy is enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub multitenancy_enabled: Option<bool>,
@@ -293,9 +319,15 @@ pub struct DashboardsInfo {
     #[doc = "The regular expression used perform password validation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub password_validation_regex: Option<String>,
+    #[doc = "The list of preferred tenants."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preferred_tenants: Option<Vec<String>>,
     #[doc = "Indicates whether a private tenant is enabled for all users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub private_tenant_enabled: Option<bool>,
+    #[doc = "Indicates whether resource sharing is enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resource_sharing_enabled: Option<bool>,
     #[doc = "A list of available sign-in options."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sign_in_options: Option<Vec<String>>,
@@ -321,6 +353,8 @@ pub struct DynamicConfig {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DynamicOptions {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_tokens: Option<crate::types::security_common::ApiTokensConfig>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auth_failure_listeners:
         Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
@@ -352,6 +386,8 @@ pub struct DynamicOptions {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub opensearch_dashboards:
         Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub privileges_evaluation_ignore_unauthorized_indices: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub respect_request_indices_options: Option<bool>,
 }
@@ -427,6 +463,8 @@ pub struct MultiTenancyConfig {
     pub default_tenant: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub multitenancy_enabled: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preferred_tenants: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub private_tenant_enabled: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -741,6 +779,8 @@ pub struct WhoAmI {
     pub dn: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub is_admin: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_authenticated: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub is_node_certificate_request: Option<bool>,
 }

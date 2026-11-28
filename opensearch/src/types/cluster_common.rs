@@ -61,6 +61,98 @@ pub struct ComponentTemplateSummary {
     pub version: Option<crate::types::common::VersionNumber>,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SettingMetadata {
+    #[doc = "The default value declared in the setting definition, in the string form that the Cluster Settings API accepts. Omitted for secure (keystore) settings and for settings that declare an empty default. Some defaults are computed by the node that responds to the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default: Option<String>,
+    #[doc = "The description declared in the setting definition. Omitted when the definition does not include a description."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[doc = "Whether the setting is dynamic. A dynamic setting can be updated on a running cluster; a static setting requires a node restart to change."]
+    pub dynamic: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub validation: Option<crate::types::cluster_common::SettingValidation>,
+}
+
+#[doc = "The declared value type and bounds of a setting. Present only for settings defined with a typed parser; string, list, and enumerated settings have no validation object."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SettingValidation {
+    #[doc = "The largest accepted value, in the same string form as `default`. Omitted when the definition places no upper bound on the value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max: Option<String>,
+    #[doc = "The smallest accepted value, in the same string form as `default`. Omitted when the definition places no lower bound on the value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min: Option<String>,
+    pub r#type: crate::types::cluster_common::SettingValueType,
+}
+
+#[doc = "The value type of a setting."]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SettingValueType {
+    #[doc = "`boolean`"]
+    Boolean,
+    #[doc = "`byte_size`"]
+    ByteSize,
+    #[doc = "`double`"]
+    Double,
+    #[doc = "`float`"]
+    Float,
+    #[doc = "`integer`"]
+    Integer,
+    #[doc = "`long`"]
+    Long,
+    #[doc = "`memory_size`"]
+    MemorySize,
+    #[doc = "`time`"]
+    Time,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SettingValueType {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SettingValueType::Boolean => "boolean",
+            SettingValueType::ByteSize => "byte_size",
+            SettingValueType::Double => "double",
+            SettingValueType::Float => "float",
+            SettingValueType::Integer => "integer",
+            SettingValueType::Long => "long",
+            SettingValueType::MemorySize => "memory_size",
+            SettingValueType::Time => "time",
+            SettingValueType::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SettingValueType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SettingValueType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "boolean" => SettingValueType::Boolean,
+            "byte_size" => SettingValueType::ByteSize,
+            "double" => SettingValueType::Double,
+            "float" => SettingValueType::Float,
+            "integer" => SettingValueType::Integer,
+            "long" => SettingValueType::Long,
+            "memory_size" => SettingValueType::MemorySize,
+            "time" => SettingValueType::Time,
+            _ => SettingValueType::Unknown(s),
+        })
+    }
+}
+
 #[doc = "Waits until the specified number of nodes (`N`) is available. Accepts `>=N`, `<=N`, `>N`, and `<N`. You can also use `ge(N)`, `le(N)`, `gt(N)`, and `lt(N)` notation."]
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]

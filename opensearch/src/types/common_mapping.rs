@@ -836,6 +836,8 @@ impl<'de> serde::Deserialize<'de> for DynamicMapping {
 pub enum DynamicMappingString {
     #[doc = "`false`"]
     False,
+    #[doc = "`false_allow_templates`"]
+    FalseAllowTemplates,
     #[doc = "`strict`"]
     Strict,
     #[doc = "`strict_allow_templates`"]
@@ -850,6 +852,7 @@ impl DynamicMappingString {
     pub fn as_str(&self) -> &str {
         match self {
             DynamicMappingString::False => "false",
+            DynamicMappingString::FalseAllowTemplates => "false_allow_templates",
             DynamicMappingString::Strict => "strict",
             DynamicMappingString::StrictAllowTemplates => "strict_allow_templates",
             DynamicMappingString::True => "true",
@@ -873,6 +876,7 @@ impl<'de> serde::Deserialize<'de> for DynamicMappingString {
         let s = <String as serde::Deserialize>::deserialize(deserializer)?;
         Ok(match s.as_str() {
             "false" => DynamicMappingString::False,
+            "false_allow_templates" => DynamicMappingString::FalseAllowTemplates,
             "strict" => DynamicMappingString::Strict,
             "strict_allow_templates" => DynamicMappingString::StrictAllowTemplates,
             "true" => DynamicMappingString::True,
@@ -2576,13 +2580,31 @@ impl<'de> serde::Deserialize<'de> for LongRangePropertyType {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MatchOnlyTextProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analyzer: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boost: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub copy_to: Option<crate::types::common::Fields>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub eager_global_ordinals: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fielddata: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fielddata_frequency_filter: Option<crate::types::indices_common::FielddataFrequencyFilter>,
     #[doc = "Multi-fields allow the same string value to be indexed in multiple ways for different purposes, such as one field for search and a multi-field for sorting and aggregations, or the same string value analyzed by different analyzers."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fields: Option<std::collections::BTreeMap<String, crate::types::common_mapping::Property>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<bool>,
     #[doc = "Metadata about the field."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<std::collections::BTreeMap<String, String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position_increment_gap: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_analyzer: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub term_vector: Option<crate::types::common_mapping::TermVectorOption>,
     pub r#type: crate::types::common_mapping::MatchOnlyTextPropertyType,
 }
 
@@ -2912,6 +2934,7 @@ impl<'de> serde::Deserialize<'de> for PercolatorPropertyType {
 #[doc = "The branches of this union cannot be told apart by their JSON shape alone, so the value is captured unparsed: call the `as_...` accessor matching what the request asked for, and bind the parsed result instead of calling the accessor repeatedly. The raw JSON always remains available through [`raw`](Self::raw)."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
+#[non_exhaustive]
 pub struct Property {
     raw: Box<serde_json::value::RawValue>,
 }
@@ -3631,13 +3654,107 @@ pub struct SemanticDenseEmbeddingConfig {
     pub mode: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SemanticModelLanguageOption {
+    #[doc = "`ENGLISH`"]
+    English,
+    #[doc = "`MULTILINGUAL`"]
+    Multilingual,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SemanticModelLanguageOption {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SemanticModelLanguageOption::English => "ENGLISH",
+            SemanticModelLanguageOption::Multilingual => "MULTILINGUAL",
+            SemanticModelLanguageOption::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SemanticModelLanguageOption {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SemanticModelLanguageOption {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "ENGLISH" => SemanticModelLanguageOption::English,
+            "MULTILINGUAL" => SemanticModelLanguageOption::Multilingual,
+            _ => SemanticModelLanguageOption::Unknown(s),
+        })
+    }
+}
+
+#[doc = "Resolves the model to use for a semantic field from cluster settings instead of a hard-coded `model_id`. The `model_type` and `language_option` pair maps to the cluster setting `plugins.neural_search.model_selection.model_id.<model_type>.<language_option>` (lower-cased), whose value is the resolved model id."]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SemanticModelSelection {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language_option: Option<crate::types::common_mapping::SemanticModelLanguageOption>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_type: Option<crate::types::common_mapping::SemanticModelType>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SemanticModelType {
+    #[doc = "`DENSE`"]
+    Dense,
+    #[doc = "`SPARSE`"]
+    Sparse,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl SemanticModelType {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            SemanticModelType::Dense => "DENSE",
+            SemanticModelType::Sparse => "SPARSE",
+            SemanticModelType::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for SemanticModelType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for SemanticModelType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "DENSE" => SemanticModelType::Dense,
+            "SPARSE" => SemanticModelType::Sparse,
+            _ => SemanticModelType::Unknown(s),
+        })
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SemanticProperty {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub chunking: Option<crate::types::common_mapping::SemanticPropertyChunking>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dense_embedding_config: Option<crate::types::common_mapping::SemanticDenseEmbeddingConfig>,
-    pub model_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_selection: Option<crate::types::common_mapping::SemanticModelSelection>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_field_type: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

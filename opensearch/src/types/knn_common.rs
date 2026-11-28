@@ -110,6 +110,88 @@ pub struct GraphStats {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ModelResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compression_level: Option<String>,
+    #[doc = "The vector data type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub data_type: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dimension: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub engine: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<String>,
+    #[doc = "The base64-encoded model data."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_blob: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_definition:
+        Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
+    pub model_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub space_type: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<crate::types::knn_common::ModelState>,
+    #[doc = "The timestamp when the model was created."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub training_node_assignment: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ModelState {
+    #[doc = "`created`"]
+    Created,
+    #[doc = "`failed`"]
+    Failed,
+    #[doc = "`training`"]
+    Training,
+    #[doc = "A value not defined by the specification, kept verbatim so that it round-trips."]
+    Unknown(String),
+}
+impl ModelState {
+    #[doc = "The JSON string of the value"]
+    pub fn as_str(&self) -> &str {
+        match self {
+            ModelState::Created => "created",
+            ModelState::Failed => "failed",
+            ModelState::Training => "training",
+            ModelState::Unknown(s) => s.as_str(),
+        }
+    }
+}
+impl serde::Serialize for ModelState {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de> serde::Deserialize<'de> for ModelState {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match s.as_str() {
+            "created" => ModelState::Created,
+            "failed" => ModelState::Failed,
+            "training" => ModelState::Training,
+            _ => ModelState::Unknown(s),
+        })
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NodeStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cache_capacity_reached: Option<bool>,
@@ -121,8 +203,9 @@ pub struct NodeStats {
     pub graph_index_errors: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub graph_index_requests: Option<i64>,
+    #[doc = "The amount of native memory used by loaded graphs, in kilobytes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub graph_memory_usage: Option<crate::types::common::ByteCount>,
+    pub graph_memory_usage: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub graph_memory_usage_percentage: Option<crate::types::common::PercentageNumber>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -175,8 +258,9 @@ pub struct NodeStats {
     pub total_load_time: Option<crate::types::common::DurationValueUnitNanos>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub training_errors: Option<i64>,
+    #[doc = "The amount of native memory used by training data, in kilobytes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub training_memory_usage: Option<crate::types::common::ByteCount>,
+    pub training_memory_usage: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub training_memory_usage_percentage: Option<crate::types::common::PercentageNumber>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -220,7 +304,11 @@ pub struct RemoteVectorIndexClientStats {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index_build_failure_count: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index_build_merge_abort_exception: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index_build_success_count: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index_build_terminal_exception: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status_request_failure_count: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

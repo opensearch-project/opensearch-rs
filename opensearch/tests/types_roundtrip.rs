@@ -151,7 +151,7 @@ fn wrong_branch_reports_union_error() {
 
 #[test]
 fn unknown_enum_value_does_not_fail_the_response() {
-    use opensearch::types::search::TotalHitsRelation;
+    use opensearch::types::common::TotalHitsRelation;
     let known: TotalHitsRelation = serde_json::from_value(json!("gte")).unwrap();
     assert_eq!(known, TotalHitsRelation::Gte);
     // a value the specification does not know must not fail deserialization,
@@ -477,7 +477,7 @@ fn search_with_total(total: Option<Value>) -> SearchResponse {
 
 #[test]
 fn total_hit_count_reads_every_form_of_hits_total() {
-    use opensearch::types::search::TotalHitsRelation;
+    use opensearch::types::common::TotalHitsRelation;
 
     // the default: an exact count
     let resp = search_with_total(Some(json!({ "value": 3, "relation": "eq" })));

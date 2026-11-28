@@ -54,7 +54,7 @@ impl FlowFrameworkCreateParts {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Create API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
+#[doc = "Builder for the [Flow Framework Create API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkCreate<'a, 'b, B> {
     transport: &'a Transport,
@@ -242,7 +242,7 @@ impl<'b> FlowFrameworkDeleteParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Delete API](https://opensearch.org/docs/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
+#[doc = "Builder for the [Flow Framework Delete API](https://docs.opensearch.org/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkDelete<'a, 'b> {
     transport: &'a Transport,
@@ -370,7 +370,7 @@ impl<'b> FlowFrameworkDeprovisionParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Deprovision API](https://opensearch.org/docs/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
+#[doc = "Builder for the [Flow Framework Deprovision API](https://docs.opensearch.org/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkDeprovision<'a, 'b, B> {
     transport: &'a Transport,
@@ -521,7 +521,7 @@ impl<'b> FlowFrameworkGetParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Get API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
+#[doc = "Builder for the [Flow Framework Get API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkGet<'a, 'b> {
     transport: &'a Transport,
@@ -641,7 +641,7 @@ impl<'b> FlowFrameworkGetStatusParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Get Status API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
+#[doc = "Builder for the [Flow Framework Get Status API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkGetStatus<'a, 'b> {
     transport: &'a Transport,
@@ -762,7 +762,7 @@ impl FlowFrameworkGetStepsParts {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Get Steps API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
+#[doc = "Builder for the [Flow Framework Get Steps API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkGetSteps<'a, 'b> {
     transport: &'a Transport,
@@ -890,7 +890,7 @@ impl<'b> FlowFrameworkProvisionParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Provision API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
+#[doc = "Builder for the [Flow Framework Provision API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkProvision<'a, 'b, B> {
     transport: &'a Transport,
@@ -1025,7 +1025,7 @@ impl FlowFrameworkSearchParts {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Search API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
+#[doc = "Builder for the [Flow Framework Search API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkSearch<'a, 'b, B> {
     transport: &'a Transport,
@@ -1165,7 +1165,7 @@ impl FlowFrameworkSearchStateParts {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Search State API](https://opensearch.org/docs/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
+#[doc = "Builder for the [Flow Framework Search State API](https://docs.opensearch.org/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkSearchState<'a, 'b, B> {
     transport: &'a Transport,
@@ -1310,7 +1310,7 @@ impl<'b> FlowFrameworkUpdateParts<'b> {
         }
     }
 }
-#[doc = "Builder for the [Flow Framework Update API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
+#[doc = "Builder for the [Flow Framework Update API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
 #[derive(Clone, Debug)]
 pub struct FlowFrameworkUpdate<'a, 'b, B> {
     transport: &'a Transport,
@@ -1489,55 +1489,55 @@ impl<'a> FlowFramework<'a> {
     pub fn transport(&self) -> &Transport {
         self.transport
     }
-    #[doc = "[Flow Framework Create API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
+    #[doc = "[Flow Framework Create API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nCreates a new workflow template."]
     pub fn create<'b>(&'a self) -> FlowFrameworkCreate<'a, 'b, ()> {
         FlowFrameworkCreate::new(self.transport())
     }
-    #[doc = "[Flow Framework Delete API](https://opensearch.org/docs/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
+    #[doc = "[Flow Framework Delete API](https://docs.opensearch.org/latest/automating-configurations/api/delete-workflow/)\n\nDeletes a workflow template."]
     pub fn delete<'b>(
         &'a self,
         parts: FlowFrameworkDeleteParts<'b>,
     ) -> FlowFrameworkDelete<'a, 'b> {
         FlowFrameworkDelete::new(self.transport(), parts)
     }
-    #[doc = "[Flow Framework Deprovision API](https://opensearch.org/docs/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
+    #[doc = "[Flow Framework Deprovision API](https://docs.opensearch.org/latest/automating-configurations/api/deprovision-workflow/)\n\nDeprovision workflow's resources when you no longer need them."]
     pub fn deprovision<'b>(
         &'a self,
         parts: FlowFrameworkDeprovisionParts<'b>,
     ) -> FlowFrameworkDeprovision<'a, 'b, ()> {
         FlowFrameworkDeprovision::new(self.transport(), parts)
     }
-    #[doc = "[Flow Framework Get API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
+    #[doc = "[Flow Framework Get API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow/)\n\nRetrieves a workflow template."]
     pub fn get<'b>(&'a self, parts: FlowFrameworkGetParts<'b>) -> FlowFrameworkGet<'a, 'b> {
         FlowFrameworkGet::new(self.transport(), parts)
     }
-    #[doc = "[Flow Framework Get Status API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
+    #[doc = "[Flow Framework Get Status API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-status/)\n\nRetrieves the current workflow provisioning status."]
     pub fn get_status<'b>(
         &'a self,
         parts: FlowFrameworkGetStatusParts<'b>,
     ) -> FlowFrameworkGetStatus<'a, 'b> {
         FlowFrameworkGetStatus::new(self.transport(), parts)
     }
-    #[doc = "[Flow Framework Get Steps API](https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
+    #[doc = "[Flow Framework Get Steps API](https://docs.opensearch.org/latest/automating-configurations/api/get-workflow-steps/)\n\nRetrieves available workflow steps."]
     pub fn get_steps<'b>(&'a self) -> FlowFrameworkGetSteps<'a, 'b> {
         FlowFrameworkGetSteps::new(self.transport())
     }
-    #[doc = "[Flow Framework Provision API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
+    #[doc = "[Flow Framework Provision API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nProvisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true."]
     pub fn provision<'b>(
         &'a self,
         parts: FlowFrameworkProvisionParts<'b>,
     ) -> FlowFrameworkProvision<'a, 'b, ()> {
         FlowFrameworkProvision::new(self.transport(), parts)
     }
-    #[doc = "[Flow Framework Search API](https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
+    #[doc = "[Flow Framework Search API](https://docs.opensearch.org/latest/automating-configurations/api/provision-workflow/)\n\nSearch for workflows by using a query matching a field."]
     pub fn search<'b>(&'a self) -> FlowFrameworkSearch<'a, 'b, ()> {
         FlowFrameworkSearch::new(self.transport())
     }
-    #[doc = "[Flow Framework Search State API](https://opensearch.org/docs/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
+    #[doc = "[Flow Framework Search State API](https://docs.opensearch.org/latest/automating-configurations/api/search-workflow-state/)\n\nSearch for workflows by using a query matching a field."]
     pub fn search_state<'b>(&'a self) -> FlowFrameworkSearchState<'a, 'b, ()> {
         FlowFrameworkSearchState::new(self.transport())
     }
-    #[doc = "[Flow Framework Update API](https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
+    #[doc = "[Flow Framework Update API](https://docs.opensearch.org/latest/automating-configurations/api/create-workflow/)\n\nUpdates a workflow template that has not been provisioned."]
     pub fn update<'b>(
         &'a self,
         parts: FlowFrameworkUpdateParts<'b>,

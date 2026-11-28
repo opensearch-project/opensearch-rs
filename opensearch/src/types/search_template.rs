@@ -47,7 +47,7 @@ pub struct SearchTemplateResponse {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phase_took: Option<crate::types::common::PhaseTook>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pit_id: Option<crate::types::common::Id>,
+    pub pit_id: Option<crate::types::common::PitId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub processor_results: Option<Vec<crate::types::search::ProcessorExecutionDetail>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -98,6 +98,7 @@ pub struct SearchTemplateResponseHitsHitsItem {
     pub version: Option<crate::types::common::VersionNumber>,
     pub fields: Option<std::collections::BTreeMap<String, Box<serde_json::value::RawValue>>>,
     pub highlight: Option<std::collections::BTreeMap<String, Vec<String>>>,
+    #[doc = "Elasticsearch-only field: not present in OpenSearch server responses."]
     pub ignored_field_values: Option<std::collections::BTreeMap<String, Vec<String>>>,
     pub inner_hits:
         Option<std::collections::BTreeMap<String, crate::types::search::InnerHitsResult>>,
@@ -539,7 +540,7 @@ impl crate::types::TotalHitCount for SearchTemplateResponseHitsTotal {
         }
     }
 
-    fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         match self {
             Self::TotalHits(total) => &total.relation,
             Self::Integer(_) => &crate::types::total_hits::ACCURATE,
@@ -554,7 +555,7 @@ impl SearchTemplateResponseHitsTotal {
     }
 
     #[doc = "How [`value`](Self::value) relates to the actual number of hits: `Eq` when exact, `Gte` when a lower bound. The integer form is always `Eq`."]
-    pub fn relation(&self) -> &crate::types::search::TotalHitsRelation {
+    pub fn relation(&self) -> &crate::types::common::TotalHitsRelation {
         crate::types::TotalHitCount::relation(self)
     }
 

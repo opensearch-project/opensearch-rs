@@ -143,5 +143,5 @@ pub type Alerts = Vec<crate::types::security_analytics_alerts::Alert>;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GetAlertsResponse {
     pub alerts: crate::types::security_analytics_alerts::Alerts,
-    pub total_alerts: i64,
+    pub total_alerts: i32,
 }

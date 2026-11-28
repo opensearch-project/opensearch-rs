@@ -31,6 +31,9 @@
 #[doc = "The core observability object containing visualization and query data."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ObservabilityObject {
+    #[doc = "The access control list for the observability object."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access: Option<Vec<String>>,
     #[doc = "When the object was created in milliseconds."]
     #[serde(rename = "createdTimeMs")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -67,7 +70,7 @@ pub struct ObservabilityObjectList {
     pub start_index: i64,
     #[doc = "The relationship of total hits to the query."]
     #[serde(rename = "totalHitRelation")]
-    pub total_hit_relation: String,
+    pub total_hit_relation: crate::types::common::TotalHitsRelation,
     #[doc = "The total number of matching objects."]
     #[serde(rename = "totalHits")]
     pub total_hits: i64,
@@ -115,17 +118,34 @@ pub struct SavedQuery {
 #[doc = "The configuration for a saved visualization."]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SavedVisualization {
+    #[doc = "The identifier of the associated application."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub application_id: Option<String>,
     #[doc = "The description of the saved visualization."]
     pub description: String,
+    #[doc = "The metric type for the visualization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metric_type: Option<String>,
     #[doc = "The name of the saved visualization."]
     pub name: String,
     #[doc = "The query associated with the visualization."]
     pub query: String,
     pub selected_date_range: crate::types::observability_common::SelectedDateRange,
     pub selected_fields: crate::types::observability_common::SelectedFields,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub selected_labels: Option<crate::types::observability_common::SelectedFields>,
     pub selected_timestamp: crate::types::observability_common::SelectedTimestamp,
+    #[doc = "The sub-type of the visualization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sub_type: Option<String>,
     #[doc = "The type of visualization."]
     pub r#type: String,
+    #[doc = "The units of measure for the visualization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub units_of_measure: Option<String>,
+    #[doc = "User-specific configuration for the visualization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_configs: Option<String>,
 }
 
 #[doc = "The date range selection configuration."]
